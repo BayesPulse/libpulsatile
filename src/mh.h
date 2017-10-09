@@ -6,52 +6,29 @@
 using namespace Rcpp;
 
 
-class Mh_mcmc                // begin declaration of the class
+class ModifiedMetropolisHastings  // begin declaration of the class
 {
 
   public:                    // begin public section
     //Cat(int initialAge);   // constructor
     //~Cat();                // destructor
-    virtual Mh_mcmc(double starting_value,  // constructor
-                    double proposal_stddev, 
-                    Posterior posterior_function, 
-                    TruncLogic truncation,
-                    MCMC_state current_state); // all changing parameters?
-    virtual ~Mh_mcmc();           // destructor
-    double Sample();              // sample from posterior (run 1 iteration)
+    virtual ModifiedMetropolisHastings(double starting_value,  // constructor
+                                       double proposal_stddev, 
+                                       Posterior posterior_function, 
+                                       TruncLogic truncation,
+                                       MCMC_state current_state); // all changing parameters?
+    virtual ~ModifiedMetropolisHastings();           // destructor
+    double sample(); // sample from posterior (run 1 iteration)
+                     // Inputs/Outputs for sample()?
+
 
   private:                   // begin private section
     virtual posterior_function(); // logrho_calculation
-    virtual truncation();         // truncation logic
+    virtual parameter_support();         // truncation logic
     Proposalvariance pv;        // this should be an object of this class
 
 };
 
-
-class Proposalvariance {
-
-  public:
-    // Constructor
-    virtual Proposalvariance(double pv,       // proposal variance
-                             int adjust_iter, // adjust pv on multiples of adjust_iter
-                             int max_iters);  // maximum iteration to adjust pv
-    virtual ~Proposalvariance(); // Destructor
-    void addaccept();  // Add to acceptance count
-    void addreject();  // Add to iters but not accept count
-    double getratio(); // 
-    void resetratio(); 
-    double getpv(); 
-    void adjustpv();
-
-  private:
-    int accept_ct; // acceptance count
-    int iter_ct;   // iteration count
-    double pv;     // proposal variance
-    double ratio;  // acceptance ratio (accept_ct/iter_ct)
-    int adjust_iter; // iteration to adjust on
-    int max_iter;
-
-}
 
 // constructor of Cat,
 Cat::Cat(int initialAge)
