@@ -1,4 +1,5 @@
 #ifndef GUARD_patient_h
+#define GUARD_patient_h
 
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
