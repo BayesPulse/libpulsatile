@@ -8,16 +8,25 @@ struct PatientData {
 
   arma::vec concentration;
   arma::vec time;
+  arma::vec response_concentration;
+  arma::vec response_time;
   int number_of_obs;
-  double period_of_obs;
+  double avg_period_of_obs;
   double duration_of_obs = number_of_obs * period_of_obs;
+
+  void read_data(std::vector<double> in_time,
+                 std::vector<double> in_conc);
+  void read_data(std::vector<double> in_time,
+                 std::vector<double> in_conc,
+                 std::vector<double> in_response_conc);
+
 
 };
 
 // always const when used
 struct PatientPriors {
 
-    double npulses;   // prior number of pulses
+    double num_pulses;   // prior number of pulses
     double baseline_mean;
     double baseline_variance;
     double halflife_mean;
@@ -36,7 +45,7 @@ struct PatientPriors {
 
 };
 
-// aka PatientParms
+// aka PatientParms -- values updated by mcmc algorithm
 struct PatientEstimates {
 
     double baseline;
@@ -48,10 +57,14 @@ struct PatientEstimates {
     double width;
     double mass_sd;
     double width_sd;
+    int pulse_count;
+
+    list<PulseEstimate> pulses;
 
 };
 
-// linked list -- 
+// linked list -- values updated by algorithm and objects created/destroyed by
+//                birth-death
 struct PulseEstimate {
 
   double time;
