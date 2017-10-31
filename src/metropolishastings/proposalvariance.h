@@ -17,7 +17,7 @@ class ProposalVariance {
                              int adjust_iter, // adjust pv on multiples of adjust_iter
                              int max_iters);  // maximum iteration to adjust pv
     virtual ~ProposalVariance(); // Destructor
-    void adjustpv();
+    virtual adjustpv();
     void addaccept() { ++accept_ct; ++iter_ct; };            // Add to acceptance count
     void addreject() { ++iter_ct; };                         // Add to iters but not accept count
     double getratio() const { return accept_ct / iter_ct; };

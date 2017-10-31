@@ -3,8 +3,18 @@
 
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
+#include <list>
 
 // patient.h
+
+struct Patient {
+
+  PatientPriors priors;
+  PatientData data;
+  PatientEstimates estimates;
+
+};
+
 struct PatientData {
 
   arma::vec concentration;
@@ -71,7 +81,7 @@ struct PulseEstimate {
   double time;
   double mass;
   double width;
-  vector<double> mean_contribution(PatientData.number_of_obs);
+  arma::vec mean_contribution(PatientData.number_of_obs);
   // the length needs to be moved -- likely need a 'Patient' class to do some of
   // the calculations required to enforce some of these rules.
 

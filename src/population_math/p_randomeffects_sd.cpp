@@ -1,29 +1,39 @@
 
-void draw_re_sd(Node_type *list,
-                Priors *priors, 
-                Common_parms *parms)
+//void draw_re_sd(Node_type *list,
+//                Priors *priors, 
+//                Common_parms *parms)
 
+
+
+class draw_sd_pulsewidths : public ModifiedMetropolisHastings<draw_sd_pulsewidths> {
+  public:
+
+
+  private:
+
+
+
+}
 
 // Draw proposed values for sigma_a and sigma_w
-double draw_proposal(double current_sd, double proposal_sd)
-{
+double draw_proposal(double current_sd, double proposal_sd) {
   return Rf_rnorm(current_sd, proposal_sd);
 }
 
 // Is proposal within the parameter support?
-bool parameter_support(double proposal, double sdmax)
-{
+bool parameter_support(double proposal, double sdmax) {
   // re_sdmax should be a const from the priors class, how to get it in here?
   return (proposal > 0 && proposal < sdmax);
 }
 
 
-double posterior_function(Patient patient, ProposalVariance pv)
-{
+double posterior_function(Patient patient, ProposalVariance pv) {
+
       node = list->succ;
       num_pulses = 0;
       third_part = 0;
       old_int = new_int = 0;
+
       while (node != NULL) {
 
         // Normalizing constants

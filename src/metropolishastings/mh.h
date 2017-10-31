@@ -2,32 +2,45 @@
 // Demonstrates declaration of a constructors and destructor for the Cat class
 
 //#include <iostream.h> // for cout
-#include <Rcpp.h>
-using namespace Rcpp;
+//#include <Rcpp.h>
+//using namespace Rcpp;
 
 
-class ModifiedMetropolisHastings  // begin declaration of the class
+template <class T> 
+class ModifiedMetropolisHastings
 {
 
-  public:                    // begin public section
-    //Cat(int initialAge);   // constructor
-    //~Cat();                // destructor
-    virtual ModifiedMetropolisHastings(double starting_value,  // constructor
-                                       double proposal_stddev, 
-                                       Posterior posterior_function, 
-                                       TruncLogic truncation,
-                                       MCMC_state current_state); // all changing parameters?
-    virtual ~ModifiedMetropolisHastings();           // destructor
-    double sample(); // sample from posterior (run 1 iteration)
-                     // Inputs/Outputs for sample()?
+  public: 
+    // constructor and destructor
+    ModifiedMetropolisHastings(double starting_value,
+                               double proposal_stddev);
+    ~ModifiedMetropolisHastings();
+    // public methods
+    double sample(); // sample from posterior
+                     //   - runs 1 iteration
+                     //   - inputs/outputs or changes internally?
 
+  private:
+    double posterior_function(); // logrho_calculation
+    double parameter_support();  // i.e. truncation logic
+    Proposalvariance pv;          // this should be an object of this class
 
-  private:                   // begin private section
-    virtual posterior_function(); // logrho_calculation
-    virtual parameter_support();         // truncation logic
-    Proposalvariance pv;        // this should be an object of this class
+    Posterior posterior_function;
+    Support parameter_support;
+    MCMC_state current_state;
 
 };
+
+
+class ModifiedMetropolisHastings::
+
+
+
+
+
+
+
+
 
 
 // constructor of Cat,
