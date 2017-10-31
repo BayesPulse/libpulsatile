@@ -11,8 +11,10 @@
 // Created: 10/13/17
 // Notes:
 //   Outstanding questions:
-//    - How to handle the two different adjustpv() functions?
-//    - Where does this class get implemented?
+//    - How to handle the two different adjustpv() functions? -- handled with
+//    two proper classes based on the ProposalVariance abstract class
+//    - Where does this class get implemented? -- implementation handled here,
+//    instantiation handled in either mcmc function or MMH classes?
 //    - draw_proposal() takes SD's - straighten this out.
 //
 
