@@ -4,26 +4,26 @@
 //                Common_parms *parms)
 
 
+#include "mh.h"
 
-class draw_sd_pulsewidths : public ModifiedMetropolisHastings<draw_sd_pulsewidths> {
-  public:
-
-
-  private:
-
-
-
+class mmh_sd_widths : public ModifiedMetropolisHastings<mmh_sd_widths> {
+  double draw_proposal();
 }
 
+
+
+
+
+
 // Draw proposed values for sigma_a and sigma_w
-double draw_proposal(double current_sd, double proposal_sd) {
+double mmh_sd_widths::draw_proposal(double current_sd, double proposal_sd) {
   return Rf_rnorm(current_sd, proposal_sd);
 }
 
 // Is proposal within the parameter support?
-bool parameter_support(double proposal, double sdmax) {
+bool parameter_support(double proposal, double min = 0, double max) {
   // re_sdmax should be a const from the priors class, how to get it in here?
-  return (proposal > 0 && proposal < sdmax);
+  return (proposal > min && proposal < max);
 }
 
 

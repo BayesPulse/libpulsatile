@@ -6,95 +6,105 @@
 //using namespace Rcpp;
 
 
-template <class T> 
+template <class T_myMMH>
 class ModifiedMetropolisHastings
 {
 
-  public: 
-    // constructor and destructor
-    ModifiedMetropolisHastings(double starting_value,
-                               double proposal_stddev);
-    ~ModifiedMetropolisHastings();
-    // public methods
-    double sample(); // sample from posterior
-                     //   - runs 1 iteration
-                     //   - inputs/outputs or changes internally?
+  public:
+    // sample from posterior
+    //   - runs 1 iteration
+    //   - inputs/outputs or changes internally?
+    double sample() {
+      return static_cast<T_myMMH &>(*this).sample();
+      // or
+      //return static_cast<T_myMMH *>(this)->sample();
+    };
 
   private:
-    double posterior_function(); // logrho_calculation
+    double draw_proposal(double current, double pv.getpv());
     double parameter_support();  // i.e. truncation logic
+    double posterior_function(); // logrho_calculation
     Proposalvariance pv;          // this should be an object of this class
+};
 
-    Posterior posterior_function;
-    Support parameter_support;
-    MCMC_state current_state;
+
+double ModifiedMetropolisHastings::draw_proposal(double current, double proposal_sd)
+{
+  return Rf_rnorm(current, proposal_sd);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class sd_widths : ModifiedMetropolisHastings<sd_widths> {
 
 };
 
 
-class ModifiedMetropolisHastings::
+class sd_mass : ModifiedMetropolisHastings<sd_widths> {
+
+};
+
+class baseline : ModifiedMetropolisHastings<sd_widths> {
+
+};
+
+class halflife : ModifiedMetropolisHastings<sd_widths> {
+
+};
+
+template <class T> 
+double sample(base<T> & mmh) {
+
+  double proposal = mmh.draw_proposal;
+  if (mmh.parameter_support()) {
 
 
+  } else {
+    return
+  }
 
 
-
-
-
-
-
-
-// constructor of Cat,
-Cat::Cat(int initialAge)
-{
-  itsAge = initialAge;
 }
 
-Cat::~Cat()                 // destructor, takes no action
+
+
+
+
+template <class T_myMMH>
+class ModifiedMetropolisHastings 
 {
-}
 
-// GetAge, Public accessor function
-// returns value of itsAge member
-int Cat::GetAge()
-{
-  return itsAge;
-}
+  public: 
+    double
+  // template method
+  //  how to choose return type in derived class?
+  myMMH draw_proposal() {
+    static_cast<myMMH *>(this)->draw_proposal();
+  };
+  myMMH within_parameter_support() {
+    static_cast<myMMH *>(this)->within_parameter_support();
+  };
+  myMMH within_parameter_support() {
+    static_cast<myMMH *>(this)->within_parameter_support();
+  };
 
-// Definition of SetAge, public
-// accessor function
+};
 
-void Cat::SetAge(int age)
-{
-  // set member variable its age to
-  // value passed in by parameter age
-  itsAge = age;
-}
 
-// definition of Meow method
-// returns: void
-// parameters: None
-// action: Prints "meow" to screen
-void Cat::Meow()
-{
-  cout << "Meow.\n";
-}
 
-// create a cat, set its age, have it
-// meow, tell us its age, then meow again.
-int main()
-{
-  Cat Frisky(5);
-  Frisky.Meow();
-  cout << "Frisky is a cat who is " ;
-  cout << Frisky.GetAge() << " years old.\n";
-  Frisky.Meow();
-  Frisky.SetAge(7);
-  cout << "Now Frisky is " ;
-  cout << Frisky.GetAge() << " years old.\n";
-  return 0;
-}
 
-Output: Meow.
-Frisky is a cat who is 5 years old.
-Meow.
-Now Frisky is 7 years old.
