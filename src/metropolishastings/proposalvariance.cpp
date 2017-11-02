@@ -11,8 +11,6 @@
 // Created: 10/13/17
 // Notes:
 //   Outstanding questions:
-//    - How to handle the two different adjustpv() functions? -- handled with
-//    two proper classes based on the ProposalVariance abstract class
 //    - Where does this class get implemented? -- implementation handled here,
 //    instantiation handled in either mcmc function or MMH classes?
 //    - draw_proposal() takes SD's - straighten this out.
@@ -44,13 +42,12 @@ ProposalVariance::~ProposalVariance() { }
 void MarginalProposalVariance::adjustpv(double x, double *X, double target_pv = 0.35)
 {
 
-  double y = 1.0 + 1000.0 * pow(target_pv, 3);
+  double y = 1.0 + 1000.0 * pow(get_ratio() - target_pv, 3);
+
   if (y < 0.9) {
-    y = 0.9;
-    *X *= y;
+    pv *= 0.9;
   } else if (y > 1.1) {
-    y = 1.1;
-    *X *= y;
+    pv *= 1.1;
   }
 
 }
@@ -70,16 +67,16 @@ void JointProposalVariance::adjustpv(double corr, double target_pv = 0.25)
   if (y < .90) {
 
     y = .90;
-    pv[0][0] *= y;
-    pv[1][1] *= y;
-    pv[0][1]  = pv[1][0] = corr * sqrt(pv[0][0] * pv[1][1]);
+    pv(0, 0) *= y;
+    pv(1, 1) *= y;
+    pv(0, 1)  = pv(1, 0) = corr * sqrt(pv(0, 0) * pv(1, 1));
 
   } else if (y > 1.1) {
 
     y = 1.1;
-    pv[0][0] *= y;
-    pv[1][1] *= y;
-    pv[0][1]  = pv[1][0] = corr * sqrt(pv[0][0] * pv[1][1]);
+    pv(0, 0) *= y;
+    pv(1, 1) *= y;
+    pv(0, 1)  = pv(1, 0) = corr * sqrt(pv(0, 0) * pv(1, 1));
 
   }
 

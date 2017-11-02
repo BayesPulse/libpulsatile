@@ -40,16 +40,6 @@ class ProposalVariance {
 
 };
 
-
-class JointProposalVariance : public ProposalVariance
-{
-  public:
-    void adjustpv(double corr = -0.90, double target_pv = 0.25);
-    arma::mat getpv const { return pv; };
-  private:
-    arma::mat pv; // proposal var-covar matrix
-}
-
 class MarginalProposalVariance : public ProposalVariance
 {
   public:
@@ -59,4 +49,14 @@ class MarginalProposalVariance : public ProposalVariance
     double pv; // proposal var-covar matrix
 }
 
+class JointProposalVariance : public ProposalVariance
+{
+  public:
+    void adjustpv(double corr = -0.90, double target_pv = 0.25);
+    arma::mat getpv() const { return pv; };
+  private:
+    arma::mat pv(2, 2); // proposal var-covar matrix
+}
+
 #endif
+
