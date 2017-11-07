@@ -1,5 +1,6 @@
 
 #include <cmath>
+#include <list>
 #include "mcmc.h"
 
 

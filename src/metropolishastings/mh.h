@@ -28,11 +28,18 @@ class ModifiedMetropolisHastings
 };
 
 
+
 double ModifiedMetropolisHastings::draw_proposal(double current, double proposal_sd)
 {
   return Rf_rnorm(current, proposal_sd);
 }
 
+
+double ModifiedMetropolisHasting::sample() {
+
+
+
+}
 
 
 
