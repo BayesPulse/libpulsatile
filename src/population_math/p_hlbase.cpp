@@ -3,8 +3,7 @@
 double draw_proposal(double current_sd, double proposal_sd) 
 {
 
-  // Draw proposal values for b and hl
-  //  via calculations.c
+  // Draw proposal values for b and hl via calculations.c
   rmvnorm(pmd, var, 2, subject->basehalf, 1);
   return Rf_rnorm(current_sd, proposal_sd);
 

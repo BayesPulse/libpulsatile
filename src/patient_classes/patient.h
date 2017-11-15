@@ -25,11 +25,11 @@ struct PatientData {
   double avg_period_of_obs;
   double duration_of_obs = number_of_obs * period_of_obs;
 
-  void read_data(std::vector<double> in_time,
-                 std::vector<double> in_conc);
-  void read_data(std::vector<double> in_time,
-                 std::vector<double> in_conc,
-                 std::vector<double> in_response_conc);
+  void read_data(arma::vec in_time,
+                 arma::vec in_conc);
+  void read_data(arma::vec in_time,
+                 arma::vec in_conc,
+                 arma::vec in_response_conc);
 
 
 };

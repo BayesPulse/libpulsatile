@@ -40,6 +40,7 @@ class ProposalVariance {
 
 };
 
+
 class MarginalProposalVariance : public ProposalVariance
 {
   public:
@@ -48,6 +49,7 @@ class MarginalProposalVariance : public ProposalVariance
   private:
     double pv; // proposal var-covar matrix
 }
+
 
 class JointProposalVariance : public ProposalVariance
 {
