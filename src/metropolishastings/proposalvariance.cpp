@@ -21,7 +21,7 @@
 //ProposalVariance::~ProposalVariance() { }
 
 
-// Constructor
+// Constructors
 // TODO: - need separate constructors for Marginal and Joint
 //       - Joint needs cholesky decomposition and covariance initialization for
 //       proposal varcov matrix

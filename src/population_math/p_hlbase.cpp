@@ -41,7 +41,7 @@ drawSubjBh::drawSubjBh(arma::vec proposal_variance, int adjust_at_iter,
 
 
 
-bool within_parameter_support(double proposal, double min = 0, double max = 0)
+bool parameter_support(double proposal, double min = 0, double max = 0)
 {
   return proposal > min;
 }
@@ -50,7 +50,13 @@ bool within_parameter_support(double proposal, double min = 0, double max = 0)
 double posterior_function(Patient patient)
 {
 
+  // pseudo code so far
   patient.update_likelihood();
+  int num_pulses = patient.estimates.pulse_count;
+  // Need to add getting likelihood and mean contrib under proposed value 
+  // Easiest way would be to save current likelihood and mean contrib,
+  // recalculate w/ new values, and replace w/ original values if rejected but
+  // w/ a target acceptance rate of 0.25-0.33, 
 
 
 }
