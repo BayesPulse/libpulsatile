@@ -1,21 +1,57 @@
-// Baseline and halflife mcmc
+#include <Rcpp.h>
+#include <RcppArmadillo.h>
+#include "mh.h"
+#include "proposalvariance.h"
+using namespace Rcpp;
 
-double draw_proposal(double current_sd, double proposal_sd) 
+// p_drawSubjBh.cpp (probably should be .h)
+//   Baseline and halflife ModifiedMetropolisHastings class
+//
+// Author: Matt Mulvahill
+// Created: 11/15/17
+// Notes:
+//
+
+
+
+class drawSubjBh : public ModifiedMetropolisHastings
 {
 
-  // Draw proposal values for b and hl via calculations.c
-  rmvnorm(pmd, var, 2, subject->basehalf, 1);
-  return Rf_rnorm(current_sd, proposal_sd);
+  public:
+    drawSubjBh(double proposal_variance, int adjust_at_iter, int max_iters);
+    ~drawSubjBh();
+
+  private:
+    bool parameter_support(arma::vec proposal_);
+    double posterior_function(Patient patient);
+    JointProposalVariance pv;
 
 }
+
+
+// Constructor
+drawSubjBh::drawSubjBh(arma::vec proposal_variance, int adjust_at_iter,
+                       int max_iters)
+{
+
+  // Instantiate/initialize pv object
+  JointProposalVariance pv(proposal_variance, adjust_at_iter, max_iters);
+
+}
+
+
 
 bool within_parameter_support(double proposal, double min = 0, double max = 0)
 {
   return proposal > min;
 }
 
-double posterior_function() 
+
+double posterior_function(Patient patient)
 {
+
+  patient.update_likelihood();
+
 
 }
 
