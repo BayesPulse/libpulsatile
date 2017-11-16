@@ -17,10 +17,18 @@
 //
 
 
+// destructor -- need to define here? - nothing so far - not yet used
+//ProposalVariance::~ProposalVariance() { }
+
+
 // Constructor
-void ProposalVariance::ProposalVariance(double initial_pv,
-                                        int adjust_at_iter = 500,
-                                        int max_iters = 25000); {
+// TODO: - need separate constructors for Marginal and Joint
+//       - Joint needs cholesky decomposition and covariance initialization for
+//       proposal varcov matrix
+MarginalProposalVariance::MarginalProposalVariance(double initial_pv,
+                                                   int adjust_at_iter = 500,
+                                                   int max_iters = 25000); 
+{
 
   pv             = initial_pv;
   adjust_at_iter = adjust_at_iter;
@@ -29,10 +37,31 @@ void ProposalVariance::ProposalVariance(double initial_pv,
   iter_ct        = 0;
   ratio          = 0;
 
+
 }
 
-// destructor -- need to define here? - nothing so far
-ProposalVariance::~ProposalVariance() { }
+
+
+JointProposalVariance::JointProposalVariance(double initial_pv,
+                                             int adjust_at_iter = 500,
+                                             int max_iters = 25000); 
+{
+
+  adjust_at_iter = adjust_at_iter;
+  max_iters      = max_iters;
+  accept_ct      = 0;
+  iter_ct        = 0;
+  ratio          = 0;
+
+  // Code for cholesky decomp and covariance initialization
+  // but seems to be no cholesky decomp (pop_mcmc.c:350)
+  pv(0, 0) = initial_pv(0);
+  pv(1, 1) = initial_pv(1);
+  pv(0, 1) = pv(1, 0) = -0.90 * sqrt(pv(0, 0) * pv(1, 1));
+
+}
+
+
 
 
 // Acceptance adjustment routine for one-parameter modified MH

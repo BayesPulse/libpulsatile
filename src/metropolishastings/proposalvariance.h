@@ -15,21 +15,25 @@
 // overhead, so all simple fn's are defined here -- not sure if this works for
 // non-const functions.
 //
+// NOTE: ProposalVariance has a constructor only to document the requirements
+// for the constructor.  It can't actually be used since its an abstract class.
+//
 
 class ProposalVariance {
 
   public:
-    // Constructor
-    ProposalVariance(double initial_pv, // proposal variance
-                     int adjust_iter,   // adjust pv on multiples of adjust_iter
-                     int max_iters);    // maximum iteration to adjust pv
-    ~ProposalVariance(); // Destructor
     virtual adjustpv();
     void addaccept() { ++accept_ct; ++iter_ct; };            // Add to acceptance count
     void addreject() { ++iter_ct; };                         // Add to iters but not accept count
     double getratio() const { return accept_ct / iter_ct; };
     void resetratio() { accept_ct = 0; iter_ct = 0; };
     virtual getpv() const { return pv; };
+
+  protected:
+    ProposalVariance(double initial_pv, // proposal variance
+                     int adjust_iter,   // adjust pv on multiples of adjust_iter
+                     int max_iters);    // maximum iteration to adjust pv
+    ~ProposalVariance(); // Destructor
 
   private:
     int accept_ct; // acceptance count
@@ -44,6 +48,8 @@ class ProposalVariance {
 class MarginalProposalVariance : public ProposalVariance
 {
   public:
+    MarginalProposalVariance(double initial_pv, int adjust_iter, int max_iters);
+    ~ProposalVariance(); // Destructor
     void adjustpv(double target_pv = 0.25);
     double getpv const { return pv; };
   private:
@@ -54,10 +60,14 @@ class MarginalProposalVariance : public ProposalVariance
 class JointProposalVariance : public ProposalVariance
 {
   public:
+    JointProposalVariance(arma::vec initial_pv, int adjust_iter, int max_iters);
+    ~ProposalVariance(); // Destructor
     void adjustpv(double corr = -0.90, double target_pv = 0.25);
     arma::mat getpv() const { return pv; };
   private:
-    arma::mat pv(2, 2); // proposal var-covar matrix
+    void initialize_pv();
+    //arma::mat pv(2, 2); // proposal var-covar matrix
+    arma::mat::fixed<2, 2> pv; // proposal var-covar matrix -- faster constructor
 }
 
 #endif
