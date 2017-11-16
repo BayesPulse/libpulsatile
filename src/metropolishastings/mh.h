@@ -30,11 +30,17 @@ class ModifiedMetropolisHastings
     //   - pass Patient as pointer?
     template<typename T> T sample();
 
+  protected:
+    ModifiedMetropolisHastings(double proposal_variance);
+    ModifiedMetropolisHastings(double proposal_variance,
+                               int adjust_at_iter,
+                               int max_iters);
+
   private:
-    double draw_proposal(double current, double pv.getpv()) {
+    double draw_proposal(double current, double proposal_sd) {
       return Rf_rnorm(current, proposal_sd);
     };
-    arma::vec draw_proposal(arma::vec current, arma::mat pv.getpv()){
+    arma::vec draw_proposal(arma::vec current, arma::mat proposal_sd){
       return Rf_rmultinorm(current, proposal_sd);
     };
     virtual parameter_support();  // i.e. truncation logic
@@ -42,6 +48,8 @@ class ModifiedMetropolisHastings
     virtual pv;                   // needs to be a ProposalVariance object
 
 };
+
+
 
 
 // MCMC sampling function
@@ -80,30 +88,6 @@ T ModifiedMetropolisHastings::sample()
   }
 }
 
-
-
-
-////////////////////////////////////////////////////////////
-// Change these over to classes inheriting abstract class
-////////////////////////////////////////////////////////////
-
-
-class ModifiedMetropolisHastings : public sd_widths {
-
-};
-
-
-class ModifiedMetropolisHastings : public sd_mass {
-
-};
-
-class ModifiedMetropolisHastings : public baseline {
-
-};
-
-class ModifiedMetropolisHastings : public halflife {
-
-};
 
 
 #endif
