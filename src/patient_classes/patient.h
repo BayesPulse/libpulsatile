@@ -4,33 +4,49 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include <list>
+using namespace Rcpp;
 
+//
 // patient.h
+//   defining the patient class and subclasses
+//
+// Author: Matt Mulvahill
+// Created: 11/14/17
+// Notes:
+//
 
-struct Patient {
+class Patient {
 
-  PatientPriors priors;
-  PatientData data;
-  PatientEstimates estimates;
+  public:
+    Patient(NumericMatrix data,
+            NumericVector priors,
+            NumericVector starting_values);
+    ~Patient();
+    void read_data(NumericMatrix data);
+  private:
+    double likelihood;
+    PatientPriors priors;
+    PatientData data;
+    ratientEstimates estimates;
+    int pulse_count;
+    list<PulseEstimate> pulses;
+    void read_data_in(arma::vec in_time,
+                      arma::vec in_conc);
+    void read_data_in(arma::vec in_time,
+                      arma::vec in_conc,
+                      arma::vec in_response_conc);
+
 
 };
 
 struct PatientData {
 
-  arma::vec concentration;
   arma::vec time;
+  arma::vec concentration;
   arma::vec response_concentration;
-  arma::vec response_time;
   int number_of_obs;
   double avg_period_of_obs;
   double duration_of_obs = number_of_obs * period_of_obs;
-
-  void read_data(arma::vec in_time,
-                 arma::vec in_conc);
-  void read_data(arma::vec in_time,
-                 arma::vec in_conc,
-                 arma::vec in_response_conc);
-
 
 };
 
@@ -69,8 +85,6 @@ struct PatientEstimates {
     double mass_sd;
     double width_sd;
     int pulse_count;
-
-    list<PulseEstimate> pulses;
 
 };
 
