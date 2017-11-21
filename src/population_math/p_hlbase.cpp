@@ -18,11 +18,11 @@ class drawSubjBh : public ModifiedMetropolisHastings
 {
 
   public:
-    drawSubjBh(double proposal_variance, int adjust_at_iter, int max_iters);
+    drawSubjBh(arma::vec proposal_variance, int adjust_at_iter, int max_iters);
     ~drawSubjBh();
 
   private:
-    bool parameter_support(arma::vec proposal_);
+    bool parameter_support(arma::vec proposal, ....);
     double posterior_function(Patient patient);
     JointProposalVariance pv;
 
@@ -41,7 +41,8 @@ drawSubjBh::drawSubjBh(arma::vec proposal_variance, int adjust_at_iter,
 
 
 
-bool drawSubjBh::parameter_support(double proposal, double min = 0, 
+bool drawSubjBh::parameter_support(arma::vec proposal,
+                                   double min = 0, 
                                    double max = 0)
 {
   return proposal > min;

@@ -14,37 +14,18 @@
 //    - Where does this class get implemented? -- implementation handled here,
 //    instantiation handled in either mcmc function or MMH classes?
 //    - draw_proposal() takes SD's - straighten this out.
-//
+//    - are defined destructors needed?
 
 
-// destructor -- need to define here? - nothing so far - not yet used
-//ProposalVariance::~ProposalVariance() { }
 
 
-// Constructors
-// TODO: - need separate constructors for Marginal and Joint
-//       - Joint needs cholesky decomposition and covariance initialization for
-//       proposal varcov matrix
+//----------------------------------------------------------
+// Marginal PV class
+//----------------------------------------------------------
 MarginalProposalVariance::MarginalProposalVariance(double initial_pv,
-                                                   int adjust_at_iter = 500,
-                                                   int max_iters = 25000); 
-{
-
-  pv             = initial_pv;
-  adjust_at_iter = adjust_at_iter;
-  max_iters      = max_iters;
-  accept_ct      = 0;
-  iter_ct        = 0;
-  ratio          = 0;
-
-
-}
-
-
-
-JointProposalVariance::JointProposalVariance(double initial_pv,
-                                             int adjust_at_iter = 500,
-                                             int max_iters = 25000); 
+                                                   int adjust_at_iter   = 500,
+                                                   int max_iters        = 25000,
+                                                   double target_ratio = 0.35)
 {
 
   adjust_at_iter = adjust_at_iter;
@@ -52,62 +33,134 @@ JointProposalVariance::JointProposalVariance(double initial_pv,
   accept_ct      = 0;
   iter_ct        = 0;
   ratio          = 0;
+  target_ratio  = target_ratio;
 
-  // Code for cholesky decomp and covariance initialization
-  // but seems to be no cholesky decomp (pop_mcmc.c:350)
-  pv(0, 0) = initial_pv(0);
-  pv(1, 1) = initial_pv(1);
-  pv(0, 1) = pv(1, 0) = -0.90 * sqrt(pv(0, 0) * pv(1, 1));
+  initialize_proposals(initial_pv);
 
 }
-
-
 
 
 // Acceptance adjustment routine for one-parameter modified MH
-// args: x   = current acceptance rate
-//       *X  = current proposal variance
-// returns: none -- updates internally
-void MarginalProposalVariance::adjustpv(double x, double *X, double target_pv = 0.35)
+void MarginalProposalVariance::adjustpv()
 {
 
-  double y = 1.0 + 1000.0 * pow(get_ratio() - target_pv, 3);
+  double y = 1.0 + 1000.0 * pow(get_ratio() - target_ratio, 3);
+  if (y < 0.9)      set_proposals(pv * 0.9);
+  else if (y > 1.1) set_proposals(pv * 1.1);
 
-  if (y < 0.9) {
-    pv *= 0.9;
-  } else if (y > 1.1) {
-    pv *= 1.1;
-  }
+}
+
+void MarginalProposalVariance::initialize_proposals(double this_pv)
+{
+  set_proposals(this_pv);
+}
+
+void MarginalProposalVariance::set_proposals(double this_pv)
+{
+  pv = this_pv;
+  psd = sqrt(pv);
+}
+
+
+
+
+
+//----------------------------------------------------------
+// Joint PV class
+//----------------------------------------------------------
+
+// Constructor
+JointProposalVariance::JointProposalVariance(arma::vec initial_pv,
+                                             int adjust_at_iter   = 500,
+                                             int max_iters        = 25000,
+                                             double target_ratio = 0.25)
+{
+
+  adjust_at_iter = adjust_at_iter;
+  max_iters      = max_iters;
+  accept_ct      = 0;
+  iter_ct        = 0;
+  ratio          = 0;
+  target_ratio   = target_ratio;
+
+  // Create pv and psd objects;
+  initialize_pv(initial_pv);
 
 }
 
 
-// Acceptance adjustment routine for two-parameter modified MH
-//   used previously for baseline and halflife
-// args: [desired?] corr correlation between the two variances
-// returns: none -- updates internally
-void JointProposalVariance::adjustpv(double corr, double target_pv = 0.25)
+// adjustpv()
+//
+//   Acceptance adjustment routine for two-parameter modified MH used previously
+//   for baseline and halflife
+//   - args:
+//      - corr correlation between the two variances
+//   - returns: 
+//      - none -- updates internally
+void JointProposalVariance::adjustpv(double corr = -0.90)
 {
+
+  arma::mat mydiag(2, 2, arma::fill::eye);
 
   // y - new diagonal elements of proposal variance-covariance matrix based on
   // inputs
-  double y = 1.0 + 1000.0 * pow(get_ratio() - target_pv, 3);
+  double y = 1.0 + 1000.0 * pow(get_ratio() - target_ratio, 3);
 
   if (y < .90) {
 
     y = .90;
-    pv(0, 0) *= y;
-    pv(1, 1) *= y;
-    pv(0, 1)  = pv(1, 0) = corr * sqrt(pv(0, 0) * pv(1, 1));
+    pv  = pv % mydiag; // set off-diag to 0 with Schur/Hadamard multiplication
+    set_proposals(pv * y, corr);
 
   } else if (y > 1.1) {
 
     y = 1.1;
-    pv(0, 0) *= y;
-    pv(1, 1) *= y;
-    pv(0, 1)  = pv(1, 0) = corr * sqrt(pv(0, 0) * pv(1, 1));
+    pv  = pv % mydiag; // set off-diag to 0 with Schur/Hadamard multiplication
+    set_proposals(pv * y, corr);
 
   }
 
 }
+
+
+
+// initialize_pv()
+//   create/set pv and psd objects (proposal var-covar and correlation matrices)
+void JointProposalVariance::initialize_pv(arma::vec initial_pv)
+{
+
+  arma::mat this_pv = arma::diagmat(initial_pv);
+  set_proposals(this_pv, -0.90);
+
+}
+
+
+void JointProposalVariance::set_proposals(arma::mat this_pv, double corr)
+{
+
+  pv = this_pv;
+  pv(0, 1) = pv(1, 0) = calc_covariance(pv, corr);
+  psd = chol(pv);
+
+}
+
+
+double JointProposalVariance::calc_covariance(arma::vec pv, double corr) 
+{
+
+  return corr * sqrt(pv(0, 0) * pv(1, 1));
+
+}
+
+
+
+TEST_CASE( "JointProposalVariances can count", "[ProposalVariance]" ) {
+
+  MarginalProposalVariance jpv(4, 500, 25000, 0.35);
+
+  REQUIRE( getpv() == 4 );
+  REQUIRE( getpsd() == sqrt(getpv()) );
+
+}
+
 

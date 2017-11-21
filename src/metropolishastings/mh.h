@@ -31,8 +31,8 @@ class ModifiedMetropolisHastings
     template<typename T> T sample();
 
   protected:
-    ModifiedMetropolisHastings(double proposal_variance);
-    ModifiedMetropolisHastings(double proposal_variance,
+    ModifiedMetropolisHastings(T proposal_variance);
+    ModifiedMetropolisHastings(T proposal_variance,
                                int adjust_at_iter,
                                int max_iters);
 
