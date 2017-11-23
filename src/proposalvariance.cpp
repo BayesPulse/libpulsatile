@@ -1,7 +1,8 @@
-#include <Rcpp.h>
+// [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <cmath>
 #include "proposalvariance.h"
+
 
 //
 // proposalvariance.cpp
@@ -32,7 +33,6 @@ MarginalProposalVariance::MarginalProposalVariance(double initial_pv,
   max_iters      = max_iters;
   accept_ct      = 0;
   iter_ct        = 0;
-  ratio          = 0;
   target_ratio  = target_ratio;
 
   initialize_proposals(initial_pv);
@@ -44,7 +44,7 @@ MarginalProposalVariance::MarginalProposalVariance(double initial_pv,
 void MarginalProposalVariance::adjustpv()
 {
 
-  double y = 1.0 + 1000.0 * pow(get_ratio() - target_ratio, 3);
+  double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
   if (y < 0.9)      set_proposals(pv * 0.9);
   else if (y > 1.1) set_proposals(pv * 1.1);
 
@@ -104,7 +104,7 @@ void JointProposalVariance::adjustpv(double corr = -0.90)
 
   // y - new diagonal elements of proposal variance-covariance matrix based on
   // inputs
-  double y = 1.0 + 1000.0 * pow(get_ratio() - target_ratio, 3);
+  double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
 
   if (y < .90) {
 
@@ -149,17 +149,6 @@ double JointProposalVariance::calc_covariance(arma::vec pv, double corr)
 {
 
   return corr * sqrt(pv(0, 0) * pv(1, 1));
-
-}
-
-
-
-TEST_CASE( "JointProposalVariances can count", "[ProposalVariance]" ) {
-
-  MarginalProposalVariance jpv(4, 500, 25000, 0.35);
-
-  REQUIRE( getpv() == 4 );
-  REQUIRE( getpsd() == sqrt(getpv()) );
 
 }
 

@@ -1,6 +1,7 @@
 #ifndef GUARD_proposalvariance_h
 #define GUARD_proposalvariance_h
 
+// [[Rcpp::depends(RcppArmadillo)]]
 #include <Rcpp.h>
 #include <RcppArmadillo.h>
 
@@ -22,18 +23,23 @@
 class ProposalVariance {
 
   public:
-    void addaccept() { ++accept_ct; ++iter_ct; };            // Add to acceptance count
-    void addreject() { ++iter_ct; };                         // Add to iters but not accept count
+    void addaccept() { ++accept_ct; ++iter_ct; }; // Add to acceptance count
+    void addreject() { ++iter_ct; };              // Add to iters but not accept count
     double getratio() const { return accept_ct / iter_ct; };
     void resetratio() { accept_ct = 0; iter_ct = 0; };
-    virtual adjustpv();
+    virtual void adjustpv();
     virtual getpv()  const { return pv; };
     virtual getpsd() const { return psd; };
 
   protected:
-    ProposalVariance(virtual initial_pv, // proposal variance
-                     int adjust_iter,   // adjust pv on multiples of adjust_iter
-                     int max_iters);    // maximum iteration to adjust pv
+    ProposalVariance(double initial_pv,    // proposal variance
+                     int adjust_iter,      // adjust pv on multiples of adjust_iter
+                     int max_iters,
+                     double target_ratio); // maximum iteration to adjust pv
+    ProposalVariance(double initial_pv,    // proposal variance
+                     int adjust_iter,      // adjust pv on multiples of adjust_iter
+                     int max_iters,        // maximum iteration to adjust pv
+                     double target_ratio); // maximum iteration to adjust pv
     ~ProposalVariance();
 
   private:
@@ -66,7 +72,7 @@ class MarginalProposalVariance : public ProposalVariance
     double psd; // proposal var-covar matrix
     double target_ratio = 0.35;
 
-}
+};
 
 
 class JointProposalVariance : public ProposalVariance
@@ -89,9 +95,7 @@ class JointProposalVariance : public ProposalVariance
     arma::mat::fixed<2, 2> psd;  // proposal correlation matrix
     double target_ratio = 0.25;
 
-}
-
-
+};
 
 
 
