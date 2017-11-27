@@ -20,6 +20,7 @@
 // for the constructor.  It can't actually be used since its an abstract class.
 //
 
+template <class T>
 class ProposalVariance {
 
   public:
@@ -27,19 +28,17 @@ class ProposalVariance {
     void addreject() { ++iter_ct; };              // Add to iters but not accept count
     double getratio() const { return accept_ct / iter_ct; };
     void resetratio() { accept_ct = 0; iter_ct = 0; };
-    virtual void adjustpv();
-    virtual getpv()  const { return pv; };
-    virtual getpsd() const { return psd; };
+    virtual void adjustpv() = 0;
+     T getpv() const { return pv; };
+     T getpsd() const { return psd; };
+    //virtual getpv()  const { return pv; };
+    //virtual getpsd() const { return psd; };
 
   protected:
-    ProposalVariance(double initial_pv,    // proposal variance
-                     int adjust_iter,      // adjust pv on multiples of adjust_iter
-                     int max_iters,
-                     double target_ratio); // maximum iteration to adjust pv
-    ProposalVariance(double initial_pv,    // proposal variance
+    ProposalVariance(T initial_pv,    // proposal variance
                      int adjust_iter,      // adjust pv on multiples of adjust_iter
                      int max_iters,        // maximum iteration to adjust pv
-                     double target_ratio); // maximum iteration to adjust pv
+                     double target_ratio); // target accept ratio
     ~ProposalVariance();
 
   private:
@@ -47,8 +46,8 @@ class ProposalVariance {
     int iter_ct;      // iteration count
     int adjust_iter;  // iteration to adjust on
     int max_iter;     // iteration to stop adjusting
-    virtual pv;       // proposal variance
-    virtual psd;       // proposal variance
+    T pv;       // proposal variance
+    T psd;      // proposal variance
     double target_ratio; // target proposal variance
 
 };
