@@ -7,3 +7,5 @@ mh_main.cpp
 .travis.yml
 ..Rcheck
 .gitignore
+coding_session.vim
+temp.c

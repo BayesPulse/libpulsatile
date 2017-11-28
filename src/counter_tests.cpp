@@ -1,3 +1,4 @@
+
 #include <testthat.h>
 #include "counter.h"
 
