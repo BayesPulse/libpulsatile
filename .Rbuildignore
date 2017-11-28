@@ -2,3 +2,8 @@
 ^\.Rproj\.user$
 test_and_build.R
 mh_main.cpp
+.git
+.vimrc
+.travis.yml
+..Rcheck
+.gitignore
