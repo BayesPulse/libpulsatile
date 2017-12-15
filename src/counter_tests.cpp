@@ -16,14 +16,14 @@ context( "Counter class") {
   expect_true(cnt.getiter() == 1);
 
   cnt.addaccept();
-  expect_true( cnt.getaccept() == 1  );
-  expect_true( cnt.getiter() == 2    );
-  expect_true( cnt.getratio() == 0.5 );
+  expect_true( cnt.getaccept() == 1   );
+  expect_true( cnt.getiter()   == 2   );
+  expect_true( cnt.getratio()  == 0.5 );
 
   cnt.resetratio();
-  expect_true( cnt.getaccept() == 0  );
-  expect_true( cnt.getiter() == 0    );
-  expect_true( cnt.getratio() != cnt.getratio() );
+  expect_true( cnt.getaccept() == 0 );
+  expect_true( cnt.getiter()   == 0 );
+  expect_true( cnt.getratio()  != cnt.getratio() );
 
   }
 }

@@ -27,19 +27,19 @@ class Counter {
   private:
     int accept_ct;       // acceptance count
     int iter_ct;         // iteration count
-    int adjust_at_iter;  // iteration to adjust on
-    int max_iters;       // iteration to stop adjusting
-    double target_ratio; // target proposal variance
+    //int adjust_at_iter;  // iteration to adjust on
+    //int max_iters;       // iteration to stop adjusting
+    //double target_ratio; // target proposal variance
 };
 
-Counter::Counter(double target_ratio, int adjust_at_iter, int max_iters)
+Counter::Counter(double target, int adjust, int max)
+  : accept_ct      ( 0 )
+  , iter_ct        ( 0 )
+  //, adjust_at_iter ( adjust )
+  //, max_iters      ( max )
+  //, target_ratio   ( target )
 {
 
-  adjust_at_iter = adjust_at_iter;
-  max_iters      = max_iters;
-  accept_ct      = 0;
-  iter_ct        = 0;
-  target_ratio   = target_ratio;
 
 }
 
