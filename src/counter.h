@@ -1,9 +1,9 @@
+#ifndef GUARD_counter_h
+#define GUARD_counter_h
+
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
-
-#ifndef GUARD_counter_h
-#define GUARD_counter_h
 
 //
 // counter.h

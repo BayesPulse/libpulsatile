@@ -13,21 +13,48 @@ context( "ProposalVariance class") {
   //arma::dvec initial_pvs = {0.7, 0.1};
   double x = 0.3;
 
-  ProposalVariance <double, double> pv(x, 200, 15000, 0.25);
+  ProposalVariance pv(x);
   expect_true(pv.getpv() == 0.3);
 
-  //pv.counter.addreject();
-  //expect_true(pv.counter.getiter() == 1);
+  pv.addreject();
+  expect_true(pv.getiter() == 1);
 
-  //cnt.addaccept();
-  //expect_true( cnt.getaccept() == 1   );
-  //expect_true( cnt.getiter()   == 2   );
-  //expect_true( cnt.getratio()  == 0.5 );
+  pv.addaccept();
+  expect_true( pv.getaccept() == 1   );
+  expect_true( pv.getiter()   == 2   );
+  expect_true( pv.getratio()  == 0.5 );
 
-  //cnt.resetratio();
-  //expect_true( cnt.getaccept() == 0 );
-  //expect_true( cnt.getiter()   == 0 );
-  //expect_true( cnt.getratio()  != cnt.getratio() );
+  pv.resetratio();
+  expect_true( pv.getaccept() == 0 );
+  expect_true( pv.getiter()   == 0 );
+  expect_true( pv.getratio()  != pv.getratio() ); // nan, this tests something cleverly, but forgot what
+
+  }
+}
+
+
+//
+// Test the Counter class
+//
+
+context( "Counter class") {
+
+  test_that("Counter can count") {
+
+  Counter cnt;
+
+  cnt.addreject();
+  expect_true(cnt.getiter() == 1);
+
+  cnt.addaccept();
+  expect_true( cnt.getaccept() == 1   );
+  expect_true( cnt.getiter()   == 2   );
+  expect_true( cnt.getratio()  == 0.5 );
+
+  cnt.resetratio();
+  expect_true( cnt.getaccept() == 0 );
+  expect_true( cnt.getiter()   == 0 );
+  expect_true( cnt.getratio()  != cnt.getratio() );
 
   }
 }

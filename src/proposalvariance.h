@@ -1,10 +1,10 @@
+#ifndef GUARD_proposalvariance_h
+#define GUARD_proposalvariance_h
+
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include "counter.h"
-
-#ifndef GUARD_proposalvariance_h
-#define GUARD_proposalvariance_h
 
 //
 // proposalvariance.h
@@ -24,19 +24,32 @@
 class ProposalVariance {
 
   public:
+    ProposalVariance();
     ProposalVariance(double inpv);
-    ~ProposalVariance();
     double getpv() const { return pv; };
+
+    // Counter implementation -- works, but keep an eye out for a better option
+    void addreject() { count.addreject(); };
+    void addaccept() { count.addaccept(); };
+    double getratio() { return count.getratio(); };
+    void resetratio() { count.resetratio(); };
+    int getiter() { return count.getiter(); };
+    int getaccept() { return count.getaccept(); };
 
   private:
     double pv;
-    Counter counter;
+    Counter count;
 };
 
-ProposalVariance::ProposalVariance(double inpv)
-  : pv(inpv)
+ProposalVariance::ProposalVariance()
+  : pv(0)
+  , count()
 {
-  counter();
+}
+
+ProposalVariance::ProposalVariance(double inpv)
+{
+  pv = inpv;
 }
 
 #endif
