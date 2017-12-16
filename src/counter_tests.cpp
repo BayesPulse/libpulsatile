@@ -1,5 +1,6 @@
 
 #include <testthat.h>
+#include <RcppArmadillo.h>
 #include "counter.h"
 
 //
@@ -10,7 +11,7 @@ context( "Counter class") {
 
   test_that("Counter can count") {
 
-  Counter cnt(0.25, 500, 25000);
+  Counter cnt;
 
   cnt.addreject();
   expect_true(cnt.getiter() == 1);

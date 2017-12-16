@@ -1,9 +1,9 @@
-#ifndef GUARD_proposalvariance_h
-#define GUARD_proposalvariance_h
-
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
+
+#ifndef GUARD_counter_h
+#define GUARD_counter_h
 
 //
 // counter.h
@@ -16,7 +16,7 @@
 
 class Counter {
   public:
-    Counter(double target_ratio, int adjust_at_iter, int max_iters);
+    Counter();
     void addaccept() { ++accept_ct; ++iter_ct; }; // Add to acceptance count
     void addreject() { ++iter_ct; };              // Add to iters but not accept count
     double getratio() const { return (double) accept_ct / iter_ct; };
@@ -25,24 +25,16 @@ class Counter {
     int getiter() const { return iter_ct; };
 
   private:
-    int accept_ct;       // acceptance count
-    int iter_ct;         // iteration count
-    //int adjust_at_iter;  // iteration to adjust on
-    //int max_iters;       // iteration to stop adjusting
-    //double target_ratio; // target proposal variance
+    int accept_ct; // acceptance count
+    int iter_ct;   // iteration count
 };
 
-Counter::Counter(double target, int adjust, int max)
+Counter::Counter()
   : accept_ct      ( 0 )
   , iter_ct        ( 0 )
-  //, adjust_at_iter ( adjust )
-  //, max_iters      ( max )
-  //, target_ratio   ( target )
 {
 
-
 }
-
 
 #endif
 
