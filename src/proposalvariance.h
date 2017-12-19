@@ -25,7 +25,15 @@ class ProposalVariance {
 
   public:
     ProposalVariance();
-    ProposalVariance(double inpv);
+    ProposalVariance(double inpv,
+                     int adjust_iter,   // adjust pv on multiples of adjust_iter
+                     int max_iters,     // maximum iteration to adjust pv
+                     double target_ratio) {
+      pv           = inpv;
+      adjust_iter  = adjust_iter;
+      max_iters    = max_iters;
+      target_ratio = target_ratio;
+    }
     double getpv() const { return pv; };
 
     // Counter implementation -- works, but keep an eye out for a better option
@@ -36,20 +44,25 @@ class ProposalVariance {
     int getiter() { return count.getiter(); };
     int getaccept() { return count.getaccept(); };
 
+    // 
+
   private:
     double pv;
     Counter count;
+    int adjust_iter;  // iteration to adjust on
+    int max_iter;     // iteration to stop adjusting
+    double target_ratio; // target proposal variance
 };
 
 ProposalVariance::ProposalVariance()
   : pv(0)
   , count()
+  , adjust_iter(500)
+  , max_iter(25000)
+  , target_ratio(0.35)
+
 {
 }
 
-ProposalVariance::ProposalVariance(double inpv)
-{
-  pv = inpv;
-}
 
 #endif
