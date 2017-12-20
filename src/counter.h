@@ -16,7 +16,7 @@
 
 class Counter {
   public:
-    Counter();
+    Counter() : accept_ct(0), iter_ct(0) { };
     void addaccept() { ++accept_ct; ++iter_ct; }; // Add to acceptance count
     void addreject() { ++iter_ct; };              // Add to iters but not accept count
     double getratio() const { return (double) accept_ct / iter_ct; };
@@ -28,13 +28,6 @@ class Counter {
     int accept_ct; // acceptance count
     int iter_ct;   // iteration count
 };
-
-Counter::Counter()
-  : accept_ct      ( 0 )
-  , iter_ct        ( 0 )
-{
-
-}
 
 #endif
 

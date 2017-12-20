@@ -6,6 +6,7 @@
 #include <Rcpp.h>
 #include "counter.h"
 
+
 //
 // proposalvariance.h
 //   Definitions for the ProposalVariance class
@@ -30,16 +31,19 @@ class ProposalVariance {
       , adjust_iter(500)
       , max_iter(25000)
       , target_ratio(0.35) { };
-    ProposalVariance(double inpv,
-                     int adjust_iter,   // adjust pv on multiples of adjust_iter
-                     int max_iters,     // maximum iteration to adjust pv
-                     double target_ratio) {
-      pv           = inpv;
-      adjust_iter  = adjust_iter;
-      max_iters    = max_iters;
-      target_ratio = target_ratio;
+    ProposalVariance(double in_pv,
+                     int in_adjust_iter,   // adjust pv on multiples of adjust_iter
+                     int in_max_iter,     // maximum iteration to adjust pv
+                     double in_target_ratio) {
+      pv           = in_pv;
+      adjust_iter  = in_adjust_iter;
+      max_iter    = in_max_iter;
+      target_ratio = in_target_ratio;
     }
+
+    // ProposalVariance functions
     double getpv() const { return pv; };
+    void adjustpv();
 
     // Counter implementation -- works, but keep an eye out for a better option
     void addreject() { count.addreject(); };
@@ -49,14 +53,18 @@ class ProposalVariance {
     int getiter() { return count.getiter(); };
     int getaccept() { return count.getaccept(); };
 
-    // 
-
   private:
     double pv;
+    double psd;          // proposal standard deviation
     Counter count;
     int adjust_iter;  // iteration to adjust on
     int max_iter;     // iteration to stop adjusting
     double target_ratio; // target proposal variance
+
+    // ProposalVariance internal functions
+    void initialize_proposals(double initial_pv);
+    void set_proposals(double this_pv);
+
 };
 
 
