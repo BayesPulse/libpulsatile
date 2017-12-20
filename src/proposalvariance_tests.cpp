@@ -1,6 +1,7 @@
-#include <testthat.h>
 #include <RcppArmadillo.h>
 #include "proposalvariance.h"
+#ifdef HAVE_TESTTHAT_H
+#include <testthat.h>
 
 //
 // Test the ProposalVariance class
@@ -13,7 +14,7 @@ context( "ProposalVariance class") {
   //arma::dvec initial_pvs = {0.7, 0.1};
   double x = 0.3;
 
-  ProposalVariance pv(x);
+  ProposalVariance pv(x, 500, 25000, 0.35);
   expect_true(pv.getpv() == 0.3);
 
   pv.addreject();
@@ -59,3 +60,4 @@ context( "Counter class") {
   }
 }
 
+#endif

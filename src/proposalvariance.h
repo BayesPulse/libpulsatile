@@ -24,7 +24,12 @@
 class ProposalVariance {
 
   public:
-    ProposalVariance();
+    ProposalVariance()
+      : pv(0)
+      , count()
+      , adjust_iter(500)
+      , max_iter(25000)
+      , target_ratio(0.35) { };
     ProposalVariance(double inpv,
                      int adjust_iter,   // adjust pv on multiples of adjust_iter
                      int max_iters,     // maximum iteration to adjust pv
@@ -54,15 +59,6 @@ class ProposalVariance {
     double target_ratio; // target proposal variance
 };
 
-ProposalVariance::ProposalVariance()
-  : pv(0)
-  , count()
-  , adjust_iter(500)
-  , max_iter(25000)
-  , target_ratio(0.35)
-
-{
-}
 
 
 #endif
