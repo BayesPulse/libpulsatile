@@ -99,7 +99,7 @@ class ProposalVariance2p {
     double target_ratio; // target proposal variance
 
     // ProposalVariance internal functions
-    void initialize_proposals(arma::vec initial_pv);    
+    void initialize_proposals(arma::vec initial_pv);
     void set_proposals(arma::mat this_pv, double corr);
     double calc_covariance(arma::mat pv, double corr);
 

@@ -13,7 +13,7 @@ context( "ProposalVariance classes") {
 
     // Initialize object for testing
     arma::vec initial_pvs = { 0.7, 0.1 };
-    ProposalVariance2p pv(initial_pvs, 500, 25000, 0.35);
+    ProposalVariance2p pv(initial_pvs, 500, 25000, 0.25);
 
     // Build matrix for testing that full matrix is initialized properly from
     // vector
@@ -42,8 +42,10 @@ context( "ProposalVariance classes") {
 
   test_that("2-parameter version, core functions.") {
 
-    ProposalVariance pv(0.7, 500, 25000, 0.35);
-    expect_true(pv.getpv() == 0.7);
+    // Initialize object for testing
+    arma::vec initial_pvs = { 0.7, 0.1 };
+    ProposalVariance2p pv(initial_pvs, 500, 25000, 0.25);
+    arma::mat initial_mat = pv.getpv();
 
     int i;
     for (int i = 0; i < 100; i++) {
@@ -54,7 +56,21 @@ context( "ProposalVariance classes") {
     // double check math on this..
     expect_true(pv.getratio() == 0.2);
 
+    // Test adjustpv();
+    pv.adjustpv(-0.90);
+    expect_true(arma::approx_equal(pv.getpv(), initial_mat, "absdiff", 0.0000001));
+
+    //double y = 1.0 + 1000.0 * pow(0.2 - 0.25, 3);
+    //if (y < 0.9) y = 0.9;
+    //if (y > 1.1) y = 1.1;
+    //if (y == 1.1 | y == 0.9) {
+    //  pv = pv % mydiag;
+    //}
+
+
+
   }
+
 
 }
 
