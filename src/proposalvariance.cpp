@@ -1,105 +1,148 @@
+// [[Rcpp::depends(RcppArmadillo)]]
+#include <RcppArmadillo.h>
+#include <Rcpp.h>
+#include "proposalvariance.h"
 
-// Constructor
-void ProposalVariance::ProposalVariance(double initial_pv,
-                                        int adjust_at_iter,
-                                        int max_iters = 25000); {
 
-  pv             = initial_pv;
-  adjust_at_iter = adjust_at_iter;
-  max_iters      = max_iters;
-  accept_ct      = 0;
-  iter_ct        = 0;
-  ratio          = 0;
+//--------------------------------------------------------//
+// ProposalVariance (1-parm)
+//--------------------------------------------------------//
+
+// -------------------------------------
+// initialize_proposals()
+// -------------------------------------
+// One for one-variable and one for two-variable MMH/pv.
+// create/set pv and psd objects (proposal var-covar and correlation matrices)
+void ProposalVariance::initialize_proposals(double initial_pv)
+{
+
+  set_proposals(initial_pv);
 
 }
 
-// destructor -- need to define here?
-ProposalVariance::~ProposalVariance() { }
 
+// -------------------------------------
+// set_proposals()
+// -------------------------------------
+void ProposalVariance::set_proposals(double this_pv)
+{
+
+  pv = this_pv;
+  psd = sqrt(pv);
+
+}
+
+
+// -------------------------------------
+// adjustpv()
+// -------------------------------------
+// Acceptance adjustment routine for one-parameter modified MH
 void ProposalVariance::adjustpv()
 {
 
-}
-
-
-
-
-
-/*----------------------------------------------------------------------------**
-/  Acceptance adjustment routines from poppulsepaper/Pop-UnifLogNormPrior
-/-----------------------------------------------------------------------------*/
-
-/*********************************************************************/
-              /*START OF adjust_acceptance SUBROUTINE*/
-/*********************************************************************/
-/*********************************************************************/
-/*adjust_acceptance: this adjusts the proposal variances based on the inputted
-                    acceptance rate and proposal variance. If the acceptance rate is
-                    too high or too low, proposal variance will be adjusted.
-    ARGUMENTS: double x; the inputted acceptance rate; usually inputted as the
-                  acceptance counter divided by the attempt counter
-               double *X; the current proposal variance
-    RETURNS: None; update to the proposal variance is made internally  */
-/*********************************************************************/
-/*********************************************************************/
-/*VARIABLE DEFINITIONS
- y: new proposal variance based on inputs
-
-SUBROUTINES USED
- None  */
- /**************************************************************************/
-
-void adjust_acceptance(double x, double *X)
-{
-
-  double y = 1.0 + 1000.0 * (x - 0.35) * (x - 0.35) * (x - 0.35);
-  if (y < 0.9) y = 0.9;
-  if (y > 1.1) y = 1.1;
-
-  *X *= y;
+  double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
+  if (y < 0.9)      set_proposals(pv * 0.9);
+  else if (y > 1.1) set_proposals(pv * 1.1);
 
 }
 
-/*********************************************************************/
-              /*START OF adjust2_acceptance SUBROUTINE*/
-/*********************************************************************/
-/*********************************************************************/
-/*adjust2_acceptance: this adjusts the proposal variance-covriance matrix for
-                     baseline and halflife based on the inputted acceptance rate
-                     and proposal matrix. If the acceptance rate is too high or
-                     too low, proposal variance will be adjusted.
-    ARGUMENTS: double x; the inputted acceptance rate; usually inputted as the
-                  acceptance counter divided by the attempt counter
-               double **X; the current proposal variance-covariance matrix
-               double corr; the correlation between the two proposal variances
-    RETURNS: None; update to the proposal variance is made internally*/
-/*********************************************************************/
-/*********************************************************************/
-/*VARIABLE DEFINITIONS
- y: new diagonal elements of proposal variance-covariance matrix based on inputs
 
-SUBROUTINES USED
- None  */
- /**************************************************************************/
 
-void adjust_acceptance(double x, double **X, double corr)
+
+//--------------------------------------------------------//
+// ProposalVariance2p (2-parm)
+//--------------------------------------------------------//
+
+//--------------------------------------
+// initialize_proposals() for each type
+//--------------------------------------
+
+ProposalVariance2p::ProposalVariance2p()
+  : count(), adjust_iter(500), max_iter(25000), target_ratio(0.35)
 {
 
-  double y = 1. + 1000.*(x-.25)*(x-.25)*(x-.25);
+  arma::vec in_pv(2);
+  in_pv.fill(0);
+  initialize_proposals(in_pv);
+
+}
+
+
+ProposalVariance2p::ProposalVariance2p(arma::vec in_pv,
+                                       int in_adjust_iter, // adjust pv on multiples of adjust_iter
+                                       int in_max_iter,    // maximum iteration to adjust pv
+                                       double in_target_ratio) 
+{
+
+  adjust_iter  = in_adjust_iter;
+  max_iter     = in_max_iter;
+  target_ratio = in_target_ratio;
+
+  initialize_proposals(in_pv);
+
+}
+
+
+//--------------------------------------
+// initialize_proposals() for each type
+//--------------------------------------
+
+void ProposalVariance2p::initialize_proposals(arma::vec initial_pv) {
+
+  arma::mat this_pv = arma::diagmat(initial_pv);
+  set_proposals(this_pv, -0.90);
+
+}
+
+
+//--------------------------------------
+// set_proposals()
+//   Consider renaming this. It always takes in a diagonal matrix and fills in
+//   the off-diagonal. (And calculates/creates the chol decomp matrix.)
+//--------------------------------------
+void ProposalVariance2p::set_proposals(arma::mat this_pv, double corr) {
+
+  pv = this_pv;
+  pv(0, 1) = pv(1, 0) = calc_covariance(pv, corr);
+  psd = chol(pv);
+
+}
+
+double ProposalVariance2p::calc_covariance(arma::mat pv, double corr) {
+
+  return corr * sqrt(pv(0, 0) * pv(1, 1));
+
+}
+
+
+//--------------------------------------
+// adjustpv()
+//--------------------------------------
+
+void ProposalVariance2p::adjustpv(double corr = -0.90)
+{
+
+  // identity matrix
+  arma::mat mydiag(2, 2, arma::fill::eye);
+
+  // y - new diagonal elements of proposal variance-covariance matrix based
+  // on inputs
+  double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
 
   if (y < .90) {
-    y = .90;
-    X[0][0] *= y;
-    X[1][1] *= y;
-    X[0][1] = X[1][0] = corr * sqrt(X[0][0] * X[1][1]);
-  }
 
-  if (y > 1.1) {
+    y = .90;
+    pv  = pv % mydiag; // set off-diag to 0 with Schur/Hadamard multiplication
+    set_proposals(pv * y, corr);
+
+  } else if (y > 1.1) {
+
     y = 1.1;
-    X[0][0] *= y;
-    X[1][1] *= y;
-    X[0][1] = X[1][0] = corr * sqrt(X[0][0] * X[1][1]);
+    pv  = pv % mydiag; // set off-diag to 0 with Schur/Hadamard multiplication
+    set_proposals(pv * y, corr);
+
   }
 
 }
+
 

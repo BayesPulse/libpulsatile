@@ -1,0 +1,7 @@
+$(info The compilation root directory is: $(ROOT_DIR))
+$(info The name of the shared library to be created is: $(SHLIB))
+
+PKG_CXXFLAGS = -I../inst/include @OPENMP_FLAG@ -DARMA_64BIT_WORD
+PKG_LIBS = @OPENMP_FLAG@ $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+CXX_STD = CXX11
+
