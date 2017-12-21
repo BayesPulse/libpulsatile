@@ -9,13 +9,19 @@
 
 context( "ProposalVariance classes") {
 
-  test_that("1-parameter version, counter implementation.") {
+  test_that("2-parameter version, counter implementation.") {
 
-    //arma::dvec initial_pvs = {0.7, 0.1};
-    double x = 0.3;
+    // Initialize object for testing
+    arma::vec initial_pvs = { 0.7, 0.1 };
+    ProposalVariance2p pv(initial_pvs, 500, 25000, 0.35);
 
-    ProposalVariance pv(x, 500, 25000, 0.35);
-    expect_true(pv.getpv() == 0.3);
+    // Build matrix for testing that full matrix is initialized properly from
+    // vector
+    double x, y, xy;
+    x = 0.7; y = 0.1; xy = -0.9 * sqrt(x * y);
+    arma::mat checkpv = { { x, xy }, { xy, y } };
+    // Test it
+    expect_true(arma::approx_equal(pv.getpv(), checkpv, "absdiff", 0.0000001));
 
     pv.addreject();
     expect_true(pv.getiter() == 1);
@@ -34,10 +40,7 @@ context( "ProposalVariance classes") {
 
   }
 
-  // test_that("Test 2-parameter version, counter implementation.") {
-  // }
-
-  test_that("1-parameter version, core functions.") {
+  test_that("2-parameter version, core functions.") {
 
     ProposalVariance pv(0.7, 500, 25000, 0.35);
     expect_true(pv.getpv() == 0.7);
@@ -53,32 +56,5 @@ context( "ProposalVariance classes") {
 
   }
 
-}
-
-
-//
-// Test the Counter class
-//
-
-context( "Counter class") {
-
-  test_that("Counter can count") {
-
-  Counter cnt;
-
-  cnt.addreject();
-  expect_true(cnt.getiter() == 1);
-
-  cnt.addaccept();
-  expect_true( cnt.getaccept() == 1   );
-  expect_true( cnt.getiter()   == 2   );
-  expect_true( cnt.getratio()  == 0.5 );
-
-  cnt.resetratio();
-  expect_true( cnt.getaccept() == 0 );
-  expect_true( cnt.getiter()   == 0 );
-  expect_true( cnt.getratio()  != cnt.getratio() );
-
-  }
 }
 
