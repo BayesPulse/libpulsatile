@@ -44,7 +44,7 @@ TEST_CASE( "Counter class", "[counter]" ) {
 
     for (int i = 0; i < 100; ++i) {
       if (i % 4 == 0) cnt.addaccept();
-      cnt.addreject();
+      else cnt.addreject();
     }
 
     // double check math on this..
@@ -105,7 +105,7 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
 
     for (int i = 0; i < 100; ++i) {
       if (i % 4 == 0) pv2.addaccept();
-      pv2.addreject();
+      else pv2.addreject();
     }
 
     // double check math on this..
