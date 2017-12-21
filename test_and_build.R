@@ -1,8 +1,13 @@
 # poppulsatile
 #
 
+setwd("~/Projects/BayesPulse/poppulsatile/")
 library(devtools)
+library(Rcpp)
+library(RcppArmadillo)
 # library(testthat)
+
+devtools::test()
 
 devtools::document()
 devtools::check()

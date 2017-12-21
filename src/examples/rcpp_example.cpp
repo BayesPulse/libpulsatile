@@ -1,6 +1,3 @@
-
-
-
 // load Rcpp
 #include <Rcpp.h>
 
