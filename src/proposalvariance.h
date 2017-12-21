@@ -2,14 +2,14 @@
 #define GUARD_proposalvariance_h
 
 // [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h>
-#include <Rcpp.h>
+//#include <Rcpp.h>
+#include <armadillo>
 #include "counter.h"
 
 
 //
 // proposalvariance.h
-//   Definitions for the ProposalVariance class
+//   Definitions for the ProposalVariance classes
 //
 // Author: Matt Mulvahill
 // Created: 10/13/17
@@ -22,9 +22,13 @@
 // for the constructor.  It can't actually be used since its an abstract class.
 //
 
+
+
+// ProposalVariance Class definition - single parameter version
 class ProposalVariance {
 
   public:
+
     ProposalVariance()
       : pv(0)
       , count()
@@ -43,17 +47,23 @@ class ProposalVariance {
 
     // ProposalVariance functions
     double getpv() const { return pv; };
-    void adjustpv();
+    void adjustpv() {
+      double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
+      if (y < 0.9)      set_proposals(pv * 0.9);
+      else if (y > 1.1) set_proposals(pv * 1.1);
+    }
 
-    // Counter implementation -- works, but keep an eye out for a better option
-    void addreject() { count.addreject(); };
-    void addaccept() { count.addaccept(); };
-    double getratio() { return count.getratio(); };
-    void resetratio() { count.resetratio(); };
-    int getiter() { return count.getiter(); };
-    int getaccept() { return count.getaccept(); };
+    // Counter object implementation
+    //   works, but keep an eye out for a better option
+    void addreject()  { count.addreject();        } ;
+    void addaccept()  { count.addaccept();        } ;
+    double getratio() { return count.getratio();  } ;
+    void resetratio() { count.resetratio();       } ;
+    int getiter()     { return count.getiter();   } ;
+    int getaccept()   { return count.getaccept(); } ;
 
   private:
+
     double pv;
     double psd;          // proposal standard deviation
     Counter count;
@@ -62,27 +72,72 @@ class ProposalVariance {
     double target_ratio; // target proposal variance
 
     // ProposalVariance internal functions
-    void initialize_proposals(double initial_pv);
-    void set_proposals(double this_pv);
+    void initialize_proposals(double initial_pv) {
+      set_proposals(initial_pv);
+    }
+
+    void set_proposals(double this_pv) {
+      pv = this_pv;
+      psd = sqrt(pv);
+    }
 
 };
 
 
+
+
+// ProposalVariance Class definition - two-parameter version
 class ProposalVariance2p {
 
   public:
-    ProposalVariance2p();
-    ProposalVariance2p(arma::vec in_pv,
-                           int in_adjust_iter,   // adjust pv on multiples of adjust_iter
-                           int in_max_iter,      // maximum iteration to adjust pv
-                           double in_target_ratio);
+
+    ProposalVariance2p()
+      : count(), adjust_iter(500), max_iter(25000), target_ratio(0.35) {
+      arma::vec in_pv(2);
+      in_pv.fill(0);
+      initialize_proposals(in_pv);
+    }
+
+    ProposalVariance2p::ProposalVariance2p(arma::vec in_pv,
+                                           int in_adjust_iter,
+                                           int in_max_iter,
+                                           double in_target_ratio) {
+      adjust_iter  = in_adjust_iter;
+      max_iter     = in_max_iter;
+      target_ratio = in_target_ratio;
+      initialize_proposals(in_pv);
+    }
+
 
     // ProposalVariance functions
     arma::mat getpv() const  { return pv; };
     arma::mat getpsd() const { return psd; };
-    void adjustpv(double corr);
 
-    // Counter implementation -- works, but keep an eye out for a better option
+    void adjustpv(double corr = -0.90) {
+      // identity matrix
+      arma::mat mydiag(2, 2, arma::fill::eye);
+
+      // y - new diagonal elements of proposal variance-covariance matrix based
+      // on inputs
+      double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
+
+      if (y < .90) {
+
+        y = .90;
+        pv  = pv % mydiag; // set off-diag to 0 with Schur/Hadamard multiplication
+        set_proposals(pv * y, corr);
+
+      } else if (y > 1.1) {
+
+        y = 1.1;
+        pv  = pv % mydiag; // set off-diag to 0 with Schur/Hadamard multiplication
+        set_proposals(pv * y, corr);
+
+      }
+    }
+
+    // Counter implementation
+    //   NOTE: works, but keep an eye out for a better option
     void addreject() { count.addreject(); };
     void addaccept() { count.addaccept(); };
     double getratio() { return count.getratio(); };
@@ -91,17 +146,28 @@ class ProposalVariance2p {
     int getaccept() { return count.getaccept(); };
 
   private:
+
     arma::mat::fixed<2, 2> pv;
     arma::mat::fixed<2, 2> psd; // proposal standard deviation
     Counter count;
-    int adjust_iter;  // iteration to adjust on
-    int max_iter;     // iteration to stop adjusting
+    int adjust_iter;     // iteration to adjust on
+    int max_iter;        // iteration to stop adjusting
     double target_ratio; // target proposal variance
 
-    // ProposalVariance internal functions
-    void initialize_proposals(arma::vec initial_pv);
-    void set_proposals(arma::mat this_pv, double corr);
-    double calc_covariance(arma::mat pv, double corr);
+    void initialize_proposals(arma::vec initial_pv) {
+      arma::mat this_pv = arma::diagmat(initial_pv);
+      set_proposals(this_pv, -0.90);
+    }
+
+    void set_proposals(arma::mat this_pv, double corr) {
+      pv = this_pv;
+      pv(0, 1) = pv(1, 0) = calc_covariance(pv, corr);
+      psd = chol(pv);
+    }
+
+    double calc_covariance(arma::mat pv, double corr) {
+      return corr * sqrt(pv(0, 0) * pv(1, 1));
+    }
 
 };
 
