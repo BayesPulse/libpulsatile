@@ -2,8 +2,8 @@
 # Makefile for libpulsatile
 #
  
-CC := g++ # This is the main compiler
-# CC := clang --analyze # and comment out the linker last line for sanity
+#CC := g++ # This is the main compiler
+CC := clang++ #--analyze # and comment out the linker last line for sanity
 SRCDIR := src
 BUILDDIR := build
 TARGET := bin/libpulsatile
@@ -13,7 +13,7 @@ SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := -g # -Wall
 LIB := $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
-INC := -I include -I../inst/include -DARMA_64BIT_WORD -std=c++11
+INC := -I include -I../inst/include -DARMA_64BIT_WORD -std=c++11 -larmadillo
 CXX_STD = CXX11
 
 $(TARGET): $(OBJECTS)

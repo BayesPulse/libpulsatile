@@ -121,29 +121,29 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
 // Test the ProposalVariance2p class
 //
 
-//TEST_CASE( "ProposalVariance class (2 param)", "[ProposalVariance2p]" ) {
-//
-//  arma::vec initial_pvs = { 0.7, 0.1 };
-//  ProposalVariance2p pv(initial_pvs, 500, 25000, 0.25);
-//
-//  SECTION( "can initialize pv and psd matrices" ) {
-//    double x, y, xy;
-//    x = 0.7; y = 0.1; xy = -0.9 * sqrt(x * y);
-//    arma::mat checkpv = { { x, xy }, { xy, y } };
-//    arma::mat checkchol = chol(checkpv);
-//
-//    REQUIRE( arma::approx_equal(pv.getpv(), checkpv, "absdiff", 0.0000001) );
-//    REQUIRE( arma::approx_equal(pv.getpsd(), checkchol, "absdiff", 0.0000001) );
-//  }
-//
-//  SECTION( "can iterate/add reject" ) {
-//    pv.addreject();
-//
-//    REQUIRE(pv.getiter() == 1);
-//    REQUIRE(pv.getaccept() == 0);
-//    REQUIRE(pv.getratio() == 0);
-//  }
-//
+TEST_CASE( "ProposalVariance class (2 param)", "[ProposalVariance2p]" ) {
+
+  arma::vec initial_pvs = { 0.7, 0.1 };
+  ProposalVariance2p pv(initial_pvs, 500, 25000, 0.25);
+
+  SECTION( "can initialize pv and psd matrices" ) {
+    double x, y, xy;
+    x = 0.7; y = 0.1; xy = -0.9 * sqrt(x * y);
+    arma::mat checkpv = { { x, xy }, { xy, y } };
+    arma::mat checkchol = arma::chol(checkpv);
+
+    REQUIRE( arma::approx_equal(pv.getpv(), checkpv, "absdiff", 0.0000001) );
+    REQUIRE( arma::approx_equal(pv.getpsd(), checkchol, "absdiff", 0.0000001) );
+  }
+
+  SECTION( "can iterate/add reject" ) {
+    pv.addreject();
+
+    REQUIRE(pv.getiter() == 1);
+    REQUIRE(pv.getaccept() == 0);
+    REQUIRE(pv.getratio() == 0);
+  }
+
 //  SECTION( "can add accept" ) {
 //    pv.addaccept();
 //
@@ -190,6 +190,6 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
 //    // //  pv = pv % mydiag;
 //    // //}
 //
-//  }
-//
-//}
+//   }
+
+}

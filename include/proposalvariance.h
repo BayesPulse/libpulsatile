@@ -164,7 +164,7 @@ class ProposalVariance2p {
     void set_proposals(arma::mat this_pv, double corr) {
       pv = this_pv;
       pv(0, 1) = pv(1, 0) = calc_covariance(pv, corr);
-      psd = chol(pv);
+      psd = arma::chol(pv);
     }
 
     double calc_covariance(arma::mat pv, double corr) {
