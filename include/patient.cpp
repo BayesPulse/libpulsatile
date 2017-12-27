@@ -5,8 +5,9 @@
 * objects can be read/updated directly -- PatientData is constant, so is this
 * what we want?
 *******************************************************************************/
+#include <RInside>
 #include <RcppArmadillo>
-#include <Rcpp>
+//#include <Rcpp>
 #include <testthat.h>
 #include "patient.h"
 using namespace Rcpp;
