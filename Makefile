@@ -22,19 +22,18 @@ RLAPACK := 		$(shell $(R_HOME)/bin/R CMD config LAPACK_LIBS)
 
 ## include headers and libraries for Rcpp interface classes
 ## note that RCPPLIBS will be empty with Rcpp (>= 0.11.0) and can be omitted
-RCPPINCL := 		$(shell echo 'Rcpp:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave)
-RCPPLIBS := 		$(shell echo 'Rcpp:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave)
+RCPPARMAINCL := 		$(shell echo 'RcppArmadillo:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave)
 
 ## include headers and libraries for Rcpp interface classes
 ## note that RCPPLIBS will be empty with Rcpp (>= 0.11.0) and can be omitted
-RCPPARMAINCL := 		$(shell echo 'RcppArmadillo:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave)
+RCPPINCL := 		$(shell echo 'Rcpp:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave)
+RCPPLIBS := 		$(shell echo 'Rcpp:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave)
 
 ## include headers and libraries for RInside embedding classes
 RINSIDEINCL := 		$(shell echo 'RInside:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave)
 RINSIDELIBS := 		$(shell echo 'RInside:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave)
 
 ## compiler etc settings used in default make rules
-CXX := 			$(shell $(R_HOME)/bin/R CMD config CXX)
 CPPFLAGS := 		-Wall $(shell $(R_HOME)/bin/R CMD config CPPFLAGS)
 CXXFLAGS := 		$(RCPPFLAGS) $(RCPPINCL) $(RCPPARMAINCL) $(RINSIDEINCL) $(shell $(R_HOME)/bin/R CMD config CXXFLAGS)
 LDLIBS := 		$(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
@@ -43,8 +42,8 @@ LDLIBS := 		$(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
 ########################################
 # Original working makefile
 ########################################
-#CC := g++ # This is the main compiler
-#CC := clang++ #--analyze # and comment out the linker last line for sanity
+#CXX := g++ # This is the main compiler
+#CXX := clang++ #--analyze # and comment out the linker last line for sanity
 CXX := $(shell $(R_HOME)/bin/R CMD config CXX)
 SRCDIR := src
 BUILDDIR := build

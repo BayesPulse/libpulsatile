@@ -2,8 +2,8 @@
 #define GUARD_proposalvariance_h
 
 // [[Rcpp::depends(RcppArmadillo)]]
-//#include <Rcpp.h>
-#include <armadillo>
+#include <RcppArmadillo.h>
+#include <RInside.h>
 #include <math.h>
 #include "counter.h"
 
@@ -24,8 +24,9 @@
 //
 
 
-
+//
 // ProposalVariance Class definition - single parameter version
+//
 class ProposalVariance {
 
   public:
@@ -88,7 +89,9 @@ class ProposalVariance {
 
 
 
+//
 // ProposalVariance Class definition - two-parameter version
+//
 class ProposalVariance2p {
 
   public:

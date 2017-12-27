@@ -2,11 +2,9 @@
 #define GUARD_metropolishastings_h
 
 #include "proposalvariance.h"
-#include <RInside.h>                    // for the embedded R via RInside
-#include <armadillo>
-//#include <Rcpp.h>
-//#include <RcppArmadillo.h>
-//%using namespace Rcpp;
+#include "utils.h"
+#include <RcppArmadillo.h>
+#include <RInside.h>
 
 // metropolishastings.h
 //   Abstract class for defining Modified Metropolis Hastings samplers

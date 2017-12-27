@@ -1,13 +1,10 @@
 #ifndef GUARD_patient_h
 #define GUARD_patient_h
-
-#include <armadillo>
-#include <RInside.h>                    // for the embedded R via RInside
+//
 //#include <RcppArmadillo.h>
-#include <Rcpp.h>
-#include <list>
-//using namespace Rcpp;
-
+//#include <RInside.h>                    // for the embedded R via RInside
+//#include <list>
+////using namespace Rcpp;
 //
 // patient.h
 //   defining the patient class and subclasses

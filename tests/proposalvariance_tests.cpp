@@ -1,8 +1,11 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
-#include "catch.h"
-#include <armadillo>
+#include <RcppArmadillo.h>
+#include <RInside.h>
 #include "counter.h"
 #include "proposalvariance.h"
+#include "mh.h"
+#include "utils.h"
+#include "catch.h"
 
 
 //
