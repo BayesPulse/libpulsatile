@@ -1,5 +1,6 @@
 #ifndef GUARD_utils_h
 #define GUARD_utils_h
+
 //
 // calculations.c
 //
@@ -60,7 +61,7 @@ namespace pulseutils {
 
 
     //
-    // set_seed -- set R seed from c++ for unit testing functions using R's RNGs
+    // set_seed -- set R seed from C++ for unit testing functions using R's RNGs
     //
 
     void set_seed(unsigned int seed) {

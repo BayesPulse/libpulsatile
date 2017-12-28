@@ -225,14 +225,12 @@ TEST_CASE( "rmvnorm Function", "[utils]" ) {
 
     arma::vec answer = { 1.3264, 3.1485 };
 
-    pulseutils::set_seed(171227); 
-    REQUIRE( 
+    pulseutils::set_seed(171227);
+    REQUIRE(
             arma::approx_equal(pulseutils::rmvnorm(initial_means, pv.getpsd()),
                                answer, "absdiff", 0.0001) 
             );
-
   }
-
 
 }
 
