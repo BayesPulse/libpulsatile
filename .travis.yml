@@ -1,17 +1,42 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+# C++ -- may need 
 
-language: R
-sudo: false
-cache: packages
-r:
-  - oldrel
-  - release
-  - devel
+# DEPENDENCIES:
+#   - C++11
+#   - clang4.0 (nonstandard version for OpenMP support(-fopenmp), necessary?)
+#   - R 3.4.3
+#   - R packages
+#     - RInside (development version via GitHub)
+#     - Rcpp (CRAN)
+#     - RcppArmadillo (CRAN)
+#
 
-warnings_are_errors: false
+#
+# macOS
+#
+language: cpp
+before_install:
+  - brew tap homebrew science
+  - brew update
+  - brew install R
 
-r_packages:
-    - covr
+install: make get-deps
+compiler:
+  - clang++
 
-after_success:
-    - Rscript -e 'library(covr); codecov()'
+
+# # remaining code from R package travis
+# sudo: false
+# cache: packages
+# r:
+#   - oldrel
+#   - release
+#   - devel
+#
+# warnings_are_errors: false
+#
+# r_packages:
+#     - covr
+#
+# after_success:
+#     - Rscript -e 'library(covr); codecov()'

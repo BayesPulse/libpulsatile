@@ -2,8 +2,9 @@
 #define GUARD_counter_h
 
 // [[Rcpp::depends(RcppArmadillo)]]
+#include <RInside.h>
 #include <RcppArmadillo.h>
-#include <Rcpp.h>
+//#include <Rcpp.h>
 
 //
 // counter.h
@@ -19,7 +20,7 @@ class Counter {
     Counter() : accept_ct(0), iter_ct(0) { };
     void addaccept() { ++accept_ct; ++iter_ct; }; // Add to acceptance count
     void addreject() { ++iter_ct; };              // Add to iters but not accept count
-    double getratio() const { return (double) accept_ct / iter_ct; };
+    double getratio() const { return (double)accept_ct / (double)iter_ct; };
     void resetratio() { accept_ct = 0; iter_ct = 0; };
     int getaccept() const { return accept_ct; };
     int getiter() const { return iter_ct; };
