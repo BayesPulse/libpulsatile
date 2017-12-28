@@ -16,7 +16,7 @@
 #
 language: cpp
 before_install:
-  - brew tap homebrew science
+  - brew tap homebrew/science
   - brew update
   - brew install R
 
