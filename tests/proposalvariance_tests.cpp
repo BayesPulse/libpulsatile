@@ -140,6 +140,17 @@ TEST_CASE( "ProposalVariance class (2 param)", "[ProposalVariance2p]" ) {
     REQUIRE( arma::approx_equal(pv.getpsd(), checkchol, "absdiff", 0.0000001) );
   }
 
+  SECTION( "Cholesky decomposed matrix is upper triangle form" ) {
+
+    arma::mat cholmat = pv.getpsd();
+    double upperright = cholmat(0, 1);
+    double lowerleft  = cholmat(1, 0);
+
+    REQUIRE( lowerleft == 0 );
+    REQUIRE( upperright != 0 );
+
+  }
+
   pv.addreject();
   SECTION( "can iterate/add reject" ) {
 
