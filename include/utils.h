@@ -11,6 +11,13 @@
 namespace pulseutils {
 
 
+  // 
+  // orderstat_default()
+  //   Defining in a single location the order-statistic on pulse location used
+  //   in all versions of the algirithm.
+  //
+  int orderstat_default() { return 3 };
+
   //
   // likelihood() 
   //   computes the current likelihood using the observed log-concentrations and
