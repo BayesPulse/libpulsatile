@@ -6,6 +6,7 @@
 #include "proposalvariance.h"
 #include "mh.h"
 #include "patient.h"
+#include "population.h"
 #include "utils.h"
 
 int main(int argc, char **argv) {
@@ -29,6 +30,12 @@ int main(int argc, char **argv) {
   std::cout << "Choldecomp of PV (i.e. PSD, upper triangle form)  = " << pv.getpsd() << "\n";
   std::cout << "PSD test that actually upper triangular form = " << cholcov << "\n";
   std::cout << "rmvnorm = " << pulseutils::rmvnorm(initial_means, pv.getpsd()) << "\n";
+
+  //double a = 11;
+  //arma::vec testvec = initial_means;
+  //testvec += a;
+  //std::cout << "vector += scalar: " << initial_means << " += " << a <<  " = " << testvec << "\n";
+  //// TRUE
 
   return 0;
 

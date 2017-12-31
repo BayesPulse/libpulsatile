@@ -42,7 +42,7 @@ class ProposalVariance {
                      int in_max_iter,     // maximum iteration to adjust pv
                      double in_target_ratio) {
       adjust_iter  = in_adjust_iter;
-      max_iter    = in_max_iter;
+      max_iter     = in_max_iter;
       target_ratio = in_target_ratio;
       initialize_proposals(in_pv);
     }

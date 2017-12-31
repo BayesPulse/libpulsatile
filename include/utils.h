@@ -7,6 +7,8 @@
 
 #include <RcppArmadillo.h>
 #include <RInside.h>
+#include "patient.h"
+#include "datastructures.h"
 
 namespace pulseutils {
 
@@ -16,7 +18,7 @@ namespace pulseutils {
   //   Defining in a single location the order-statistic on pulse location used
   //   in all versions of the algirithm.
   //
-  int orderstat_default() { return 3 };
+  int orderstat_default() { return 3; };
 
   //
   // likelihood() 
