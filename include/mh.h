@@ -19,7 +19,9 @@
 //    - How do I get priors, parms, data into MMH methods?
 //    - Pointer *is --may be-- best.  Is there a meaningful/simple way to take
 //      simple args and return a value? Or is it best to update internally
+//
 
+template <typename T>
 class ModifiedMetropolisHastings
 {
 
@@ -28,7 +30,40 @@ class ModifiedMetropolisHastings
     //   - runs 1 iteration
     //   - inputs/outputs or changes internally?
     //   - pass Patient as pointer?
-    template<typename T> T sample();
+    //  S will be double or arma::vec depending on single or two parameter MMH
+    template <typename S> S sample()
+    {
+
+      double accept_prob, alpha;
+
+      // Draw new proposal
+      S proposal     = draw_proposal(current, pv.getpv());
+      bool supported = parameter_support(proposal);
+
+      if (!supported) {
+
+        pv.addreject();
+        return current;
+
+      } else {
+
+        accept_prob = posterior_function();
+        alpha = (0 < accept_prob) ? 0 : accept_prob;
+
+        if (log(Rf_runif()) < alpha) {
+
+          pv.addaccept();
+          return proposal;
+
+        } else {
+
+          pv.addreject();
+          return current;
+
+        }
+      }
+    }
+
 
   protected:
     ModifiedMetropolisHastings(T proposal_variance);
@@ -41,7 +76,7 @@ class ModifiedMetropolisHastings
       return Rf_rnorm(current, proposal_sd);
     };
     arma::vec draw_proposal(arma::vec current, arma::mat proposal_sd){
-      return Rf_rmultinorm(current, proposal_sd);
+      return rmvnorm(current, proposal_sd);
     };
     virtual bool parameter_support();  // i.e. truncation logic
     virtual double posterior_function(); // logrho_calculation
@@ -51,42 +86,6 @@ class ModifiedMetropolisHastings
 
 
 
-
-// MCMC sampling function
-//  T will be double or arma::vec depending on single or two parameter MMH
-template <typename T>
-T ModifiedMetropolisHastings::sample()
-{
-
-  double accept_prob, alpha;
-
-  // Draw new proposal
-  T proposal     = draw_proposal(current, pv.getpv());
-  bool supported = parameter_support(proposal);
-
-  if (!supported) {
-
-    pv.addreject();
-    return current;
-
-  } else {
-
-    accept_prob = posterior_function();
-    alpha = (0 < accept_prob) ? 0 : accept_prob;
-
-    if (log(Rf_runif()) < alpha) {
-
-      pv.addaccept();
-      return proposal;
-
-    } else {
-
-      pv.addreject();
-      return current;
-
-    }
-  }
-}
 
 
 
