@@ -82,7 +82,7 @@ struct PatientPriors {
 
   }
 
-  // Population constructor
+  // Population constructor (Base + 2 parameters)
   PatientPriors(double prior_baseline_mean,
                 double prior_baseline_variance,
                 double prior_halflife_mean,
@@ -108,7 +108,7 @@ struct PatientPriors {
 
     }
 
-  // Single-subject constructor
+  // Single-subject constructor (Base + 8 parameters)
   PatientPriors(double prior_baseline_mean,
                 double prior_baseline_variance,
                 double prior_halflife_mean,
@@ -121,10 +121,9 @@ struct PatientPriors {
                 double prior_width_sd_max,
                 double prior_error_alpha,
                 double prior_error_beta,
-                double prior_num_orderstat,
                 int    prior_pulse_count,
                 double prior_strauss_repulsion,
-                //double prior_strauss_hardcore_range,
+                //double prior_strauss_hardcore_range, // not needed in single-subj
                 double prior_strauss_repulsion_range
                ) :
     PatientPriors(prior_baseline_mean, prior_baseline_variance,
