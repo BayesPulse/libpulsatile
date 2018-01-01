@@ -1,7 +1,6 @@
 #ifndef GUARD_proposalvariance_h
 #define GUARD_proposalvariance_h
 
-// [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <RInside.h>
 #include <math.h>

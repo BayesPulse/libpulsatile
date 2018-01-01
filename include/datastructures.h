@@ -2,9 +2,8 @@
 #define GUARD_datastructures_h
 
 #include <RcppArmadillo.h>
-#include <RInside.h>                    // for the embedded R via RInside
+#include <RInside.h>
 #include "utils.h"
-//#include <list>
 
 //
 // datastructures_patient.h
@@ -16,8 +15,6 @@
 //
 
 using namespace Rcpp;
-//using namespace RcppArmadillo;
-
 
 
 //

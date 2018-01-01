@@ -16,7 +16,7 @@
 //
 
 using namespace Rcpp;
-using namespace RcppArmadillo;
+//using namespace RcppArmadillo;
 
 
 
