@@ -169,19 +169,22 @@ struct PatientPriors_Single : PatientPriors {
 
 //
 // PatientEstimates structure
-//   aka PatientParms -- common chain updated by mcmc algorithm
-//   called Common_parms in my single-subject
-// TODO: Update comments (like PatientPriors)
+//
+//   1. PatientEstimates_Pop is the version of the 'common parms' mcmc chain
+//   (patient-level estimates) that is used in the population model.
+//
+//   2. PatientEstimates_Single is the single-subject version, which adds two
+//   parameters. These two parameters are estimated at the population level in
+//   the pop model.
 //
 
+// 1. PatientEstimates_Pop
 struct PatientEstimates_Pop {
 
   // Used in all models
   double baseline;
   double halflife;
-  double decay;      // decay rate converted from above half-life
   double errorsq;    // model error (variance)
-  double logerrorsq; // log of model error (may not be used)
   double mass_mean;
   double width_mean;
   int    pulse_count;
@@ -200,16 +203,17 @@ struct PatientEstimates_Pop {
     width_mean  = sv_width_mean;
     pulse_count = sv_pulse_count;
 
-    decay      = log(2) / halflife;
-    logerrorsq = log(errorsq);
   }
 
+  // Always use these functions to get these values.  removed them as separate
+  // member variables to ensure the result is always up-to-date
   double get_decay() { return log(2) / halflife; }
   double get_logerrorsq() { return log(errorsq); }
 
 };
 
 
+// 2. PatientEstimates_Single
 struct PatientEstimates_Single : PatientEstimates_Pop {
   // Not used in Population models:
   double mass_sd;
@@ -234,12 +238,15 @@ struct PatientEstimates_Single : PatientEstimates_Pop {
 
 
 
+
+
 //
 // PulseEstimate structure
 //   aka PulseParms -- pulse chain updated by mcmc algorithm
 //   called
-//   TODO: Check  on lambda, does fsh need sepearte definition?
+//   TODO: Check  on lambda, does fsh need separate definition?
 //
+
 struct PulseEstimate {
 
   // Variables used in all models

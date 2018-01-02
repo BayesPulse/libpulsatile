@@ -143,13 +143,6 @@ TEST_CASE( "PatientEstimates_Pop population constructor works",
 
   }
 
-  SECTION( "Other variables are correctly calculated." ) {
-
-    REQUIRE(pepop.decay      == (log(2) / pepop.halflife));
-    REQUIRE(pepop.logerrorsq == log(pepop.errorsq));
-
-  }
-
   SECTION( "Accessor methods do correct calculations." ) {
 
     // Change values used in the calculations
