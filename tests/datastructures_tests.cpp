@@ -7,7 +7,7 @@
 
 //
 // datastructures_tests.cpp
-//  For now, also contains tests of utils.h
+//  For now, also contains tests of utils.h (first set of tests)
 //
 
 
@@ -47,10 +47,16 @@ TEST_CASE( "rmvnorm Function", "[utils]" ) {
 }
 
 
+
+
 //
 // Test datastructures structs
 //
 
+
+//
+// PatientPriors based objects
+//
 TEST_CASE( "PatientPriors base constructor works (never otherwise used directly)", 
            "[datastructures]" ) {
 
@@ -127,6 +133,9 @@ TEST_CASE( "PatientPriors single-subject constructor works",
 }
 
 
+//
+// PatientEstimates based objects
+//
 TEST_CASE( "PatientEstimates_Pop population constructor works",
            "[datastructures]" ) {
 
@@ -175,14 +184,85 @@ TEST_CASE( "PatientEstimates_Single single-subject constructor works",
 
   }
 
-  SECTION( "Other variables are correctly calculated." ) {
+  SECTION( "Accessor methods do correct calculations." ) {
 
-    REQUIRE(pesingle.decay      == (log(2) / pesingle.halflife));
-    REQUIRE(pesingle.logerrorsq == log(pesingle.errorsq));
+    // Change values used in the calculations
+    pesingle.halflife = 75;
+    pesingle.errorsq = 0.01;
+
+    REQUIRE(pesingle.get_decay() == (log(2) / pesingle.halflife));
+    REQUIRE(pesingle.get_logerrorsq() == log(pesingle.errorsq));
 
   }
 
 }
+
+
+//
+// PatientData object
+//
+TEST_CASE( "PatientData single hormone constructor works",
+           "[datastructures]" ) {
+
+  NumericVector time(144);
+  NumericVector conc = rnorm(144, 3, 0.1);
+  for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
+
+  PatientData pdone(time, conc);
+
+  SECTION( "Variables included in constructor are initialized as expected." ) {
+
+    REQUIRE(arma::approx_equal(pdone.time, as<arma::vec>(time),
+                               "absdiff", 0.00001));
+    REQUIRE(arma::approx_equal(pdone.concentration, as<arma::vec>(conc),
+                               "absdiff", 0.00001));
+  }
+
+  SECTION( "Check calculated variables" ) {
+
+    REQUIRE(pdone.number_of_obs == time.size());
+    REQUIRE(pdone.number_of_obs == 144);
+    REQUIRE(pdone.duration_of_obs == 1430);
+    REQUIRE(pdone.avg_period_of_obs == 10);
+
+  }
+
+}
+
+
+TEST_CASE( "PatientData two-hormone constructor works",
+           "[datastructures]" ) {
+
+  NumericVector time(144);
+  NumericVector conc = rnorm(144, 3, 0.1);
+  NumericVector responseconc = conc + rnorm(144, 3, 0.1);
+  for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
+
+  PatientData pdtwo(time, conc, responseconc);
+
+  SECTION( "Variables included in constructor are initialized as expected." ) {
+
+    REQUIRE(arma::approx_equal(pdtwo.time, as<arma::vec>(time),
+                               "absdiff", 0.00001));
+    REQUIRE(arma::approx_equal(pdtwo.concentration, as<arma::vec>(conc),
+                               "absdiff", 0.00001));
+    REQUIRE(arma::approx_equal(pdtwo.response_concentration,
+                               as<arma::vec>(responseconc),
+                               "absdiff", 0.00001));
+  }
+
+  SECTION( "Check calculated variables" ) {
+
+    REQUIRE(pdtwo.number_of_obs == time.size());
+    REQUIRE(pdtwo.number_of_obs == 144);
+    REQUIRE(pdtwo.duration_of_obs == 1430);
+    REQUIRE(pdtwo.avg_period_of_obs == 10);
+
+  }
+
+}
+
+
 
 
 

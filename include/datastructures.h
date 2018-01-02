@@ -268,12 +268,10 @@ struct PulseEstimate {
 //
 // PatientData structure
 //
-// TODO: Start here.  should it be updated to fit in with  inheritance approach?
-//  (difference is probably too small to warrant it (just response_concentration
-//  column))
 // TODO: Then move on to patient class, then mmh, then mcmc for single subject,
 // then add in gibbs.
 //
+
 struct PatientData {
 
   arma::vec time;
@@ -285,15 +283,13 @@ struct PatientData {
 
   // Constructor for single hormone data
   PatientData(NumericVector in_time,
-              NumericVector in_conc,
-              int in_numobs,
-              double in_period) {
+              NumericVector in_conc) {
 
     time              = as<arma::vec>(in_time);
     concentration     = as<arma::vec>(in_conc);
     number_of_obs     = time.size();
-    duration_of_obs   = (time.end() - 1) - time.begin();
-    avg_period_of_obs = duration_of_obs / number_of_obs;
+    duration_of_obs   = time(number_of_obs - 1) - time(0); // NOTE: 1430 for typical 24 hour dataset (not 1440)
+    avg_period_of_obs = duration_of_obs / (number_of_obs - 1);
 
   }
 
@@ -301,10 +297,8 @@ struct PatientData {
   //   using C++11 delegating constructors feature to avoid repeating code
   PatientData(NumericVector in_time,
               NumericVector in_conc,
-              NumericVector in_responseconc,
-              int in_numobs,
-              double in_period) 
-    : PatientData(in_time, in_conc, in_numobs, in_period) {
+              NumericVector in_responseconc
+             ) : PatientData(in_time, in_conc) {
 
       response_concentration = as<arma::vec>(in_responseconc);
 
