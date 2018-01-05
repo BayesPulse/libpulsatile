@@ -1,5 +1,6 @@
 #include <RcppArmadillo.h>
 #include <RInside.h>
+#include "patient.h"
 #include "datastructures.h"
 #include "utils.h"
 #include "proposalvariance.h"
@@ -263,7 +264,163 @@ TEST_CASE( "PatientData two-hormone constructor works",
 }
 
 
+//
+// PulseEstimate object
+//
+TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
+
+  arma::vec mc(100);
+  PulseEstimate pulse { 10.7, 5.1, 32.3, 0.174, 0.764, mc };
+
+  SECTION( "member variables can be access" ) {
+    REQUIRE(pulse.time == 10.7);
+    REQUIRE(pulse.mass == 5.1);
+    REQUIRE(pulse.width == 32.3);
+    REQUIRE(pulse.tvarscale_mass == 0.174);
+    REQUIRE(pulse.tvarscale_width == 0.764);
+    REQUIRE(approx_equal(pulse.mean_contribution, mc, "absdiff", 0.0001));
+    REQUIRE(pulse.mean_contribution(0) == 0.0);
+    REQUIRE(pulse.mean_contribution(99) == 0.0);
+    REQUIRE(pulse.mean_contribution.size() == 100);
+  }
+
+}
 
 
+//
+// patient_tests.cpp
+//
+// note: haven't added tests of response_concentration data
+//
+
+// Single-subject patient (OnlyPatient)
+TEST_CASE( "OnlyPatient class constructor works", "[patient]" ) {
+
+  NumericVector time(144);
+  NumericVector conc = rnorm(144, 3, 0.1);
+  for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
+
+  PatientData pdone(time, conc);
+  PatientPriors_Single ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
+                                10, 100, 1000, 1000, 12, 0, 40);
+  PatientEstimates_Single pesingle(3, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientData * data = &pdone;
+  PatientPriors_Single * priors = &ppsingle;
+  PatientEstimates_Single * estimates = &pesingle;
+
+  OnlyPatient pat(data, priors, estimates);
+
+  SECTION( "Estimates can be accessed" ) {
+    REQUIRE(pat.estimates->baseline == 3);
+    REQUIRE(pat.estimates->mass_mean == 3.5);
+    REQUIRE(pat.estimates->pulse_count == 12);
+    REQUIRE(pat.estimates->mass_sd == 10);
+  }
+
+  SECTION( "Estimates can be updated" ) {
+    pat.estimates->baseline = 10;
+    REQUIRE(pat.estimates->baseline == 10);
+    pat.estimates->mass_mean = 5.0;
+    REQUIRE(pat.estimates->mass_mean == 5.0);
+    pat.estimates->pulse_count = 6;
+    REQUIRE(pat.estimates->pulse_count == 6);
+    pat.estimates->mass_sd = 50;
+    REQUIRE(pat.estimates->mass_sd == 50);
+  }
+
+  SECTION( "Priors can be accessed" ) {
+    REQUIRE(pat.priors->baseline_mean == 1.5);
+    REQUIRE(pat.priors->mass_sd_max == 10);
+    REQUIRE(pat.priors->error_alpha == 1000);
+    REQUIRE(pat.priors->num_orderstat == 3);
+    REQUIRE(pat.priors->strauss_repulsion == 0);
+  }
+
+  SECTION( "Priors can be updated" ) {
+    pat.priors->baseline_mean     = 2.25;
+    pat.priors->mass_sd_max       = 90;
+    pat.priors->error_alpha       = 700;
+    pat.priors->num_orderstat     = 4;
+    pat.priors->strauss_repulsion = 0.75;
+    REQUIRE(pat.priors->baseline_mean     == 2.25);
+    REQUIRE(pat.priors->mass_sd_max       == 90);
+    REQUIRE(pat.priors->error_alpha       == 700);
+    REQUIRE(pat.priors->num_orderstat     == 4);
+    REQUIRE(pat.priors->strauss_repulsion == 0.75);
+  }
+
+  SECTION( "Data can be accessed" ) {
+    REQUIRE(pat.data->time(1) == 20);
+    REQUIRE(pat.data->time(143) == 1440);
+    REQUIRE(pat.data->concentration(1) < 20);
+    REQUIRE(pat.data->concentration(1) > 0);
+    REQUIRE(pat.data->concentration(143) < 20);
+    REQUIRE(pat.data->concentration(143) > 0);
+    REQUIRE(pat.data->time.size() == 144);
+    REQUIRE(pat.data->concentration.size() == 144);
+    REQUIRE(pat.data->response_concentration.size() == 0);
+  }
+
+  // TODO: look at how the first one is created in the pulsatile() pkg code
+  // TODO: Look at iterators for this
+  SECTION( "Can add a pulse" ) {
+  }
+
+  SECTION( "Can remove a pulse" ) {
+  }
+
+}
+
+
+// Population patient (OnePatient)
+TEST_CASE( "OnePatient class constructor works", "[patient]" ) {
+
+  NumericVector time(144);
+  NumericVector conc = rnorm(144, 3, 0.1);
+  for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
+
+  PatientData pd(time, conc);
+  PatientEstimates_Pop pep(3, 45, 0.05, 3.5, 30, 12);
+  PatientData * data = &pd;
+  PatientEstimates_Pop * estimates = &pep;
+
+  OnePatient pat(data, estimates);
+
+  SECTION( "Estimates can be accessed" ) {
+    REQUIRE(pat.estimates->baseline == 3);
+    REQUIRE(pat.estimates->mass_mean == 3.5);
+    REQUIRE(pat.estimates->pulse_count == 12);
+  }
+
+  SECTION( "Estimates can be updated" ) {
+    pat.estimates->baseline = 10;
+    REQUIRE(pat.estimates->baseline == 10);
+    pat.estimates->mass_mean = 5.0;
+    REQUIRE(pat.estimates->mass_mean == 5.0);
+    pat.estimates->pulse_count = 6;
+    REQUIRE(pat.estimates->pulse_count == 6);
+  }
+
+  SECTION( "Data can be accessed" ) {
+    REQUIRE(pat.data->time(1) == 20);
+    REQUIRE(pat.data->time(143) == 1440);
+    REQUIRE(pat.data->concentration(1) < 20);
+    REQUIRE(pat.data->concentration(1) > 0);
+    REQUIRE(pat.data->concentration(143) < 20);
+    REQUIRE(pat.data->concentration(143) > 0);
+    REQUIRE(pat.data->time.size() == 144);
+    REQUIRE(pat.data->concentration.size() == 144);
+    REQUIRE(pat.data->response_concentration.size() == 0);
+  }
+
+  // TODO: look at how the first one is created in the pulsatile() pkg code
+  // TODO: Look at iterators for this
+  SECTION( "Can add a pulse" ) {
+  }
+
+  SECTION( "Can remove a pulse" ) {
+  }
+
+}
 
 

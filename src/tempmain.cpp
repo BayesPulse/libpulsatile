@@ -37,6 +37,21 @@ int main(int argc, char **argv) {
   //std::cout << "vector += scalar: " << initial_means << " += " << a <<  " = " << testvec << "\n";
   //// TRUE
 
+  // Testing using R objects in c++
+  NumericVector time(100); //, conc(100);
+  NumericVector conc     = rnorm(100, 3, 0.1);
+  NumericVector response = conc + rnorm(100, 1, 0.001);
+  for (int i = 0; i < time.size(); i++) time(i) = i + 1;
+
+
+  std::cout << "Time meta: size=" << time.size() << ", begin=" << time(0) << ", end=" << time(time.size() - 1) << "\n";
+
+  //std::cout << "NumericVector w/ values from 1 to 100 and 100 random normals and 100 more\n";
+  //for (int i = 0; i < time.size(); i++) {
+  //  std::cout << time(i) << ", " << conc(i) << ", " << response(i) << "\n";
+  //}
+
+
   return 0;
 
 }

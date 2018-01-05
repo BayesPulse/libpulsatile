@@ -20,65 +20,105 @@
 // Parent class of Patients and Populations, object that MMH and Gibbs
 // recognize
 //
-struct MCMCSamplingUnit { };
+//struct MCMCSamplingUnit { };
 
 
-//using namespace Rcpp;
-////using namespace RcppArmadillo;
+using namespace Rcpp;
+//using namespace RcppArmadillo;
+
+
+
 //
+// OnlyPatient struct
+//   For single-subject model
 //
+struct OnlyPatient {
+//: MCMCSamplingUnit
+
+  OnlyPatient(PatientData *in_data,
+              PatientPriors_Single *in_priors,
+              PatientEstimates_Single *in_parms) {
+
+    data = in_data;
+    priors = in_priors;
+    estimates = in_parms;
+
+  }
+
+  //int get_pulsecount() { return estimates.pulse_count };
+
+  // need access to pulses, pulse_count, priors, data.. basically all of this
+  PatientData *data;
+  PatientPriors_Single *priors;
+  PatientEstimates_Single *estimates;
+  //AssocEstimates association; // Note: should move to Population class, check how its estimated.
+  std::list<PulseEstimate> pulses;
+  std::list<PulseEstimate> responses;
+
+};
+
+
 //
-////
-//// Patient class
-////
-//class Patient : MCMCSamplingUnit {
+// aPatient struct
+//  For pop model (OnePatient of many) 
+//
+struct OnePatient {
+//: MCMCSamplingUnit
+
+  OnePatient(PatientData *in_data,
+             //PatientPriors_Pop *in_priors,
+             PatientEstimates_Pop *in_parms) {
+
+    data = in_data;
+    //priors = in_priors;
+    estimates = in_parms;
+
+  }
+
+  //int get_pulsecount() { return estimates.pulse_count };
+
+  // need access to pulses, pulse_count, priors, data.. basically all of this
+  PatientData *data;
+  PatientEstimates_Pop *estimates;
+  std::list<PulseEstimate> pulses;
+  std::list<PulseEstimate> responses;
+
+  //PopulationEstimates *popest; // Note: should move to population class
+  //AssocEstimates association; // Note: should move to Population class, check how its estimated.
+
+};
+
+
+
+// Example handler class
+//class Student_info { 
 //
 //  public:
+//    // constructors and copy control
+//    Student_info(): cp(0) { } 
+//    Student_info(std::istream& is): cp(0) { read(is); } 
+//    Student_info(const Student_info&);
+//    Student_info& operator=(const Student_info&); 
+//    ~Student_info() { delete cp; }
 //
-//    Patient(NumericMatrix data,
-//            NumericVector priors,
-//            NumericVector starting_values) {
-//
-//      read_data(data);
-//      PatientPriors priors();
-//      PatientData data();
-//      PatientEstimates estimates();
-//
+//    // operations
+//    std::istream& read(std::istream&);
+//    std::string name() const {
+//      if (cp) return cp->name();
+//      else throw std::runtime_error("uninitialized Student");
+//    }
+//    double grade() const {
+//      if (cp) return cp->grade();
+//      else throw std::runtime_error("uninitialized Student");
 //    }
 //
-//    // Read in data
-//    // TODO: need to use PatientData constructors instead
-//    void read_data(NumericMatrix data) {
-//
-//      // col 0 = time; col 1 = (driver) conc.; col 2 = (response conc.)
-//      int ncol = data.ncol();
-//      if (ncol == 2) {
-//        read_data_in(data(_, 0), data(_, 1));
-//      } else if (ncol == 3) {
-//        read_data_in(data(_, 0),  data(_, 1),  data(_, 2));
-//      } else {
-//        // **error handling**
-//      }
-//
-//    }
-//
-//    int get_pulsecount() { return estimates.pulse_count };
-//
+//    static bool compare(const Student_info& s1,
+//                        const Student_info& s2) { return s1.name() < s2.name(); }
 //
 //  private:
+//    Core* cp;
 //
-//    // need access to pulses, pulse_count, priors, data.. basically all of this
-//    //double likelihood; // calculate as-needed?
-//    PatientPriors priors;
-//    PatientData data;
-//    PatientEstimates estimates;
-//    AssocEstimates association; // Note: should move to Population class, check how its estimated.
-//    std::list<PulseEstimate> pulses;
-//
-//
-//};
-
-
+//}
 
 
 ////////////////////////////////////////////////////////////

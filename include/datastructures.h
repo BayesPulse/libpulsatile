@@ -178,8 +178,11 @@ struct PatientPriors_Single : PatientPriors {
 //   the pop model.
 //
 
+struct PatientEstimates { };
+
+
 // 1. PatientEstimates_Pop
-struct PatientEstimates_Pop {
+struct PatientEstimates_Pop : PatientEstimates{
 
   // Used in all models
   double baseline;

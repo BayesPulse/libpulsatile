@@ -85,6 +85,41 @@ namespace pulselikelihood {
   }
 
 
+  //
+  // mean_contribution()
+  //   this updates a pulse's mean_contrib vector based on current values of
+  //   parameters
+  // This function updates a pulse's mean_contrib vector based on inputted parms
+  //
+  // Node_type *node; what pulse are we updating;
+  // double **ts; this is the matrix of observed data (a column of times and a column of log(concentration);
+  // Common_parms *parms; the current values of the common parameters;
+  // int N; the number of observations in **ts;
+  //
+  void mean_contribution(PulseEstimate *pulse, arma::vec *concentration, PatientEstimates *patest)
+  {
+
+    int i;             // generic counter
+    double x, y, z, w; // part of arithmetic used in calculating mean contrib
+    double decay = patest->get_decay();
+
+    z  = pulse->theta[1] * decay;
+    y  = decay * (0.5 * z  + pulse->time);
+    z += pulse->time;
+    w  = sqrt(2. * pulse->theta[1]);
+
+    for (i = 0; i < N; i++) {
+      x = (ts[i][0] - z) / w;
+      x = Rf_pnorm5(x * sqrt(2), 0.0, 1.0, 1, 0);
+
+      if (x == 0) {
+        pulse->mean_contrib[i] = 0; 
+      } else {
+        pulse->mean_contrib[i] = pulse->theta[0] * x * exp(y - ts[i][0] * decay);
+      }
+    }
+
+  }
 
 }
 
