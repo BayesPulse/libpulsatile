@@ -53,6 +53,7 @@ struct OnlyPatient {
   PatientEstimates_Single *estimates;
   //AssocEstimates association; // Note: should move to Population class, check how its estimated.
   std::list<PulseEstimate> pulses;
+  std::list<PulseEstimate>::iterator piter = pulses.begin();
   std::list<PulseEstimate> responses;
 
 };

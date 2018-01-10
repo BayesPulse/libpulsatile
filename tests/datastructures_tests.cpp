@@ -270,6 +270,7 @@ TEST_CASE( "PatientData two-hormone constructor works",
 TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
 
   arma::vec mc(100);
+  mc.fill(0.);
   PulseEstimate pulse { 10.7, 5.1, 32.3, 0.174, 0.764, mc };
 
   SECTION( "member variables can be access" ) {
@@ -363,7 +364,15 @@ TEST_CASE( "OnlyPatient class constructor works", "[patient]" ) {
 
   // TODO: look at how the first one is created in the pulsatile() pkg code
   // TODO: Look at iterators for this
+
   SECTION( "Can add a pulse" ) {
+    arma::vec mc(100);
+    mc.fill(0.);
+    PulseEstimate pulse { 10.7, 5.1, 32.3, 0.174, 0.764, mc };
+    pat.pulses.push_back(pulse);
+    pat.pulses(0);
+    //REQUIRE(
+    //pat.pulses.piter
   }
 
   SECTION( "Can remove a pulse" ) {
