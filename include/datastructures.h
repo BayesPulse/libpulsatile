@@ -260,6 +260,52 @@ struct PulseEstimate {
   double tvarscale_width;  // variance scale for width t-dist (eta)
   arma::vec mean_contribution;
 
+  PulseEstimate(double in_time,
+                double in_mass,
+                double in_width,
+                double in_tvarscale_mass,
+                double in_tvarscale_width,
+                double patient_decay,
+                const arma::vec &patient_conc) 
+    : time            (in_time)
+    , mass            (in_mass)
+    , width           (in_width)
+    , tvarscale_mass  (in_tvarscale_mass)
+    , tvarscale_width (in_tvarscale_width)
+    , mean_contribution(patient_conc.n_elem)
+  {
+    mean_contribution.fill(0.);
+    calc_mean_contribution(patient_conc, patient_decay);
+
+  }
+
+  // mean_contribution() of each pulse to the total mean_concentration
+  //   TODO: when/how to call for updates?
+  void calc_mean_contribution(const arma::vec &concentration, double decay_rate)
+  {
+
+    int i;                // generic counter
+    double x, y, z, w, N; // part of arithmetic used in calculating mean contrib
+
+    z  = width * decay_rate;
+    y  = decay_rate * (0.5 * z  + time);
+    z += time;
+    w  = sqrt(2. * width);
+    N = concentration.n_elem;
+
+    for (i = 0; i < N; i++) {
+      x = ((double)concentration(i) - z) / w;
+      x = Rf_pnorm5(x * sqrt(2), 0.0, 1.0, 1, 0);
+
+      if (x == 0) {
+        mean_contribution(i) = 0;
+      } else {
+        mean_contribution(i) = mass * x * exp(y - concentration(i) * decay_rate);
+      }
+    }
+
+  }
+
   // Used only in 2-hormone models
   //double lambda; // for fsh pulse only, denomsum - NOT SURE WHAT THIS TERM IS
                    //FOR (from Karen's code)

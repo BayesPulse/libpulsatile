@@ -82,7 +82,9 @@ struct OnePatient {
   PatientData *data;
   PatientEstimates_Pop *estimates;
   std::list<PulseEstimate> pulses;
+  std::list<PulseEstimate>::iterator piter = pulses.begin();
   std::list<PulseEstimate> responses;
+  std::list<PulseEstimate>::iterator riter = responses.begin();
 
   //PopulationEstimates *popest; // Note: should move to population class
   //AssocEstimates association; // Note: should move to Population class, check how its estimated.
