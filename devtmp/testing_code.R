@@ -18,7 +18,7 @@ for (i in 0:100) {
 accepts/iters
 
 
-
+sim <- readRDS("devtmp/sim_data.Rds")
 
 calc_mean_contribution <- function(concentration, decay_rate) {
   time  <- 10.7
@@ -44,4 +44,3 @@ concentration <- sim$data$concentration
 
 decay_rate    <- 0.5
 calc_mean_contribution(concentration, decay_rate)
-

@@ -250,65 +250,92 @@ struct PatientEstimates_Single : PatientEstimates_Pop {
 //   TODO: Check  on lambda, does fsh need separate definition?
 //
 
-struct PulseEstimate {
+class PulseEstimate {
 
-  // Variables used in all models
-  double time;
-  double mass;
-  double width;
-  double tvarscale_mass;   // variance scale for mass t-dist (eta)
-  double tvarscale_width;  // variance scale for width t-dist (eta)
-  arma::vec mean_contribution;
+  public:
 
-  PulseEstimate(double in_time,
-                double in_mass,
-                double in_width,
-                double in_tvarscale_mass,
-                double in_tvarscale_width,
-                double patient_decay,
-                const arma::vec &patient_conc) 
-    : time            (in_time)
-    , mass            (in_mass)
-    , width           (in_width)
-    , tvarscale_mass  (in_tvarscale_mass)
-    , tvarscale_width (in_tvarscale_width)
-    , mean_contribution(patient_conc.n_elem)
-  {
-    mean_contribution.fill(0.);
-    calc_mean_contribution(patient_conc, patient_decay);
+    // Variables used in all models
+    double time;
+    double mass;
+    double width;
+    double tvarscale_mass;   // variance scale for mass t-dist (eta)
+    double tvarscale_width;  // variance scale for width t-dist (eta)
+    double lambda; // for fsh pulse only, denomsum - NOT SURE WHAT THIS TERM IS
+                   //FOR (from Karen's code)
 
-  }
+    // Public user-facing access function for mean_contrib. Only calculates
+    // mean_contrib if input values have changed.
+    arma::vec get_mean_contribution(const arma::vec & concentration, double decay_rate)
+    {
 
-  // mean_contribution() of each pulse to the total mean_concentration
-  //   TODO: when/how to call for updates?
-  void calc_mean_contribution(const arma::vec &concentration, double decay_rate)
-  {
-
-    int i;                // generic counter
-    double x, y, z, w, N; // part of arithmetic used in calculating mean contrib
-
-    z  = width * decay_rate;
-    y  = decay_rate * (0.5 * z  + time);
-    z += time;
-    w  = sqrt(2. * width);
-    N = concentration.n_elem;
-
-    for (i = 0; i < N; i++) {
-      x = ((double)concentration(i) - z) / w;
-      x = Rf_pnorm5(x * sqrt(2), 0.0, 1.0, 1, 0);
-
-      if (x == 0) {
-        mean_contribution(i) = 0;
-      } else {
-        mean_contribution(i) = mass * x * exp(y - concentration(i) * decay_rate);
+      if (prev_mass != mass | prev_width != width | prev_time != time | prev_decay_rate != decay_rate) {
+        calc_mean_contribution(concentration, decay_rate);
+        prev_time = time;
+        prev_mass = mass;
+        prev_width = width;
+        prev_decay_rate = decay_rate;
       }
+
+      return mean_contribution;
+
     }
 
-  }
+    // Constructor for new PulseEstimate objects
+    PulseEstimate(double in_time,
+                  double in_mass,
+                  double in_width,
+                  double in_tvarscale_mass,
+                  double in_tvarscale_width,
+                  //double fshlambda,
+                  double patient_decay,
+                  const arma::vec &patient_conc)
+        : time            (in_time)
+        , mass            (in_mass)
+        , width           (in_width)
+        , tvarscale_mass  (in_tvarscale_mass)
+        , tvarscale_width (in_tvarscale_width)
+        //, lambda          (fshlambda)
+        , mean_contribution(patient_conc.n_elem)
+      {
+        mean_contribution.fill(0.);
+        calc_mean_contribution(patient_conc, patient_decay);
+        prev_time       = time;
+        prev_mass       = mass;
+        prev_width      = width;
+        prev_decay_rate = patient_decay;
+      }
 
-  // Used only in 2-hormone models
-  //double lambda; // for fsh pulse only, denomsum - NOT SURE WHAT THIS TERM IS
-                   //FOR (from Karen's code)
+  private:
+
+    arma::vec mean_contribution;
+    double prev_time, prev_mass, prev_width, prev_decay_rate;
+
+    // mean_contribution() of each pulse to the total mean_concentration
+    void calc_mean_contribution(const arma::vec &concentration, double decay_rate)
+    {
+
+      int i;                // generic counter
+      double x, y, z, w, N; // part of arithmetic used in calculating mean contrib
+
+      z  = width * decay_rate;
+      y  = decay_rate * (0.5 * z  + time);
+      z += time;
+      w  = sqrt(2. * width);
+      N = concentration.n_elem;
+
+      for (i = 0; i < N; i++) {
+        x = ((double)concentration(i) - z) / w;
+        x = Rf_pnorm5(x * sqrt(2), 0.0, 1.0, 1, 0);
+
+        if (x == 0) {
+          mean_contribution(i) = 0;
+        } else {
+          mean_contribution(i) = mass * x * exp(y - concentration(i) * decay_rate);
+        }
+      }
+
+    }
+
 
 };
 

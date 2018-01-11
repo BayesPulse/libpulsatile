@@ -270,32 +270,43 @@ TEST_CASE( "PatientData two-hormone constructor works",
 TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
 
   arma::vec conc =
-    { 5.237937, 5.1568, 5.773434, 6.364134, 9.87264, 8.782145, 8.633523, 7.166886,
-      6.063834, 6.393283, 5.547755, 5.609554, 17.80913, 14.86423, 14.48801,
-      11.01298, 10.07494, 8.579306, 7.925953, 7.505312, 7.408293, 6.296038,
-      6.138372, 6.114483, 4.589039, 4.787283, 4.125096, 4.560712, 3.838159,
-      3.611227, 10.14919, 9.114352, 8.47573, 8.166254, 7.115865, 6.364551, 6.076659,
-      4.936654, 4.81576, 5.00079, 4.405922, 4.62151, 3.612532, 3.861247, 3.480776,
-      4.382934, 6.908732, 5.677212, 5.697563, 5.04941, 5.033481, 5.036818, 4.766425,
-      4.108461, 4.493277, 3.970064, 3.479031, 3.105488, 3.182802, 2.832481,
-      2.904569, 13.39396, 12.16036, 12.60488, 9.282701, 8.971699, 7.872894, 7.34175,
-      6.12995, 6.754877, 6.236324, 5.221481, 4.712401, 4.251457, 4.10765, 3.642404,
-      3.409108, 3.673586, 3.573048, 3.006202, 3.57485, 2.984541, 2.942794, 6.142817,
-      6.239127, 5.607103, 5.781841, 5.3651, 4.4835, 4.318313, 3.729648, 4.186974,
-      3.661007, 3.587046, 3.420915, 3.554909, 2.951518, 3.197826, 2.768718,
-      4.050486, 6.375893, 5.984611, 4.975292, 4.75875, 5.00626, 4.13762, 3.676703,
-      4.133922, 3.445431, 3.81306, 3.304948, 3.308399, 3.362024, 3.239059, 5.554801,
-      5.157033, 5.049831, 5.366527, 4.410822, 4.798887, 4.386467, 4.013058, 3.74904,
-      3.58009, 3.434933, 3.086843, 3.47147, 3.334008, 2.913723, 2.98034, 2.862694,
-      5.89194, 6.136203, 6.251388, 6.17061 };
-  PulseEstimate pulse(10.7, 5.1, 32.3, 0.174, 0.764, 0.5, conc);
+    { 5.237937,  5.156800,  5.773434,  6.364134,  9.872640,  8.782145, 8.633523,
+      7.166886,  6.063834,  6.393283,  5.547755,  5.609554, 17.809125,
+      14.864233, 14.488007, 11.012978, 10.074941,  8.579306,  7.925953,
+      7.505312,  7.408293, 6.296038,  6.138372,  6.114483,  4.589039,  4.787283,
+      4.125096,  4.560712, 3.838159,  3.611227, 10.149188,  9.114352,  8.475730,
+      8.166254,  7.115865, 6.364551,  6.076659,  4.936654,  4.815760,  5.000790,
+      4.405922,  4.621510, 3.612532,  3.861247,  3.480776,  4.382934,  6.908732,
+      5.677212,  5.697563, 5.049410,  5.033481,  5.036818,  4.766425,  4.108461,
+      4.493277,  3.970064, 3.479031,  3.105488,  3.182802,  2.832481,  2.904569,
+      13.393956, 12.160363, 12.604881,  9.282701,  8.971699,  7.872894,
+      7.341750,  6.129950,  6.754877, 6.236324,  5.221481,  4.712401,  4.251457,
+      4.107650,  3.642404,  3.409108, 3.673586,  3.573048,  3.006202,  3.574850,
+      2.984541,  2.942794,  6.142817, 6.239127,  5.607103,  5.781841,  5.365100,
+      4.483500,  4.318313,  3.729648, 4.186974,  3.661007,  3.587046,  3.420915,
+      3.554909,  2.951518,  3.197826, 2.768718,  4.050486,  6.375893,  5.984611,
+      4.975292,  4.758750,  5.006260, 4.137620,  3.676703,  4.133922,  3.445431,
+      3.813060,  3.304948,  3.308399, 3.362024,  3.239059,  5.554801,  5.157033,
+      5.049831,  5.366527,  4.410822, 4.798887,  4.386467,  4.013058,  3.749040,
+      3.580090,  3.434933,  3.086843, 3.471470,  3.334008,  2.913723,  2.980340,
+      2.862694,  5.891940,  6.136203, 6.251388,  6.170612,  5.191264,  4.810252,
+      4.989489,  3.951583,  3.793401, 4.320815, 10.128100,  9.961510,  8.155648 };
+  double time = 10.7;
+  double mass = 5.1;
+  double width = 32.3;
+  double tvarscale_mass = 0.174;
+  double tvarscale_width = 0.764;
+  //double lambda = 0.5;
+  double decay_rate = 0.5;
+  PulseEstimate pulse(time, mass, width, tvarscale_mass, tvarscale_width,
+                      decay_rate, conc);
 
   SECTION( "member variables can be access" ) {
-    REQUIRE(pulse.time == 10.7);
-    REQUIRE(pulse.mass == 5.1);
-    REQUIRE(pulse.width == 32.3);
-    REQUIRE(pulse.tvarscale_mass == 0.174);
-    REQUIRE(pulse.tvarscale_width == 0.764);
+    REQUIRE(pulse.time == time);
+    REQUIRE(pulse.mass == mass);
+    REQUIRE(pulse.width == width);
+    REQUIRE(pulse.tvarscale_mass == tvarscale_mass);
+    REQUIRE(pulse.tvarscale_width == tvarscale_width);
   }
 
   arma::vec  mc = 
@@ -322,11 +333,63 @@ TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
     0.2585494, 0.6268234, 0.6194906, 0.5180005 };
 
   SECTION( "mean_contribution is working on initialization" ) {
-    //REQUIRE(approx_equal(pulse.mean_contribution, mc, "absdiff", 0.0001));
-    //REQUIRE(pulse.mean_contribution(0) == 0.0);
-    //REQUIRE(pulse.mean_contribution(99) == 0.0);
-    REQUIRE(pulse.mean_contribution.size() == 144);
+    arma::vec pulsemc = pulse.get_mean_contribution(conc, decay_rate);
+    REQUIRE(conc.n_elem == 144);
+    REQUIRE(pulsemc.n_elem == 144);
+    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000001));
   }
+
+  SECTION( "mean_contribution changes with new decay rate" ) {
+    arma::vec pulsemc = pulse.get_mean_contribution(conc, 0.1);
+    REQUIRE(pulsemc.n_elem == 144);
+    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000001) == false);
+  }
+
+  SECTION( "mean_contribution changes with new pulse time" ) {
+    // mean contrib still the same
+    arma::vec pulsemc = pulse.get_mean_contribution(conc, decay_rate);
+    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000001) == true);
+
+    // now it should be updated.
+    pulse.time = 12.1;
+    pulsemc    = pulse.get_mean_contribution(conc, decay_rate);
+    REQUIRE(pulse.time == 12.1);
+    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.01) == false);
+  }
+
+  SECTION( "mean_contribution changes with new pulse mass" ) {
+    // mean contrib still the same
+    arma::vec pulsemc = pulse.get_mean_contribution(conc, decay_rate);
+    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000001) == true);
+
+    // now it should be updated.
+    pulse.mass = 2.1;
+    pulsemc    = pulse.get_mean_contribution(conc, decay_rate);
+    REQUIRE(pulse.time == time);
+    REQUIRE(pulse.mass == 2.1);
+    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000001) == false);
+  }
+
+  SECTION( "mean_contribution changes with new pulse width" ) {
+    // mean contrib still the same
+    arma::vec pulsemc = pulse.get_mean_contribution(conc, decay_rate);
+    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000001) == true);
+
+    // now it should be updated.
+    pulse.width = 42.1;
+    pulsemc     = pulse.get_mean_contribution(conc, decay_rate);
+    REQUIRE(pulse.mass == mass);
+    REQUIRE(pulse.width == 42.1);
+    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000001) == false);
+  }
+
+
+  //SECTION( "mean_contribution changes with new decay rate" ) {
+  //  arma::vec pulsemc = pulse.get_mean_contribution(conc, decay_rate);
+  //  REQUIRE(conc.n_elem == 144);
+  //  REQUIRE(pulsemc.n_elem == 144);
+  //  REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000001) == false);
+  //}
 
 }
 
