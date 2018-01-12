@@ -20,6 +20,7 @@ using namespace Rcpp;
 //
 // PatientPriors structures
 //
+//  TODO: abandoned inheritance approach -- clean up comments
 //   a. PatientPriors is the base structure containing the components common to
 //      all data structures representing the hierarchical level for
 //      patient-level priors/population estimates
@@ -35,9 +36,14 @@ using namespace Rcpp;
 //
 
 // a. PatientPriors structure
+// TODO: Will need constructor for Xsingle-subject, Xpopulation, and possibly
+// separate ones for trigger and response hormones (so up to 4)
+
 struct PatientPriors {
 
+  //
   // Used in all models
+  //
   double baseline_mean;
   double baseline_variance;
   double halflife_mean;
@@ -47,7 +53,19 @@ struct PatientPriors {
   double width_mean;
   double width_variance;
 
-  // Base constructor
+  //
+  // For Population models:
+  //
+
+  //   Haven't quite wrapped my head around these (is it sd or variance),
+  //   beleive they correspond to mass_sd and width_sd in patient estimates for
+  //   single-subj model.
+  double mass_mean_sd;
+  double mass_mean_variance;
+  double width_mean_sd;
+  double width_mean_variance;
+
+  // Population constructor (Base + 2 parameters)
   PatientPriors(double prior_baseline_mean,
                 double prior_baseline_variance,
                 double prior_halflife_mean,
@@ -55,8 +73,11 @@ struct PatientPriors {
                 double prior_mass_mean,
                 double prior_mass_variance,
                 double prior_width_mean,
-                double prior_width_variance) {
+                double prior_width_variance,
+                double prior_mass_mean_sd,
+                double prior_width_mean_sd) {
 
+    // All models
     baseline_mean     = prior_baseline_mean;
     baseline_variance = prior_baseline_variance;
     halflife_mean     = prior_halflife_mean;
@@ -66,48 +87,25 @@ struct PatientPriors {
     width_mean        = prior_width_mean;
     width_variance    = prior_width_variance;
 
-  }
-
-};
-
-
-// 1. PopulationEstimates struct
-struct PopulationEstimates : PatientPriors {
-  // Only used in Population models:
-  // Haven't quite wrapped my head around these (is it sd or variance), beleive
-  // they correspond to mass_sd and width_sd in patient estimates for
-  // single-subj model.
-  double mass_mean_sd;
-  double mass_mean_variance;
-  double width_mean_sd;
-  double width_mean_variance;
-
-  // Population constructor (Base + 2 parameters)
-  PopulationEstimates(double prior_baseline_mean,
-                      double prior_baseline_variance,
-                      double prior_halflife_mean,
-                      double prior_halflife_variance,
-                      double prior_mass_mean,
-                      double prior_mass_variance,
-                      double prior_width_mean,
-                      double prior_width_variance,
-                      double prior_mass_mean_sd,
-                      double prior_width_mean_sd
-                     ) :
-    PatientPriors(prior_baseline_mean, prior_baseline_variance,
-                  prior_halflife_mean, prior_halflife_variance, prior_mass_mean,
-                  prior_mass_variance, prior_width_mean, prior_width_variance) {
-
+    // Population-only variables
     mass_mean_sd  = prior_mass_mean_sd;
     width_mean_sd = prior_width_mean_sd;
 
+    // Set single-subject only variables to 0
+    mass_sd_max             = 0;
+    width_sd_max            = 0;
+    error_alpha             = 0;
+    error_beta              = 0;
+    num_orderstat           = 0;
+    pulse_count             = 0;
+    strauss_repulsion       = 0;
+    strauss_repulsion_range = 0;
+
   }
 
-};
-
-
-// 2. PatientPriors_Single struct
-struct PatientPriors_Single : PatientPriors {
+  //
+  // For Single-subject model:
+  //
 
   // Member variables not used in Population model:
   double mass_sd_max;
@@ -118,50 +116,55 @@ struct PatientPriors_Single : PatientPriors {
   int    pulse_count;             // prior number of pulses, i.e. strauss_rate/beta
   double strauss_repulsion;       // strauss gamma for secondary/non-hc interaction
   double strauss_repulsion_range; // range of secondary/non-hardcore interaction
-  //double strauss_hardcore_range;  // range of hardcore interaction (only need
-  //                                //one for single subject model and doesn't
-  //                                //exist in this struct in pop model)
-
-  // TODO: Will need constructor for Xsingle-subject, Xpopulation, and possibly
-  // separate ones for trigger and response hormones (so up to 4)
 
   // Single-subject constructor (Base + 8 parameters)
-  PatientPriors_Single(double prior_baseline_mean,
-                       double prior_baseline_variance,
-                       double prior_halflife_mean,
-                       double prior_halflife_variance,
-                       double prior_mass_mean,
-                       double prior_mass_variance,
-                       double prior_width_mean,
-                       double prior_width_variance,
-                       double prior_mass_sd_max,
-                       double prior_width_sd_max,
-                       double prior_error_alpha,
-                       double prior_error_beta,
-                       int    prior_pulse_count,
-                       double prior_strauss_repulsion,
-                       //double prior_strauss_hardcore_range, // not in single-subj
-                       double prior_strauss_repulsion_range
-                      ) :
-    PatientPriors(prior_baseline_mean, prior_baseline_variance,
-                  prior_halflife_mean, prior_halflife_variance, prior_mass_mean,
-                  prior_mass_variance, prior_width_mean, prior_width_variance) {
+  PatientPriors(double prior_baseline_mean,
+                double prior_baseline_variance,
+                double prior_halflife_mean,
+                double prior_halflife_variance,
+                double prior_mass_mean,
+                double prior_mass_variance,
+                double prior_width_mean,
+                double prior_width_variance,
+                double prior_mass_sd_max,
+                double prior_width_sd_max,
+                double prior_error_alpha,
+                double prior_error_beta,
+                int    prior_pulse_count,
+                double prior_strauss_repulsion,
+                //double prior_strauss_hardcore_range, // not in single-subj
+                double prior_strauss_repulsion_range) {
 
-      mass_sd_max  = prior_mass_sd_max;
-      width_sd_max = prior_width_sd_max;
-      error_alpha  = prior_error_alpha;
-      error_beta   = prior_error_beta;
+    // All models
+    baseline_mean     = prior_baseline_mean;
+    baseline_variance = prior_baseline_variance;
+    halflife_mean     = prior_halflife_mean;
+    halflife_variance = prior_halflife_variance;
+    mass_mean         = prior_mass_mean;
+    mass_variance     = prior_mass_variance;
+    width_mean        = prior_width_mean;
+    width_variance    = prior_width_variance;
 
-      num_orderstat = pulseutils::orderstat_default();
+    // Set population model-only parms to 0
+    mass_mean_sd  = 0;
+    width_mean_sd = 0;
 
-      pulse_count             = prior_pulse_count;
-      strauss_repulsion       = prior_strauss_repulsion;
-      //strauss_hardcore_range  = prior_strauss_hardcore_range;
-      strauss_repulsion_range = prior_strauss_repulsion_range;
+    // Single-subject only
+    mass_sd_max             = prior_mass_sd_max;
+    width_sd_max            = prior_width_sd_max;
+    error_alpha             = prior_error_alpha;
+    error_beta              = prior_error_beta;
+    num_orderstat           = pulseutils::orderstat_default();
+    pulse_count             = prior_pulse_count;
+    strauss_repulsion       = prior_strauss_repulsion;
+    strauss_repulsion_range = prior_strauss_repulsion_range;
 
-    }
+  }
 
 };
+
+// A more appropriate name for the population version
+typedef struct PatientPriors PopulationEstimates;
 
 
 
@@ -170,6 +173,7 @@ struct PatientPriors_Single : PatientPriors {
 //
 // PatientEstimates structure
 //
+//  TODO: abandoned inheritance approach -- clean up comments
 //   1. PatientEstimates_Pop is the version of the 'common parms' mcmc chain
 //   (patient-level estimates) that is used in the population model.
 //
@@ -178,11 +182,7 @@ struct PatientPriors_Single : PatientPriors {
 //   the pop model.
 //
 
-struct PatientEstimates { };
-
-
-// 1. PatientEstimates_Pop
-struct PatientEstimates_Pop : PatientEstimates{
+struct PatientEstimates {
 
   // Used in all models
   double baseline;
@@ -190,15 +190,22 @@ struct PatientEstimates_Pop : PatientEstimates{
   double errorsq;    // model error (variance)
   double mass_mean;
   double width_mean;
-  int    pulse_count;
+  int    pulse_count; // function of linked list instead?;
+  // Always use these functions to get these values.  removed them as separate
+  // member variables to ensure the result is always up-to-date
+  double get_decay() { return log(2) / halflife; }
+  double get_logerrorsq() { return log(errorsq); }
 
-  // Population constructor
-  PatientEstimates_Pop(double sv_baseline,
-                       double sv_halflife,
-                       double sv_errorsq,
-                       double sv_mass_mean,
-                       double sv_width_mean,
-                       int    sv_pulse_count) {
+  //
+  // For population-only model (just constructor is unique)
+  //
+  PatientEstimates(double sv_baseline,
+                   double sv_halflife,
+                   double sv_errorsq,
+                   double sv_mass_mean,
+                   double sv_width_mean,
+                   int    sv_pulse_count) {
+
     baseline    = sv_baseline,
     halflife    = sv_halflife;
     errorsq     = sv_errorsq;
@@ -208,34 +215,33 @@ struct PatientEstimates_Pop : PatientEstimates{
 
   }
 
-  // Always use these functions to get these values.  removed them as separate
-  // member variables to ensure the result is always up-to-date
-  double get_decay() { return log(2) / halflife; }
-  double get_logerrorsq() { return log(errorsq); }
 
-};
-
-
-// 2. PatientEstimates_Single
-struct PatientEstimates_Single : PatientEstimates_Pop {
-  // Not used in Population models:
+  //
+  // For single-subject model only
+  //
   double mass_sd;
   double width_sd;
 
   // Single-subject constructor:
-  PatientEstimates_Single(double sv_baseline,
-                          double sv_halflife,
-                          double sv_errorsq,
-                          double sv_mass_mean,
-                          double sv_width_mean,
-                          int    sv_pulse_count,
-                          double sv_mass_sd,
-                          double sv_width_sd) :
-    PatientEstimates_Pop(sv_baseline, sv_halflife, sv_errorsq, sv_mass_mean,
-                         sv_width_mean, sv_pulse_count) {
-      mass_sd  = sv_mass_sd;
-      width_sd = sv_width_sd;
-    }
+  PatientEstimates(double sv_baseline,
+                   double sv_halflife,
+                   double sv_errorsq,
+                   double sv_mass_mean,
+                   double sv_width_mean,
+                   int    sv_pulse_count,
+                   double sv_mass_sd,
+                   double sv_width_sd) {
+
+    baseline    = sv_baseline,
+    halflife    = sv_halflife;
+    errorsq     = sv_errorsq;
+    mass_mean   = sv_mass_mean;
+    width_mean  = sv_width_mean;
+    pulse_count = sv_pulse_count;
+    mass_sd     = sv_mass_sd;
+    width_sd    = sv_width_sd;
+
+  }
 
 };
 

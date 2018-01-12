@@ -37,8 +37,8 @@ struct OnlyPatient {
 
   // need access to pulses, pulse_count, priors, data.. basically all of this
   PatientData *data;
-  PatientPriors_Single *priors;
-  PatientEstimates_Single *estimates;
+  PatientPriors *priors;
+  PatientEstimates *estimates;
   std::list<PulseEstimate> pulses;
   std::list<PulseEstimate>::iterator piter = pulses.begin();
   std::list<PulseEstimate> responses;
@@ -46,8 +46,8 @@ struct OnlyPatient {
 
   // Constructor
   OnlyPatient(PatientData *in_data,
-              PatientPriors_Single *in_priors,
-              PatientEstimates_Single *in_parms) {
+              PatientPriors *in_priors,
+              PatientEstimates *in_parms) {
 
     data = in_data;
     priors = in_priors;
@@ -136,7 +136,7 @@ struct OnePatient {
 //: MCMCSamplingUnit
 
   OnePatient(PatientData *in_data,
-             PatientEstimates_Pop *in_parms) {
+             PatientEstimates *in_parms) {
 
     data = in_data;
     estimates = in_parms;
@@ -146,7 +146,7 @@ struct OnePatient {
   int get_pulsecount() { return pulses.size(); };
 
   PatientData *data;
-  PatientEstimates_Pop *estimates;
+  PatientEstimates *estimates;
   std::list<PulseEstimate> pulses;
   std::list<PulseEstimate>::iterator piter = pulses.begin();
   std::list<PulseEstimate> responses;

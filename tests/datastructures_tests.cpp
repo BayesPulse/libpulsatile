@@ -58,34 +58,11 @@ TEST_CASE( "rmvnorm Function", "[utils]" ) {
 //
 // PatientPriors based objects
 //
-TEST_CASE( "PatientPriors base constructor works (never otherwise used directly)", 
-           "[datastructures]" ) {
-
-  PatientPriors ppriors(1.5, 100, 45, 100, 3.5, 100, 30, 100);
-
-  SECTION( "Variables included in constructor are initialized as expected." ) {
-
-    // Test use pointers just for fun.
-    //PatientPriors * pppointer = &ppriors;
-
-    REQUIRE(ppriors.baseline_mean     == 1.5);
-    REQUIRE(ppriors.baseline_variance == 100.0);
-    REQUIRE(ppriors.halflife_mean     == 45.0);
-    REQUIRE(ppriors.halflife_variance == 100.0);
-    REQUIRE(ppriors.mass_mean         == 3.5);
-    REQUIRE(ppriors.mass_variance     == 100.0);
-    REQUIRE(ppriors.width_mean        == 30.0);
-    REQUIRE(ppriors.width_variance    == 100.0);
-
-  }
-
-}
-
 
 TEST_CASE( "PopulationEstimates (PatientPriors Population) constructor works", 
            "[datastructures]" ) {
 
-  PopulationEstimates pppop(1.5, 100, 45, 100, 3.5, 100, 30, 100, 5, 10);
+  PatientPriors pppop(1.5, 100, 45, 100, 3.5, 100, 30, 100, 5, 10);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -108,8 +85,8 @@ TEST_CASE( "PopulationEstimates (PatientPriors Population) constructor works",
 TEST_CASE( "PatientPriors single-subject constructor works",
            "[datastructures]" ) {
 
-  PatientPriors_Single ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
-                                10, 100, 1000, 1000, 12, 0, 40);
+  PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
+                         10, 100, 1000, 1000, 12, 0, 40);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -137,10 +114,10 @@ TEST_CASE( "PatientPriors single-subject constructor works",
 //
 // PatientEstimates based objects
 //
-TEST_CASE( "PatientEstimates_Pop population constructor works",
+TEST_CASE( "PatientEstimates population constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates_Pop pepop(3, 45, 0.05, 3.5, 30, 12);
+  PatientEstimates pepop(3, 45, 0.05, 3.5, 30, 12);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -167,10 +144,10 @@ TEST_CASE( "PatientEstimates_Pop population constructor works",
 }
 
 
-TEST_CASE( "PatientEstimates_Single single-subject constructor works",
+TEST_CASE( "PatientEstimates single-subject constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates_Single pesingle(3, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(3, 45, 0.05, 3.5, 30, 12, 10, 10);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -432,12 +409,12 @@ TEST_CASE( "OnlyPatient class constructor works", "[patient]" ) {
       4.989489,  3.951583,  3.793401, 4.320815, 10.128100,  9.961510,  8.155648 };
 
   PatientData pdone(time, conc);
-  PatientPriors_Single ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
+  PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                                 10, 100, 1000, 1000, 12, 0, 40);
-  PatientEstimates_Single pesingle(3, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(3, 45, 0.05, 3.5, 30, 12, 10, 10);
   PatientData * data = &pdone;
-  PatientPriors_Single * priors = &ppsingle;
-  PatientEstimates_Single * estimates = &pesingle;
+  PatientPriors * priors = &ppsingle;
+  PatientEstimates * estimates = &pesingle;
 
   OnlyPatient pat(data, priors, estimates);
 
@@ -536,9 +513,9 @@ TEST_CASE( "OnePatient class constructor works", "[patient]" ) {
   for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
 
   PatientData pd(time, conc);
-  PatientEstimates_Pop pep(3, 45, 0.05, 3.5, 30, 12);
+  PatientEstimates pep(3, 45, 0.05, 3.5, 30, 12); // population constructor
   PatientData * data = &pd;
-  PatientEstimates_Pop * estimates = &pep;
+  PatientEstimates * estimates = &pep;
 
   OnePatient pat(data, estimates);
 
