@@ -45,16 +45,16 @@ struct OnlyPatient {
 
   }
 
-  //int get_pulsecount() { return estimates.pulse_count };
+  int get_pulsecount() { return pulses.size(); };
 
   // need access to pulses, pulse_count, priors, data.. basically all of this
   PatientData *data;
   PatientPriors_Single *priors;
   PatientEstimates_Single *estimates;
-  //AssocEstimates association; // Note: should move to Population class, check how its estimated.
   std::list<PulseEstimate> pulses;
   std::list<PulseEstimate>::iterator piter = pulses.begin();
   std::list<PulseEstimate> responses;
+  std::list<PulseEstimate>::iterator riter = responses.begin();
 
 };
 
@@ -76,7 +76,7 @@ struct OnePatient {
 
   }
 
-  //int get_pulsecount() { return estimates.pulse_count };
+  int get_pulsecount() { return pulses.size(); };
 
   // need access to pulses, pulse_count, priors, data.. basically all of this
   PatientData *data;
@@ -85,9 +85,6 @@ struct OnePatient {
   std::list<PulseEstimate>::iterator piter = pulses.begin();
   std::list<PulseEstimate> responses;
   std::list<PulseEstimate>::iterator riter = responses.begin();
-
-  //PopulationEstimates *popest; // Note: should move to population class
-  //AssocEstimates association; // Note: should move to Population class, check how its estimated.
 
 };
 

@@ -12,6 +12,10 @@
 
 namespace pulselikelihood {
 
+
+  // TODO: Move likelihood and mean_concentration to Patient classes
+
+
   //
   // likelihood() 
   //   computes the current likelihood using the observed log-concentrations and
