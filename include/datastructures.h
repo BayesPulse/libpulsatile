@@ -230,17 +230,12 @@ struct PatientEstimates {
                    double sv_width_mean,
                    int    sv_pulse_count,
                    double sv_mass_sd,
-                   double sv_width_sd) {
-
-    baseline    = sv_baseline,
-    halflife    = sv_halflife;
-    errorsq     = sv_errorsq;
-    mass_mean   = sv_mass_mean;
-    width_mean  = sv_width_mean;
-    pulse_count = sv_pulse_count;
-    mass_sd     = sv_mass_sd;
-    width_sd    = sv_width_sd;
-
+                   double sv_width_sd)
+    : PatientEstimates(sv_baseline, sv_halflife, sv_errorsq, sv_mass_mean,
+                       sv_width_mean, sv_pulse_count)
+  {
+    mass_sd  = sv_mass_sd;
+    width_sd = sv_width_sd;
   }
 
 };
@@ -271,6 +266,7 @@ class PulseEstimate {
 
     // Public user-facing access function for mean_contrib. Only calculates
     // mean_contrib if input values have changed.
+    // TODO: change this return type to a pointer
     arma::vec get_mean_contribution(const arma::vec & concentration, double decay_rate)
     {
 
@@ -310,6 +306,13 @@ class PulseEstimate {
         prev_width      = width;
         prev_decay_rate = patient_decay;
       }
+    // Constructor for empty pulse object
+    PulseEstimate()
+      : time(0), mass(0), width(0), tvarscale_mass(0),
+        tvarscale_width(0), mean_contribution(1) 
+      {
+        mean_contribution.fill(0);
+      }
 
   private:
 
@@ -317,33 +320,39 @@ class PulseEstimate {
     double prev_time, prev_mass, prev_width, prev_decay_rate;
 
     // mean_contribution() of each pulse to the total mean_concentration
-    void calc_mean_contribution(const arma::vec &concentration, double decay_rate)
+    void calc_mean_contribution(const arma::vec &data_time, double decay_rate)
     {
 
-      int i;                // generic counter
-      double x, y, z, w, N; // part of arithmetic used in calculating mean contrib
+      double y, z, w;
+      arma::vec x(data_time.n_elem);
+      x.fill(0.);
 
       z  = width * decay_rate;
       y  = decay_rate * (0.5 * z  + time);
       z += time;
       w  = sqrt(2. * width);
-      N = concentration.n_elem;
+      x = ((data_time - z) / w) * sqrt(2);
 
-      for (i = 0; i < N; i++) {
-        x = ((double)concentration(i) - z) / w;
-        x = Rf_pnorm5(x * sqrt(2), 0.0, 1.0, 1, 0);
-
-        if (x == 0) {
-          mean_contribution(i) = 0;
-        } else {
-          mean_contribution(i) = mass * x * exp(y - concentration(i) * decay_rate);
-        }
+      double N = data_time.n_elem;
+      // NOTE: potentially slow piece
+      for (int i = 0; i < N; i++) {
+        x(i) = Rf_pnorm5(x(i), 0.0, 1.0, 1, 0);
+        //x = arma::normpdf(x); // doesn't give same results
       }
+
+      // Finish calculating mean_contrib w/ vectorized ops
+      //    mass * x is a vector, as is exp(), so use element-wise
+      //    multiplication via %
+      mean_contribution = (mass * x) % exp(y - data_time * decay_rate);
+      // Truncate <0 = 0
+      mean_contribution.for_each( [](arma::vec::elem_type& val) { val = std::max(val, 0.); } );
 
     }
 
 
 };
+
+
 
 
 
@@ -362,6 +371,8 @@ struct PatientData {
   int number_of_obs;
   double avg_period_of_obs; // in minutes
   double duration_of_obs;   // in minutes
+  double fitstart;
+  double fitend;
 
   // Constructor for single hormone data
   PatientData(NumericVector in_time,
@@ -369,9 +380,13 @@ struct PatientData {
 
     time              = as<arma::vec>(in_time);
     concentration     = as<arma::vec>(in_conc);
+    concentration     = log(concentration);
     number_of_obs     = time.size();
     duration_of_obs   = time(number_of_obs - 1) - time(0); // NOTE: 1430 for typical 24 hour dataset (not 1440)
     avg_period_of_obs = duration_of_obs / (number_of_obs - 1);
+
+    fitstart = -(avg_period_of_obs * 4);
+    fitend   =  time(number_of_obs - 1) + (avg_period_of_obs * 2);
 
   }
 
@@ -383,6 +398,7 @@ struct PatientData {
              ) : PatientData(in_time, in_conc) {
 
       response_concentration = as<arma::vec>(in_responseconc);
+      response_concentration = log(response_concentration);
 
     }
 
@@ -391,3 +407,4 @@ struct PatientData {
 
 
 #endif
+
