@@ -140,8 +140,12 @@ struct Patient {
 
     // Add the contribution to the mean from each pulse
     //++pulse_iter; // move to first pulse, not sure if works**
+    int i = 0; // for testing only
+    std::cout << "Patient's halflife = " << estimates->halflife << " and decay rate = " << estimates->get_decay() << std::endl;
     while (pulse_iter != pulselist_end) {
+      i++; 
       if (pulse_iter != pulse_excluded) {
+        std::cout << "Pulse number " << i << "'s mean concentration" << std::endl;
         mean_conc += pulse_iter->get_mean_contribution(data->concentration, estimates->get_decay());
       }
       ++pulse_iter;

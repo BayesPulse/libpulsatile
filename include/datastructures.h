@@ -267,11 +267,11 @@ class PulseEstimate {
     // Public user-facing access function for mean_contrib. Only calculates
     // mean_contrib if input values have changed.
     // TODO: change this return type to a pointer
-    arma::vec get_mean_contribution(const arma::vec & concentration, double decay_rate)
+    arma::vec get_mean_contribution(const arma::vec & data_time, double decay_rate)
     {
 
       if (prev_mass != mass | prev_width != width | prev_time != time | prev_decay_rate != decay_rate) {
-        calc_mean_contribution(concentration, decay_rate);
+        calc_mean_contribution(data_time, decay_rate);
         prev_time = time;
         prev_mass = mass;
         prev_width = width;
@@ -290,17 +290,17 @@ class PulseEstimate {
                   double in_tvarscale_width,
                   //double fshlambda,
                   double patient_decay,
-                  const arma::vec &patient_conc)
+                  const arma::vec &data_time)
         : time            (in_time)
         , mass            (in_mass)
         , width           (in_width)
         , tvarscale_mass  (in_tvarscale_mass)
         , tvarscale_width (in_tvarscale_width)
         //, lambda          (fshlambda)
-        , mean_contribution(patient_conc.n_elem)
+        , mean_contribution(data_time.n_elem)
       {
         mean_contribution.fill(0.);
-        calc_mean_contribution(patient_conc, patient_decay);
+        calc_mean_contribution(data_time, patient_decay);
         prev_time       = time;
         prev_mass       = mass;
         prev_width      = width;
