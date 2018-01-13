@@ -341,10 +341,11 @@ class PulseEstimate {
       }
 
       // Finish calculating mean_contrib w/ vectorized ops
+      //    mass * x is a vector, as is exp(), so use element-wise
+      //    multiplication via %
       mean_contribution = (mass * x) % exp(y - data_time * decay_rate);
-      // Truncate at 0
+      // Truncate <0 = 0
       mean_contribution.for_each( [](arma::vec::elem_type& val) { val = std::max(val, 0.); } );
-      std::cout << "internal mean_contrib = " << mean_contribution << "\n";
 
     }
 

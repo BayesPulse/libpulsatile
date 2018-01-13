@@ -299,27 +299,24 @@ TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
       0.0000000584, 0.0000000502, 0.0000000432, 0.0000000372 };
 
   SECTION( "mean_contribution is working on initialization" ) {
+
     arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
     REQUIRE(data_time.n_elem == 144);
     REQUIRE(pulsemc.n_elem == 144);
-
-    //arma::mat tmp(pulsemc.n_elem, 2);
-    std::cout << "Internal = " << pulsemc << "\n";
-    std::cout << "External = " << mc << "\n";
-
     REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001));
 
   }
 
   SECTION( "mean_contribution changes with new decay rate" ) {
+
     arma::vec pulsemc = pulse.get_mean_contribution(data_time, 0.1);
     REQUIRE(pulsemc.n_elem == 144);
     REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
-    //std::cout << "Internal mc = " << pulsemc << "\n";
-    //std::cout << "External mc = " << mc << "\n";
+
   }
 
   SECTION( "mean_contribution changes with new pulse time" ) {
+
     // mean contrib still the same
     arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
     REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
@@ -329,9 +326,11 @@ TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
     pulsemc    = pulse.get_mean_contribution(data_time, decay_rate);
     REQUIRE(pulse.time == 12.1);
     REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
+
   }
 
   SECTION( "mean_contribution changes with new pulse mass" ) {
+
     // mean contrib still the same
     arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
     REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
@@ -342,9 +341,11 @@ TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
     REQUIRE(pulse.time == time);
     REQUIRE(pulse.mass == 5);
     REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
+
   }
 
   SECTION( "mean_contribution changes with new pulse width" ) {
+
     // mean contrib still the same
     arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
     REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
@@ -355,6 +356,7 @@ TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
     REQUIRE(pulse.mass == mass);
     REQUIRE(pulse.width == 10.);
     REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
+
   }
 
 }
