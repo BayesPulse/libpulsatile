@@ -16,7 +16,7 @@
 
 
 //// In context of population model, patient priors are population estimates.
-//typedef struct PatientPriors PopulationEstimates;
+////typedef struct PatientPriors PopulationEstimates;
 //
 //
 //// The user defined values for the priors on the population level parameters

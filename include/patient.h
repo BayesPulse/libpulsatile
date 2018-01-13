@@ -29,13 +29,14 @@ using namespace Rcpp;
 
 
 //
-// OnlyPatient struct
-//   For single-subject model
+// Patient struct
 //
-struct OnlyPatient {
-//: MCMCSamplingUnit
+struct Patient {
 
-  // need access to pulses, pulse_count, priors, data.. basically all of this
+  //
+  // For single-subject model
+  //
+
   PatientData *data;
   PatientPriors *priors;
   PatientEstimates *estimates;
@@ -44,16 +45,39 @@ struct OnlyPatient {
   std::list<PulseEstimate> responses;
   std::list<PulseEstimate>::iterator riter = responses.begin();
 
-  // Constructor
-  OnlyPatient(PatientData *in_data,
-              PatientPriors *in_priors,
-              PatientEstimates *in_parms) {
+  // Single-subject constructor
+  Patient(PatientData *in_data,
+          PatientPriors *in_priors,
+          PatientEstimates *in_parms) {
 
     data = in_data;
     priors = in_priors;
     estimates = in_parms;
 
+
+    PulseEstimate firstpulse(in_data->fitstart, 1, 1, 1, 1, in_parms->get_decay(), in_data->concentration);
+    pulses.push_back(firstpulse);
+    //++piter;
+
   }
+
+  //
+  // For population models
+  //
+
+  Patient(PatientData *in_data,
+          PatientEstimates *in_parms) {
+
+    data = in_data;
+    estimates = in_parms;
+    // priors // uninitialized
+
+  }
+
+
+  //
+  // Methods for both types/all-models
+  //
 
   // Get current number of pulses
   int get_pulsecount() { return pulses.size(); };
@@ -62,62 +86,73 @@ struct OnlyPatient {
   // likelihood()
   //   computes the current likelihood using the observed log-concentrations and
   //   mean concentration
-  double likelihood(Patient *patient,
-                    Pulse *pulse_excluded,
-                    bool response_hormone = FALSE){
+  //double likelihood(Patient *patient,
+  //                  Pulse *pulse_excluded,
+  //                  bool response_hormone = FALSE){
 
-    int i;
-    int N = get_pulsecount();  // function not yet defined **
-    double like = 0; // likelihood to be calculated
-    arma::vec mean_conc;
-    arma::vec *data;
+  //  int i;
+  //  int N = get_pulsecount();  // function not yet defined **
+  //  double like = 0; // likelihood to be calculated
+  //  arma::vec mean_conc;
+  //  arma::vec *data;
 
-    if (response_hormone) {
-      data = patient->data.response_concentration;
-    } else {
-      data = patient->data.concentration;
-    }
+  //  if (response_hormone) {
+  //    data = data.response_concentration;
+  //  } else {
+  //    data = data.concentration;
+  //  }
 
-    // Sum across mean_contribs
-    mean_conc = mean_concentration(patient, pulse_excluded);
-    for (i = 0; i < N; i++) {
-      like += pow(data(i) - mean_conc(i), 2);  // should be able to get rid of the loop by element diffing these vectors and squaring
-    }
+  //  // Sum across mean_contribs
+  //  mean_conc = mean_concentration(patient, pulse_excluded);
+  //  for (i = 0; i < N; i++) {
+  //    like += pow(data(i) - mean_conc(i), 2);  // should be able to get rid of the loop by element diffing these vectors and squaring
+  //  }
 
-    like /= (-2.0 * patient->estimates.errorsq);
-    like += -0.5 * N * (1.8378771 + patient->estimates.logerrorsq);
+  //  like /= (-2.0 * patient->estimates.errorsq);
+  //  like += -0.5 * N * (1.8378771 + patient->estimates.logerrorsq);
 
-    return like;
+  //  return like;
 
-  }
+  //}
 
   // mean_concentration()
   //   this takes each pulse's mean_contrib vector and sums across them
-  arma::vec mean_concentration(Pulse **patient, // list of pulses
-                               Pulse *pulse_excluded,
-                               int pulse_count)
-  {
+  arma::vec mean_concentration(bool response_pulses) {
 
-    int i;
-    Pulse *pulse;
-    int N = pulse_count; //patient.get_pulsecount();  // function not yet defined **
-    arma::vec mean_conc(N);
+    std::list<PulseEstimate>::const_iterator emptyiter;
+    return mean_concentration(response_pulses, emptyiter);
+
+  }
+  arma::vec mean_concentration(bool response_pulses,
+                               std::list<PulseEstimate>::const_iterator pulse_excluded) {
+
+    arma::vec mean_conc(data->concentration.n_elem);
+    std::list<PulseEstimate>::iterator pulse_iter;
+    std::list<PulseEstimate>::const_iterator pulselist_end;
+
+    if (response_pulses) {
+      pulse_iter    = responses.begin();
+      pulselist_end = responses.end();
+    } else {
+      pulse_iter    = pulses.begin();
+      pulselist_end = pulses.end();
+    }
 
     // Add the contribution to the mean from each pulse
-    pulse = Patient->pulses->next; // move to first pulse, not sure if works**
-    while (pulse != NULL) {
-      if (pulse != pulse_excluded) {
-        for (i = 0; i < N; i++)
-          mean_conc(i) += pulse->mean_contrib(i); // mean contrib not yet fully defined **
+    //++pulse_iter; // move to first pulse, not sure if works**
+    while (pulse_iter != pulselist_end) {
+      if (pulse_iter != pulse_excluded) {
+        mean_conc += pulse_iter->get_mean_contribution(data->concentration, estimates->get_decay());
       }
-      node = pulse->next;
+      ++pulse_iter;
     }
 
     // Add the baseline contribution and log
-    mean_conc += baseline;
+    mean_conc += estimates->baseline;
     mean_conc = log(mean_conc);
 
     return mean_conc;
+
   }
 
 
@@ -128,63 +163,6 @@ struct OnlyPatient {
 
 
 
-//
-// OnePatient struct
-//  For pop model (OnePatient of many) 
-//
-struct OnePatient {
-//: MCMCSamplingUnit
-
-  OnePatient(PatientData *in_data,
-             PatientEstimates *in_parms) {
-
-    data = in_data;
-    estimates = in_parms;
-
-  }
-
-  int get_pulsecount() { return pulses.size(); };
-
-  PatientData *data;
-  PatientEstimates *estimates;
-  std::list<PulseEstimate> pulses;
-  std::list<PulseEstimate>::iterator piter = pulses.begin();
-  std::list<PulseEstimate> responses;
-  std::list<PulseEstimate>::iterator riter = responses.begin();
-
-};
-
-
-
-// Example handler class
-//class Student_info { 
-//
-//  public:
-//    // constructors and copy control
-//    Student_info(): cp(0) { } 
-//    Student_info(std::istream& is): cp(0) { read(is); } 
-//    Student_info(const Student_info&);
-//    Student_info& operator=(const Student_info&); 
-//    ~Student_info() { delete cp; }
-//
-//    // operations
-//    std::istream& read(std::istream&);
-//    std::string name() const {
-//      if (cp) return cp->name();
-//      else throw std::runtime_error("uninitialized Student");
-//    }
-//    double grade() const {
-//      if (cp) return cp->grade();
-//      else throw std::runtime_error("uninitialized Student");
-//    }
-//
-//    static bool compare(const Student_info& s1,
-//                        const Student_info& s2) { return s1.name() < s2.name(); }
-//
-//  private:
-//    Core* cp;
-//
-//}
 
 
 ////////////////////////////////////////////////////////////
