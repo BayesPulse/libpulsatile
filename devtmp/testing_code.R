@@ -1,4 +1,5 @@
 library(tidyverse)
+options(scipen=999)
 
 myvec <- c()
 accepts <- 0

@@ -307,7 +307,7 @@ class PulseEstimate {
         prev_decay_rate = patient_decay;
       }
     // Constructor for empty pulse object
-    PulseEstimate() 
+    PulseEstimate()
       : time(0), mass(0), width(0), tvarscale_mass(0),
         tvarscale_width(0), mean_contribution(1) 
       {
@@ -323,29 +323,28 @@ class PulseEstimate {
     void calc_mean_contribution(const arma::vec &data_time, double decay_rate)
     {
 
-      int i;       // generic counter
-      double x = 0,
-             y = 0,
-             z = 0,
-             w = 0,
-             N = 0; // part of arithmetic used in calculating mean contrib
+      double y, z, w;
+      arma::vec x(data_time.n_elem);
+      x.fill(0.);
 
       z  = width * decay_rate;
       y  = decay_rate * (0.5 * z  + time);
       z += time;
       w  = sqrt(2. * width);
-      N = data_time.n_elem;
+      x = ((data_time - z) / w) * sqrt(2);
 
-      for (i = 0; i < N; i++) {
-        x = ((double)data_time(i) - z) / w;
-        x = Rf_pnorm5(x * sqrt(2), 0.0, 1.0, 1, 0);
-
-        if (x == 0) {
-          mean_contribution(i) = 0;
-        } else {
-          mean_contribution(i) = mass * x * exp(y - data_time(i) * decay_rate);
-        }
+      double N = data_time.n_elem;
+      // NOTE: potentially slow piece
+      for (int i = 0; i < N; i++) {
+        x(i) = Rf_pnorm5(x(i), 0.0, 1.0, 1, 0);
+        //x = arma::normpdf(x); // doesn't give same results
       }
+
+      // Finish calculating mean_contrib w/ vectorized ops
+      mean_contribution = (mass * x) % exp(y - data_time * decay_rate);
+      // Truncate at 0
+      mean_contribution.for_each( [](arma::vec::elem_type& val) { val = std::max(val, 0.); } );
+      std::cout << "internal mean_contrib = " << mean_contribution << "\n";
 
     }
 
