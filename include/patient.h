@@ -86,34 +86,34 @@ struct Patient {
   // likelihood()
   //   computes the current likelihood using the observed log-concentrations and
   //   mean concentration
-  //double likelihood(Patient *patient,
-  //                  Pulse *pulse_excluded,
-  //                  bool response_hormone = FALSE){
+  double likelihood(bool response_hormone,
+                    //Patient *patient,
+                    Pulse *pulse_excluded) {
 
-  //  int i;
-  //  int N = get_pulsecount();  // function not yet defined **
-  //  double like = 0; // likelihood to be calculated
-  //  arma::vec mean_conc;
-  //  arma::vec *data;
+    int i;
+    int N = get_pulsecount();  // function not yet defined **
+    double like = 0; // likelihood to be calculated
+    arma::vec mean_conc;
+    arma::vec *data;
 
-  //  if (response_hormone) {
-  //    data = data.response_concentration;
-  //  } else {
-  //    data = data.concentration;
-  //  }
+    if (response_hormone) {
+      data = data.response_concentration;
+    } else {
+      data = data.concentration;
+    }
 
-  //  // Sum across mean_contribs
-  //  mean_conc = mean_concentration(patient, pulse_excluded);
-  //  for (i = 0; i < N; i++) {
-  //    like += pow(data(i) - mean_conc(i), 2);  // should be able to get rid of the loop by element diffing these vectors and squaring
-  //  }
+    // Sum across mean_contribs
+    mean_conc = mean_concentration(patient, pulse_excluded);
+    for (i = 0; i < N; i++) {
+      like += pow(data(i) - mean_conc(i), 2);  // should be able to get rid of the loop by element diffing these vectors and squaring
+    }
 
-  //  like /= (-2.0 * patient->estimates.errorsq);
-  //  like += -0.5 * N * (1.8378771 + patient->estimates.logerrorsq);
+    like /= (-2.0 * patient->estimates.errorsq);
+    like += -0.5 * N * (1.8378771 + patient->estimates.logerrorsq);
 
-  //  return like;
+    return like;
 
-  //}
+  }
 
   // mean_concentration()
   //   this takes each pulse's mean_contrib vector and sums across them

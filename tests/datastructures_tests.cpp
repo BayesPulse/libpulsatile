@@ -531,11 +531,11 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
   SECTION( "Can get mean_concentration, after removing one pulse" ) {
 
-    //arma::vec mconc_all, mconc_lessone;
     ++pat.piter;
     REQUIRE( pat.piter->time == location(0) );
     arma::vec mconc_excl1 = pat.mean_concentration(false, pat.piter);
     REQUIRE( mconc_excl1.n_elem == 144 );
+
     REQUIRE( !arma::approx_equal(mconc_excl1, mconc, "absdiff", 0.0000001) );
     REQUIRE( arma::all(mconc_excl1 <= mconc) );
     REQUIRE( arma::all(mconc_excl1 >= 0) );
@@ -551,13 +551,11 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
     // calc mean_conc excluding one pulse
     arma::vec mconc_excl3 = pat.mean_concentration(false, pat.piter);
-    //std::cout << "mconc: " << mconc << std::endl;
-    //std::cout << "mconc_excl3: " << mconc_excl3 << std::endl;
     REQUIRE( mconc_excl3.n_elem == 144 );
+
     // Require mconc excluding 3 (#4) to be <= and not all == to full mconc
     REQUIRE( !arma::approx_equal(mconc_excl3, mconc, "absdiff", 0.0000001) );
     REQUIRE( arma::all(mconc_excl3 <= mconc) );
-
     REQUIRE(arma::all(mconc_excl3 >= 0));
     REQUIRE(arma::all(mconc_excl3 < 10));
 
@@ -566,60 +564,58 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 }
 
 
-//// Population patient
-//TEST_CASE( "Patient class constructor for population model works", "[patient]" ) {
-//
-//  NumericVector time(144);
-//  NumericVector conc = rnorm(144, 3, 0.1);
-//  for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
-//
-//  PatientData pd(time, conc);
-//  PatientEstimates pep(3, 45, 0.05, 3.5, 30, 12); // population constructor
-//  PatientData * data = &pd;
-//  PatientEstimates * estimates = &pep;
-//
-//  Patient pat(data, estimates);
-//
-//  SECTION( "Estimates can be accessed" ) {
-//    REQUIRE(pat.estimates->baseline == 3);
-//    REQUIRE(pat.estimates->mass_mean == 3.5);
-//    REQUIRE(pat.estimates->pulse_count == 12);
-//  }
-//
-//  SECTION( "Estimates can be updated" ) {
-//    pat.estimates->baseline = 10;
-//    REQUIRE(pat.estimates->baseline == 10);
-//    pat.estimates->mass_mean = 5.0;
-//    REQUIRE(pat.estimates->mass_mean == 5.0);
-//    pat.estimates->pulse_count = 6;
-//    REQUIRE(pat.estimates->pulse_count == 6);
-//  }
-//
-//  SECTION( "Data can be accessed" ) {
-//    REQUIRE(pat.data->time(1) == 20);
-//    REQUIRE(pat.data->time(143) == 1440);
-//    REQUIRE(pat.data->concentration(1) < 20);
-//    REQUIRE(pat.data->concentration(1) > 0);
-//    REQUIRE(pat.data->concentration(143) < 20);
-//    REQUIRE(pat.data->concentration(143) > 0);
-//    REQUIRE(pat.data->time.size() == 144);
-//    REQUIRE(pat.data->concentration.size() == 144);
-//    REQUIRE(pat.data->response_concentration.size() == 0);
-//  }
-//
-//  // TODO: look at how the first one is created in the pulsatile() pkg code
-//  // TODO: Look at iterators for this
-//  SECTION( "Can add a pulse" ) {
-//  }
-//
-//  SECTION( "Can remove a pulse" ) {
-//  }
-//
-//}
-//
-//
-//
-//
+// Population patient
+TEST_CASE( "Patient class constructor for population model works", "[patient]" ) {
+
+  NumericVector time(144);
+  NumericVector conc = rnorm(144, 3, 0.1);
+  for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
+
+  PatientData pd(time, conc);
+  PatientEstimates pep(3, 45, 0.05, 3.5, 30, 12); // population constructor
+  PatientData * data = &pd;
+  PatientEstimates * estimates = &pep;
+
+  Patient pat(data, estimates);
+
+  SECTION( "Estimates can be accessed" ) {
+    REQUIRE(pat.estimates->baseline == 3);
+    REQUIRE(pat.estimates->mass_mean == 3.5);
+    REQUIRE(pat.estimates->pulse_count == 12);
+  }
+
+  SECTION( "Estimates can be updated" ) {
+    pat.estimates->baseline = 10;
+    REQUIRE(pat.estimates->baseline == 10);
+    pat.estimates->mass_mean = 5.0;
+    REQUIRE(pat.estimates->mass_mean == 5.0);
+    pat.estimates->pulse_count = 6;
+    REQUIRE(pat.estimates->pulse_count == 6);
+  }
+
+  SECTION( "Data can be accessed" ) {
+    REQUIRE(pat.data->time(1) == 20);
+    REQUIRE(pat.data->time(143) == 1440);
+    REQUIRE(pat.data->concentration(1) < 20);
+    REQUIRE(pat.data->concentration(1) > 0);
+    REQUIRE(pat.data->concentration(143) < 20);
+    REQUIRE(pat.data->concentration(143) > 0);
+    REQUIRE(pat.data->time.size() == 144);
+    REQUIRE(pat.data->concentration.size() == 144);
+    REQUIRE(pat.data->response_concentration.size() == 0);
+  }
+
+  // TODO: look at what is necessary for the pop constructor version
+  //SECTION( "Can add a pulse" ) {
+  //}
+  //SECTION( "Can remove a pulse" ) {
+  //}
+
+}
+
+
+
+
 
 
 
