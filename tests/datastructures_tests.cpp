@@ -117,11 +117,11 @@ TEST_CASE( "PatientPriors single-subject constructor works",
 TEST_CASE( "PatientEstimates population constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates pepop(3, 45, 0.05, 3.5, 30, 12);
+  PatientEstimates pepop(2.6, 45, 0.05, 3.5, 30, 12);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
-    REQUIRE(pepop.baseline    == 3);
+    REQUIRE(pepop.baseline    == 2.6);
     REQUIRE(pepop.halflife    == 45);
     REQUIRE(pepop.errorsq     == 0.05);
     REQUIRE(pepop.mass_mean   == 3.5);
@@ -147,11 +147,11 @@ TEST_CASE( "PatientEstimates population constructor works",
 TEST_CASE( "PatientEstimates single-subject constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates pesingle(3, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
-    REQUIRE(pesingle.baseline    == 3);
+    REQUIRE(pesingle.baseline    == 2.6);
     REQUIRE(pesingle.halflife    == 45);
     REQUIRE(pesingle.errorsq     == 0.05);
     REQUIRE(pesingle.mass_mean   == 3.5);
@@ -244,123 +244,123 @@ TEST_CASE( "PatientData two-hormone constructor works",
 
 //
 // PulseEstimate object
+////
+//TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
 //
-TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
-
-  arma::vec data_time(144);
-  for (int i = 0; i < 144; i++) data_time(i) = 10 * i + 10;
-  double time = 126;
-  double mass = 13.5;
-  double width = 5.99;
-  double tvarscale_mass = 0.174;
-  double tvarscale_width = 0.764;
-  //double lambda = 0.5;
-  double decay_rate = 0.015;
-  PulseEstimate pulse(time, mass, width, tvarscale_mass, tvarscale_width,
-                      decay_rate, data_time);
-
-  SECTION( "member variables can be access" ) {
-    REQUIRE(pulse.time == time);
-    REQUIRE(pulse.mass == mass);
-    REQUIRE(pulse.width == width);
-    REQUIRE(pulse.tvarscale_mass == tvarscale_mass);
-    REQUIRE(pulse.tvarscale_width == tvarscale_width);
-  }
-
-  arma::vec  mc =
-    { 0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000,
-      0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000,
-      0.0000000004, 0.0948776609, 12.0218825294, 10.9502638717, 9.4249795205,
-      8.1121550510, 6.9821965584, 6.0096322708, 5.1725384308, 4.4520450858,
-      3.8319107167, 3.2981561188, 2.8387492790, 2.4433341475, 2.1029971898,
-      1.8100664557, 1.5579386363, 1.3409302110, 1.1541493284, 0.9933855330,
-      0.8550148519, 0.7359181030, 0.6334105812, 0.5451815396, 0.4692420998,
-      0.4038804181, 0.3476230974, 0.2992019727, 0.2575255245, 0.2216542731,
-      0.1907796008, 0.1642055242, 0.1413330044, 0.1216464442, 0.1047020649,
-      0.0901179024, 0.0775651974, 0.0667609841, 0.0574617115, 0.0494577534,
-      0.0425686829, 0.0366392049, 0.0315356559, 0.0271429906, 0.0233621885,
-      0.0201080220, 0.0173071349, 0.0148963891, 0.0128214409, 0.0110355164,
-      0.0094983570, 0.0081753117, 0.0070365560, 0.0060564198, 0.0052128089,
-      0.0044867062, 0.0038617438, 0.0033238337, 0.0028608502, 0.0024623566,
-      0.0021193699, 0.0018241586, 0.0015700679, 0.0013513699, 0.0011631349,
-      0.0010011195, 0.0008616715, 0.0007416475, 0.0006383420, 0.0005494260,
-      0.0004728954, 0.0004070248, 0.0003503295, 0.0003015314, 0.0002595305,
-      0.0002233799, 0.0001922649, 0.0001654839, 0.0001424333, 0.0001225935,
-      0.0001055172, 0.0000908195, 0.0000781691, 0.0000672807, 0.0000579091,
-      0.0000498428, 0.0000429001, 0.0000369245, 0.0000317812, 0.0000273543,
-      0.0000235441, 0.0000202646, 0.0000174419, 0.0000150124, 0.0000129213,
-      0.0000111214, 0.0000095723, 0.0000082390, 0.0000070913, 0.0000061036,
-      0.0000052534, 0.0000045216, 0.0000038918, 0.0000033497, 0.0000028831,
-      0.0000024815, 0.0000021359, 0.0000018384, 0.0000015823, 0.0000013619,
-      0.0000011722, 0.0000010089, 0.0000008684, 0.0000007474, 0.0000006433,
-      0.0000005537, 0.0000004766, 0.0000004102, 0.0000003531, 0.0000003039,
-      0.0000002616, 0.0000002251, 0.0000001938, 0.0000001668, 0.0000001435,
-      0.0000001235, 0.0000001063, 0.0000000915, 0.0000000788, 0.0000000678,
-      0.0000000584, 0.0000000502, 0.0000000432, 0.0000000372 };
-
-  SECTION( "mean_contribution is working on initialization" ) {
-
-    arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
-    REQUIRE(data_time.n_elem == 144);
-    REQUIRE(pulsemc.n_elem == 144);
-    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001));
-
-  }
-
-  SECTION( "mean_contribution changes with new decay rate" ) {
-
-    arma::vec pulsemc = pulse.get_mean_contribution(data_time, 0.1);
-    REQUIRE(pulsemc.n_elem == 144);
-    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
-
-  }
-
-  SECTION( "mean_contribution changes with new pulse time" ) {
-
-    // mean contrib still the same
-    arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
-    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
-
-    // now it should be updated.
-    pulse.time = 12.1;
-    pulsemc    = pulse.get_mean_contribution(data_time, decay_rate);
-    REQUIRE(pulse.time == 12.1);
-    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
-
-  }
-
-  SECTION( "mean_contribution changes with new pulse mass" ) {
-
-    // mean contrib still the same
-    arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
-    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
-
-    // now it should be updated.
-    pulse.mass = 5;
-    pulsemc    = pulse.get_mean_contribution(data_time, decay_rate);
-    REQUIRE(pulse.time == time);
-    REQUIRE(pulse.mass == 5);
-    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
-
-  }
-
-  SECTION( "mean_contribution changes with new pulse width" ) {
-
-    // mean contrib still the same
-    arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
-    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
-
-    // now it should be updated.
-    pulse.width = 10.;
-    pulsemc     = pulse.get_mean_contribution(data_time, decay_rate);
-    REQUIRE(pulse.mass == mass);
-    REQUIRE(pulse.width == 10.);
-    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
-
-  }
-
-}
-
+//  arma::vec data_time(144);
+//  for (int i = 0; i < 144; i++) data_time(i) = 10 * i + 10;
+//  double time = 126;
+//  double mass = 13.5;
+//  double width = 5.99;
+//  double tvarscale_mass = 0.174;
+//  double tvarscale_width = 0.764;
+//  //double lambda = 0.5;
+//  double decay_rate = 0.015;
+//  PulseEstimate pulse(time, mass, width, tvarscale_mass, tvarscale_width,
+//                      decay_rate, data_time);
+//
+//  SECTION( "member variables can be access" ) {
+//    REQUIRE(pulse.time == time);
+//    REQUIRE(pulse.mass == mass);
+//    REQUIRE(pulse.width == width);
+//    REQUIRE(pulse.tvarscale_mass == tvarscale_mass);
+//    REQUIRE(pulse.tvarscale_width == tvarscale_width);
+//  }
+//
+//  arma::vec  mc =
+//    { 0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000,
+//      0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000, 0.0000000000,
+//      0.0000000004, 0.0948776609, 12.0218825294, 10.9502638717, 9.4249795205,
+//      8.1121550510, 6.9821965584, 6.0096322708, 5.1725384308, 4.4520450858,
+//      3.8319107167, 3.2981561188, 2.8387492790, 2.4433341475, 2.1029971898,
+//      1.8100664557, 1.5579386363, 1.3409302110, 1.1541493284, 0.9933855330,
+//      0.8550148519, 0.7359181030, 0.6334105812, 0.5451815396, 0.4692420998,
+//      0.4038804181, 0.3476230974, 0.2992019727, 0.2575255245, 0.2216542731,
+//      0.1907796008, 0.1642055242, 0.1413330044, 0.1216464442, 0.1047020649,
+//      0.0901179024, 0.0775651974, 0.0667609841, 0.0574617115, 0.0494577534,
+//      0.0425686829, 0.0366392049, 0.0315356559, 0.0271429906, 0.0233621885,
+//      0.0201080220, 0.0173071349, 0.0148963891, 0.0128214409, 0.0110355164,
+//      0.0094983570, 0.0081753117, 0.0070365560, 0.0060564198, 0.0052128089,
+//      0.0044867062, 0.0038617438, 0.0033238337, 0.0028608502, 0.0024623566,
+//      0.0021193699, 0.0018241586, 0.0015700679, 0.0013513699, 0.0011631349,
+//      0.0010011195, 0.0008616715, 0.0007416475, 0.0006383420, 0.0005494260,
+//      0.0004728954, 0.0004070248, 0.0003503295, 0.0003015314, 0.0002595305,
+//      0.0002233799, 0.0001922649, 0.0001654839, 0.0001424333, 0.0001225935,
+//      0.0001055172, 0.0000908195, 0.0000781691, 0.0000672807, 0.0000579091,
+//      0.0000498428, 0.0000429001, 0.0000369245, 0.0000317812, 0.0000273543,
+//      0.0000235441, 0.0000202646, 0.0000174419, 0.0000150124, 0.0000129213,
+//      0.0000111214, 0.0000095723, 0.0000082390, 0.0000070913, 0.0000061036,
+//      0.0000052534, 0.0000045216, 0.0000038918, 0.0000033497, 0.0000028831,
+//      0.0000024815, 0.0000021359, 0.0000018384, 0.0000015823, 0.0000013619,
+//      0.0000011722, 0.0000010089, 0.0000008684, 0.0000007474, 0.0000006433,
+//      0.0000005537, 0.0000004766, 0.0000004102, 0.0000003531, 0.0000003039,
+//      0.0000002616, 0.0000002251, 0.0000001938, 0.0000001668, 0.0000001435,
+//      0.0000001235, 0.0000001063, 0.0000000915, 0.0000000788, 0.0000000678,
+//      0.0000000584, 0.0000000502, 0.0000000432, 0.0000000372 };
+//
+//  SECTION( "mean_contribution is working on initialization" ) {
+//
+//    arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
+//    REQUIRE(data_time.n_elem == 144);
+//    REQUIRE(pulsemc.n_elem == 144);
+//    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001));
+//
+//  }
+//
+//  SECTION( "mean_contribution changes with new decay rate" ) {
+//
+//    arma::vec pulsemc = pulse.get_mean_contribution(data_time, 0.1);
+//    REQUIRE(pulsemc.n_elem == 144);
+//    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
+//
+//  }
+//
+//  SECTION( "mean_contribution changes with new pulse time" ) {
+//
+//    // mean contrib still the same
+//    arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
+//    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
+//
+//    // now it should be updated.
+//    pulse.time = 12.1;
+//    pulsemc    = pulse.get_mean_contribution(data_time, decay_rate);
+//    REQUIRE(pulse.time == 12.1);
+//    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
+//
+//  }
+//
+//  SECTION( "mean_contribution changes with new pulse mass" ) {
+//
+//    // mean contrib still the same
+//    arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
+//    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
+//
+//    // now it should be updated.
+//    pulse.mass = 5;
+//    pulsemc    = pulse.get_mean_contribution(data_time, decay_rate);
+//    REQUIRE(pulse.time == time);
+//    REQUIRE(pulse.mass == 5);
+//    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
+//
+//  }
+//
+//  SECTION( "mean_contribution changes with new pulse width" ) {
+//
+//    // mean contrib still the same
+//    arma::vec pulsemc = pulse.get_mean_contribution(data_time, decay_rate);
+//    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == true);
+//
+//    // now it should be updated.
+//    pulse.width = 10.;
+//    pulsemc     = pulse.get_mean_contribution(data_time, decay_rate);
+//    REQUIRE(pulse.mass == mass);
+//    REQUIRE(pulse.width == 10.);
+//    REQUIRE(approx_equal(pulsemc, mc, "absdiff", 0.0000000001) == false);
+//
+//  }
+//
+//}
+//
 
 
 
@@ -402,7 +402,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   PatientData pdone(time, conc);
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
-  PatientEstimates pesingle(3, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
   PatientData * data = &pdone;
   PatientPriors * priors = &ppsingle;
   PatientEstimates * estimates = &pesingle;
@@ -410,7 +410,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   Patient pat(data, priors, estimates);
 
   SECTION( "Estimates can be accessed" ) {
-    REQUIRE(pat.estimates->baseline == 3);
+    REQUIRE(pat.estimates->baseline == 2.6);
     REQUIRE(pat.estimates->mass_mean == 3.5);
     REQUIRE(pat.estimates->pulse_count == 12);
     REQUIRE(pat.estimates->mass_sd == 10);
@@ -485,12 +485,25 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   pat.piter = pat.pulses.erase(pat.piter);
 
   // Now add a bunch of pulses (from matt's sim data)
-  arma::vec location  { -37.7, 41.0, 126, 306, 462, 617, 836, 1000, 1149, 1319, 1414 };
-  arma::vec mass  { 6.64, 5.94, 13.5, 7.65, 4.31, 12.3, 4.24, 3.73, 3.55, 4.59, 7.36 };
-  arma::vec width { 4.60, 6.74, 5.99, 4.48, 4.70, 3.83, 5.92, 4.93, 6.37, 4.92, 5.69 };
-  arma::vec tvarscale_mass { 1.34, 0.968, 0.266, 0.109, 0.561, 0.434, 0.318, 0.206, 1.42, 2.18, 1.07 };
-  arma::vec tvarscale_width { 1.03, 0.751, 1.95, 1.98, 1.27, 0.476, 1.75, 0.606, 1.52, 0.895, 0.863 };
+  arma::vec location        { -37.65204, 41.04917, 125.58297, 306.32966,
+                              461.65469, 616.95867, 835.64466, 1000.29703,
+                              1149.08360, 1319.19888, 1414.31830 };
+  arma::vec mass            { 6.635627,  5.940251, 13.463474,  7.649251,
+                              4.309497, 12.285200,  4.241401,  3.734942,
+                              3.553504,  4.589623, 7.364310 };
+  arma::vec width           { 4.596894, 6.740636, 5.986173, 4.476816, 4.701983,
+                              3.829487, 5.917652, 4.932739, 6.367862, 4.915543,
+                              5.692852 };
+  arma::vec tvarscale_mass  { 1.3362258, 0.9683636, 0.2660084, 0.1090139,
+                              0.5613391, 0.4339317, 0.3184480, 0.2060616,
+                              1.4164371, 2.1759781, 1.0744991 };
+  arma::vec tvarscale_width { 1.0301410, 0.7512098, 1.9517880, 1.9834742,
+                              1.2743407, 0.4760933, 1.7499186, 0.6057495,
+                              1.5219036, 0.8946568, 0.8632652 };
+
+  //std::cout << " NOW CREATING PULSES OF INTEREST \n\n" << std::endl;
   for (int i = 0; i < location.n_elem; i++) {
+    //std::cout << " \n\nPulse num " << i+1 << "\n" << std::endl;
     PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
@@ -519,6 +532,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
   // Get mean concentration of all pulses
   arma::vec mconc = pat.mean_concentration(false);
+  //std::cout << "Mean concentration = \n" << mconc << std::endl;
 
   SECTION( "Can get mean_concentration" ) {
 
@@ -556,9 +570,17 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
     // Require mconc excluding 3 (#4) to be <= and not all == to full mconc
     REQUIRE( !arma::approx_equal(mconc_excl3, mconc, "absdiff", 0.0000001) );
     REQUIRE( arma::all(mconc_excl3 <= mconc) );
-    REQUIRE(arma::all(mconc_excl3 >= 0));
-    REQUIRE(arma::all(mconc_excl3 < 10));
+    REQUIRE( arma::all(mconc_excl3 >= 0) );
+    REQUIRE( arma::all(mconc_excl3 < 10) );
 
+  }
+
+  SECTION( "Can get likelihood" ) {
+    //std::cout << "num pulses = " << pat.get_pulsecount() << std::endl;
+    //std::cout << "baseline = " << pat.estimates->baseline << std::endl;
+    pat.piter = pat.pulses.begin();
+    double this_likelihood = pat.likelihood(false);
+    REQUIRE(this_likelihood == Approx(83.36087));
   }
 
 }
@@ -572,14 +594,14 @@ TEST_CASE( "Patient class constructor for population model works", "[patient]" )
   for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
 
   PatientData pd(time, conc);
-  PatientEstimates pep(3, 45, 0.05, 3.5, 30, 12); // population constructor
+  PatientEstimates pep(2.6, 45, 0.05, 3.5, 30, 12); // population constructor
   PatientData * data = &pd;
   PatientEstimates * estimates = &pep;
 
   Patient pat(data, estimates);
 
   SECTION( "Estimates can be accessed" ) {
-    REQUIRE(pat.estimates->baseline == 3);
+    REQUIRE(pat.estimates->baseline == 2.6);
     REQUIRE(pat.estimates->mass_mean == 3.5);
     REQUIRE(pat.estimates->pulse_count == 12);
   }

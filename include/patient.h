@@ -86,51 +86,70 @@ struct Patient {
   // likelihood()
   //   computes the current likelihood using the observed log-concentrations and
   //   mean concentration
-  double likelihood(bool response_hormone,
-                    //Patient *patient,
-                    Pulse *pulse_excluded) {
+  double likelihood(bool response_hormone) {
+    std::list<PulseEstimate>::const_iterator emptyiter;
+    return likelihood(response_hormone, emptyiter);
+  }
 
-    int i;
-    int N = get_pulsecount();  // function not yet defined **
-    double like = 0; // likelihood to be calculated
+  double likelihood(bool response_hormone,
+                    std::list<PulseEstimate>::const_iterator pulse_excluded) {
+
+    double like = 0;
     arma::vec mean_conc;
-    arma::vec *data;
+    arma::vec *conc;
 
     if (response_hormone) {
-      data = data.response_concentration;
+      conc = &data->response_concentration;
     } else {
-      data = data.concentration;
+      conc = &data->concentration;
     }
 
     // Sum across mean_contribs
-    mean_conc = mean_concentration(patient, pulse_excluded);
-    for (i = 0; i < N; i++) {
-      like += pow(data(i) - mean_conc(i), 2);  // should be able to get rid of the loop by element diffing these vectors and squaring
-    }
+    mean_conc = mean_concentration(response_hormone, pulse_excluded);
 
-    like /= (-2.0 * patient->estimates.errorsq);
-    like += -0.5 * N * (1.8378771 + patient->estimates.logerrorsq);
+    arma::vec tmp = (*conc) - mean_conc;
+    //std::cout << "conc = " << (*conc) << std::endl;
+    //std::cout << "mean_conc = " << mean_conc << std::endl;
+    //std::cout << "tmp = " << tmp << std::endl;
+    like  = arma::sum(tmp);
+    //std::cout << "baseline = " << estimates->baseline << std::endl;
+    //std::cout << "like = " << like << std::endl;
+    //std::cout << "errorsq = " << estimates->errorsq << std::endl;
+    //std::cout << "logerrorsq = " << estimates->get_logerrorsq() << std::endl;
+    like  = pow(like, 2);
+    //std::cout << "like^2 = " << like << std::endl;
+    like /= (-2.0 * estimates->errorsq);
+    //std::cout << "like/(-2*errsq) = " << like << std::endl;
+    like += -0.5 * conc->n_elem * (1.8378771 + estimates->get_logerrorsq());
+    //std::cout << "like + -.5*144*... = " << like << std::endl;
+
+    std::cout << "Final likelihood = " << like << std::endl;
 
     return like;
 
   }
 
+
+  //
   // mean_concentration()
   //   this takes each pulse's mean_contrib vector and sums across them
-  arma::vec mean_concentration(bool response_pulses) {
+  //
+  arma::vec mean_concentration(bool response_hormone) {
 
     std::list<PulseEstimate>::const_iterator emptyiter;
-    return mean_concentration(response_pulses, emptyiter);
+    return mean_concentration(response_hormone, emptyiter);
 
   }
-  arma::vec mean_concentration(bool response_pulses,
+
+  arma::vec mean_concentration(bool response_hormone,
                                std::list<PulseEstimate>::const_iterator pulse_excluded) {
 
     arma::vec mean_conc(data->concentration.n_elem);
+    mean_conc.fill(0);
     std::list<PulseEstimate>::iterator pulse_iter;
     std::list<PulseEstimate>::const_iterator pulselist_end;
 
-    if (response_pulses) {
+    if (response_hormone) {
       pulse_iter    = responses.begin();
       pulselist_end = responses.end();
     } else {
@@ -139,18 +158,21 @@ struct Patient {
     }
 
     // Add the contribution to the mean from each pulse
-    //++pulse_iter; // move to first pulse, not sure if works**
-    int i = 0; // for testing only
-    std::cout << "Patient's halflife = " << estimates->halflife << " and decay rate = " << estimates->get_decay() << std::endl;
+    arma::vec mctrb(data->concentration.n_elem);
+    int i = 1;
     while (pulse_iter != pulselist_end) {
-      i++; 
       if (pulse_iter != pulse_excluded) {
-        std::cout << "Pulse number " << i << "'s mean concentration" << std::endl;
-        mean_conc += pulse_iter->get_mean_contribution(data->concentration, estimates->get_decay());
+        mctrb = pulse_iter->get_mean_contribution(data->concentration,
+                                                  estimates->get_decay());
+        mean_conc += mctrb;
+        //std::cout << " Pulse num " << i << " and its mean contrib: " << mctrb << std::endl;
+        //std::cout << " Pulse num " << i << " and cumsum mean concentration: " << mean_conc << std::endl;
       }
       ++pulse_iter;
+      ++i;
     }
 
+    //std::cout << "Baseline = " << estimates->baseline << std::endl;
     // Add the baseline contribution and log
     mean_conc += estimates->baseline;
     mean_conc = log(mean_conc);
