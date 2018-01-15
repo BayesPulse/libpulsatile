@@ -108,22 +108,10 @@ struct Patient {
     mean_conc = mean_concentration(response_hormone, pulse_excluded);
 
     arma::vec tmp = (*conc) - mean_conc;
-    //std::cout << "conc = " << (*conc) << std::endl;
-    //std::cout << "mean_conc = " << mean_conc << std::endl;
-    //std::cout << "tmp = " << tmp << std::endl;
     like  = arma::sum(tmp);
-    //std::cout << "baseline = " << estimates->baseline << std::endl;
-    //std::cout << "like = " << like << std::endl;
-    //std::cout << "errorsq = " << estimates->errorsq << std::endl;
-    //std::cout << "logerrorsq = " << estimates->get_logerrorsq() << std::endl;
     like  = pow(like, 2);
-    //std::cout << "like^2 = " << like << std::endl;
     like /= (-2.0 * estimates->errorsq);
-    //std::cout << "like/(-2*errsq) = " << like << std::endl;
     like += -0.5 * conc->n_elem * (1.8378771 + estimates->get_logerrorsq());
-    //std::cout << "like + -.5*144*... = " << like << std::endl;
-
-    std::cout << "Final likelihood = " << like << std::endl;
 
     return like;
 
@@ -165,14 +153,11 @@ struct Patient {
         mctrb = pulse_iter->get_mean_contribution(data->concentration,
                                                   estimates->get_decay());
         mean_conc += mctrb;
-        //std::cout << " Pulse num " << i << " and its mean contrib: " << mctrb << std::endl;
-        //std::cout << " Pulse num " << i << " and cumsum mean concentration: " << mean_conc << std::endl;
       }
       ++pulse_iter;
       ++i;
     }
 
-    //std::cout << "Baseline = " << estimates->baseline << std::endl;
     // Add the baseline contribution and log
     mean_conc += estimates->baseline;
     mean_conc = log(mean_conc);

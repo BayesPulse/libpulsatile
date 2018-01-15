@@ -468,10 +468,6 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   // sensible results...
   SECTION( "Has initial pulse" ) {
     std::list<PulseEstimate>::const_iterator this_piter = pat.pulses.begin();
-    //std::cout << "Pulse count = " << this_piter->time << "\n"; 
-    //std::cout << "time = " << this_piter->time << "\n"; 
-    //std::cout << "mass = " << this_piter->mass << "\n"; 
-    //std::cout << "width = " << this_piter->width << "\n"; 
     REQUIRE(pat.get_pulsecount()        == 1);
     REQUIRE(this_piter->time            == pat.data->fitstart);
     REQUIRE(this_piter->mass            == 1);
@@ -501,9 +497,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
                               1.2743407, 0.4760933, 1.7499186, 0.6057495,
                               1.5219036, 0.8946568, 0.8632652 };
 
-  //std::cout << " NOW CREATING PULSES OF INTEREST \n\n" << std::endl;
   for (int i = 0; i < location.n_elem; i++) {
-    //std::cout << " \n\nPulse num " << i+1 << "\n" << std::endl;
     PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
@@ -532,7 +526,6 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
   // Get mean concentration of all pulses
   arma::vec mconc = pat.mean_concentration(false);
-  //std::cout << "Mean concentration = \n" << mconc << std::endl;
 
   SECTION( "Can get mean_concentration" ) {
 
@@ -576,11 +569,9 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   }
 
   SECTION( "Can get likelihood" ) {
-    //std::cout << "num pulses = " << pat.get_pulsecount() << std::endl;
-    //std::cout << "baseline = " << pat.estimates->baseline << std::endl;
-    pat.piter = pat.pulses.begin();
-    double this_likelihood = pat.likelihood(false);
-    REQUIRE(this_likelihood == Approx(83.36087));
+
+    REQUIRE(pat.likelihood(false) == Approx(83.36087));
+
   }
 
 }

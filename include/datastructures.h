@@ -328,19 +328,10 @@ class PulseEstimate {
       x.fill(0.);
 
       z  = width * decay_rate;
-      //std::cout << "width * decay_rate = z \n" << 
-      //  width << " * " << decay_rate << " = " << z << 
-      //  std::endl;
       y  = decay_rate * (0.5 * z  + time);
-      //std::cout << "decay_rate * (0.5 * z + time) = y \n" << 
-      //  decay_rate << " * (0.5 * " << z << " + " << time << 
-      //  " = " << y << std::endl;
       z += time;
-      //std::cout << "z = " << z << std::endl;
       w  = sqrt(2. * width);
-      //std::cout << "w = " << w << std::endl;
       x = ((data_time - z) / w) * sqrt(2);
-      //std::cout << "x = " << x << std::endl;
 
       double N = data_time.n_elem;
       // NOTE: potentially slow piece
@@ -348,7 +339,6 @@ class PulseEstimate {
         x(i) = Rf_pnorm5(x(i), 0.0, 1.0, 1, 0);
         //x = arma::normpdf(x); // doesn't give same results
       }
-      //std::cout << "x (pnorm'd) = " << x << std::endl;
 
       // Finish calculating mean_contrib w/ vectorized ops
       //    mass * x is a vector, as is exp(), so use element-wise
