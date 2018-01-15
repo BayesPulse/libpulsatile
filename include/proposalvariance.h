@@ -30,6 +30,7 @@ class ProposalVariance {
 
   public:
 
+    // Constructors
     ProposalVariance()
       : pv(0)
       , count()
@@ -69,15 +70,14 @@ class ProposalVariance {
     double pv;
     double psd;          // proposal standard deviation
     Counter count;
-    int adjust_iter;  // iteration to adjust on
-    int max_iter;     // iteration to stop adjusting
+    int adjust_iter;     // iteration to adjust on
+    int max_iter;        // iteration to stop adjusting
     double target_ratio; // target proposal variance
 
     // ProposalVariance internal functions
     void initialize_proposals(double initial_pv) {
       set_proposals(initial_pv);
     }
-
     void set_proposals(double this_pv) {
       pv = this_pv;
       psd = sqrt(pv);

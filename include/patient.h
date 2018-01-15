@@ -79,7 +79,8 @@ struct Patient {
   // Methods for both types/all-models
   //
 
-  // Get current number of pulses
+  // get_pulsecount()
+  //   Get current number of pulses
   int get_pulsecount() { return pulses.size(); };
 
 
@@ -118,10 +119,8 @@ struct Patient {
   }
 
 
-  //
   // mean_concentration()
   //   this takes each pulse's mean_contrib vector and sums across them
-  //
   arma::vec mean_concentration(bool response_hormone) {
 
     std::list<PulseEstimate>::const_iterator emptyiter;
@@ -165,9 +164,6 @@ struct Patient {
     return mean_conc;
 
   }
-
-
-
 
 };
 
