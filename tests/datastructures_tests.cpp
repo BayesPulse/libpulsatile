@@ -16,11 +16,14 @@
 // Test utility functions
 //
 
+PulseUtils pu;
+
+
 TEST_CASE( "orderstat_default", "[utils]" ) {
 
   SECTION( "equal to 3" ) {
 
-    REQUIRE(pulseutils::orderstat_default() == 3);
+    REQUIRE(pu.orderstat_default() == 3);
 
   }
 
@@ -38,9 +41,9 @@ TEST_CASE( "rmvnorm Function", "[utils]" ) {
 
     arma::vec answer = { 1.3264, 3.1485 };
 
-    pulseutils::set_seed(171227);
+    pu.set_seed(171227);
     REQUIRE(
-            arma::approx_equal(pulseutils::rmvnorm(initial_means, pv.getpsd()),
+            arma::approx_equal(pu.rmvnorm(initial_means, pv.getpsd()),
                                answer, "absdiff", 0.0001) 
             );
   }

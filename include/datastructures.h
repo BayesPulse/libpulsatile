@@ -52,6 +52,7 @@ struct PatientPriors {
   double mass_variance;
   double width_mean;
   double width_variance;
+  PulseUtils pu;
 
   //
   // For Population models:
@@ -154,7 +155,7 @@ struct PatientPriors {
     width_sd_max            = prior_width_sd_max;
     error_alpha             = prior_error_alpha;
     error_beta              = prior_error_beta;
-    num_orderstat           = pulseutils::orderstat_default();
+    num_orderstat           = pu.orderstat_default();
     pulse_count             = prior_pulse_count;
     strauss_repulsion       = prior_strauss_repulsion;
     strauss_repulsion_range = prior_strauss_repulsion_range;

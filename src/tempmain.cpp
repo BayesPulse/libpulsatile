@@ -15,7 +15,8 @@ int main(int argc, char **argv) {
 
   // Create R instance (for RNGs) and set seed for reproducing test results
   RInside R;
-  pulseutils::set_seed(171227);
+  PulseUtils pu;
+  pu.set_seed(171227);
 
   // Create objects for checking/testing RNG implementation
   arma::vec initial_means = { 2, 3 };
@@ -29,7 +30,7 @@ int main(int argc, char **argv) {
   std::cout << "PV = " << pv.getpv() << "\n";
   std::cout << "Choldecomp of PV (i.e. PSD, upper triangle form)  = " << pv.getpsd() << "\n";
   std::cout << "PSD test that actually upper triangular form = " << cholcov << "\n";
-  std::cout << "rmvnorm = " << pulseutils::rmvnorm(initial_means, pv.getpsd()) << "\n";
+  std::cout << "rmvnorm = " << pu.rmvnorm(initial_means, pv.getpsd()) << "\n";
 
   //double a = 11;
   //arma::vec testvec = initial_means;

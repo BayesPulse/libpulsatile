@@ -76,7 +76,7 @@ class ModifiedMetropolisHastings
                                int max_iters);
 
   private:
-    pulseutils pu;
+    PulseUtils pu;
     double draw_proposal(double current, double proposal_sd) {
       return Rf_rnorm(current, proposal_sd);
     };
