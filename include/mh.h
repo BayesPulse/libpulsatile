@@ -21,36 +21,40 @@
 //      simple args and return a value? Or is it best to update internally
 //
 
-template <typename T>
+template <typename T, typename S>
 class ModifiedMetropolisHastings
 {
 
   public:
+    T sampling_unit;
+    S current_val;
+
     // sample from posterior
     //   - runs 1 iteration
     //   - inputs/outputs or changes internally?
     //   - pass Patient as pointer?
-    //  S will be double or arma::vec depending on single or two parameter MMH
-    template <typename S> S sample()
+    //  S will be double (or int) or arma::vec depending on single or two
+    //    parameter MMH
+    S sample()
     {
 
       double accept_prob, alpha;
 
       // Draw new proposal
-      S proposal     = draw_proposal(current, pv.getpv());
+      S proposal     = draw_proposal(current_val, pv.getpv());
       bool supported = parameter_support(proposal);
 
       if (!supported) {
 
         pv.addreject();
-        return current;
+        return current_val;
 
       } else {
 
         accept_prob = posterior_function();
         alpha = (0 < accept_prob) ? 0 : accept_prob;
 
-        if (log(Rf_runif()) < alpha) {
+        if (log(R::runif(0, 1)) < alpha) {
 
           pv.addaccept();
           return proposal;
@@ -58,7 +62,7 @@ class ModifiedMetropolisHastings
         } else {
 
           pv.addreject();
-          return current;
+          return current_val;
 
         }
       }
@@ -72,11 +76,12 @@ class ModifiedMetropolisHastings
                                int max_iters);
 
   private:
+    pulseutils pu;
     double draw_proposal(double current, double proposal_sd) {
       return Rf_rnorm(current, proposal_sd);
     };
     arma::vec draw_proposal(arma::vec current, arma::mat proposal_sd){
-      return pulseutils::rmvnorm(current, proposal_sd);
+      return pu.rmvnorm(current, proposal_sd);
     };
     virtual bool parameter_support();  // i.e. truncation logic
     virtual double posterior_function(); // logrho_calculation
