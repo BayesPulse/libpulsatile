@@ -17,6 +17,7 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
 {
 
   public:
+    ProposalVariance pv;
 
     SS_DrawFixedEffects(double in_pv, int in_adjust_iter, int in_max_iter, double in_target_ratio) :
       ModifiedMetropolisHastings<Patient, double, ProposalVariance>::ModifiedMetropolisHastings() { 
