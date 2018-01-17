@@ -62,20 +62,20 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[utils]" ) {
 
   // Now add a bunch of pulses (from matt's sim data)
   arma::vec location        { -37.65204, 41.04917, 125.58297, 306.32966,
-    461.65469, 616.95867, 835.64466, 1000.29703,
-    1149.08360, 1319.19888, 1414.31830 };
+                              461.65469, 616.95867, 835.64466, 1000.29703,
+                              1149.08360, 1319.19888, 1414.31830 };
   arma::vec mass            { 6.635627,  5.940251, 13.463474,  7.649251,
-    4.309497, 12.285200,  4.241401,  3.734942,
-    3.553504,  4.589623, 7.364310 };
+                              4.309497, 12.285200,  4.241401,  3.734942,
+                              3.553504,  4.589623, 7.364310 };
   arma::vec width           { 4.596894, 6.740636, 5.986173, 4.476816, 4.701983,
-    3.829487, 5.917652, 4.932739, 6.367862, 4.915543,
-    5.692852 };
+                              3.829487, 5.917652, 4.932739, 6.367862, 4.915543,
+                              5.692852 };
   arma::vec tvarscale_mass  { 1.3362258, 0.9683636, 0.2660084, 0.1090139,
-    0.5613391, 0.4339317, 0.3184480, 0.2060616,
-    1.4164371, 2.1759781, 1.0744991 };
+                              0.5613391, 0.4339317, 0.3184480, 0.2060616,
+                              1.4164371, 2.1759781, 1.0744991 };
   arma::vec tvarscale_width { 1.0301410, 0.7512098, 1.9517880, 1.9834742,
-    1.2743407, 0.4760933, 1.7499186, 0.6057495,
-    1.5219036, 0.8946568, 0.8632652 };
+                              1.2743407, 0.4760933, 1.7499186, 0.6057495,
+                              1.5219036, 0.8946568, 0.8632652 };
 
   for (int i = 0; i < location.n_elem; i++) {
     PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
@@ -89,7 +89,8 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[utils]" ) {
 
   SECTION( "equal to 3" ) {
     for (int i = 0; i < 100; i++) {
-      draw_fixed_effects.sample(patient, &(patient->estimates->mass_mean));
+      patient->estimates->mass_mean =
+        draw_fixed_effects.sample(patient, patient->estimates->mass_mean);
       std::cout << "sample value " << i << " = "<< patient->estimates->mass_mean << std::endl;
       std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
     }

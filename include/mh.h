@@ -36,7 +36,7 @@ class ModifiedMetropolisHastings
     //   - pass Patient as pointer?
     //  S will be double (or int) or arma::vec depending on single or two
     //    parameter MMH
-    void sample(T *sampling_unit, S *current_val) {
+    double sample(T *sampling_unit, S current_val) {
 
       double accept_prob, alpha;
 
@@ -47,7 +47,7 @@ class ModifiedMetropolisHastings
       if (!supported) {
 
         pv.addreject();
-        //return current_val;
+        return current_val;
 
       } else {
 
@@ -57,13 +57,13 @@ class ModifiedMetropolisHastings
         if (log(R::runif(0, 1)) < alpha) {
 
           pv.addaccept();
-          (*current_val) = proposal;
-          //return proposal;
+          //(*current_val) = proposal;
+          return proposal;
 
         } else {
 
           pv.addreject();
-          //return current_val;
+          return current_val;
 
         }
       }
@@ -80,10 +80,10 @@ class ModifiedMetropolisHastings
 
   private:
     PulseUtils pu;
-    double draw_proposal(const double * current, double proposal_sd) {
-      return Rf_rnorm((*current), proposal_sd);
+    double draw_proposal(double current, double proposal_sd) {
+      return Rf_rnorm((current), proposal_sd);
     };
-    arma::vec draw_proposal(const arma::vec * current, arma::mat proposal_sd){
+    arma::vec draw_proposal(const arma::vec current, arma::mat proposal_sd){
       return pu.rmvnorm(current, proposal_sd);
     };
     virtual bool parameter_support(S val); // i.e. truncation logic
