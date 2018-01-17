@@ -21,6 +21,9 @@
 //      simple args and return a value? Or is it best to update internally
 //
 
+// T = sampling unit = Patient or Population (or pulse?) 
+// S = current val type
+// PV = proposal variance object type
 template <typename T, typename S, typename PV>
 class ModifiedMetropolisHastings
 {
@@ -39,14 +42,19 @@ class ModifiedMetropolisHastings
     void sample(T *sampling_unit, S *current_val) {
 
       double accept_prob, alpha;
+      std::cout << "current_val is = " << *current_val << std::endl;
 
       // Draw new proposal
+      std::cout << "Proposal variance and SD is = " << pv.getpv() << " & " << pv.getpsd() << 
+        std::endl;
       S proposal     = draw_proposal(current_val, pv.getpsd());
       bool supported = parameter_support(proposal);
+      std::cout << "Proposal is = " << proposal << std::endl;
 
       if (!supported) {
 
         pv.addreject();
+        std::cout << "reject (not supported) = " << pv.getratio() << std::endl;
         //return current_val;
 
       } else {
@@ -57,12 +65,14 @@ class ModifiedMetropolisHastings
         if (log(R::runif(0, 1)) < alpha) {
 
           pv.addaccept();
-          (*current_val) = proposal;
+          *current_val = proposal;
+          std::cout << "accepted! = " << pv.getratio() << std::endl;
           //return proposal;
 
         } else {
 
           pv.addreject();
+          std::cout << "reject = " << pv.getratio() << std::endl;
           //return current_val;
 
         }
@@ -73,21 +83,26 @@ class ModifiedMetropolisHastings
   protected:
     // Constructors
     ModifiedMetropolisHastings() {}
-    ModifiedMetropolisHastings(S proposal_variance);
-    ModifiedMetropolisHastings(S proposal_variance,
-                               int adjust_at_iter,
-                               int max_iters);
+    ModifiedMetropolisHastings(PV proposal_variance);
+    ModifiedMetropolisHastings(double in_pv,
+                               int in_adjust_iter,
+                               int in_max_iters,
+                               double in_target_ratio);
 
   private:
     PulseUtils pu;
     double draw_proposal(const double * current, double proposal_sd) {
-      return Rf_rnorm((*current), proposal_sd);
+      double p = Rf_rnorm(*current, proposal_sd);
+      std::cout << "(inside draw_proposal)  proposal_sd is = " << proposal_sd << std::endl;
+      std::cout << "(inside draw_proposal)  current is = " << *current << std::endl;
+      std::cout << "(inside draw_proposal)  proposal is = " << p << std::endl;
+      return p; 
     };
     arma::vec draw_proposal(const arma::vec * current, arma::mat proposal_sd){
       return pu.rmvnorm(current, proposal_sd);
     };
-    virtual bool parameter_support(S val); // i.e. truncation logic
-    virtual double posterior_function(T * sampling_unit, S proposal);   // logrho_calculation
+    virtual bool const parameter_support(S val); // i.e. truncation logic
+    virtual double const posterior_function(T * sampling_unit, S proposal);   // logrho_calculation
 
 };
 

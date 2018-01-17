@@ -70,7 +70,7 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
   ProposalVariance pv(x, 500, 25000, 0.35);
 
   SECTION( "can initilize and return pv and psd values" ) {
-    REQUIRE( pv.getpv() == 0.3 );
+    REQUIRE( pv.getpv() == Approx(0.3) );
     REQUIRE( pv.getpsd() == sqrt(0.3) );
   }
 
@@ -101,7 +101,7 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
   SECTION( "1-parameter version, core functions." ) {
     ProposalVariance pv2(0.7, 500, 25000, 0.35);
 
-    REQUIRE( pv2.getpv() == 0.7 );
+    REQUIRE( pv2.getpv() == Approx(0.7) );
     REQUIRE( pv2.getpsd() == sqrt(0.7) );
 
     for (int i = 0; i < 100; ++i) {

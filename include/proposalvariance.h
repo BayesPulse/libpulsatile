@@ -34,7 +34,7 @@ class ProposalVariance {
     ProposalVariance()
       : pv(0)
       , count()
-      , adjust_iter(500)
+      , adjust_iter(10)
       , max_iter(25000)
       , target_ratio(0.35) { };
     ProposalVariance(double in_pv,
@@ -44,16 +44,36 @@ class ProposalVariance {
       adjust_iter  = in_adjust_iter;
       max_iter     = in_max_iter;
       target_ratio = in_target_ratio;
+      Counter count;
       initialize_proposals(in_pv);
+      std::cout << "(in constructor) inpv is = " << in_pv << std::endl;
     }
 
     // ProposalVariance functions
-    double getpv() const { return pv; };
-    double getpsd() const { return psd; };
+    double getpsd() {
+      std::cout << "(in getpsd) psd is = " << psd << std::endl;
+      return sqrt(pv);
+    }
+    double getpv() {
+      //check_adjust();
+      return pv; 
+    }
+    void check_adjust() {
+      int iter = count.getiter();
+      //std::cout << " iter < max_iter = " << iter << " < " << max_iter << " = " << (iter < max_iter) << std::endl;
+      //std::cout << " modulo math gives us: iter % adjust_iter = " << iter << " % " << adjust_iter << " = " << iter % adjust_iter << std::endl;
+      if (iter < max_iter && iter % adjust_iter == 0) adjustpv(); 
+      //std::cout << " now back to getting pv/psd" << std::endl;
+    }
     void adjustpv() {
       double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
-      if (y < 0.9)      set_proposals(pv * 0.9);
-      else if (y > 1.1) set_proposals(pv * 1.1);
+      if (y < 0.9)        {
+        set_proposals(pv * 0.9);
+        //std::cout << "adjusted! pv = " << pv << std::endl;
+      } else if (y > 1.1) {
+        set_proposals(pv * 1.1);
+        //std::cout << "adjusted!" << pv << std::endl;
+      }
     }
 
     // Counter object implementation
@@ -76,11 +96,16 @@ class ProposalVariance {
 
     // ProposalVariance internal functions
     void initialize_proposals(double initial_pv) {
+      std::cout << "(in initialize_prop) inpv is = " << initial_pv << std::endl;
+
       set_proposals(initial_pv);
     }
     void set_proposals(double this_pv) {
-      pv = this_pv;
-      psd = sqrt(pv);
+      std::cout << "(in set_prop) inpv is = " << this_pv << std::endl;
+      this->pv = this_pv;
+      this->psd = sqrt(pv);
+      std::cout << "(in set_prop) pv is = " << pv << std::endl;
+      std::cout << "(in set_prop) psd is = " << psd << std::endl;
     }
 
 };
@@ -114,7 +139,7 @@ class ProposalVariance2p {
 
 
     // ProposalVariance functions
-    arma::mat getpv() const  { return pv; };
+    arma::mat getpv() const  { return psd*psd; };
     arma::mat getpsd() const { return psd; };
 
     void adjustpv(double corr = -0.90) {

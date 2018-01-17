@@ -18,13 +18,16 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
 
   public:
 
-    SS_DrawFixedEffects() :
-      ModifiedMetropolisHastings<Patient, double, ProposalVariance>::ModifiedMetropolisHastings() { };
+    SS_DrawFixedEffects(double in_pv, int in_adjust_iter, int in_max_iter, double in_target_ratio) :
+      ModifiedMetropolisHastings<Patient, double, ProposalVariance>::ModifiedMetropolisHastings() { 
+        std::cout << "inpv is = " << in_pv << std::endl;
+        ProposalVariance pv(in_pv, in_adjust_iter, in_max_iter, in_target_ratio);
+      };
 
   private:
-    bool parameter_support(double val) { return (val > 0.0); }
+    bool const parameter_support(double val) { return (val > 0.0); }
 
-    double posterior_function(Patient *patient, double proposal) {
+    double const posterior_function(Patient *patient, double proposal) {
 
       //  TODO: Double check whether mass_variance is an SD or actually variance and make patientpriors match.
       double prior_ratio       = 0.0 ;
@@ -40,6 +43,9 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
       double curr_mass_sd      = patient->estimates->mass_sd;
       std::list<PulseEstimate>::const_iterator pulse     = patient->pulses.begin();
       std::list<PulseEstimate>::const_iterator pulse_end = patient->pulses.end();
+
+      //std::cout << "current mass is = " << curr_mass << std::endl;
+      //std::cout << "proposal mass is = " << proposal << std::endl;
 
       // Prior Ratio
       prior_ratio = (pow(curr_mass - prior_mass_mean, 2) -

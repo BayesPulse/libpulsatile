@@ -85,13 +85,19 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[utils]" ) {
 
 
 
-  SS_DrawFixedEffects draw_fixed_effects;
+  SS_DrawFixedEffects draw_fixed_effects(4, 500, 25000, 0.25);
 
-  SECTION( "equal to 3" ) {
-    for (int i = 0; i < 100; i++) {
+  SECTION( "check initializations" ) {
+
+    REQUIRE( draw_fixed_effects.pv.getpsd() == 2 );
+  }
+
+  SECTION( "Misc. testing iteration features " ) {
+    std::cout << "starting value = "<< patient->estimates->mass_mean << std::endl;
+    for (int i = 0; i < 1; i++) {
       draw_fixed_effects.sample(patient, &(patient->estimates->mass_mean));
       std::cout << "sample value " << i << " = "<< patient->estimates->mass_mean << std::endl;
-      std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
+      //std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
     }
 
     //REQUIRE(pu.orderstat_default() == 3);
