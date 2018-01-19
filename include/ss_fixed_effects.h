@@ -18,15 +18,24 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
 
   public:
 
-    SS_DrawFixedEffects() :
-      ModifiedMetropolisHastings<Patient, double, ProposalVariance>::ModifiedMetropolisHastings() { };
+    // Constructors
+    //   a) first option is to pass the proposal variance parameters to the
+    //      constructor
+    SS_DrawFixedEffects(double in_pv, // double or arma::vec
+                        int in_adjust_iter,
+                        int in_max_iter,
+                        double in_target_ratio) :
+      ModifiedMetropolisHastings
+      <Patient, double, ProposalVariance>::ModifiedMetropolisHastings() { };
+    //   b) second option is to pass a ProposalVariance object to the constructor
+    SS_DrawFixedEffects(ProposalVariance pv) :
+      ModifiedMetropolisHastings<Patient, double, ProposalVariance>::ModifiedMetropolisHastings(pv) { };
 
   private:
     bool parameter_support(double val) { return (val > 0.0); }
 
     double posterior_function(Patient *patient, double proposal) {
 
-      //  TODO: Double check whether mass_variance is an SD or actually variance and make patientpriors match.
       double prior_ratio       = 0.0 ;
       double psum_old          = 0.0 ;
       double psum_new          = 0.0 ;

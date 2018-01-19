@@ -1,0 +1,429 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+0	coding_session.vim	/^normal! 0$/;"	m
+05|	coding_session.vim	/^normal! 05|$/;"	m
+Arg	include/catch.h	/^    class Arg : public ParserRefImpl<Arg> {$/;"	c	namespace:Catch
+AssocEstimates	include/population.h	/^struct AssocEstimates {$/;"	s
+AutoReg	include/catch.h	/^struct AutoReg : NonCopyable {$/;"	s	namespace:Catch
+BENCHMARK	include/catch.h	/^#define BENCHMARK(/;"	d
+BUILDDIR	Makefile	/^BUILDDIR := build$/;"	m
+BoundFlagLambda	include/catch.h	/^        explicit BoundFlagLambda( L const &lambda ) : m_lambda( lambda ) {}$/;"	f	struct:Catch::BoundFlagLambda
+BoundFlagLambda	include/catch.h	/^    struct BoundFlagLambda : BoundFlagRefBase {$/;"	s	namespace:Catch
+BoundLambda	include/catch.h	/^        explicit BoundLambda( L const &lambda ) : m_lambda( lambda ) {}$/;"	f	struct:Catch::BoundLambda
+BoundLambda	include/catch.h	/^    struct BoundLambda : BoundValueRefBase {$/;"	s	namespace:Catch
+CATCH_ARC_ENABLED	include/catch.h	/^#define CATCH_ARC_ENABLED /;"	d
+CATCH_ARC_STRONG	include/catch.h	/^#define CATCH_ARC_STRONG /;"	d
+CATCH_ARC_STRONG	include/catch.h	/^#define CATCH_ARC_STRONG$/;"	d
+CATCH_BREAK_INTO_DEBUGGER	include/catch.h	/^    #define CATCH_BREAK_INTO_DEBUGGER(/;"	d
+CATCH_CLARA_CONFIG_CONSOLE_WIDTH	include/catch.h	/^#define CATCH_CLARA_CONFIG_CONSOLE_WIDTH /;"	d
+CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH	include/catch.h	/^#define CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH /;"	d
+CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH	include/catch.h	/^#undef CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH$/;"	d
+CATCH_CONFIG_COLOUR_NONE	include/catch.h	/^#       define CATCH_CONFIG_COLOUR_NONE$/;"	d
+CATCH_CONFIG_COLOUR_NONE	include/catch.h	/^#    define CATCH_CONFIG_COLOUR_NONE$/;"	d
+CATCH_CONFIG_CONSOLE_WIDTH	include/catch.h	/^#define CATCH_CONFIG_CONSOLE_WIDTH /;"	d
+CATCH_CONFIG_COUNTER	include/catch.h	/^#   define CATCH_CONFIG_COUNTER$/;"	d
+CATCH_CONFIG_DISABLE_MATCHERS	include/catch.h	/^#    undef CATCH_CONFIG_DISABLE_MATCHERS$/;"	d
+CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER	include/catch.h	/^#  define CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER$/;"	d
+CATCH_CONFIG_ENABLE_PAIR_STRINGMAKER	include/catch.h	/^#  define CATCH_CONFIG_ENABLE_PAIR_STRINGMAKER$/;"	d
+CATCH_CONFIG_ENABLE_TUPLE_STRINGMAKER	include/catch.h	/^#  define CATCH_CONFIG_ENABLE_TUPLE_STRINGMAKER$/;"	d
+CATCH_CONFIG_EXTERNAL_INTERFACES	include/catch.h	/^#  define CATCH_CONFIG_EXTERNAL_INTERFACES$/;"	d
+CATCH_CONFIG_MAIN	tests/tests.cpp	/^#define CATCH_CONFIG_MAIN$/;"	d	file:
+CATCH_CONFIG_POSIX_SIGNALS	include/catch.h	/^#   define CATCH_CONFIG_POSIX_SIGNALS$/;"	d
+CATCH_CONFIG_WINDOWS_SEH	include/catch.h	/^#   define CATCH_CONFIG_WINDOWS_SEH$/;"	d
+CATCH_CPP14_OR_GREATER	include/catch.h	/^#    define CATCH_CPP14_OR_GREATER$/;"	d
+CATCH_ENFORCE	include/catch.h	/^#define CATCH_ENFORCE(/;"	d
+CATCH_ERROR	include/catch.h	/^#define CATCH_ERROR(/;"	d
+CATCH_IMPL	include/catch.h	/^#  define CATCH_IMPL$/;"	d
+CATCH_INTERNAL_CONFIG_COUNTER	include/catch.h	/^    #define CATCH_INTERNAL_CONFIG_COUNTER$/;"	d
+CATCH_INTERNAL_CONFIG_NO_POSIX_SIGNALS	include/catch.h	/^#       define CATCH_INTERNAL_CONFIG_NO_POSIX_SIGNALS$/;"	d
+CATCH_INTERNAL_CONFIG_WINDOWS_SEH	include/catch.h	/^#    define CATCH_INTERNAL_CONFIG_WINDOWS_SEH$/;"	d
+CATCH_INTERNAL_ERROR	include/catch.h	/^#define CATCH_INTERNAL_ERROR(/;"	d
+CATCH_INTERNAL_LINEINFO	include/catch.h	/^#define CATCH_INTERNAL_LINEINFO /;"	d
+CATCH_INTERNAL_STRINGIFY	include/catch.h	/^  #define CATCH_INTERNAL_STRINGIFY(/;"	d
+CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS	include/catch.h	/^#       define CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS /;"	d
+CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS	include/catch.h	/^#   define CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS$/;"	d
+CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS	include/catch.h	/^#       define CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS /;"	d
+CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS	include/catch.h	/^#   define CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS$/;"	d
+CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS	include/catch.h	/^#       define CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS /;"	d
+CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS	include/catch.h	/^#   define CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS$/;"	d
+CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS	include/catch.h	/^#       define CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS /;"	d
+CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS	include/catch.h	/^#   define CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS$/;"	d
+CATCH_PLATFORM_IPHONE	include/catch.h	/^#  define CATCH_PLATFORM_IPHONE$/;"	d
+CATCH_PLATFORM_LINUX	include/catch.h	/^#  define CATCH_PLATFORM_LINUX$/;"	d
+CATCH_PLATFORM_MAC	include/catch.h	/^#  define CATCH_PLATFORM_MAC$/;"	d
+CATCH_PLATFORM_WINDOWS	include/catch.h	/^#  define CATCH_PLATFORM_WINDOWS$/;"	d
+CATCH_PLATFORM_WINDOWS	include/catch.h	/^#define CATCH_PLATFORM_WINDOWS$/;"	d
+CATCH_PREPARE_EXCEPTION	include/catch.h	/^#define CATCH_PREPARE_EXCEPTION(/;"	d
+CATCH_REGISTER_LISTENER	include/catch.h	/^#define CATCH_REGISTER_LISTENER(/;"	d
+CATCH_REGISTER_REPORTER	include/catch.h	/^#define CATCH_REGISTER_REPORTER(/;"	d
+CATCH_REGISTER_TAG_ALIAS	include/catch.h	/^#define CATCH_REGISTER_TAG_ALIAS(/;"	d
+CATCH_TEMP_CLARA_CONFIG_CONSOLE_WIDTH	include/catch.h	/^#define CATCH_TEMP_CLARA_CONFIG_CONSOLE_WIDTH /;"	d
+CATCH_TRAP	include/catch.h	/^    #define CATCH_TRAP(/;"	d
+CATCH_UNSAFE_UNRETAINED	include/catch.h	/^#define CATCH_UNSAFE_UNRETAINED /;"	d
+CATCH_UNSAFE_UNRETAINED	include/catch.h	/^#define CATCH_UNSAFE_UNRETAINED$/;"	d
+CFLAGS	Makefile	/^CFLAGS := -g -Wall$/;"	m
+CLARA_CONFIG_MAIN	include/catch.h	/^#    define CLARA_CONFIG_MAIN$/;"	d
+CLARA_CONFIG_MAIN_NOT_DEFINED	include/catch.h	/^#    define CLARA_CONFIG_MAIN_NOT_DEFINED$/;"	d
+CPPFLAGS	Makefile	/^CPPFLAGS := 		-Wall $(shell $(R_HOME)\/bin\/R CMD config CPPFLAGS)$/;"	m
+CXX	Makefile	/^CXX := $(shell $(R_HOME)\/bin\/R CMD config CXX)$/;"	m
+CXXFLAGS	Makefile	/^CXXFLAGS := 		$(RCPPFLAGS) $(RCPPINCL) $(RCPPARMAINCL) $(RINSIDEINCL) $(shell $(R_HOME)\/bin\/R CMD config CXXFLAGS)$/;"	m
+CaseSensitive	include/catch.h	/^    struct CaseSensitive { enum Choice {$/;"	s	namespace:Catch
+Catch	include/catch.h	/^namespace Catch {$/;"	n
+Choice	include/catch.h	/^    struct CaseSensitive { enum Choice {$/;"	g	struct:Catch::CaseSensitive
+ComposableParserImpl	include/catch.h	/^    class ComposableParserImpl : public ParserBase {$/;"	c	namespace:Catch
+Counter	include/counter.h	/^    Counter() : accept_ct(0), iter_ct(0) { };$/;"	f	class:Counter
+Counter	include/counter.h	/^class Counter {$/;"	c
+Detail	include/catch.h	/^    namespace Detail {$/;"	n	namespace:Catch
+EnumStringMaker	include/catch.h	/^    struct EnumStringMaker {$/;"	s	namespace:Catch
+ExeName	include/catch.h	/^        ExeName() : m_name( std::make_shared<std::string>( "<executable>" ) ) {}$/;"	f	class:Catch::ExeName
+ExeName	include/catch.h	/^        explicit ExeName( LambdaT const& lambda ) : ExeName() {$/;"	f	class:Catch::ExeName
+ExeName	include/catch.h	/^        explicit ExeName( std::string &ref ) : ExeName() {$/;"	f	class:Catch::ExeName
+ExeName	include/catch.h	/^    class ExeName : public ComposableParserImpl<ExeName> {$/;"	c	namespace:Catch
+GUARD_counter_h	include/counter.h	/^#define GUARD_counter_h$/;"	d
+GUARD_datastructures_h	include/datastructures.h	/^#define GUARD_datastructures_h$/;"	d
+GUARD_metropolishastings_h	include/mh.h	/^#define GUARD_metropolishastings_h$/;"	d
+GUARD_patient_h	include/patient.h	/^#define GUARD_patient_h$/;"	d
+GUARD_population_h	include/population.h	/^#define GUARD_population_h$/;"	d
+GUARD_proposalvariance_h	include/proposalvariance.h	/^#define GUARD_proposalvariance_h$/;"	d
+GUARD_ss_drawfixedeffects_h	include/ss_fixed_effects.h	/^#define GUARD_ss_drawfixedeffects_h$/;"	d
+GUARD_utils_h	include/utils.h	/^#define GUARD_utils_h$/;"	d
+Help	include/catch.h	/^        Help( bool &showHelpFlag )$/;"	f	struct:Catch::Help
+Help	include/catch.h	/^    struct Help : Opt {$/;"	s	namespace:Catch
+INC	Makefile	/^INC := -I include $(CPPFLAGS) $(CXXFLAGS) -std=c++11$/;"	m
+INTERNAL_CATCH_CATCH	include/catch.h	/^#define INTERNAL_CATCH_CATCH(/;"	d
+INTERNAL_CATCH_ELSE	include/catch.h	/^#define INTERNAL_CATCH_ELSE(/;"	d
+INTERNAL_CATCH_IF	include/catch.h	/^#define INTERNAL_CATCH_IF(/;"	d
+INTERNAL_CATCH_INFO	include/catch.h	/^#define INTERNAL_CATCH_INFO(/;"	d
+INTERNAL_CATCH_METHOD_AS_TEST_CASE	include/catch.h	/^    #define INTERNAL_CATCH_METHOD_AS_TEST_CASE(/;"	d
+INTERNAL_CATCH_MSG	include/catch.h	/^#define INTERNAL_CATCH_MSG(/;"	d
+INTERNAL_CATCH_NO_THROW	include/catch.h	/^#define INTERNAL_CATCH_NO_THROW(/;"	d
+INTERNAL_CATCH_REACT	include/catch.h	/^#define INTERNAL_CATCH_REACT(/;"	d
+INTERNAL_CATCH_REGISTER_TESTCASE	include/catch.h	/^    #define INTERNAL_CATCH_REGISTER_TESTCASE(/;"	d
+INTERNAL_CATCH_SECTION	include/catch.h	/^    #define INTERNAL_CATCH_SECTION(/;"	d
+INTERNAL_CATCH_TEST	include/catch.h	/^#define INTERNAL_CATCH_TEST(/;"	d
+INTERNAL_CATCH_TESTCASE	include/catch.h	/^    #define INTERNAL_CATCH_TESTCASE(/;"	d
+INTERNAL_CATCH_TESTCASE2	include/catch.h	/^    #define INTERNAL_CATCH_TESTCASE2(/;"	d
+INTERNAL_CATCH_TESTCASE_METHOD_NO_REGISTRATION	include/catch.h	/^    #define INTERNAL_CATCH_TESTCASE_METHOD_NO_REGISTRATION(/;"	d
+INTERNAL_CATCH_TESTCASE_NO_REGISTRATION	include/catch.h	/^    #define INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(/;"	d
+INTERNAL_CATCH_TEST_CASE_METHOD	include/catch.h	/^    #define INTERNAL_CATCH_TEST_CASE_METHOD(/;"	d
+INTERNAL_CATCH_TEST_CASE_METHOD2	include/catch.h	/^    #define INTERNAL_CATCH_TEST_CASE_METHOD2(/;"	d
+INTERNAL_CATCH_THROWS	include/catch.h	/^#define INTERNAL_CATCH_THROWS(/;"	d
+INTERNAL_CATCH_THROWS_AS	include/catch.h	/^#define INTERNAL_CATCH_THROWS_AS(/;"	d
+INTERNAL_CATCH_THROWS_MATCHES	include/catch.h	/^#define INTERNAL_CATCH_THROWS_MATCHES(/;"	d
+INTERNAL_CATCH_THROWS_STR_MATCHES	include/catch.h	/^#define INTERNAL_CATCH_THROWS_STR_MATCHES(/;"	d
+INTERNAL_CATCH_TRANSLATE_EXCEPTION	include/catch.h	/^#define INTERNAL_CATCH_TRANSLATE_EXCEPTION(/;"	d
+INTERNAL_CATCH_TRANSLATE_EXCEPTION2	include/catch.h	/^#define INTERNAL_CATCH_TRANSLATE_EXCEPTION2(/;"	d
+INTERNAL_CATCH_TRANSLATE_EXCEPTION_NO_REG	include/catch.h	/^    #define INTERNAL_CATCH_TRANSLATE_EXCEPTION_NO_REG(/;"	d
+INTERNAL_CATCH_TRY	include/catch.h	/^#define INTERNAL_CATCH_TRY(/;"	d
+INTERNAL_CATCH_UNIQUE_NAME	include/catch.h	/^#  define INTERNAL_CATCH_UNIQUE_NAME(/;"	d
+INTERNAL_CATCH_UNIQUE_NAME_LINE	include/catch.h	/^#define INTERNAL_CATCH_UNIQUE_NAME_LINE(/;"	d
+INTERNAL_CATCH_UNIQUE_NAME_LINE2	include/catch.h	/^#define INTERNAL_CATCH_UNIQUE_NAME_LINE2(/;"	d
+INTERNAL_CHECK_THAT	include/catch.h	/^#define INTERNAL_CHECK_THAT(/;"	d
+ITestCaseRegistry	include/catch.h	/^    struct ITestCaseRegistry {$/;"	s	namespace:Catch
+ITestInvoker	include/catch.h	/^    struct ITestInvoker {$/;"	s	namespace:Catch
+InternalParseResult	include/catch.h	/^        virtual auto parse( std::string const& exeName, TokenStream const &tokens) const -> InternalParseResult  = 0;$/;"	m	class:Catch::ParserBase
+IsStreamInsertable	include/catch.h	/^        class IsStreamInsertable {$/;"	c	namespace:Catch::Detail
+LDLIBS	Makefile	/^LDLIBS := 		$(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)$/;"	m
+LIB	Makefile	/^LIB := $(LDLIBS)$/;"	m
+LambdaInvoker	include/catch.h	/^    struct LambdaInvoker {$/;"	s	namespace:Catch
+LambdaInvoker	include/catch.h	/^    struct LambdaInvoker<void> {$/;"	s	namespace:Catch
+ModifiedMetropolisHastings	include/mh.h	/^    ModifiedMetropolisHastings() { ProposalVariance pv; }$/;"	f	class:ModifiedMetropolisHastings
+ModifiedMetropolisHastings	include/mh.h	/^    ModifiedMetropolisHastings(PV proposal_variance) {$/;"	f	class:ModifiedMetropolisHastings
+ModifiedMetropolisHastings	include/mh.h	/^    ModifiedMetropolisHastings(S in_pv, \/\/ double or arma::vec$/;"	f	class:ModifiedMetropolisHastings
+ModifiedMetropolisHastings	include/mh.h	/^class ModifiedMetropolisHastings$/;"	c
+NameAndTags	include/catch.h	/^struct NameAndTags {$/;"	s	namespace:Catch
+No	include/catch.h	/^        No$/;"	e	enum:Catch::CaseSensitive::Choice
+NonCopyable	include/catch.h	/^    class NonCopyable {$/;"	c	namespace:Catch
+OBJECTS	Makefile	/^OBJECTS := $(patsubst $(SRCDIR)\/%,$(BUILDDIR)\/%,$(SOURCES:.$(SRCEXT)=.o))$/;"	m
+OC_MAKE_UNIQUE_NAME	include/catch.h	/^#define OC_MAKE_UNIQUE_NAME(/;"	d
+OC_TEST_CASE	include/catch.h	/^#define OC_TEST_CASE(/;"	d
+OC_TEST_CASE2	include/catch.h	/^#define OC_TEST_CASE2(/;"	d
+Opt	include/catch.h	/^        Opt( LambdaT const &ref, std::string const &hint ) : ParserRefImpl( ref, hint ) {}$/;"	f	class:Catch::Opt
+Opt	include/catch.h	/^        Opt( T &ref, std::string const &hint ) : ParserRefImpl( ref, hint ) {}$/;"	f	class:Catch::Opt
+Opt	include/catch.h	/^        explicit Opt( LambdaT const &ref ) : ParserRefImpl( std::make_shared<BoundFlagLambda<LambdaT>>( ref ) ) {}$/;"	f	class:Catch::Opt
+Opt	include/catch.h	/^        explicit Opt( bool &ref ) : ParserRefImpl( std::make_shared<BoundFlagRef>( ref ) ) {}$/;"	f	class:Catch::Opt
+Opt	include/catch.h	/^    class Opt : public ParserRefImpl<Opt> {$/;"	c	namespace:Catch
+Optional	include/catch.h	/^    enum class Optionality { Optional, Required };$/;"	m	class:Catch::Optionality
+Optionality	include/catch.h	/^    enum class Optionality { Optional, Required };$/;"	c	namespace:Catch
+Parser	include/catch.h	/^        auto operator|( T const &other ) const -> Parser;$/;"	m	class:Catch::ComposableParserImpl
+Parser	include/catch.h	/^    struct Parser : ParserBase {$/;"	s	namespace:Catch
+ParserBase	include/catch.h	/^    class ParserBase {$/;"	c	namespace:Catch
+ParserRefImpl	include/catch.h	/^        ParserRefImpl( LambdaT const &ref, std::string const &hint )$/;"	f	class:Catch::ParserRefImpl
+ParserRefImpl	include/catch.h	/^        ParserRefImpl( T &ref, std::string const &hint )$/;"	f	class:Catch::ParserRefImpl
+ParserRefImpl	include/catch.h	/^        explicit ParserRefImpl( std::shared_ptr<BoundRefBase> const &ref ) : m_ref( ref ) {}$/;"	f	class:Catch::ParserRefImpl
+ParserRefImpl	include/catch.h	/^    class ParserRefImpl : public ComposableParserImpl<DerivedT> {$/;"	c	namespace:Catch
+Patient	include/patient.h	/^  Patient(PatientData *in_data,$/;"	f	struct:Patient
+Patient	include/patient.h	/^struct Patient {$/;"	s
+PatientData	include/datastructures.h	/^  PatientData(NumericVector in_time,$/;"	f	struct:PatientData
+PatientData	include/datastructures.h	/^struct PatientData {$/;"	s
+PatientEstimates	include/datastructures.h	/^  PatientEstimates(double sv_baseline,$/;"	f	struct:PatientEstimates
+PatientEstimates	include/datastructures.h	/^struct PatientEstimates {$/;"	s
+PatientPriors	include/datastructures.h	/^  PatientPriors(double prior_baseline_mean,$/;"	f	struct:PatientPriors
+PatientPriors	include/datastructures.h	/^struct PatientPriors {$/;"	s
+PopulationEstimates	include/datastructures.h	/^typedef struct PatientPriors PopulationEstimates;$/;"	t	typeref:struct:PatientPriors
+ProposalVariance	include/proposalvariance.h	/^    ProposalVariance()$/;"	f	class:ProposalVariance
+ProposalVariance	include/proposalvariance.h	/^    ProposalVariance(double in_pv,$/;"	f	class:ProposalVariance
+ProposalVariance	include/proposalvariance.h	/^class ProposalVariance {$/;"	c
+ProposalVariance2p	include/proposalvariance.h	/^    ProposalVariance2p()$/;"	f	class:ProposalVariance2p
+ProposalVariance2p	include/proposalvariance.h	/^    ProposalVariance2p(arma::vec in_pv,$/;"	f	class:ProposalVariance2p
+ProposalVariance2p	include/proposalvariance.h	/^class ProposalVariance2p {$/;"	c
+PulseEstimate	include/datastructures.h	/^    PulseEstimate()$/;"	f	class:PulseEstimate
+PulseEstimate	include/datastructures.h	/^    PulseEstimate(double in_time,$/;"	f	class:PulseEstimate
+PulseEstimate	include/datastructures.h	/^class PulseEstimate {$/;"	c
+PulseUtils	include/utils.h	/^class PulseUtils {$/;"	c
+RBLAS	Makefile	/^RBLAS     := 		$(shell $(R_HOME)\/bin\/R CMD config BLAS_LIBS)$/;"	m
+RCPPARMAINCL	Makefile	/^RCPPARMAINCL := 		$(shell echo 'RcppArmadillo:::CxxFlags()' | $(R_HOME)\/bin\/R --vanilla --slave)$/;"	m
+RCPPFLAGS	Makefile	/^RCPPFLAGS := 		$(shell $(R_HOME)\/bin\/R CMD config --cppflags)$/;"	m
+RCPPINCL	Makefile	/^RCPPINCL := 		$(shell echo 'Rcpp:::CxxFlags()' | $(R_HOME)\/bin\/R --vanilla --slave)$/;"	m
+RCPPLIBS	Makefile	/^RCPPLIBS := 		$(shell echo 'Rcpp:::LdFlags()'  | $(R_HOME)\/bin\/R --vanilla --slave)$/;"	m
+RINSIDEINCL	Makefile	/^RINSIDEINCL := 		$(shell echo 'RInside:::CxxFlags()' | $(R_HOME)\/bin\/R --vanilla --slave)$/;"	m
+RINSIDELIBS	Makefile	/^RINSIDELIBS := 		$(shell echo 'RInside:::LdFlags()'  | $(R_HOME)\/bin\/R --vanilla --slave)$/;"	m
+RLAPACK	Makefile	/^RLAPACK   := 		$(shell $(R_HOME)\/bin\/R CMD config LAPACK_LIBS)$/;"	m
+RLDFLAGS	Makefile	/^RLDFLAGS  := 		$(shell $(R_HOME)\/bin\/R CMD config --ldflags)$/;"	m
+R_HOME	Makefile	/^R_HOME := 		$(shell R RHOME)$/;"	m
+RegistrarForTagAliases	include/catch.h	/^    struct RegistrarForTagAliases {$/;"	s	namespace:Catch
+SOURCES	Makefile	/^SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))$/;"	m
+SRCDIR	Makefile	/^SRCDIR := src$/;"	m
+SRCEXT	Makefile	/^SRCEXT := cpp$/;"	m
+SS_DrawFixedEffects	include/ss_fixed_effects.h	/^    SS_DrawFixedEffects(ProposalVariance pv) :$/;"	f	class:SS_DrawFixedEffects
+SS_DrawFixedEffects	include/ss_fixed_effects.h	/^    SS_DrawFixedEffects(double in_pv, \/\/ double or arma::vec$/;"	f	class:SS_DrawFixedEffects
+SS_DrawFixedEffects	include/ss_fixed_effects.h	/^class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, ProposalVariance>$/;"	c
+SessionLoad	coding_session.vim	/^let SessionLoad = 1$/;"	v
+SourceLineInfo	include/catch.h	/^    struct SourceLineInfo {$/;"	s	namespace:Catch
+StreamEndStop	include/catch.h	/^    struct StreamEndStop {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<NSObject*> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<NSString*> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<R C::*> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<T*> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<bool> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<char *> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<char const *> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<char> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<char[SZ]> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<double> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<float> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<int> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<long long> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<long> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<signed char> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<signed char[SZ]> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<std::nullptr_t> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<std::pair<T1, T2> > {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<std::string> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<std::vector<T, Allocator> > {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<std::wstring> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<unsigned char> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<unsigned char[SZ]> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<unsigned int> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<unsigned long long> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<unsigned long> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<wchar_t *> {$/;"	s	namespace:Catch
+StringMaker	include/catch.h	/^    struct StringMaker<wchar_t const *> {$/;"	s	namespace:Catch
+StringRef	include/catch.h	/^    class StringRef {$/;"	c	namespace:Catch
+TARGET	Makefile	/^TARGET := bin\/libpulsatile$/;"	m
+TESTBUILDDIR	Makefile	/^TESTBUILDDIR := buildtests$/;"	m
+TESTOBJECTS	Makefile	/^TESTOBJECTS := $(patsubst $(TESTSRCDIR)\/%,$(TESTBUILDDIR)\/%,$(TESTSOURCES:.$(SRCEXT)=.o))$/;"	m
+TESTSOURCES	Makefile	/^TESTSOURCES := $(shell find $(TESTSRCDIR) -type f -name *.$(SRCEXT))$/;"	m
+TESTSRCDIR	Makefile	/^TESTSRCDIR := tests$/;"	m
+TESTTARGET	Makefile	/^TESTTARGET := bin\/tests$/;"	m
+TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED	include/catch.h	/^#define TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED$/;"	d
+TestInvokerAsMethod	include/catch.h	/^class TestInvokerAsMethod : public ITestInvoker {$/;"	c	namespace:Catch
+Yes	include/catch.h	/^        Yes,$/;"	e	enum:Catch::CaseSensitive::Choice
+_BSD_SOURCE	include/catch.h	/^#   define _BSD_SOURCE$/;"	d
+accept_ct	include/counter.h	/^    int accept_ct; \/\/ acceptance count$/;"	m	class:Counter
+addaccept	include/counter.h	/^    void addaccept() { ++accept_ct; ++iter_ct; }; \/\/ Add to acceptance count$/;"	f	class:Counter
+addaccept	include/proposalvariance.h	/^    void addaccept()  { count.addaccept();        } ;$/;"	f	class:ProposalVariance
+addaccept	include/proposalvariance.h	/^    void addaccept() { count.addaccept(); };$/;"	f	class:ProposalVariance2p
+addreject	include/counter.h	/^    void addreject() { ++iter_ct; };              \/\/ Add to iters but not accept count$/;"	f	class:Counter
+addreject	include/proposalvariance.h	/^    void addreject()  { count.addreject();        } ;$/;"	f	class:ProposalVariance
+addreject	include/proposalvariance.h	/^    void addreject() { count.addreject(); };$/;"	f	class:ProposalVariance2p
+adjust_iter	include/proposalvariance.h	/^    int adjust_iter;     \/\/ iteration to adjust on$/;"	m	class:ProposalVariance
+adjust_iter	include/proposalvariance.h	/^    int adjust_iter;     \/\/ iteration to adjust on$/;"	m	class:ProposalVariance2p
+adjustpv	include/proposalvariance.h	/^    void adjustpv() {$/;"	f	class:ProposalVariance
+adjustpv	include/proposalvariance.h	/^    void adjustpv(double corr = -0.90) {$/;"	f	class:ProposalVariance2p
+arcSafeRelease	include/catch.h	/^inline void arcSafeRelease( NSObject* ){}$/;"	f
+arcSafeRelease	include/catch.h	/^inline void arcSafeRelease( NSObject* obj ) {$/;"	f
+avg_period_of_obs	include/datastructures.h	/^  double avg_period_of_obs; \/\/ in minutes$/;"	m	struct:PatientData
+baseline	include/datastructures.h	/^  double baseline;$/;"	m	struct:PatientEstimates
+baseline_mean	include/datastructures.h	/^  double baseline_mean;$/;"	m	struct:PatientPriors
+baseline_variance	include/datastructures.h	/^  double baseline_variance;$/;"	m	struct:PatientPriors
+calc_covariance	include/proposalvariance.h	/^    double calc_covariance(arma::mat pv, double corr) {$/;"	f	class:ProposalVariance2p
+calc_mean_contribution	include/datastructures.h	/^    void calc_mean_contribution(const arma::vec &data_time, double decay_rate)$/;"	f	class:PulseEstimate
+cluster_size	include/population.h	/^  double cluster_size;      \/\/ cluster size (rho)$/;"	m	struct:AssocEstimates
+cluster_width	include/population.h	/^  double cluster_width;     \/\/ cluster width (nu)$/;"	m	struct:AssocEstimates
+concentration	include/datastructures.h	/^  arma::vec concentration;$/;"	m	struct:PatientData
+convert	include/catch.h	/^            convert(const Fake& t) {$/;"	f	struct:Catch::StringMaker
+convert	include/catch.h	/^            convert(const Fake&) {$/;"	f	struct:Catch::StringMaker
+convert	include/catch.h	/^        static std::string convert( std::vector<T,Allocator> const& v ) {$/;"	f	struct:Catch::StringMaker
+convert	include/catch.h	/^        static std::string convert(NSObject* nsObject) {$/;"	f	struct:Catch::StringMaker
+convert	include/catch.h	/^        static std::string convert(NSString * nsstring) {$/;"	f	struct:Catch::StringMaker
+convert	include/catch.h	/^        static std::string convert(R C::* p) {$/;"	f	struct:Catch::StringMaker
+convert	include/catch.h	/^        static std::string convert(U* p) {$/;"	f	struct:Catch::StringMaker
+convert	include/catch.h	/^        static std::string convert(const T& t) {$/;"	f	struct:Catch::EnumStringMaker
+convert	include/catch.h	/^        static std::string convert(const char* str) {$/;"	f	struct:Catch::StringMaker
+convert	include/catch.h	/^        static std::string convert(const std::pair<T1, T2>& pair) {$/;"	f	struct:Catch::StringMaker
+count	include/proposalvariance.h	/^    Counter count;$/;"	m	class:ProposalVariance
+count	include/proposalvariance.h	/^    Counter count;$/;"	m	class:ProposalVariance2p
+data	include/patient.h	/^  PatientData *data;$/;"	m	struct:Patient
+draw_proposal	include/mh.h	/^    arma::vec draw_proposal(const arma::vec current, arma::mat proposal_sd){$/;"	f	class:ModifiedMetropolisHastings
+draw_proposal	include/mh.h	/^    double draw_proposal(double current, double proposal_sd) {$/;"	f	class:ModifiedMetropolisHastings
+duration_of_obs	include/datastructures.h	/^  double duration_of_obs;   \/\/ in minutes$/;"	m	struct:PatientData
+error_alpha	include/datastructures.h	/^  double error_alpha;$/;"	m	struct:PatientPriors
+error_beta	include/datastructures.h	/^  double error_beta;$/;"	m	struct:PatientPriors
+errorsq	include/datastructures.h	/^  double errorsq;    \/\/ model error (variance)$/;"	m	struct:PatientEstimates
+estimates	include/patient.h	/^  PatientEstimates *estimates;$/;"	m	struct:Patient
+false_type	include/catch.h	/^            static auto test(...)->std::false_type;$/;"	m	class:Catch::Detail::IsStreamInsertable::std
+file	include/catch.h	/^        char const* file;$/;"	m	struct:Catch::SourceLineInfo
+fitend	include/datastructures.h	/^  double fitend;$/;"	m	struct:PatientData
+fitstart	include/datastructures.h	/^  double fitstart;$/;"	m	struct:PatientData
+get_decay	include/datastructures.h	/^  double get_decay() { return log(2) \/ halflife; }$/;"	f	struct:PatientEstimates
+get_logerrorsq	include/datastructures.h	/^  double get_logerrorsq() { return log(errorsq); }$/;"	f	struct:PatientEstimates
+get_mean_contribution	include/datastructures.h	/^    arma::vec get_mean_contribution(const arma::vec & data_time, double decay_rate)$/;"	f	class:PulseEstimate
+get_pulsecount	include/patient.h	/^  int get_pulsecount() { return pulses.size(); };$/;"	f	struct:Patient
+getaccept	include/counter.h	/^    int getaccept() const { return accept_ct; };$/;"	f	class:Counter
+getaccept	include/proposalvariance.h	/^    int getaccept()   { return count.getaccept(); } ;$/;"	f	class:ProposalVariance
+getaccept	include/proposalvariance.h	/^    int getaccept() { return count.getaccept(); };$/;"	f	class:ProposalVariance2p
+getiter	include/counter.h	/^    int getiter() const { return iter_ct; };$/;"	f	class:Counter
+getiter	include/proposalvariance.h	/^    int getiter()     { return count.getiter();   } ;$/;"	f	class:ProposalVariance
+getiter	include/proposalvariance.h	/^    int getiter() { return count.getiter(); };$/;"	f	class:ProposalVariance2p
+getpsd	include/proposalvariance.h	/^    arma::mat getpsd() const { return psd; };$/;"	f	class:ProposalVariance2p
+getpsd	include/proposalvariance.h	/^    double getpsd() const { return psd; };$/;"	f	class:ProposalVariance
+getpv	include/proposalvariance.h	/^    arma::mat getpv() const  { return pv; };$/;"	f	class:ProposalVariance2p
+getpv	include/proposalvariance.h	/^    double getpv() const { return psd * psd; };$/;"	f	class:ProposalVariance
+getratio	include/counter.h	/^    double getratio() const { return (double)accept_ct \/ (double)iter_ct; };$/;"	f	class:Counter
+getratio	include/proposalvariance.h	/^    double getratio() { return count.getratio();  } ;$/;"	f	class:ProposalVariance
+getratio	include/proposalvariance.h	/^    double getratio() { return count.getratio(); };$/;"	f	class:ProposalVariance2p
+halflife	include/datastructures.h	/^  double halflife;$/;"	m	struct:PatientEstimates
+halflife_mean	include/datastructures.h	/^  double halflife_mean;$/;"	m	struct:PatientPriors
+halflife_variance	include/datastructures.h	/^  double halflife_variance;$/;"	m	struct:PatientPriors
+initialize_proposals	include/proposalvariance.h	/^    void initialize_proposals(arma::vec initial_pv) {$/;"	f	class:ProposalVariance2p
+initialize_proposals	include/proposalvariance.h	/^    void initialize_proposals(double initial_pv) {$/;"	f	class:ProposalVariance
+iter_ct	include/counter.h	/^    int iter_ct;   \/\/ iteration count$/;"	m	class:Counter
+lambda	include/datastructures.h	/^    double lambda; \/\/ for fsh pulse only, denomsum - NOT SURE WHAT THIS TERM IS$/;"	m	class:PulseEstimate
+likelihood	include/patient.h	/^  double likelihood(bool response_hormone) {$/;"	f	struct:Patient
+likelihood	include/patient.h	/^  double likelihood(bool response_hormone,$/;"	f	struct:Patient
+line	include/catch.h	/^        std::size_t line;$/;"	m	struct:Catch::SourceLineInfo
+log_cluster_size	include/population.h	/^  double log_cluster_size;  \/\/ log scale cluster size$/;"	m	struct:AssocEstimates
+log_cluster_width	include/population.h	/^  double log_cluster_width;$/;"	m	struct:AssocEstimates
+m_args	include/catch.h	/^        std::vector<Arg> m_args;$/;"	m	struct:Catch::Parser
+m_data	include/catch.h	/^        char* m_data = nullptr;$/;"	m	class:Catch::StringRef
+m_description	include/catch.h	/^        std::string m_description;$/;"	m	class:Catch::ParserRefImpl
+m_exeName	include/catch.h	/^        mutable ExeName m_exeName;$/;"	m	struct:Catch::Parser
+m_hint	include/catch.h	/^        std::string m_hint;$/;"	m	class:Catch::ParserRefImpl
+m_lambda	include/catch.h	/^        L m_lambda;$/;"	m	struct:Catch::BoundFlagLambda
+m_lambda	include/catch.h	/^        L m_lambda;$/;"	m	struct:Catch::BoundLambda
+m_name	include/catch.h	/^        std::shared_ptr<std::string> m_name;$/;"	m	class:Catch::ExeName
+m_optNames	include/catch.h	/^        std::vector<std::string> m_optNames;$/;"	m	class:Catch::Opt
+m_optionality	include/catch.h	/^        Optionality m_optionality = Optionality::Optional;$/;"	m	class:Catch::ParserRefImpl
+m_options	include/catch.h	/^        std::vector<Opt> m_options;$/;"	m	struct:Catch::Parser
+m_ref	include/catch.h	/^        std::shared_ptr<BoundRefBase> m_ref;$/;"	m	class:Catch::ExeName
+m_ref	include/catch.h	/^        std::shared_ptr<BoundRefBase> m_ref;$/;"	m	class:Catch::ParserRefImpl
+m_size	include/catch.h	/^        size_type m_size;$/;"	m	class:Catch::StringRef
+m_start	include/catch.h	/^        char const* m_start;$/;"	m	class:Catch::StringRef
+m_testAsMethod	include/catch.h	/^    TestInvokerAsMethod( void (C::*testAsMethod)() ) noexcept : m_testAsMethod( testAsMethod ) {}$/;"	f	class:Catch::TestInvokerAsMethod
+m_testAsMethod	include/catch.h	/^    void (C::*m_testAsMethod)();$/;"	m	class:Catch::TestInvokerAsMethod
+main	src/tempmain.cpp	/^int main(int argc, char **argv) {$/;"	f
+mass	include/datastructures.h	/^    double mass;$/;"	m	class:PulseEstimate
+mass_mean	include/datastructures.h	/^  double mass_mean;$/;"	m	struct:PatientEstimates
+mass_mean	include/datastructures.h	/^  double mass_mean;$/;"	m	struct:PatientPriors
+mass_mean_sd	include/datastructures.h	/^  double mass_mean_sd;$/;"	m	struct:PatientPriors
+mass_mean_variance	include/datastructures.h	/^  double mass_mean_variance;$/;"	m	struct:PatientPriors
+mass_sd	include/datastructures.h	/^  double mass_sd;$/;"	m	struct:PatientEstimates
+mass_sd_max	include/datastructures.h	/^  double mass_sd_max;$/;"	m	struct:PatientPriors
+mass_variance	include/datastructures.h	/^  double mass_variance;$/;"	m	struct:PatientPriors
+max_iter	include/proposalvariance.h	/^    int max_iter;        \/\/ iteration to stop adjusting$/;"	m	class:ProposalVariance
+max_iter	include/proposalvariance.h	/^    int max_iter;        \/\/ iteration to stop adjusting$/;"	m	class:ProposalVariance2p
+mean_concentration	include/patient.h	/^  arma::vec mean_concentration(bool response_hormone) {$/;"	f	struct:Patient
+mean_concentration	include/patient.h	/^  arma::vec mean_concentration(bool response_hormone,$/;"	f	struct:Patient
+mean_contribution	include/datastructures.h	/^    arma::vec mean_contribution;$/;"	m	class:PulseEstimate
+name	include/catch.h	/^    StringRef name;$/;"	m	struct:Catch::NameAndTags
+noexcept	include/catch.h	/^        SourceLineInfo( char const* _file, std::size_t _line ) noexcept;$/;"	m	struct:Catch::SourceLineInfo
+noexcept	include/catch.h	/^        StringRef( StringRef const& other ) noexcept;$/;"	m	class:Catch::StringRef
+noexcept	include/catch.h	/^        StringRef( StringRef&& other ) noexcept;$/;"	m	class:Catch::StringRef
+noexcept	include/catch.h	/^        StringRef( char const* rawChars ) noexcept;$/;"	m	class:Catch::StringRef
+noexcept	include/catch.h	/^        StringRef( char const* rawChars, size_type size ) noexcept;$/;"	m	class:Catch::StringRef
+noexcept	include/catch.h	/^        StringRef( std::string const& stdString ) noexcept;$/;"	m	class:Catch::StringRef
+noexcept	include/catch.h	/^        StringRef() noexcept;$/;"	m	class:Catch::StringRef
+noexcept	include/catch.h	/^        bool empty() const noexcept;$/;"	m	struct:Catch::SourceLineInfo
+noexcept	include/catch.h	/^        bool operator < ( SourceLineInfo const& other ) const noexcept;$/;"	m	struct:Catch::SourceLineInfo
+noexcept	include/catch.h	/^        bool operator == ( SourceLineInfo const& other ) const noexcept;$/;"	m	struct:Catch::SourceLineInfo
+noexcept	include/catch.h	/^        void swap( StringRef& other ) noexcept;$/;"	m	class:Catch::StringRef
+noexcept	include/catch.h	/^        ~StringRef() noexcept;$/;"	m	class:Catch::StringRef
+noexcept	include/catch.h	/^    AutoReg( ITestInvoker* invoker, SourceLineInfo const& lineInfo, StringRef classOrMethod, NameAndTags const& nameAndTags ) noexcept;$/;"	m	struct:Catch::AutoReg
+noexcept	include/catch.h	/^    NameAndTags( StringRef name_ = "", StringRef tags_ = "" ) noexcept;$/;"	m	struct:Catch::NameAndTags
+num_orderstat	include/datastructures.h	/^  double num_orderstat;$/;"	m	struct:PatientPriors
+number_of_obs	include/datastructures.h	/^  int number_of_obs;$/;"	m	struct:PatientData
+operator +	include/catch.h	/^    T const& operator + ( T const& value, StreamEndStop ) {$/;"	f	namespace:Catch
+orderstat_default	include/utils.h	/^    int orderstat_default() { return 3; };$/;"	f	class:PulseUtils
+ostream	include/catch.h	/^    auto operator << ( std::ostream& os, StringRef const& sr ) -> std::ostream&;$/;"	m	class:Catch::std
+other	include/catch.h	/^        SourceLineInfo( SourceLineInfo const& other )        = default;$/;"	m	struct:Catch::SourceLineInfo
+parameter_support	include/ss_fixed_effects.h	/^    bool parameter_support(double val) { return (val > 0.0); }$/;"	f	class:SS_DrawFixedEffects
+performOptionalSelector	include/catch.h	/^inline id performOptionalSelector( id obj, SEL sel ) {$/;"	f
+piter	include/patient.h	/^  std::list<PulseEstimate>::iterator piter = pulses.begin();$/;"	m	struct:Patient
+posterior_function	include/ss_fixed_effects.h	/^    double posterior_function(Patient *patient, double proposal) {$/;"	f	class:SS_DrawFixedEffects
+prev_decay_rate	include/datastructures.h	/^    double prev_time, prev_mass, prev_width, prev_decay_rate;$/;"	m	class:PulseEstimate
+prev_mass	include/datastructures.h	/^    double prev_time, prev_mass, prev_width, prev_decay_rate;$/;"	m	class:PulseEstimate
+prev_time	include/datastructures.h	/^    double prev_time, prev_mass, prev_width, prev_decay_rate;$/;"	m	class:PulseEstimate
+prev_width	include/datastructures.h	/^    double prev_time, prev_mass, prev_width, prev_decay_rate;$/;"	m	class:PulseEstimate
+priors	include/patient.h	/^  PatientPriors *priors;$/;"	m	struct:Patient
+psd	include/proposalvariance.h	/^    arma::mat::fixed<2, 2> psd; \/\/ proposal standard deviation$/;"	m	class:ProposalVariance2p
+psd	include/proposalvariance.h	/^    double psd;          \/\/ proposal standard deviation$/;"	m	class:ProposalVariance
+pu	include/datastructures.h	/^  PulseUtils pu;$/;"	m	struct:PatientPriors
+pu	include/mh.h	/^    PulseUtils pu;$/;"	m	class:ModifiedMetropolisHastings
+pu	tests/datastructures_tests.cpp	/^PulseUtils pu;$/;"	v
+pulse_count	include/datastructures.h	/^  int    pulse_count;             \/\/ prior number of pulses, i.e. strauss_rate\/beta$/;"	m	struct:PatientPriors
+pulse_count	include/datastructures.h	/^  int    pulse_count; \/\/ function of linked list instead?;$/;"	m	struct:PatientEstimates
+pulses	include/patient.h	/^  std::list<PulseEstimate> pulses;$/;"	m	struct:Patient
+pv	include/mh.h	/^    PV pv;                   \/\/ needs to be a ProposalVariance object$/;"	m	class:ModifiedMetropolisHastings
+pv	include/proposalvariance.h	/^    arma::mat::fixed<2, 2> pv;$/;"	m	class:ProposalVariance2p
+rangeToString	include/catch.h	/^        std::string rangeToString(InputIterator first, InputIterator last) {$/;"	f	namespace:Catch::Detail
+rawMemoryToString	include/catch.h	/^        std::string rawMemoryToString( const T& object ) {$/;"	f	namespace:Catch::Detail
+resetratio	include/counter.h	/^    void resetratio() { accept_ct = 0; iter_ct = 0; };$/;"	f	class:Counter
+resetratio	include/proposalvariance.h	/^    void resetratio() { count.resetratio();       } ;$/;"	f	class:ProposalVariance
+resetratio	include/proposalvariance.h	/^    void resetratio() { count.resetratio(); };$/;"	f	class:ProposalVariance2p
+response_concentration	include/datastructures.h	/^  arma::vec response_concentration;$/;"	m	struct:PatientData
+responses	include/patient.h	/^  std::list<PulseEstimate> responses;$/;"	m	struct:Patient
+riter	include/patient.h	/^  std::list<PulseEstimate>::iterator riter = responses.begin();$/;"	m	struct:Patient
+rmvnorm	include/utils.h	/^    arma::vec rmvnorm(arma::vec mean,    \/\/ mean of distr to sample from (curr values)$/;"	f	class:PulseUtils
+s:l	coding_session.vim	/^let s:l = 13 - ((9 * winheight(0) + 34) \/ 69)$/;"	v
+s:l	coding_session.vim	/^let s:l = 172 - ((63 * winheight(0) + 34) \/ 69)$/;"	v
+s:l	coding_session.vim	/^let s:l = 18 - ((17 * winheight(0) + 34) \/ 69)$/;"	v
+s:l	coding_session.vim	/^let s:l = 196 - ((68 * winheight(0) + 34) \/ 69)$/;"	v
+s:l	coding_session.vim	/^let s:l = 3 - ((2 * winheight(0) + 34) \/ 69)$/;"	v
+s:so_save	coding_session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
+s:sx	coding_session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:wipebuf	coding_session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+sample	include/mh.h	/^    void sample(T *sampling_unit, S *current_val) {$/;"	f	class:ModifiedMetropolisHastings
+set_proposals	include/proposalvariance.h	/^    void set_proposals(arma::mat this_pv, double corr) {$/;"	f	class:ProposalVariance2p
+set_proposals	include/proposalvariance.h	/^    void set_proposals(double this_pv) {$/;"	f	class:ProposalVariance
+set_seed	include/utils.h	/^    void set_seed(unsigned int seed) {$/;"	f	class:PulseUtils
+strauss_repulsion	include/datastructures.h	/^  double strauss_repulsion;       \/\/ strauss gamma for secondary\/non-hc interaction$/;"	m	struct:PatientPriors
+strauss_repulsion_range	include/datastructures.h	/^  double strauss_repulsion_range; \/\/ range of secondary\/non-hardcore interaction$/;"	m	struct:PatientPriors
+string	include/catch.h	/^    auto operator + ( StringRef const& lhs, StringRef const& rhs ) -> std::string;$/;"	m	class:Catch::std
+string	include/catch.h	/^    auto operator + ( StringRef const& lhs, char const* rhs ) -> std::string;$/;"	m	class:Catch::std
+string	include/catch.h	/^    auto operator + ( char const* lhs, StringRef const& rhs ) -> std::string;$/;"	m	class:Catch::std
+stringify	include/catch.h	/^        inline std::string stringify( NSString* nsstring ) {$/;"	f	namespace:Catch::Detail
+stringify	include/catch.h	/^        std::string stringify(const T& e) {$/;"	f	namespace:Catch::Detail
+tags	include/catch.h	/^    StringRef tags;$/;"	m	struct:Catch::NameAndTags
+target_ratio	include/proposalvariance.h	/^    double target_ratio; \/\/ target proposal variance$/;"	m	class:ProposalVariance
+target_ratio	include/proposalvariance.h	/^    double target_ratio; \/\/ target proposal variance$/;"	m	class:ProposalVariance2p
+time	include/datastructures.h	/^    double time;$/;"	m	class:PulseEstimate
+time	include/datastructures.h	/^  arma::vec time;$/;"	m	struct:PatientData
+tvarscale_mass	include/datastructures.h	/^    double tvarscale_mass;   \/\/ variance scale for mass t-dist (eta)$/;"	m	class:PulseEstimate
+tvarscale_width	include/datastructures.h	/^    double tvarscale_width;  \/\/ variance scale for width t-dist (eta)$/;"	m	class:PulseEstimate
+value	include/catch.h	/^            static const bool value = decltype(test<std::ostream, const T&>(0))::value;$/;"	m	class:Catch::Detail::IsStreamInsertable
+width	include/datastructures.h	/^    double width;$/;"	m	class:PulseEstimate
+width_mean	include/datastructures.h	/^  double width_mean;$/;"	m	struct:PatientEstimates
+width_mean	include/datastructures.h	/^  double width_mean;$/;"	m	struct:PatientPriors
+width_mean_sd	include/datastructures.h	/^  double width_mean_sd;$/;"	m	struct:PatientPriors
+width_mean_variance	include/datastructures.h	/^  double width_mean_variance;$/;"	m	struct:PatientPriors
+width_sd	include/datastructures.h	/^  double width_sd;$/;"	m	struct:PatientEstimates
+width_sd_max	include/datastructures.h	/^  double width_sd_max;$/;"	m	struct:PatientPriors
+width_variance	include/datastructures.h	/^  double width_variance;$/;"	m	struct:PatientPriors
+writeToStream	include/catch.h	/^        void writeToStream( std::ostream &os ) const {$/;"	f	struct:Catch::Parser
+zt	coding_session.vim	/^normal! zt$/;"	m

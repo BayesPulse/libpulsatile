@@ -83,17 +83,22 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[utils]" ) {
     pat.pulses.push_back(pulse);
   }
 
+  SS_DrawFixedEffects draw_fixed_effects(10, 500, 25000, 0.35);
 
+  SECTION( "Check sub-functions" ) {
 
-  SS_DrawFixedEffects draw_fixed_effects;
+    std::cout << "current psd = " << draw_fixed_effects.pv.getpsd() << " and pv = " << draw_fixed_effects.pv.getpv() << std::endl;
+
+  }
 
   SECTION( "equal to 3" ) {
-    for (int i = 0; i < 100; i++) {
-      patient->estimates->mass_mean =
-        draw_fixed_effects.sample(patient, patient->estimates->mass_mean);
-      std::cout << "sample value " << i << " = "<< patient->estimates->mass_mean << std::endl;
-      std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
+    for (int i = 0; i < 250000; i++) {
+      //std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
+      //std::cout << "sample value " << i << " = "<< patient->estimates->mass_mean << std::endl;
+      draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
     }
+    std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
+    std::cout << "final sample value " << " = "<< patient->estimates->mass_mean << std::endl;
 
     //REQUIRE(pu.orderstat_default() == 3);
 

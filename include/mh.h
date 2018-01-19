@@ -36,18 +36,17 @@ class ModifiedMetropolisHastings
     //   - pass Patient as pointer?
     //  S will be double (or int) or arma::vec depending on single or two
     //    parameter MMH
-    double sample(T *sampling_unit, S current_val) {
+    void sample(T *sampling_unit, S *current_val) {
 
       double accept_prob, alpha;
 
       // Draw new proposal
-      S proposal     = draw_proposal(current_val, pv.getpsd());
+      S proposal     = draw_proposal(*current_val, pv.getpsd());
       bool supported = parameter_support(proposal);
 
       if (!supported) {
 
         pv.addreject();
-        return current_val;
 
       } else {
 
@@ -57,31 +56,34 @@ class ModifiedMetropolisHastings
         if (log(R::runif(0, 1)) < alpha) {
 
           pv.addaccept();
-          //(*current_val) = proposal;
-          return proposal;
+          *current_val = proposal;
 
         } else {
 
           pv.addreject();
-          return current_val;
 
         }
       }
     }
 
-
   protected:
     // Constructors
-    ModifiedMetropolisHastings() {}
-    ModifiedMetropolisHastings(S proposal_variance);
-    ModifiedMetropolisHastings(S proposal_variance,
-                               int adjust_at_iter,
-                               int max_iters);
+    ModifiedMetropolisHastings() { ProposalVariance pv; }
+    ModifiedMetropolisHastings(PV proposal_variance) {
+      pv = proposal_variance;
+    }
+    ModifiedMetropolisHastings(S in_pv, // double or arma::vec
+                               int in_adjust_iter,
+                               int in_max_iter,
+                               double in_target_ratio) : 
+      PV(in_pv, in_adjust_iter, in_max_iter, in_target_ratio) {
+    }
 
   private:
+
     PulseUtils pu;
     double draw_proposal(double current, double proposal_sd) {
-      return Rf_rnorm((current), proposal_sd);
+      return Rf_rnorm(current, proposal_sd);
     };
     arma::vec draw_proposal(const arma::vec current, arma::mat proposal_sd){
       return pu.rmvnorm(current, proposal_sd);

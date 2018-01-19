@@ -32,7 +32,7 @@ class ProposalVariance {
 
     // Constructors
     ProposalVariance()
-      : pv(0)
+      : psd(sqrt(5))
       , count()
       , adjust_iter(500)
       , max_iter(25000)
@@ -48,12 +48,12 @@ class ProposalVariance {
     }
 
     // ProposalVariance functions
-    double getpv() const { return pv; };
+    double getpv() const { return psd * psd; };
     double getpsd() const { return psd; };
     void adjustpv() {
       double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
-      if (y < 0.9)      set_proposals(pv * 0.9);
-      else if (y > 1.1) set_proposals(pv * 1.1);
+      if (y < 0.9)      set_proposals(getpv() * 0.9);
+      else if (y > 1.1) set_proposals(getpv() * 1.1);
     }
 
     // Counter object implementation
@@ -67,7 +67,6 @@ class ProposalVariance {
 
   private:
 
-    double pv;
     double psd;          // proposal standard deviation
     Counter count;
     int adjust_iter;     // iteration to adjust on
@@ -79,8 +78,7 @@ class ProposalVariance {
       set_proposals(initial_pv);
     }
     void set_proposals(double this_pv) {
-      pv = this_pv;
-      psd = sqrt(pv);
+      psd = sqrt(this_pv);
     }
 
 };
