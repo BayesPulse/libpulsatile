@@ -31,12 +31,12 @@ class ProposalVariance {
   public:
 
     // Constructors
-    ProposalVariance()
-      : psd(sqrt(5))
-      , count()
-      , adjust_iter(500)
-      , max_iter(25000)
-      , target_ratio(0.35) { };
+    //ProposalVariance()
+    //  : psd(sqrt(5))
+    //  , count()
+    //  , adjust_iter(500)
+    //  , max_iter(25000)
+    //  , target_ratio(0.35) { };
     ProposalVariance(double in_pv,
                      int in_adjust_iter,   // adjust pv on multiples of adjust_iter
                      int in_max_iter,     // maximum iteration to adjust pv

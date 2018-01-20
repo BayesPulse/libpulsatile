@@ -32,8 +32,8 @@ class ModifiedMetropolisHastings
 
     // sample from posterior
     //   - runs 1 iteration
-    //   - inputs/outputs or changes internally?
-    //   - pass Patient as pointer?
+    //   - changes internally (pass-by-reference)
+    //   - pass Patient as pointer
     //  S will be double (or int) or arma::vec depending on single or two
     //    parameter MMH
     void sample(T *sampling_unit, S *current_val) {
@@ -67,17 +67,19 @@ class ModifiedMetropolisHastings
     }
 
   protected:
+
+    //
     // Constructors
-    ModifiedMetropolisHastings() { ProposalVariance pv; }
-    ModifiedMetropolisHastings(PV proposal_variance) {
-      pv = proposal_variance;
-    }
+    //   - Don't need multiple constructors for now.
+    //ModifiedMetropolisHastings() { ProposalVariance pv; }
+    //ModifiedMetropolisHastings(PV proposal_variance) {
+    //  pv = proposal_variance;
+    //}
     ModifiedMetropolisHastings(S in_pv, // double or arma::vec
                                int in_adjust_iter,
                                int in_max_iter,
-                               double in_target_ratio) : 
-      PV(in_pv, in_adjust_iter, in_max_iter, in_target_ratio) {
-    }
+                               double in_target_ratio) :
+      pv(in_pv, in_adjust_iter, in_max_iter, in_target_ratio) { }
 
   private:
 

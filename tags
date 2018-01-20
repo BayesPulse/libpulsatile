@@ -131,8 +131,6 @@ LDLIBS	Makefile	/^LDLIBS := 		$(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLI
 LIB	Makefile	/^LIB := $(LDLIBS)$/;"	m
 LambdaInvoker	include/catch.h	/^    struct LambdaInvoker {$/;"	s	namespace:Catch
 LambdaInvoker	include/catch.h	/^    struct LambdaInvoker<void> {$/;"	s	namespace:Catch
-ModifiedMetropolisHastings	include/mh.h	/^    ModifiedMetropolisHastings() { ProposalVariance pv; }$/;"	f	class:ModifiedMetropolisHastings
-ModifiedMetropolisHastings	include/mh.h	/^    ModifiedMetropolisHastings(PV proposal_variance) {$/;"	f	class:ModifiedMetropolisHastings
 ModifiedMetropolisHastings	include/mh.h	/^    ModifiedMetropolisHastings(S in_pv, \/\/ double or arma::vec$/;"	f	class:ModifiedMetropolisHastings
 ModifiedMetropolisHastings	include/mh.h	/^class ModifiedMetropolisHastings$/;"	c
 NameAndTags	include/catch.h	/^struct NameAndTags {$/;"	s	namespace:Catch
@@ -165,7 +163,6 @@ PatientEstimates	include/datastructures.h	/^struct PatientEstimates {$/;"	s
 PatientPriors	include/datastructures.h	/^  PatientPriors(double prior_baseline_mean,$/;"	f	struct:PatientPriors
 PatientPriors	include/datastructures.h	/^struct PatientPriors {$/;"	s
 PopulationEstimates	include/datastructures.h	/^typedef struct PatientPriors PopulationEstimates;$/;"	t	typeref:struct:PatientPriors
-ProposalVariance	include/proposalvariance.h	/^    ProposalVariance()$/;"	f	class:ProposalVariance
 ProposalVariance	include/proposalvariance.h	/^    ProposalVariance(double in_pv,$/;"	f	class:ProposalVariance
 ProposalVariance	include/proposalvariance.h	/^class ProposalVariance {$/;"	c
 ProposalVariance2p	include/proposalvariance.h	/^    ProposalVariance2p()$/;"	f	class:ProposalVariance2p
@@ -189,7 +186,6 @@ RegistrarForTagAliases	include/catch.h	/^    struct RegistrarForTagAliases {$/;"
 SOURCES	Makefile	/^SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))$/;"	m
 SRCDIR	Makefile	/^SRCDIR := src$/;"	m
 SRCEXT	Makefile	/^SRCEXT := cpp$/;"	m
-SS_DrawFixedEffects	include/ss_fixed_effects.h	/^    SS_DrawFixedEffects(ProposalVariance pv) :$/;"	f	class:SS_DrawFixedEffects
 SS_DrawFixedEffects	include/ss_fixed_effects.h	/^    SS_DrawFixedEffects(double in_pv, \/\/ double or arma::vec$/;"	f	class:SS_DrawFixedEffects
 SS_DrawFixedEffects	include/ss_fixed_effects.h	/^class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, ProposalVariance>$/;"	c
 SessionLoad	coding_session.vim	/^let SessionLoad = 1$/;"	v

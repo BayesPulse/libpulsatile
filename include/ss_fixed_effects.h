@@ -26,10 +26,14 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
                         int in_max_iter,
                         double in_target_ratio) :
       ModifiedMetropolisHastings
-      <Patient, double, ProposalVariance>::ModifiedMetropolisHastings() { };
+      <Patient, double, ProposalVariance>::ModifiedMetropolisHastings(in_pv,
+                                                                      in_adjust_iter,
+                                                                      in_max_iter,
+                                                                      in_target_ratio) { };
     //   b) second option is to pass a ProposalVariance object to the constructor
-    SS_DrawFixedEffects(ProposalVariance pv) :
-      ModifiedMetropolisHastings<Patient, double, ProposalVariance>::ModifiedMetropolisHastings(pv) { };
+    //SS_DrawFixedEffects(ProposalVariance pv) :
+    //  ModifiedMetropolisHastings<Patient, double,
+    //  ProposalVariance>::ModifiedMetropolisHastings(pv) { };
 
   private:
     bool parameter_support(double val) { return (val > 0.0); }
