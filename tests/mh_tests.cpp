@@ -103,21 +103,23 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[utils]" ) {
 
   }
 
-  SECTION( "equal to 3" ) {
+  SECTION( "Check tracking iterations and adjusting pv/psd" ) {
+
     double initial_psd, adjusted_psd;;
     initial_psd = draw_fixed_effects.pv.getpsd();
-    for (int i = 0; i < 250000; i++) {
+    for (int i = 0; i < 502; i++) {
+      //std::cout << "Iter = " << draw_fixed_effects.pv.getiter() << std::endl;
       //std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
-      //std::cout << "sample value " << i << " = "<< patient->estimates->mass_mean << std::endl;
+      std::cout << "sample value " << i << " = "<< patient->estimates->mass_mean << std::endl;
+      //std::cout << "Proposal SD = " << draw_fixed_effects.pv.getpv() << std::endl;
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
     }
     adjusted_psd = draw_fixed_effects.pv.getpsd();
 
     REQUIRE(adjusted_psd != initial_psd);
 
-    //std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
-    //std::cout << "final sample value " << " = "<< patient->estimates->mass_mean << std::endl;
-    //REQUIRE(pu.orderstat_default() == 3);
+    std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
+    std::cout << "final sample value " << " = "<< patient->estimates->mass_mean << std::endl;
 
   }
 

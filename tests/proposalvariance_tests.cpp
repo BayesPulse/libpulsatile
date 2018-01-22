@@ -66,20 +66,20 @@ TEST_CASE( "Counter class", "[counter]" ) {
 
 TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
 
-  double x = 0.3;
+  double x = 10;
   ProposalVariance pv(x, 500, 25000, 0.35);
 
   SECTION( "can initilize and return pv and psd values" ) {
-    REQUIRE( pv.getpv() == Approx(0.3) );
-    REQUIRE( pv.getpsd() == sqrt(0.3) );
+    REQUIRE( pv.getpv() == Approx(10) );
+    REQUIRE( pv.getpsd() == sqrt(10) );
   }
 
   pv.addreject();
   SECTION( "can iterate/add reject" ) {
 
-    REQUIRE(pv.getiter() == 1);
-    REQUIRE(pv.getaccept() == 0);
-    REQUIRE(pv.getratio() == 0);
+    REQUIRE( pv.getiter()   == 1 );
+    REQUIRE( pv.getaccept() == 0 );
+    REQUIRE( pv.getratio()  == 0 );
   }
 
   pv.addaccept();
@@ -99,10 +99,10 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
   }
 
   SECTION( "1-parameter version, core functions." ) {
-    ProposalVariance pv2(0.7, 500, 25000, 0.35);
+    ProposalVariance pv2(12, 500, 25000, 0.35);
 
-    REQUIRE( pv2.getpv() == Approx(0.7) );
-    REQUIRE( pv2.getpsd() == sqrt(0.7) );
+    REQUIRE( pv2.getpv() == Approx(12) );
+    REQUIRE( pv2.getpsd() == sqrt(12) );
 
     for (int i = 0; i < 100; ++i) {
       if (i % 4 == 0) pv2.addaccept();
@@ -114,6 +114,18 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
     REQUIRE( pv2.getratio() == 0.25 );
   }
 
+  SECTION( "can adjust on adjust_iter" ) {
+
+    pv.resetratio();
+    for (int i = 0; i < 501; i++) {
+      // 500 = adjust_iter
+      if ((i % 2) == 0) pv.addreject();
+      else pv.addaccept();
+    }
+    std::cout << "post-adj. pv = " << pv.getpv() << std::endl;;
+    REQUIRE( pv.getpv() == Approx(11) );
+
+  }
 }
 
 

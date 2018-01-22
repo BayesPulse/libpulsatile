@@ -99,3 +99,25 @@ str(cpp_mean_contribs)
 
 
 
+########################################
+# 
+########################################
+
+getratio <- 0.5
+getpv <- 0.3
+target_ratio <- 0.35
+
+adjustpv <- function(getratio) {
+  y = 1.0 + 1000.0 * (getratio - target_ratio)^3;
+  if (y < 0.9) {
+    return(getpv * 0.9)
+  } else if (y > 1.1) {
+    return(getpv * 1.1)
+  } else {
+    getpv
+  }
+}
+
+ratio <- seq(0.1, 0.6, by = 0.01)
+map(getratio, adjustpv) %>% do.call(c, .)
+

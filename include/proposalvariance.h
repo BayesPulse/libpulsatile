@@ -48,8 +48,16 @@ class ProposalVariance {
     }
 
     // ProposalVariance functions
-    double getpv() const { return psd * psd; };
-    double getpsd() const { return psd; };
+    double getpv()  { return pow(psd, 2); }
+    double getpsd() { return psd;         }
+
+    void check_adjust() {
+      int iter = getiter();
+      if (iter < max_iter && iter % adjust_iter == 0 && iter > 0) {
+        adjustpv(); 
+      }
+    }
+
     void adjustpv() {
       double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
       if (y < 0.9)      set_proposals(getpv() * 0.9);
@@ -58,8 +66,8 @@ class ProposalVariance {
 
     // Counter object implementation
     //   works, but keep an eye out for a better option
-    void addreject()  { count.addreject();        } ;
-    void addaccept()  { count.addaccept();        } ;
+    void addreject()  { check_adjust(); count.addreject(); } ;
+    void addaccept()  { check_adjust(); count.addaccept(); } ;
     double getratio() { return count.getratio();  } ;
     void resetratio() { count.resetratio();       } ;
     int getiter()     { return count.getiter();   } ;

@@ -233,10 +233,10 @@ Yes	include/catch.h	/^        Yes,$/;"	e	enum:Catch::CaseSensitive::Choice
 _BSD_SOURCE	include/catch.h	/^#   define _BSD_SOURCE$/;"	d
 accept_ct	include/counter.h	/^    int accept_ct; \/\/ acceptance count$/;"	m	class:Counter
 addaccept	include/counter.h	/^    void addaccept() { ++accept_ct; ++iter_ct; }; \/\/ Add to acceptance count$/;"	f	class:Counter
-addaccept	include/proposalvariance.h	/^    void addaccept()  { count.addaccept();        } ;$/;"	f	class:ProposalVariance
+addaccept	include/proposalvariance.h	/^    void addaccept()  { check_adjust(); count.addaccept(); } ;$/;"	f	class:ProposalVariance
 addaccept	include/proposalvariance.h	/^    void addaccept() { count.addaccept(); };$/;"	f	class:ProposalVariance2p
 addreject	include/counter.h	/^    void addreject() { ++iter_ct; };              \/\/ Add to iters but not accept count$/;"	f	class:Counter
-addreject	include/proposalvariance.h	/^    void addreject()  { count.addreject();        } ;$/;"	f	class:ProposalVariance
+addreject	include/proposalvariance.h	/^    void addreject()  { check_adjust(); count.addreject(); } ;$/;"	f	class:ProposalVariance
 addreject	include/proposalvariance.h	/^    void addreject() { count.addreject(); };$/;"	f	class:ProposalVariance2p
 adjust_iter	include/proposalvariance.h	/^    int adjust_iter;     \/\/ iteration to adjust on$/;"	m	class:ProposalVariance
 adjust_iter	include/proposalvariance.h	/^    int adjust_iter;     \/\/ iteration to adjust on$/;"	m	class:ProposalVariance2p
@@ -250,6 +250,7 @@ baseline_mean	include/datastructures.h	/^  double baseline_mean;$/;"	m	struct:Pa
 baseline_variance	include/datastructures.h	/^  double baseline_variance;$/;"	m	struct:PatientPriors
 calc_covariance	include/proposalvariance.h	/^    double calc_covariance(arma::mat pv, double corr) {$/;"	f	class:ProposalVariance2p
 calc_mean_contribution	include/datastructures.h	/^    void calc_mean_contribution(const arma::vec &data_time, double decay_rate)$/;"	f	class:PulseEstimate
+check_adjust	include/proposalvariance.h	/^    void check_adjust() {$/;"	f	class:ProposalVariance
 cluster_size	include/population.h	/^  double cluster_size;      \/\/ cluster size (rho)$/;"	m	struct:AssocEstimates
 cluster_width	include/population.h	/^  double cluster_width;     \/\/ cluster width (nu)$/;"	m	struct:AssocEstimates
 concentration	include/datastructures.h	/^  arma::vec concentration;$/;"	m	struct:PatientData
@@ -288,9 +289,9 @@ getiter	include/counter.h	/^    int getiter() const { return iter_ct; };$/;"	f	c
 getiter	include/proposalvariance.h	/^    int getiter()     { return count.getiter();   } ;$/;"	f	class:ProposalVariance
 getiter	include/proposalvariance.h	/^    int getiter() { return count.getiter(); };$/;"	f	class:ProposalVariance2p
 getpsd	include/proposalvariance.h	/^    arma::mat getpsd() const { return psd; };$/;"	f	class:ProposalVariance2p
-getpsd	include/proposalvariance.h	/^    double getpsd() const { return psd; };$/;"	f	class:ProposalVariance
+getpsd	include/proposalvariance.h	/^    double getpsd() { return psd;         }$/;"	f	class:ProposalVariance
 getpv	include/proposalvariance.h	/^    arma::mat getpv() const  { return pv; };$/;"	f	class:ProposalVariance2p
-getpv	include/proposalvariance.h	/^    double getpv() const { return psd * psd; };$/;"	f	class:ProposalVariance
+getpv	include/proposalvariance.h	/^    double getpv()  { return pow(psd, 2); }$/;"	f	class:ProposalVariance
 getratio	include/counter.h	/^    double getratio() const { return (double)accept_ct \/ (double)iter_ct; };$/;"	f	class:Counter
 getratio	include/proposalvariance.h	/^    double getratio() { return count.getratio();  } ;$/;"	f	class:ProposalVariance
 getratio	include/proposalvariance.h	/^    double getratio() { return count.getratio(); };$/;"	f	class:ProposalVariance2p
