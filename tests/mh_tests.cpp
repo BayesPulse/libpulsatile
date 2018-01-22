@@ -98,28 +98,31 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[utils]" ) {
   SECTION( "Check sub-functions" ) {
 
     REQUIRE(draw_fixed_effects.pv.getpsd() == sqrt(10));
-    //std::cout << "current psd = " << draw_fixed_effects.pv.getpsd() << " and pv = " << draw_fixed_effects.pv.getpv() << std::endl;
     REQUIRE(draw_fixed_effects.pv.getpv() == Approx(10.0));
 
   }
 
   SECTION( "Check tracking iterations and adjusting pv/psd" ) {
 
-    double initial_psd, adjusted_psd;;
+    double initial_psd, adjusted_psd, final_psd;
     initial_psd = draw_fixed_effects.pv.getpsd();
     for (int i = 0; i < 502; i++) {
-      //std::cout << "Iter = " << draw_fixed_effects.pv.getiter() << std::endl;
-      //std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
-      std::cout << "sample value " << i << " = "<< patient->estimates->mass_mean << std::endl;
-      //std::cout << "Proposal SD = " << draw_fixed_effects.pv.getpv() << std::endl;
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
     }
     adjusted_psd = draw_fixed_effects.pv.getpsd();
+    REQUIRE(adjusted_psd == sqrt((pow(initial_psd, 2)*1.1)));
 
-    REQUIRE(adjusted_psd != initial_psd);
+    for (int i = draw_fixed_effects.pv.getiter(); i < 25001; i++) {
+      draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
+    }
 
-    std::cout << "Acceptance ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
-    std::cout << "final sample value " << " = "<< patient->estimates->mass_mean << std::endl;
+    final_psd = draw_fixed_effects.pv.getpsd();
+    for (int i = draw_fixed_effects.pv.getiter(); i < 50001; i++) {
+      draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
+    }
+    REQUIRE(draw_fixed_effects.pv.getpsd() == final_psd);
+    REQUIRE(draw_fixed_effects.pv.getiter() == 50001);
+
 
   }
 
