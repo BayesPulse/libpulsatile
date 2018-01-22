@@ -35,8 +35,8 @@ CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER	include/catch.h	/^#  define CATCH_CONFIG_
 CATCH_CONFIG_ENABLE_PAIR_STRINGMAKER	include/catch.h	/^#  define CATCH_CONFIG_ENABLE_PAIR_STRINGMAKER$/;"	d
 CATCH_CONFIG_ENABLE_TUPLE_STRINGMAKER	include/catch.h	/^#  define CATCH_CONFIG_ENABLE_TUPLE_STRINGMAKER$/;"	d
 CATCH_CONFIG_EXTERNAL_INTERFACES	include/catch.h	/^#  define CATCH_CONFIG_EXTERNAL_INTERFACES$/;"	d
-CATCH_CONFIG_MAIN	tests/tests.cpp	/^#define CATCH_CONFIG_MAIN$/;"	d	file:
 CATCH_CONFIG_POSIX_SIGNALS	include/catch.h	/^#   define CATCH_CONFIG_POSIX_SIGNALS$/;"	d
+CATCH_CONFIG_RUNNER	tests/tests.cpp	/^#define CATCH_CONFIG_RUNNER$/;"	d	file:
 CATCH_CONFIG_WINDOWS_SEH	include/catch.h	/^#   define CATCH_CONFIG_WINDOWS_SEH$/;"	d
 CATCH_CPP14_OR_GREATER	include/catch.h	/^#    define CATCH_CPP14_OR_GREATER$/;"	d
 CATCH_ENFORCE	include/catch.h	/^#define CATCH_ENFORCE(/;"	d
@@ -97,7 +97,7 @@ GUARD_ss_drawfixedeffects_h	include/ss_fixed_effects.h	/^#define GUARD_ss_drawfi
 GUARD_utils_h	include/utils.h	/^#define GUARD_utils_h$/;"	d
 Help	include/catch.h	/^        Help( bool &showHelpFlag )$/;"	f	struct:Catch::Help
 Help	include/catch.h	/^    struct Help : Opt {$/;"	s	namespace:Catch
-INC	Makefile	/^INC := -I include $(CPPFLAGS) $(CXXFLAGS) -std=c++11$/;"	m
+INC	Makefile	/^INC := -I include -I include\/population -I include\/singlesubject $(CPPFLAGS) $(CXXFLAGS) -std=c++11$/;"	m
 INTERNAL_CATCH_CATCH	include/catch.h	/^#define INTERNAL_CATCH_CATCH(/;"	d
 INTERNAL_CATCH_ELSE	include/catch.h	/^#define INTERNAL_CATCH_ELSE(/;"	d
 INTERNAL_CATCH_IF	include/catch.h	/^#define INTERNAL_CATCH_IF(/;"	d
@@ -329,6 +329,7 @@ m_start	include/catch.h	/^        char const* m_start;$/;"	m	class:Catch::String
 m_testAsMethod	include/catch.h	/^    TestInvokerAsMethod( void (C::*testAsMethod)() ) noexcept : m_testAsMethod( testAsMethod ) {}$/;"	f	class:Catch::TestInvokerAsMethod
 m_testAsMethod	include/catch.h	/^    void (C::*m_testAsMethod)();$/;"	m	class:Catch::TestInvokerAsMethod
 main	src/tempmain.cpp	/^int main(int argc, char **argv) {$/;"	f
+main	tests/tests.cpp	/^int main( int argc, char* argv[] ) {$/;"	f
 mass	include/datastructures.h	/^    double mass;$/;"	m	class:PulseEstimate
 mass_mean	include/datastructures.h	/^  double mass_mean;$/;"	m	struct:PatientEstimates
 mass_mean	include/datastructures.h	/^  double mass_mean;$/;"	m	struct:PatientPriors
