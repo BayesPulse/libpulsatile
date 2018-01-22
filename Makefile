@@ -56,7 +56,7 @@ SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := -g -Wall
 LIB := $(LDLIBS)
-INC := -I include $(CPPFLAGS) $(CXXFLAGS) -std=c++11
+INC := -I include -I include/population -I include/singlesubject $(CPPFLAGS) $(CXXFLAGS) -std=c++11
 
 
 TESTSRCDIR := tests

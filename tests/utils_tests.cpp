@@ -25,8 +25,6 @@ TEST_CASE( "orderstat_default", "[utils]" ) {
 
 TEST_CASE( "rmvnorm Function", "[utils]" ) {
 
-  RInside R;
-
   arma::vec initial_means = { 2, 3 };
   arma::vec initial_pvs = { 0.7, 0.1 };
   ProposalVariance2p pv(initial_pvs, 500, 25000, 0.25);

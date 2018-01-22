@@ -146,7 +146,7 @@ TEST_CASE( "PatientData single hormone constructor works",
            "[datastructures]" ) {
 
   // R sesh for calling R functions
-  RInside R;
+  //RInside R;
 
   Rcpp::NumericVector time(144);
   Rcpp::NumericVector conc = rnorm(144, 3, 0.1);
