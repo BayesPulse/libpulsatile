@@ -5,6 +5,10 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
 0	coding_session.vim	/^normal! 0$/;"	m
+012|	coding_session.vim	/^normal! 012|$/;"	m
+034|	coding_session.vim	/^normal! 034|$/;"	m
+039|	coding_session.vim	/^normal! 039|$/;"	m
+055|	coding_session.vim	/^normal! 055|$/;"	m
 05|	coding_session.vim	/^normal! 05|$/;"	m
 Arg	include/catch.h	/^    class Arg : public ParserRefImpl<Arg> {$/;"	c	namespace:Catch
 AssocEstimates	include/population.h	/^struct AssocEstimates {$/;"	s
@@ -372,7 +376,7 @@ psd	include/proposalvariance.h	/^    arma::mat::fixed<2, 2> psd; \/\/ proposal s
 psd	include/proposalvariance.h	/^    double psd;          \/\/ proposal standard deviation$/;"	m	class:ProposalVariance
 pu	include/datastructures.h	/^  PulseUtils pu;$/;"	m	struct:PatientPriors
 pu	include/mh.h	/^    PulseUtils pu;$/;"	m	class:ModifiedMetropolisHastings
-pu	tests/datastructures_tests.cpp	/^PulseUtils pu;$/;"	v
+pu	tests/utils_tests.cpp	/^PulseUtils pu;$/;"	v
 pulse_count	include/datastructures.h	/^  int    pulse_count;             \/\/ prior number of pulses, i.e. strauss_rate\/beta$/;"	m	struct:PatientPriors
 pulse_count	include/datastructures.h	/^  int    pulse_count; \/\/ function of linked list instead?;$/;"	m	struct:PatientEstimates
 pulses	include/patient.h	/^  std::list<PulseEstimate> pulses;$/;"	m	struct:Patient
@@ -387,11 +391,16 @@ response_concentration	include/datastructures.h	/^  arma::vec response_concentra
 responses	include/patient.h	/^  std::list<PulseEstimate> responses;$/;"	m	struct:Patient
 riter	include/patient.h	/^  std::list<PulseEstimate>::iterator riter = responses.begin();$/;"	m	struct:Patient
 rmvnorm	include/utils.h	/^    arma::vec rmvnorm(arma::vec mean,    \/\/ mean of distr to sample from (curr values)$/;"	f	class:PulseUtils
-s:l	coding_session.vim	/^let s:l = 13 - ((9 * winheight(0) + 34) \/ 69)$/;"	v
-s:l	coding_session.vim	/^let s:l = 172 - ((63 * winheight(0) + 34) \/ 69)$/;"	v
-s:l	coding_session.vim	/^let s:l = 18 - ((17 * winheight(0) + 34) \/ 69)$/;"	v
-s:l	coding_session.vim	/^let s:l = 196 - ((68 * winheight(0) + 34) \/ 69)$/;"	v
-s:l	coding_session.vim	/^let s:l = 3 - ((2 * winheight(0) + 34) \/ 69)$/;"	v
+s:l	coding_session.vim	/^let s:l = 112 - ((31 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	coding_session.vim	/^let s:l = 121 - ((71 * winheight(0) + 40) \/ 80)$/;"	v
+s:l	coding_session.vim	/^let s:l = 127 - ((42 * winheight(0) + 28) \/ 57)$/;"	v
+s:l	coding_session.vim	/^let s:l = 18 - ((16 * winheight(0) + 28) \/ 57)$/;"	v
+s:l	coding_session.vim	/^let s:l = 32 - ((31 * winheight(0) + 40) \/ 80)$/;"	v
+s:l	coding_session.vim	/^let s:l = 438 - ((12 * winheight(0) + 6) \/ 13)$/;"	v
+s:l	coding_session.vim	/^let s:l = 63 - ((32 * winheight(0) + 28) \/ 57)$/;"	v
+s:l	coding_session.vim	/^let s:l = 73 - ((28 * winheight(0) + 28) \/ 57)$/;"	v
+s:l	coding_session.vim	/^let s:l = 95 - ((79 * winheight(0) + 40) \/ 80)$/;"	v
+s:l	coding_session.vim	/^let s:l = 9835 - ((79 * winheight(0) + 40) \/ 80)$/;"	v
 s:so_save	coding_session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:sx	coding_session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	coding_session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
@@ -423,4 +432,5 @@ width_sd	include/datastructures.h	/^  double width_sd;$/;"	m	struct:PatientEstim
 width_sd_max	include/datastructures.h	/^  double width_sd_max;$/;"	m	struct:PatientPriors
 width_variance	include/datastructures.h	/^  double width_variance;$/;"	m	struct:PatientPriors
 writeToStream	include/catch.h	/^        void writeToStream( std::ostream &os ) const {$/;"	f	struct:Catch::Parser
+zo	coding_session.vim	/^normal! zo$/;"	m
 zt	coding_session.vim	/^normal! zt$/;"	m

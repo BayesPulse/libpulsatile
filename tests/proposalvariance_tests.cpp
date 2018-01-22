@@ -59,7 +59,6 @@ TEST_CASE( "Counter class", "[counter]" ) {
 
 
 
-
 //
 // Test the ProposalVariance 1p class
 //
@@ -122,12 +121,11 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
       if ((i % 2) == 0) pv.addreject();
       else pv.addaccept();
     }
-    std::cout << "post-adj. pv = " << pv.getpv() << std::endl;;
+
     REQUIRE( pv.getpv() == Approx(11) );
 
   }
 }
-
 
 
 
@@ -218,4 +216,6 @@ TEST_CASE( "ProposalVariance class (2 param)", "[ProposalVariance2p]" ) {
    }
 
 }
+
+
 

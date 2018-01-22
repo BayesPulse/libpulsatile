@@ -7,7 +7,17 @@
 
 
 //
-// Test MH and child classes
+// mh_tests.cpp
+//     Test MH and child classes
+//
+// Note: Mor tests needed.
+//
+
+
+
+//
+// Test first implementation of ModifiedMetropolisHastings in
+// SS_DrawFixedEffects child class
 //
 
 TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[utils]" ) {
@@ -127,4 +137,5 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[utils]" ) {
   }
 
 }
+
 
