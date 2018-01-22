@@ -1,7 +1,6 @@
 #ifndef GUARD_proposalvariance_h
 #define GUARD_proposalvariance_h
 
-// [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <RInside.h>
 #include <math.h>
@@ -31,35 +30,44 @@ class ProposalVariance {
 
   public:
 
-    ProposalVariance()
-      : pv(0)
-      , count()
-      , adjust_iter(500)
-      , max_iter(25000)
-      , target_ratio(0.35) { };
+    // Constructors
+    //ProposalVariance()
+    //  : psd(sqrt(5))
+    //  , count()
+    //  , adjust_iter(500)
+    //  , max_iter(25000)
+    //  , target_ratio(0.35) { };
     ProposalVariance(double in_pv,
                      int in_adjust_iter,   // adjust pv on multiples of adjust_iter
                      int in_max_iter,     // maximum iteration to adjust pv
                      double in_target_ratio) {
       adjust_iter  = in_adjust_iter;
-      max_iter    = in_max_iter;
+      max_iter     = in_max_iter;
       target_ratio = in_target_ratio;
       initialize_proposals(in_pv);
     }
 
     // ProposalVariance functions
-    double getpv() const { return pv; };
-    double getpsd() const { return psd; };
+    double getpv()  { return pow(psd, 2); }
+    double getpsd() { return psd;         }
+
+    void check_adjust() {
+      int iter = getiter();
+      if (iter < max_iter && iter % adjust_iter == 0 && iter > 0) {
+        adjustpv(); 
+      }
+    }
+
     void adjustpv() {
       double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
-      if (y < 0.9)      set_proposals(pv * 0.9);
-      else if (y > 1.1) set_proposals(pv * 1.1);
+      if (y < 0.9)      set_proposals(getpv() * 0.9);
+      else if (y > 1.1) set_proposals(getpv() * 1.1);
     }
 
     // Counter object implementation
     //   works, but keep an eye out for a better option
-    void addreject()  { count.addreject();        } ;
-    void addaccept()  { count.addaccept();        } ;
+    void addreject()  { check_adjust(); count.addreject(); } ;
+    void addaccept()  { check_adjust(); count.addaccept(); } ;
     double getratio() { return count.getratio();  } ;
     void resetratio() { count.resetratio();       } ;
     int getiter()     { return count.getiter();   } ;
@@ -67,21 +75,18 @@ class ProposalVariance {
 
   private:
 
-    double pv;
     double psd;          // proposal standard deviation
     Counter count;
-    int adjust_iter;  // iteration to adjust on
-    int max_iter;     // iteration to stop adjusting
+    int adjust_iter;     // iteration to adjust on
+    int max_iter;        // iteration to stop adjusting
     double target_ratio; // target proposal variance
 
     // ProposalVariance internal functions
     void initialize_proposals(double initial_pv) {
       set_proposals(initial_pv);
     }
-
     void set_proposals(double this_pv) {
-      pv = this_pv;
-      psd = sqrt(pv);
+      psd = sqrt(this_pv);
     }
 
 };

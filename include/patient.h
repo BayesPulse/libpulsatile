@@ -1,134 +1,183 @@
 #ifndef GUARD_patient_h
 #define GUARD_patient_h
-//
-//#include <RcppArmadillo.h>
-//#include <RInside.h>                    // for the embedded R via RInside
+
+#include <RcppArmadillo.h>
+#include <RInside.h>                    // for the embedded R via RInside
+#include "datastructures.h"
 //#include <list>
-////using namespace Rcpp;
+
 //
-////
-//// patient.h
-////   defining the patient class and subclasses
-////
-//// Author: Matt Mulvahill
-//// Created: 11/14/17
-//// Notes:
-////
+// patient.h
+//   defining the patient class and subclasses
 //
-//class Patient {
+// Author: Matt Mulvahill
+// Created: 11/14/17
+// Notes:
 //
-//  public:
+
+
 //
-//    Patient(NumericMatrix data,
-//            NumericVector priors,
-//            NumericVector starting_values);
-//    ~Patient();
-//    void read_data(NumericMatrix data);
+// Parent class of Patients and Populations, object that MMH and Gibbs
+// recognize
 //
-//  private:
+//struct MCMCSamplingUnit { };
+
+
+using namespace Rcpp;
+//using namespace RcppArmadillo;
+
+
+
 //
-//    double likelihood;
-//    PatientPriors priors;
-//    PatientData data;
-//    PatientEstimates estimates;
-//    AssocEstimates association;
-//    int pulse_count;
-//    list<PulseEstimate> pulses;
-//    void read_data_in(arma::vec in_time,
-//                      arma::vec in_conc);
-//    void read_data_in(arma::vec in_time,
-//                      arma::vec in_conc,
-//                      arma::vec in_response_conc);
+// Patient struct
 //
-//
-//};
-//
-//struct PatientData {
-//
-//  arma::vec time;
-//  arma::vec concentration;
-//  arma::vec response_concentration;
-//  int number_of_obs;
-//  double avg_period_of_obs;
-//  double duration_of_obs = number_of_obs * period_of_obs;
-//
-//};
-//
-//// Patient priors and const when used in single subject model
-//// Estimated population chain 
-//struct PopulationEstimates {
-//
-//  double num_pulses;   // prior number of pulses
-//  double baseline_mean;
-//  double baseline_variance;
-//  double halflife_mean;
-//  double halflife_variance;
-//  double mass_mean;
-//  double mass_variance;
-//  double width_mean;
-//  double width_variance;
-//  double mass_sdmax;
-//  double width_sdmax;
-//  double error_alpha;
-//  double error_beta;
-//  double num_orderstat;
-//  double strauss_gamma;
-//  double strauss_range;
-//
-//};
-//
-//// aka PatientParms -- values updated by mcmc algorithm
-//struct PatientEstimates {
-//
-//  double baseline;
-//  double halflife;
-//  double decay;     // decay rate converted from above half-life
-//  double error2;    // model error (variance)
-//  double logerror2; // log of model error (may not be used)
-//  double mass;
-//  double width;
-//  double mass_sd;
-//  double width_sd;
-//  int pulse_count;
-//
-//};
-//
-//// linked list -- values updated by algorithm and objects created/destroyed by
-////                birth-death
-//struct PulseEstimate {
-//
-//  double time;
-//  double mass;
-//  double width;
-//  arma::vec mean_contribution(PatientData.number_of_obs);
-//  // the length needs to be moved -- likely need a 'Patient' class to do some of
-//  // the calculations required to enforce some of these rules.
-//
-//};
-//
-//
-//struct AssocEstimates {
-//
-//  // Parameters in the cox process for the response hormone intensity
-//  double cluster_size;      // cluster size (rho)
-//  double log_cluster_size;  // log scale cluster size
-//  double cluster_width;     // cluster width (nu)
-//  double log_cluster_width;
-//
-//};
-//
-//
-//// Chains -- use R data types?
-//struct PulseChain {
-//
-//};
-//
-//struct PatientChain {
-//
-//};
-//
-//struct PopulationChain {
-//
-//};
+struct Patient {
+
+  //
+  // For single-subject model
+  //
+
+  PatientData *data;
+  PatientPriors *priors;
+  PatientEstimates *estimates;
+  std::list<PulseEstimate> pulses;
+  std::list<PulseEstimate>::iterator piter = pulses.begin();
+  std::list<PulseEstimate> responses;
+  std::list<PulseEstimate>::iterator riter = responses.begin();
+
+  // Single-subject constructor
+  Patient(PatientData *in_data,
+          PatientPriors *in_priors,
+          PatientEstimates *in_parms) {
+
+    data = in_data;
+    priors = in_priors;
+    estimates = in_parms;
+
+
+    PulseEstimate firstpulse(in_data->fitstart, 1, 1, 1, 1, in_parms->get_decay(), in_data->concentration);
+    pulses.push_back(firstpulse);
+    //++piter;
+
+  }
+
+  //
+  // For population models
+  //
+
+  Patient(PatientData *in_data,
+          PatientEstimates *in_parms) {
+
+    data = in_data;
+    estimates = in_parms;
+    // priors // uninitialized
+
+  }
+
+
+  //
+  // Methods for both types/all-models
+  //
+
+  // get_pulsecount()
+  //   Get current number of pulses
+  int get_pulsecount() { return pulses.size(); };
+
+
+  // likelihood()
+  //   computes the current likelihood using the observed log-concentrations and
+  //   mean concentration
+  double likelihood(bool response_hormone) {
+    std::list<PulseEstimate>::const_iterator emptyiter;
+    return likelihood(response_hormone, emptyiter);
+  }
+
+  double likelihood(bool response_hormone,
+                    std::list<PulseEstimate>::const_iterator pulse_excluded) {
+
+    double like = 0;
+    arma::vec mean_conc;
+    arma::vec *conc;
+
+    if (response_hormone) {
+      conc = &data->response_concentration;
+    } else {
+      conc = &data->concentration;
+    }
+
+    // Sum across mean_contribs
+    mean_conc = mean_concentration(response_hormone, pulse_excluded);
+
+    arma::vec tmp = (*conc) - mean_conc;
+    like  = arma::sum(tmp);
+    like  = pow(like, 2);
+    like /= (-2.0 * estimates->errorsq);
+    like += -0.5 * conc->n_elem * (1.8378771 + estimates->get_logerrorsq());
+
+    return like;
+
+  }
+
+
+  // mean_concentration()
+  //   this takes each pulse's mean_contrib vector and sums across them
+  arma::vec mean_concentration(bool response_hormone) {
+
+    std::list<PulseEstimate>::const_iterator emptyiter;
+    return mean_concentration(response_hormone, emptyiter);
+
+  }
+
+  arma::vec mean_concentration(bool response_hormone,
+                               std::list<PulseEstimate>::const_iterator pulse_excluded) {
+
+    arma::vec mean_conc(data->concentration.n_elem);
+    mean_conc.fill(0);
+    std::list<PulseEstimate>::iterator pulse_iter;
+    std::list<PulseEstimate>::const_iterator pulselist_end;
+
+    if (response_hormone) {
+      pulse_iter    = responses.begin();
+      pulselist_end = responses.end();
+    } else {
+      pulse_iter    = pulses.begin();
+      pulselist_end = pulses.end();
+    }
+
+    // Add the contribution to the mean from each pulse
+    arma::vec mctrb(data->concentration.n_elem);
+    int i = 1;
+    while (pulse_iter != pulselist_end) {
+      if (pulse_iter != pulse_excluded) {
+        mctrb = pulse_iter->get_mean_contribution(data->concentration,
+                                                  estimates->get_decay());
+        mean_conc += mctrb;
+      }
+      ++pulse_iter;
+      ++i;
+    }
+
+    // Add the baseline contribution and log
+    mean_conc += estimates->baseline;
+    mean_conc = log(mean_conc);
+
+    return mean_conc;
+
+  }
+
+};
+
+
+
+
+
+
+////////////////////////////////////////////////////////////
+// Chains -- use R data types? YES
+////////////////////////////////////////////////////////////
+//struct PulseChain { NumericMatrix pulse };
+//struct PatientChain { NumericMatrix patient };
+//struct PopulationChain { NumericMatrix population };
+//struct AssociationChain { NumericMatrix association };
 
 #endif

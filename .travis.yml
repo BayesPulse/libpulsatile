@@ -14,9 +14,11 @@
 #
 # macOS
 #
+os: osx
+osx_image: xcode9.9
 language: cpp
 before_install:
-  - brew tap homebrew science
+  - brew tap homebrew/science
   - brew update
   - brew install R
 

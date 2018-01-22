@@ -1,0 +1,10 @@
+-I/
+-g
+-Wall
+-I include
+-I/usr/local/include
+-I/Library/Frameworks/R.framework/Resources/include
+-I/Library/Frameworks/R.framework/Versions/3.4/Resources/library/Rcpp/include
+-I"/Library/Frameworks/R.framework/Versions/3.4/Resources/library/RcppArmadillo/include"
+-I/Library/Frameworks/R.framework/Versions/3.4/Resources/library/RInside/include
+-std=c++11
