@@ -79,14 +79,14 @@ cache:
 # - update all installed packages
 # - install package with dependencies
 install:
-  - mkdir -p ~/Rlib
-  - echo 'R_LIBS=~/Rlib' > .Renviron
   - echo 'options(repos = "http://cran.rstudio.com")' > .Rprofile
-  - echo '.travis.yml' > .Rbuildignore
-  - Rscript -e 'if(!"devtools" %in% rownames(installed.packages())) { install.packages("devtools", dependencies = TRUE) };
-                if(!"covr" %in% rownames(installed.packages())) { install.packages("covr", dependencies = TRUE) };
-                if(!"RInside" %in% rownames(installed.packages())) { devtools::install_github("eddelbuettel/rinside", dependencies = TRUE) }'
-    #- Rscript -e 'update.packages(ask = FALSE, instlib = "~/Rlib")'
+  - Rscript -e 'if(!"devtools" %in% rownames(installed.packages())) { install.packages("devtools", dependencies = TRUE) }'
+  - Rscript -e 'if(!"covr" %in% rownames(installed.packages())) { install.packages("covr", dependencies = TRUE) }'
+  - Rscript -e 'if(!"RInside" %in% rownames(installed.packages())) { devtools::install_github("eddelbuettel/rinside", dependencies = TRUE) }'
+  #- mkdir -p ~/Rlib
+  #- echo 'R_LIBS=~/Rlib' > .Renviron
+  #- echo '.travis.yml' > .Rbuildignore
+  #- Rscript -e 'update.packages(ask = FALSE, instlib = "~/Rlib")'
 
 # report coverage rate to coveralls
 after_success:
