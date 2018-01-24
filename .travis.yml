@@ -61,7 +61,7 @@ addons:
     - r-packages-precise
     packages:
     - r-base-dev	
-      #    - r-recommended
+    - r-recommended
       #    - pandoc
 
 # cache local R libraries directory:
