@@ -86,7 +86,6 @@ install:
   - Rscript -e 'if(!"devtools" %in% rownames(installed.packages())) { install.packages("devtools", dependencies = TRUE) }'
   - Rscript -e 'if(!"covr" %in% rownames(installed.packages())) { install.packages("covr", dependencies = TRUE) }'
   - Rscript -e 'update.packages(ask = FALSE, instlib = "~/Rlib")'
-  - Rscript -e 'devtools::install_deps(pkg = ".", dependencies = TRUE)'
   - Rscript -e 'if(!"RInside" %in% rownames(installed.packages())) { devtools::install_github("eddelbuettela/RInside", dependencies = TRUE) }'
 
 # report coverage rate to coveralls
