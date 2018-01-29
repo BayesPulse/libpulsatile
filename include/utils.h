@@ -4,8 +4,11 @@
 #include <RcppArmadillo.h>
 #include <RInside.h>
 
+
 //
 // utils.h
+//    Defines the PulseUtils class, containing miscellaneous functions and
+//    calculations needed for estimation.
 //
 
 class PulseUtils {
@@ -15,18 +18,24 @@ class PulseUtils {
     // 
     // orderstat_default()
     //   Defining in a single location the order-statistic on pulse location used
-    //   in all versions of the algirithm.
+    //   in all versions of the algirithm. (always 3, but if need to be changed,
+    //   here is where it should be done.)
     //
     int orderstat_default() { return 3; };
 
+
     //
-    // rmvnorm
+    // rmvnorm()
+    //   Random multivariate normal.  Accepts a mean vector and a
+    //   cholesky-decomposed variance-covariance matrix (psd from PV class). And
+    //   returns a vector of results. Currently only works with bivariate
+    //   normal, but could be generatlized if needed.
     //
     arma::vec rmvnorm(arma::vec mean,    // mean of distr to sample from (curr values)
                       arma::mat cholvar) // cholesky decomposed varcovar matrix (psd)
     {
 
-      int i, j;
+      unsigned int i, j;
       arma::vec runiv = { ::Rf_rnorm(0, 1), ::Rf_rnorm(0, 1) };
       arma::vec result = { 0, 0 };
 
@@ -70,9 +79,9 @@ class PulseUtils {
 
 
     //
-    // set_seed -- set R seed from C++ for unit testing functions using R's RNGs
+    // set_seed() 
+    //   set R seed from C++ for unit testing functions using R's RNGs
     //
-
     void set_seed(unsigned int seed) {
 
       Rcpp::Environment base_env("package:base");
