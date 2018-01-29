@@ -21,8 +21,8 @@ latex: false
 addons:
   apt:
     packages:
-    - gcc-5.4
-    - g++-5.4
+    - gcc-5
+    - g++-5
 
 # build project
 script:
