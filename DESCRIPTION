@@ -2,6 +2,6 @@ Package: placeholder
 Type: C++ library
 Title: Does not matter.
 Version: 0.0.1
-Imports: Rcpp, RcppArmadillo
-Remotes: github::eddelbuettel/rinside
+Imports: Rcpp, RcppArmadillo, RInside
+Remotes: eddelbuettel/RInside
 
