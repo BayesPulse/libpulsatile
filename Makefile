@@ -45,12 +45,13 @@ LDLIBS := 		$(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
 # Original working makefile
 #
 #CXX := g++ # This is the main compiler
-CXX := clang++ #--analyze # and comment out the linker last line for sanity
-#CXX := $(shell $(R_HOME)/bin/R CMD config CXX)
+#CXX := clang++ #--analyze # and comment out the linker last line for sanity
+CXX := $(shell $(R_HOME)/bin/R CMD config CXX)
 SRCDIR := src
 BUILDDIR := build
 SRCEXT := cpp
-TARGET := bin/libpulsatile
+TARGET := libpulsatile
+TARGETDIR := bin
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
@@ -61,7 +62,7 @@ INC := -I include -I include/population -I include/singlesubject $(CPPFLAGS) $(C
 
 TESTSRCDIR := tests
 TESTBUILDDIR := buildtests
-TESTTARGET := bin/tests
+TESTTARGET := tests
 TESTSOURCES := $(shell find $(TESTSRCDIR) -type f -name *.$(SRCEXT))
 TESTOBJECTS := $(patsubst $(TESTSRCDIR)/%,$(TESTBUILDDIR)/%,$(TESTSOURCES:.$(SRCEXT)=.o))
 
@@ -69,19 +70,21 @@ TESTOBJECTS := $(patsubst $(TESTSRCDIR)/%,$(TESTBUILDDIR)/%,$(TESTSOURCES:.$(SRC
 # Recipes
 #
 
-all: $(TARGET) $(TESTTARGET)
+all: $(TARGETDIR)/$(TARGET) $(TARGETDIR)/$(TESTTARGET)
 
-$(TARGET): $(OBJECTS)
+$(TARGETDIR)/$(TARGET): $(OBJECTS)
 	@echo " Linking..."
-	@echo " $(CXX) $^ -o $(TARGET) $(LIB)"; $(CXX) $^ -o $(TARGET) $(LIB)
+	@mkdir -p $(TARGETDIR)
+	@echo " $(CXX) $^ -o $(TARGETDIR)/$(TARGET) $(LIB)"; $(CXX) $^ -o $(TARGETDIR)/$(TARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo " $(CXX) $(CFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(INC) -c -o $@ $<
 
-$(TESTTARGET): $(TESTOBJECTS)
+$(TARGETDIR)/$(TESTTARGET): $(TESTOBJECTS)
 	@echo " Linking tests..."
-	$(CXX) $^ -o $(TESTTARGET) $(LIB)
+	@mkdir -p $(TARGETDIR)
+	$(CXX) $^ -o $(TARGETDIR)/$(TESTTARGET) $(LIB)
 
 $(TESTBUILDDIR)/%.o: $(TESTSRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(TESTBUILDDIR)
@@ -89,8 +92,9 @@ $(TESTBUILDDIR)/%.o: $(TESTSRCDIR)/%.$(SRCEXT)
 
 clean:
 	@echo " Cleaning...";
-	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
-	@echo " $(RM) -r $(TESTBUILDDIR) $(TESTTARGET)"; $(RM) -r $(TESTBUILDDIR) $(TESTTARGET)
+	@echo " $(RM) -r $(BUILDDIR) $(TARGETDIR)/$(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGETDIR)/$(TARGET)
+	@echo " $(RM) -r $(TESTBUILDDIR) $(TARGETDIR)/$(TESTTARGET)"; $(RM) -r $(TESTBUILDDIR) $(TARGETDIR)/$(TESTTARGET)
+	@echo " $(RM) -rf $(TARGETDIR)"; $(RM) -rf $(TARGETDIR)
 
 # 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% $(INC) -c tests/tests.cpp tests/proposalvariance_tests.cpp tests/utils_tests.cpp
 # 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% $(INC) -o bin/tests tests/tests.o tests/proposalvariance_tests.o tests/utils_tests.o && bin/tests --success
