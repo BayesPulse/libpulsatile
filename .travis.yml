@@ -18,6 +18,12 @@ dist: trusty
 cache: packages
 latex: false
 
+addons:
+  apt:
+    packages:
+    - gcc-5.4
+    - g++-5.4
+
 # build project
 script:
   - ls -la ./
