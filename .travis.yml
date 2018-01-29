@@ -20,6 +20,11 @@ latex: false
 r_packages:
   - covr
 
+addons:
+  apt:
+    packages:
+      - gcovr
+
 # build project
 script:
   - make
