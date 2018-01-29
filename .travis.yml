@@ -20,7 +20,6 @@ latex: false
 
 # build project
 script:
-  - ls -la ./
   - make
 
 # report coverage rate to coveralls
