@@ -1,0 +1,6 @@
+Package: placeholder
+Type: C++ library
+Title: Does not matter.
+Version: 0.0.1
+Imports: Rcpp, RcppArmadillo
+Remotes: eddelbuettel/rinside
