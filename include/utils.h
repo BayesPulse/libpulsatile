@@ -35,7 +35,7 @@ class PulseUtils {
                       arma::mat cholvar) // cholesky decomposed varcovar matrix (psd)
     {
 
-      int i, j;
+      unsigned int i, j;
       arma::vec runiv = { ::Rf_rnorm(0, 1), ::Rf_rnorm(0, 1) };
       arma::vec result = { 0, 0 };
 
