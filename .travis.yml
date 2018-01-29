@@ -24,6 +24,8 @@ addons:
   apt:
     packages:
       - gcovr
+install:
+  - pip install codecov
 
 # build project
 script:
