@@ -18,15 +18,19 @@ dist: trusty
 cache: packages
 latex: false
 
-# build project
+# For coverate reporting
+r_packages:
+  - covr
+
+# Build project
 script:
   - make
 
-# report coverage rate to coveralls
+# Report coverage rate to coveralls
 after_success:
     - Rscript -e 'library(covr); codecov()'
 
-# send e-mails if stuff changes
+# Send e-mails if stuff changes
 notifications:
   email:
     on_success: change
