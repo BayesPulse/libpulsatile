@@ -10,11 +10,13 @@
 #     - RInside (development version via GitHub)
 #     - Rcpp (CRAN)
 #     - RcppArmadillo (CRAN)
+#     # Header
 
-lanugage: r
+language: r
 sudo: false
-cache:
-  packages: yes
+dist: trusty
+cache: packages
+latex: false
 
 # build project
 script:
