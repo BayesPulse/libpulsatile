@@ -13,7 +13,7 @@
 #     # Header
 
 language: r
-sudo: true
+sudo: false
 dist: trusty
 cache: packages
 latex: false
