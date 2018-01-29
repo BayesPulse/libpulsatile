@@ -5,6 +5,7 @@
 *.swp
 *.o
 *.so
+*.gcno
 bin/
 build/
 tags
