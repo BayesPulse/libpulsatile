@@ -55,8 +55,8 @@ TARGETDIR := bin
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g -Wall
-LIB := $(LDLIBS)
+CFLAGS := -g -Wall -fprofile-arcs -ftest-coverage
+LIB := $(LDLIBS) -lgcov --coverage
 INC := -I include -I include/population -I include/singlesubject $(CPPFLAGS) $(CXXFLAGS) -std=c++11
 
 
@@ -90,23 +90,14 @@ $(TESTBUILDDIR)/%.o: $(TESTSRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(TESTBUILDDIR)
 	$(CXX)  $(CFLAGS) $(INC) -c -o $@ $<
 
+gcov:
+	gcovr -r ./bin/ --html -o coverage.html --html-details
+
 clean:
 	@echo " Cleaning...";
 	@echo " $(RM) -r $(BUILDDIR) $(TARGETDIR)/$(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGETDIR)/$(TARGET)
 	@echo " $(RM) -r $(TESTBUILDDIR) $(TARGETDIR)/$(TESTTARGET)"; $(RM) -r $(TESTBUILDDIR) $(TARGETDIR)/$(TESTTARGET)
 	@echo " $(RM) -rf $(TARGETDIR)"; $(RM) -rf $(TARGETDIR)
-
-# 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% $(INC) -c tests/tests.cpp tests/proposalvariance_tests.cpp tests/utils_tests.cpp
-# 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% $(INC) -o bin/tests tests/tests.o tests/proposalvariance_tests.o tests/utils_tests.o && bin/tests --success
-# 
-# # Tests
-# tester: $(TESTOBJECTS)
-# 	echo " Building testfile";
-# ##	$(CXX) $(CFLAGS) tests/proposalvariance_tests.cpp $(INC) $(LIB) -o bin/proposalvariance_tests
-# # 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% tests/proposalvariance_tests.cpp $(INC) $(LIB) -c bin/proposalvariance_tests
-# # 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% tests/proposalvariance_tests.cpp $(INC) $(LIB) -o bin/proposalvariance_tests
-# 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% $(INC) -c tests/tests.cpp tests/proposalvariance_tests.cpp tests/utils_tests.cpp
-# 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% $(INC) -o bin/tests tests/tests.o tests/proposalvariance_tests.o tests/utils_tests.o && bin/tests --success
 
 .PHONY: clean
 
