@@ -22,10 +22,6 @@ latex: false
 script:
   - make
 
-# report coverage rate to coveralls
-after_success:
-    - Rscript -e 'library(covr); codecov()'
-
 # send e-mails if stuff changes
 notifications:
   email:
