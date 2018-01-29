@@ -5,93 +5,20 @@
 #   - C++11
 #   - clang4.0 (nonstandard version for OpenMP support(-fopenmp), necessary?)
 #   - R 3.4.3
-#   - R packages
+#
+#   - R packages (defined in DESCRIPTION)
 #     - RInside (development version via GitHub)
 #     - Rcpp (CRAN)
 #     - RcppArmadillo (CRAN)
-#
 
-#
-# macOS
-#
-#os: osx
-#osx_image: xcode9.9
-#language: cpp
-#before_install:
-#  - brew tap homebrew/science
-#  - brew update
-#  - brew install R
-#
-#install: make get-deps
-#compiler:
-#  - clang++
-
-
-# # remaining code from R package travis
-# sudo: false
-# cache: packages
-# r:
-#   - oldrel
-#   - release
-#   - devel
-#
-# warnings_are_errors: false
-#
-# r_packages:
-#     - covr
-#
-# after_success:
-#     - Rscript -e 'library(covr); codecov()'
-#
-
-
-# .travis.yml using container-based infrastructure
-
-# use c as catch-all language
-language: cpp
-
-# use containers
+lanugage: r
 sudo: false
-
-# install R: use r-packages-precise (https://cran.r-project.org/bin/linux/ubuntu/precise/) 
-# as source which is white listed (https://github.com/travis-ci/apt-source-whitelist/)
-addons:
-  apt:
-    sources:
-    - r-packages-precise
-    packages:
-    - r-base-dev	
-    - r-recommended
-      #    - pandoc
-
-# cache local R libraries directory:
 cache:
-  directories:
-    - ~/Rlib
+  packages: yes
 
-# install the package and dependencies:
-# - create directory for R libraries (if not already exists)
-# - create .Renviron with location of R libraries
-# - define R repository in .Rprofile
-# - add .travis.yml to .Rbuildignore
-# - install devtools if not already installed
-# - install covr if not already installed
-# - update all installed packages
-# - install package with dependencies
-install:
-  - mkdir -p mkdir $HOME/R/library
-  - echo 'R_LIBS_USER="~/R/library"' >  $HOME/.Renviron
-  - echo 'options(repos = "http://cran.rstudio.com")' > .Rprofile
-  - sudo su - -c "R -e \"install.packages('devtools', repos='http://cran.rstudio.com/')\""
-  - sudo su - -c "R -e \"install.packages('covr', repos='http://cran.rstudio.com/')\""
-  - sudo su - -c "R -e \"devtools::install_github('eddelbuettel/rinside', repos='http://cran.rstudio.com/')\""
-  #- Rscript -e 'if(!"devtools" %in% rownames(installed.packages())) { install.packages("devtools", dependencies = TRUE) }'
-  #- Rscript -e 'if(!"covr" %in% rownames(installed.packages())) { install.packages("covr", dependencies = TRUE) }'
-  #- Rscript -e 'if(!"RInside" %in% rownames(installed.packages())) { devtools::install_github("eddelbuettel/rinside", dependencies = TRUE) }'
-  #- mkdir -p ~/Rlib
-  #- echo 'R_LIBS=~/Rlib' > .Renviron
-  #- echo '.travis.yml' > .Rbuildignore
-  #- Rscript -e 'update.packages(ask = FALSE, instlib = "~/Rlib")'
+# build project
+script:
+  - make
 
 # report coverage rate to coveralls
 after_success:
@@ -102,4 +29,5 @@ notifications:
   email:
     on_success: change
     on_failure: change
+
 
