@@ -5,40 +5,27 @@
 #   - C++11
 #   - clang4.0 (nonstandard version for OpenMP support(-fopenmp), necessary?)
 #   - R 3.4.3
-#   - R packages
+#
+#   - R packages (defined in DESCRIPTION)
 #     - RInside (development version via GitHub)
 #     - Rcpp (CRAN)
 #     - RcppArmadillo (CRAN)
-#
+#     # Header
 
-#
-# macOS
-#
-os: osx
-osx_image: xcode9.9
-language: cpp
-before_install:
-  - brew tap homebrew/science
-  - brew update
-  - brew install R
+language: r
+sudo: false
+dist: trusty
+cache: packages
+latex: false
 
-install: make get-deps
-compiler:
-  - clang++
+# build project
+script:
+  - make
+
+# send e-mails if stuff changes
+notifications:
+  email:
+    on_success: change
+    on_failure: change
 
 
-# # remaining code from R package travis
-# sudo: false
-# cache: packages
-# r:
-#   - oldrel
-#   - release
-#   - devel
-#
-# warnings_are_errors: false
-#
-# r_packages:
-#     - covr
-#
-# after_success:
-#     - Rscript -e 'library(covr); codecov()'

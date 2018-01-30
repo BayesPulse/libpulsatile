@@ -271,7 +271,8 @@ class PulseEstimate {
     arma::vec get_mean_contribution(const arma::vec & data_time, double decay_rate)
     {
 
-      if (prev_mass != mass | prev_width != width | prev_time != time | prev_decay_rate != decay_rate) {
+      if ((prev_mass != mass) | (prev_width != width) | (prev_time != time) |
+          (prev_decay_rate != decay_rate)) {
         calc_mean_contribution(data_time, decay_rate);
         prev_time = time;
         prev_mass = mass;
