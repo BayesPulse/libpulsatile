@@ -59,7 +59,7 @@ struct PatientPriors {
   //
 
   //   Haven't quite wrapped my head around these (is it sd or variance),
-  //   beleive they correspond to mass_sd and width_sd in patient estimates for
+  //   believe they correspond to mass_sd and width_sd in patient estimates for
   //   single-subj model.
   double mass_mean_sd;
   double mass_mean_variance;

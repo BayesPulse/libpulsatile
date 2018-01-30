@@ -4,15 +4,12 @@
 #include <RcppArmadillo.h>
 #include <RInside.h>                    // for the embedded R via RInside
 #include "datastructures.h"
-//#include <list>
+
+
 
 //
 // patient.h
 //   defining the patient class and subclasses
-//
-// Author: Matt Mulvahill
-// Created: 11/14/17
-// Notes:
 //
 
 
@@ -24,7 +21,6 @@
 
 
 using namespace Rcpp;
-//using namespace RcppArmadillo;
 
 
 
@@ -33,31 +29,35 @@ using namespace Rcpp;
 //
 struct Patient {
 
-  //
-  // For single-subject model
-  //
-
+  // Member objects for all models
   PatientData *data;
-  PatientPriors *priors;
   PatientEstimates *estimates;
   std::list<PulseEstimate> pulses;
   std::list<PulseEstimate>::iterator piter = pulses.begin();
   std::list<PulseEstimate> responses;
   std::list<PulseEstimate>::iterator riter = responses.begin();
 
-  // Single-subject constructor
+  //
+  // For single-subject model
+  //
+
+  // Member objects
+  PatientPriors *priors;
+
+  // Constructor
   Patient(PatientData *in_data,
           PatientPriors *in_priors,
           PatientEstimates *in_parms) {
 
-    data = in_data;
-    priors = in_priors;
+    data      = in_data;
+    priors    = in_priors;
     estimates = in_parms;
 
-
-    PulseEstimate firstpulse(in_data->fitstart, 1, 1, 1, 1, in_parms->get_decay(), in_data->concentration);
+    PulseEstimate firstpulse(in_data->fitstart,
+                             1, 1, 1, 1,
+                             in_parms->get_decay(), 
+                             in_data->concentration);
     pulses.push_back(firstpulse);
-    //++piter;
 
   }
 
@@ -65,12 +65,13 @@ struct Patient {
   // For population models
   //
 
+  // Constructor
   Patient(PatientData *in_data,
           PatientEstimates *in_parms) {
 
     data = in_data;
     estimates = in_parms;
-    // priors // uninitialized
+    // priors member obj not used
 
   }
 
@@ -87,6 +88,8 @@ struct Patient {
   // likelihood()
   //   computes the current likelihood using the observed log-concentrations and
   //   mean concentration
+  //   there is a version for a) using all pulses and b) one for excluding one
+  //   pulse.
   double likelihood(bool response_hormone) {
     std::list<PulseEstimate>::const_iterator emptyiter;
     return likelihood(response_hormone, emptyiter);
@@ -121,6 +124,8 @@ struct Patient {
 
   // mean_concentration()
   //   this takes each pulse's mean_contrib vector and sums across them
+  //   there is a version for a) using all pulses and b) one for excluding one
+  //   pulse.
   arma::vec mean_concentration(bool response_hormone) {
 
     std::list<PulseEstimate>::const_iterator emptyiter;

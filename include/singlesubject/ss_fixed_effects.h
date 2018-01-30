@@ -8,7 +8,8 @@
 #include "patient.h"
 
 
-// draw_fixed_effects
+//
+// SS_DrawFixedEffects
 //   Modified Metropolis Hastings sampler instantiating the mmh class for
 //   sample the mean mass & width
 //
