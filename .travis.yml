@@ -17,21 +17,13 @@ sudo: false
 dist: trusty
 cache: packages
 latex: false
-r_packages:
-  - covr
-
-addons:
-  apt:
-    packages:
-      - gcovr
-install:
-  - pip install codecov
 
 # build project
 script:
   - make
-  - ./get_code_cov.sh
-  - codecov
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 # send e-mails if stuff changes
 notifications:

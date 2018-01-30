@@ -55,8 +55,8 @@ TARGETDIR := bin
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g -Wall -fprofile-arcs -ftest-coverage
-LIB := $(LDLIBS) -lgcov --coverage
+CFLAGS := -g -Wall #-fprofile-arcs -ftest-coverage
+LIB := $(LDLIBS) -coverage #-lgcov --coverage
 INC := -I include -I include/population -I include/singlesubject $(CPPFLAGS) $(CXXFLAGS) -std=c++11
 
 
