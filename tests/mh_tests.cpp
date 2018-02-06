@@ -2,7 +2,7 @@
 #include <RInside.h>
 #include "patient.h"
 #include "datastructures.h"
-#include "ss_fixed_effects.h"
+#include "ss_drawfixedeffects.h"
 #include "catch.h"
 
 

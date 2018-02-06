@@ -76,6 +76,36 @@ class PulseUtils {
 
     //  return(rtn);
     //}
+    //
+
+    //
+    // calc_sr_strauss()
+    //   Calculates sum(S(R)), the exponent on the gamma parameter in the Strauss
+    //   process/prior for pulse location. Used for Strauss prior in birth_death
+    //   and mh_time_strauss.
+    //
+    int calc_sr_strauss(double location,     // location to test pulses against
+                        Patient *patient,
+                        PulseEstimate *pulse_excluded) {
+
+      int s_r = 0;       // Sum of indicators where diff < 20
+      double difference; // Time difference
+      std::list<PulseEstimate>::const_iterator this_piter = patient.pulses.begin();
+
+      while (this_piter != NULL) {
+        if (this_piter != excl_pulse) {
+          // skip if node is same that location is from;
+          difference = fabs(location - node->time);
+          // increment by 1 if diff<R
+          s_r = (difference < priors->range) ? s_r + 1 : s_r; 
+        }
+        this_piter++;
+      }
+
+      // sum(S(R)) - scalar value for sum of # pulses too close to each other
+      return(s_r); 
+
+    }
 
 
     //
