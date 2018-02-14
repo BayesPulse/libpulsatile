@@ -47,6 +47,8 @@ class SS_DrawLocationsStrauss :
 
 
   private:
+    bool parameter_support(double val) { return false; };
+    double posterior_function(PulseEstimate *pulse, double proposal) { return -999; };
 
     bool parameter_support(double val, Patient *patient) {
       return ((val <= patient->data->fitend) && (val > patient->data->fitstart));

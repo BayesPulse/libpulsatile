@@ -223,7 +223,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
 
 
   // Create sampler object 
-  SS_DrawLocationsStrauss draw_locations_strauss(10, 500, 25000, 0.35);
+  SS_DrawLocationsStrauss draw_locations_strauss(10, 500*12, 25000*12, 0.35);
 
 
   //
@@ -242,6 +242,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
 
     double initial_psd, adjusted_psd, final_psd;
     initial_psd = draw_locations_strauss.pv.getpsd();
+
     draw_locations_strauss.sample_pulses(patient);
 
     //for (int i = 0; i < 502; i++) {
