@@ -157,7 +157,7 @@ struct PatientPriors {
     error_beta              = prior_error_beta;
     num_orderstat           = pu.orderstat_default();
     pulse_count             = prior_pulse_count;
-    strauss_repulsion       = prior_strauss_repulsion;
+    strauss_repulsion       = prior_strauss_repulsion; //gamma
     strauss_repulsion_range = prior_strauss_repulsion_range;
 
   }

@@ -14,7 +14,7 @@
 //   sample the mean mass & width
 //
 
-class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, ProposalVariance>
+class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, double, ProposalVariance>
 {
 
   public:
@@ -27,10 +27,11 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
                         int in_max_iter,
                         double in_target_ratio) :
       ModifiedMetropolisHastings
-      <Patient, double, ProposalVariance>::ModifiedMetropolisHastings(in_pv,
-                                                                      in_adjust_iter,
-                                                                      in_max_iter,
-                                                                      in_target_ratio) { };
+      <Patient, bool, double,
+       ProposalVariance>::ModifiedMetropolisHastings(in_pv,
+                                                     in_adjust_iter,
+                                                     in_max_iter,
+                                                     in_target_ratio) { };
     //   b) second option is to pass a ProposalVariance object to the constructor
     //SS_DrawFixedEffects(ProposalVariance pv) :
     //  ModifiedMetropolisHastings<Patient, double,
@@ -38,6 +39,13 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
 
   private:
     bool parameter_support(double val) { return (val > 0.0); }
+
+    // UNUSED version (must defined for current structure...)
+    bool parameter_support(double val, bool *container) { return false; }
+    // UNUSED version (must defined for current structure...)
+    double posterior_function(Patient *patient, bool *container, double proposal) { 
+      return -999; 
+    }
 
     double posterior_function(Patient *patient, double proposal) {
 

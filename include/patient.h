@@ -87,7 +87,7 @@ struct Patient {
 
   // likelihood()
   //   computes the current likelihood using the observed log-concentrations and
-  //   mean concentration
+  //   mean concentration as requested. Not stored.
   //   there is a version for a) using all pulses and b) one for excluding one
   //   pulse.
   double likelihood(bool response_hormone) {
@@ -151,7 +151,7 @@ struct Patient {
 
     // Add the contribution to the mean from each pulse
     arma::vec mctrb(data->concentration.n_elem);
-    int i = 1;
+    int i = 1; // i think this is extraneous
     while (pulse_iter != pulselist_end) {
       if (pulse_iter != pulse_excluded) {
         mctrb = pulse_iter->get_mean_contribution(data->concentration,
