@@ -123,10 +123,6 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
     }
     adjusted_psd = draw_fixed_effects.pv.getpsd();
     REQUIRE(adjusted_psd == sqrt((pow(initial_psd, 2)*1.1)));
-    std::cout << "Fixed effects MMH" << std::endl;
-    std::cout << "N iters = " << draw_fixed_effects.pv.getiter() << std::endl;
-    std::cout << "N accept = " << draw_fixed_effects.pv.getaccept() << std::endl;
-    std::cout << "accept ratio = " << draw_fixed_effects.pv.getratio() << std::endl;
 
     for (int i = draw_fixed_effects.pv.getiter(); i < 25001; i++) {
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
@@ -227,7 +223,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
 
 
   // Create sampler object 
-  SS_DrawLocationsStrauss draw_locations_strauss(10, 500*12, 25000*12, 0.35);
+  SS_DrawLocationsStrauss draw_locations_strauss(10, 500*11, 25000*11, 0.35);
 
 
   //
@@ -247,10 +243,6 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
     double initial_psd, adjusted_psd, final_psd;
     initial_psd = draw_locations_strauss.pv.getpsd();
 
-    std::cout << "Pulse locations MMH" << std::endl;
-    std::cout << "N iters = " << draw_locations_strauss.pv.getiter() << std::endl;
-    std::cout << "N accept = " << draw_locations_strauss.pv.getaccept() << std::endl;
-    std::cout << "accept ratio = " << draw_locations_strauss.pv.getratio() << std::endl;
     draw_locations_strauss.sample_pulses(patient);
     ///REQUIRE()
 
@@ -258,13 +250,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
       draw_locations_strauss.sample_pulses(patient);
     }
     adjusted_psd = draw_locations_strauss.pv.getpsd();
-    //REQUIRE(adjusted_psd == sqrt((pow(initial_psd, 2)*1.1)));
-
-    std::cout << "N iters = " << draw_locations_strauss.pv.getiter() << std::endl;
-    std::cout << "N accept = " << draw_locations_strauss.pv.getaccept() << std::endl;
-    std::cout << "accept ratio = " << draw_locations_strauss.pv.getratio() << std::endl;
-    std::cout << "initial psd = " << initial_psd << std::endl;
-    std::cout << "current psd = " << adjusted_psd << std::endl;
+    REQUIRE(adjusted_psd == sqrt((pow(initial_psd, 2)*1.1)));
 
     //for (int i = draw_locations_strauss.pv.getiter(); i < 25001; i++) {
     //  draw_locations_strauss.sample(patient, &patient->estimates->mass_mean);
