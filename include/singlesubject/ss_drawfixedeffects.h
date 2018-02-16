@@ -19,9 +19,10 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
 
   public:
 
-    // Constructors
-    //   a) first option is to pass the proposal variance parameters to the
-    //      constructor
+    //
+    // Constructor
+    //   pass the proposal variance parameters to the constructor
+    //
     SS_DrawFixedEffects(double in_pv, // double or arma::vec
                         int in_adjust_iter,
                         int in_max_iter,
@@ -32,22 +33,12 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
                                                      in_adjust_iter,
                                                      in_max_iter,
                                                      in_target_ratio) { };
-    //   b) second option is to pass a ProposalVariance object to the constructor
-    //SS_DrawFixedEffects(ProposalVariance pv) :
-    //  ModifiedMetropolisHastings<Patient, double,
-    //  ProposalVariance>::ModifiedMetropolisHastings(pv) { };
 
   private:
-    bool parameter_support(double val) { return (val > 0.0); }
 
-    // UNUSED version (must defined for current structure...)
-    bool parameter_support(double val, bool *container) { return false; }
-    // UNUSED version (must defined for current structure...)
-    double posterior_function(Patient *patient, bool *container, double proposal) { 
-      return -999; 
-    }
+    bool parameter_support(double val, bool *notused) { return (val > 0.0); }
 
-    double posterior_function(Patient *patient, double proposal) {
+    double posterior_function(Patient *patient, double proposal, bool *notused) {
 
       double prior_ratio       = 0.0 ;
       double psum_old          = 0.0 ;

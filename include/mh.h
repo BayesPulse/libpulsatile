@@ -42,13 +42,14 @@ class ModifiedMetropolisHastings
     //   - pass Patient as pointer
     //  SAMPLETYPE will be double (or int) or arma::vec depending on single or two
     //    parameter MMH
-    void sample(T *sampling_unit, SAMPLETYPE *current_val) {
+    //    - pass container (or one level higher in hierarchy) as container
+    void sample(T *sampling_unit, SAMPLETYPE *current_val, U *container) {
 
       double accept_prob, alpha;
 
       // Draw new proposal
-      SAMPLETYPE proposal     = draw_proposal(*current_val, pv.getpsd());
-      bool supported = parameter_support(proposal);
+      SAMPLETYPE proposal = draw_proposal(*current_val, pv.getpsd());
+      bool supported      = parameter_support(proposal, container);
 
       if (!supported) {
 
@@ -56,7 +57,7 @@ class ModifiedMetropolisHastings
 
       } else {
 
-        accept_prob = posterior_function(sampling_unit, proposal);
+        accept_prob = posterior_function(sampling_unit, proposal, container);
         alpha = (0 < accept_prob) ? 0 : accept_prob;
 
         if (log(R::runif(0, 1)) < alpha) {
@@ -70,6 +71,12 @@ class ModifiedMetropolisHastings
 
         }
       }
+    }
+
+    void sample(T *sampling_unit, SAMPLETYPE *current_val) {
+      U empty_container;
+      U * empty = &empty_container;
+      sample(sampling_unit, current_val, empty);
     }
 
   protected:
@@ -90,23 +97,25 @@ class ModifiedMetropolisHastings
   private:
 
     PulseUtils pu;
+
     double draw_proposal(double current, double proposal_sd) {
       return Rf_rnorm(current, proposal_sd);
     };
     arma::vec draw_proposal(const arma::vec current, arma::mat proposal_sd){
       return pu.rmvnorm(current, proposal_sd);
     };
-    virtual bool parameter_support(SAMPLETYPE val); // i.e. truncation logic
-    virtual bool parameter_support(SAMPLETYPE val, U *container); // i.e. truncation logic
-    virtual double posterior_function(T *sampling_unit, SAMPLETYPE proposal);   // logrho_calculation
-    virtual double posterior_function(T *sampling_unit, U *container, SAMPLETYPE proposal);   // logrho_calculation
+
+    // Parameter support/Truncation logic
+    virtual bool parameter_support(SAMPLETYPE val, U *container);
+    // Posterior function/log(rho) calculation
+    virtual double posterior_function(T *sampling_unit, SAMPLETYPE proposal, U *container);
 
     // Some estimates can only have one MMH object for multiple objects being
     // sampled -- since pulses are born/die, we can't have an MMH for each pulse
     // -- all pulses need one MMH for each location, mass, and widths.
     // so we need a function for iterating over them, that calls sample() from
     // within it.
-    void sample_pulses(U *container, SAMPLETYPE *current_val); 
+    //void sample_pulses(U *container, SAMPLETYPE *current_val); 
 
 };
 

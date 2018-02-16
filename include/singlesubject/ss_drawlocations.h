@@ -30,7 +30,8 @@ class SS_DrawLocationsStrauss :
                             double in_target_ratio) :
       ModifiedMetropolisHastings
       <PulseEstimate, Patient, double,
-       ProposalVariance>::ModifiedMetropolisHastings(in_pv, in_adjust_iter,
+       ProposalVariance>::ModifiedMetropolisHastings(in_pv,
+                                                     in_adjust_iter,
                                                      in_max_iter,
                                                      in_target_ratio) { };
     // Pulse level estimates need to be done at the pulse level
@@ -38,8 +39,11 @@ class SS_DrawLocationsStrauss :
 
       std::list<PulseEstimate>::iterator pulse = patient->pulses.begin();
       std::list<PulseEstimate>::const_iterator pulse_end = patient->pulses.end();
+
       while (pulse != pulse_end) {
-        sample(&(*pulse), &pulse->time); // &(*pulse) derefs iter, then gets address of underlying obj
+        // Sample pulse,
+        //   note: &(*pulse) derefs iter, then gets address of underlying obj
+        sample(&(*pulse), &pulse->time, patient);
         pulse++;
       }
 
@@ -47,11 +51,10 @@ class SS_DrawLocationsStrauss :
 
 
   private:
-    bool parameter_support(double val) { return false; };
-    double posterior_function(PulseEstimate *pulse, double proposal) { return -999; };
 
     bool parameter_support(double val, Patient *patient) {
-      return ((val <= patient->data->fitend) && (val > patient->data->fitstart));
+      return ((val <= patient->data->fitend) &&
+              (val > patient->data->fitstart));
     }
 
     //
@@ -59,8 +62,8 @@ class SS_DrawLocationsStrauss :
     //   for strauss location prior mmh
     //
     double posterior_function(PulseEstimate *pulse,
-                              Patient *patient,
-                              double proposal) {
+                              double proposal,
+                              Patient *patient) {
 
       // Calculated tmp variables
       double acceptance_ratio;
