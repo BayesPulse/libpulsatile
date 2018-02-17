@@ -100,7 +100,7 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
   //////////////// END LOADING DATA STRUCTURES ///////////////
 
   // Create sampler object 
-  SS_DrawFixedEffects draw_fixed_effects(10, 500, 25000, 0.35);
+  SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35);
 
 
   //
@@ -109,8 +109,8 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
 
   SECTION( "Check sub-functions" ) {
 
-    REQUIRE(draw_fixed_effects.pv.getpsd() == sqrt(10));
-    REQUIRE(draw_fixed_effects.pv.getpv() == Approx(10.0));
+    REQUIRE(draw_fixed_effects.pv.getpsd() == sqrt(1.1));
+    REQUIRE(draw_fixed_effects.pv.getpv() == Approx(1.1));
 
   }
 
@@ -118,22 +118,28 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
 
     double initial_psd, adjusted_psd, final_psd;
     initial_psd = draw_fixed_effects.pv.getpsd();
-    for (int i = 0; i < 502; i++) {
+    for (int i = 0; i < 501; i++) {
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
     }
     adjusted_psd = draw_fixed_effects.pv.getpsd();
     REQUIRE(adjusted_psd == sqrt((pow(initial_psd, 2)*1.1)));
 
-    for (int i = draw_fixed_effects.pv.getiter(); i < 25001; i++) {
+    for (int i = 500; i < 24499; i++) {
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
     }
 
+    // Test before and after the final change
+    adjusted_psd = draw_fixed_effects.pv.getpsd();
+    REQUIRE(draw_fixed_effects.pv.getpsd() == adjusted_psd);
+    draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
+    REQUIRE(draw_fixed_effects.pv.getpsd() != adjusted_psd);
+
     final_psd = draw_fixed_effects.pv.getpsd();
-    for (int i = draw_fixed_effects.pv.getiter(); i < 50001; i++) {
+    for (int i = draw_fixed_effects.pv.getiter(); i < 50000; i++) {
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
     }
     REQUIRE(draw_fixed_effects.pv.getpsd() == final_psd);
-    REQUIRE(draw_fixed_effects.pv.getiter() == 50001);
+    REQUIRE(draw_fixed_effects.pv.getiter() == 50000);
 
 
   }
@@ -244,7 +250,6 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
     initial_psd = draw_locations_strauss.pv.getpsd();
 
     draw_locations_strauss.sample_pulses(patient);
-    ///REQUIRE()
 
     for (int i = 0; i < 500; i++) {
       draw_locations_strauss.sample_pulses(patient);
@@ -252,17 +257,23 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
     adjusted_psd = draw_locations_strauss.pv.getpsd();
     REQUIRE(adjusted_psd == sqrt((pow(initial_psd, 2)*1.1)));
 
-    //for (int i = draw_locations_strauss.pv.getiter(); i < 25001; i++) {
-    //  draw_locations_strauss.sample(patient, &patient->estimates->mass_mean);
-    //}
+    for (int i = 500; i < 24499; i++) {
+      draw_locations_strauss.sample_pulses(patient);
+    }
 
-    //final_psd = draw_locations_strauss.pv.getpsd();
-    //for (int i = draw_locations_strauss.pv.getiter(); i < 50001; i++) {
-    //  draw_locations_strauss.sample(patient, &patient->estimates->mass_mean);
-    //}
-    //REQUIRE(draw_locations_strauss.pv.getpsd() == final_psd);
-    //REQUIRE(draw_locations_strauss.pv.getiter() == 50001);
+    // Test before and after the final change
+    adjusted_psd = draw_locations_strauss.pv.getpsd();
+    REQUIRE(draw_locations_strauss.pv.getpsd() == adjusted_psd);
+    draw_locations_strauss.sample_pulses(patient);
+    REQUIRE(draw_locations_strauss.pv.getpsd() != adjusted_psd);
 
+    // Test final psd change
+    final_psd = draw_locations_strauss.pv.getpsd();
+    for (int i = 24500; i < 50000; i++) {
+      draw_locations_strauss.sample_pulses(patient);
+    }
+    REQUIRE(draw_locations_strauss.pv.getpsd() == final_psd);
+    REQUIRE(draw_locations_strauss.pv.getiter() == 550011);
 
   }
 
