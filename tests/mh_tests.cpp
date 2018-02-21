@@ -4,6 +4,7 @@
 #include "datastructures.h"
 #include "ss_drawfixedeffects.h"
 #include "ss_drawlocations.h"
+#include "ss_draw_randomeffects.h"
 #include "catch.h"
 
 
@@ -230,6 +231,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
 
   // Create sampler object 
   SS_DrawLocationsStrauss draw_locations_strauss(10, 500*11, 25000*11, 0.35);
+  SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
 
 
   //
@@ -240,6 +242,8 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
 
     REQUIRE(draw_locations_strauss.pv.getpsd() == sqrt(10));
     REQUIRE(draw_locations_strauss.pv.getpv() == Approx(10.0));
+    REQUIRE(draw_pulse_masses.pv.getpsd() == sqrt(10));
+    REQUIRE(draw_pulse_masses.pv.getpv() == Approx(10.0));
 
   }
 
