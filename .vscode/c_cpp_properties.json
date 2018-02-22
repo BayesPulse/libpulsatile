@@ -38,12 +38,19 @@
             "includePath": [
                 "/usr/include",
                 "/usr/local/include",
-                "${workspaceRoot}"
+                "${workspaceRoot}",
+                "/usr/share/R/include",
+                "/home/matt/R/x86_64-pc-linux-gnu-library/3.4/Rcpp/include",
+                "/home/matt/R/x86_64-pc-linux-gnu-library/3.4/RcppArmadillo/include",
+                "/home/matt/R/x86_64-pc-linux-gnu-library/3.4/RInside/include",
+                "${workspaceRoot}/include",
+                "/usr/include/c++/5"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
+                    "/usr/bin",
                     "/usr/include",
                     "/usr/local/include",
                     "${workspaceRoot}"

@@ -52,7 +52,7 @@ class SS_DrawRandomEffects :
 
   private:
 
-    bool parameter_support(double val) {
+    bool parameter_support(double val, Patient *patient) {
       // NOTE: original was:
       //   mass > 0.0 && width > 0.01 && width < 10
       return ( val > 0.0 );
@@ -66,7 +66,8 @@ class SS_DrawRandomEffects :
                               double proposal,
                               Patient *patient) {
 
-        double patient_mass_mean = patient->estimates->mass;
+        double prior_old, prior_new, prior_ratio, current_mass, plikelihood;
+        double patient_mass_mean = patient->estimates->mass_mean;
         double patient_mass_sd   = patient->estimates->mass_sd;
         double curr_likelihood   = patient->likelihood(false);
 
@@ -81,10 +82,10 @@ class SS_DrawRandomEffects :
 
         // Save the current value of mass/width and set to proposed value
         current_mass = pulse->mass;
-        pulse->mass = proposal;
+        pulse->mass  = proposal;
 
         // Calculate likelihood assuming proposed mass/width 
-        plikelihood      = patient->likelihood(false);
+        plikelihood = patient->likelihood(false);
 
         // Reset pulse->time to current (sample() chooses whether to keep)
         //   and get_mean_contribution() will recalc that when requested.

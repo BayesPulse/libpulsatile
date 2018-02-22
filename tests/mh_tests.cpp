@@ -242,8 +242,8 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
 
     REQUIRE(draw_locations_strauss.pv.getpsd() == sqrt(10));
     REQUIRE(draw_locations_strauss.pv.getpv() == Approx(10.0));
-    REQUIRE(draw_pulse_masses.pv.getpsd() == sqrt(10));
-    REQUIRE(draw_pulse_masses.pv.getpv() == Approx(10.0));
+    REQUIRE(draw_pulse_masses.pv.getpsd() == sqrt(1.1));
+    REQUIRE(draw_pulse_masses.pv.getpv() == Approx(1.1));
 
   }
 
