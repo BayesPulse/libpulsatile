@@ -59,7 +59,7 @@ struct PatientPriors {
   //
 
   //   Haven't quite wrapped my head around these (is it sd or variance),
-  //   beleive they correspond to mass_sd and width_sd in patient estimates for
+  //   believe they correspond to mass_sd and width_sd in patient estimates for
   //   single-subj model.
   double mass_mean_sd;
   double mass_mean_variance;
@@ -157,7 +157,7 @@ struct PatientPriors {
     error_beta              = prior_error_beta;
     num_orderstat           = pu.orderstat_default();
     pulse_count             = prior_pulse_count;
-    strauss_repulsion       = prior_strauss_repulsion;
+    strauss_repulsion       = prior_strauss_repulsion; //gamma
     strauss_repulsion_range = prior_strauss_repulsion_range;
 
   }
@@ -186,15 +186,16 @@ typedef struct PatientPriors PopulationEstimates;
 struct PatientEstimates {
 
   // Used in all models
-  double baseline;
-  double halflife;
+  arma::vec baseline_halflife;
+  //double baseline;
+  //double halflife;
   double errorsq;    // model error (variance)
   double mass_mean;
   double width_mean;
   int    pulse_count; // function of linked list instead?;
   // Always use these functions to get these values.  removed them as separate
   // member variables to ensure the result is always up-to-date
-  double get_decay() { return log(2) / halflife; }
+  double get_decay() { return log(2) / baseline_halflife(1); }
   double get_logerrorsq() { return log(errorsq); }
 
   //
@@ -207,8 +208,9 @@ struct PatientEstimates {
                    double sv_width_mean,
                    int    sv_pulse_count) {
 
-    baseline    = sv_baseline,
-    halflife    = sv_halflife;
+    baseline_halflife = { sv_baseline, sv_halflife };
+    //baseline    = sv_baseline,
+    //halflife    = sv_halflife;
     errorsq     = sv_errorsq;
     mass_mean   = sv_mass_mean;
     width_mean  = sv_width_mean;

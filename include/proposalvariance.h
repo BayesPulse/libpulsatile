@@ -101,13 +101,12 @@ class ProposalVariance2p {
 
   public:
 
-    ProposalVariance2p()
-      : count(), adjust_iter(500), max_iter(25000), target_ratio(0.35) {
-      arma::vec in_pv(2);
-      in_pv.fill(0);
-      initialize_proposals(in_pv);
-    }
-
+    //ProposalVariance2p()
+    //  : count(), adjust_iter(500), max_iter(25000), target_ratio(0.35) {
+    //  arma::vec in_pv(2);
+    //  in_pv.fill(0);
+    //  initialize_proposals(in_pv);
+    //}
     ProposalVariance2p(arma::vec in_pv,
                        int in_adjust_iter,
                        int in_max_iter,
@@ -122,6 +121,14 @@ class ProposalVariance2p {
     // ProposalVariance functions
     arma::mat getpv() const  { return pv; };
     arma::mat getpsd() const { return psd; };
+
+    void check_adjust() {
+      int iter = getiter();
+      if (iter < max_iter && iter % adjust_iter == 0 && iter > 0) {
+        adjustpv(-0.90); 
+      }
+    }
+
 
     void adjustpv(double corr = -0.90) {
       // identity matrix
@@ -148,12 +155,12 @@ class ProposalVariance2p {
 
     // Counter implementation
     //   NOTE: works, but keep an eye out for a better option
-    void addreject() { count.addreject(); };
-    void addaccept() { count.addaccept(); };
-    double getratio() { return count.getratio(); };
-    void resetratio() { count.resetratio(); };
-    int getiter() { return count.getiter(); };
-    int getaccept() { return count.getaccept(); };
+    void addreject()  { check_adjust(); count.addreject(); };
+    void addaccept()  { check_adjust(); count.addaccept(); };
+    double getratio() { return count.getratio();  } ;
+    void resetratio() { count.resetratio();       } ;
+    int getiter()     { return count.getiter();   } ;
+    int getaccept()   { return count.getaccept(); } ;
 
   private:
 

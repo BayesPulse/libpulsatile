@@ -1,5 +1,5 @@
-#ifndef GUARD_ss_drawfixedeffects_h
-#define GUARD_ss_drawfixedeffects_h
+#ifndef GUARD_pop_drawsubjectmeans_h
+#define GUARD_pop_drawsubjectmeans_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>
@@ -8,12 +8,13 @@
 #include "patient.h"
 
 
-// draw_fixed_effects
+//
+// Pop_DrawSubjectMeans
 //   Modified Metropolis Hastings sampler instantiating the mmh class for
-//   sample the mean mass & width
+//   patient-level mean mass & width
 //
 
-class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, ProposalVariance>
+class Pop_DrawSubjectMeans : public ModifiedMetropolisHastings<Patient, double, ProposalVariance>
 {
 
   public:
@@ -21,7 +22,7 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
     // Constructors
     //   a) first option is to pass the proposal variance parameters to the
     //      constructor
-    SS_DrawFixedEffects(double in_pv, // double or arma::vec
+    Pop_DrawSubjectMeans(double in_pv, // double or arma::vec
                         int in_adjust_iter,
                         int in_max_iter,
                         double in_target_ratio) :
@@ -31,7 +32,7 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
                                                                       in_max_iter,
                                                                       in_target_ratio) { };
     //   b) second option is to pass a ProposalVariance object to the constructor
-    //SS_DrawFixedEffects(ProposalVariance pv) :
+    //Pop_DrawSubjectMeans(ProposalVariance pv) :
     //  ModifiedMetropolisHastings<Patient, double,
     //  ProposalVariance>::ModifiedMetropolisHastings(pv) { };
 
@@ -82,4 +83,8 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, double, P
 };
 
 #endif
+
+
+
+
 

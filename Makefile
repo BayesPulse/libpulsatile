@@ -45,8 +45,8 @@ LDLIBS := 		$(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
 # Original working makefile
 #
 #CXX := g++ # This is the main compiler
-CXX := clang++ #--analyze # and comment out the linker last line for sanity
-#CXX := $(shell $(R_HOME)/bin/R CMD config CXX)
+#CXX := clang++ #--analyze # and comment out the linker last line for sanity
+CXX := $(shell $(R_HOME)/bin/R CMD config CXX)
 SRCDIR := src
 BUILDDIR := build
 SRCEXT := cpp
