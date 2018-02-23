@@ -106,9 +106,9 @@ class ModifiedMetropolisHastings
     };
 
     // Parameter support/Truncation logic
-    virtual bool parameter_support(SAMPLETYPE val, U *container);
+    virtual bool parameter_support(SAMPLETYPE val, U *container) = 0;
     // Posterior function/log(rho) calculation
-    virtual double posterior_function(T *sampling_unit, SAMPLETYPE proposal, U *container);
+    virtual double posterior_function(T *sampling_unit, SAMPLETYPE proposal, U *container) = 0;
 
     // Some estimates can only have one MMH object for multiple objects being
     // sampled -- since pulses are born/die, we can't have an MMH for each pulse
