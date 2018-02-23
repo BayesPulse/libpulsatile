@@ -9,11 +9,14 @@
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/usr/include",
                 "${workspaceRoot}",
-                "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/RcppArmadillo/include",
                 "${workspaceRoot}/include",
+                "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/RcppArmadillo/include",
                 "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/RInside/include",
                 "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/Rcpp/include",
-                "/Library/Frameworks/R.framework/Versions/3.4/Resources/include"
+                "/Library/Frameworks/R.framework/Versions/3.4/Resources/include",
+                "/usr/local/lib/R/3.4/site-library/RcppArmadillo/include",
+                "/usr/local/lib/R/3.4/site-library/RInside/include",
+                "/usr/local/lib/R/3.4/site-library/Rcpp/include"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",

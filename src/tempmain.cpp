@@ -10,7 +10,7 @@
 #include "utils.h"
 #include "ss_draw_fixedeffects.h"
 #include "ss_draw_sdrandomeffects.h"
-#include "ss_draw_baselinehalflife.h"
+//#include "ss_draw_baselinehalflife.h"
 #include "ss_draw_locations.h"
 #include "ss_draw_randomeffects.h"
 #include "ss_draw_tvarscale.h"
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
   arma::vec bhl_pv = { 0.5, 45 };
   SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35);
   SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500*11, 25000*11, 0.35);
-  SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
+//  SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
   SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500*11, 25000*11, 0.35);
   SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
   SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500*11, 25000*11, 0.35);
@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
   for (int i = 0; i < 250000; i++) {
     draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
     draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
-    draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife, patient);
+//    draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife, patient);
     draw_pulse_locations_strauss.sample_pulses(patient);
     draw_pulse_masses.sample_pulses(patient);
     draw_pulse_tvarscale.sample_pulses(patient);

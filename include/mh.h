@@ -101,7 +101,7 @@ class ModifiedMetropolisHastings
     double draw_proposal(double current, double proposal_sd) {
       return Rf_rnorm(current, proposal_sd);
     };
-    arma::vec draw_proposal(const arma::vec current, arma::mat proposal_sd){
+    arma::vec draw_proposal(arma::vec current, arma::mat proposal_sd){
       return pu.rmvnorm(current, proposal_sd);
     };
 

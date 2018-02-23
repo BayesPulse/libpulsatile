@@ -101,13 +101,12 @@ class ProposalVariance2p {
 
   public:
 
-    ProposalVariance2p()
-      : count(), adjust_iter(500), max_iter(25000), target_ratio(0.35) {
-      arma::vec in_pv(2);
-      in_pv.fill(0);
-      initialize_proposals(in_pv);
-    }
-
+    //ProposalVariance2p()
+    //  : count(), adjust_iter(500), max_iter(25000), target_ratio(0.35) {
+    //  arma::vec in_pv(2);
+    //  in_pv.fill(0);
+    //  initialize_proposals(in_pv);
+    //}
     ProposalVariance2p(arma::vec in_pv,
                        int in_adjust_iter,
                        int in_max_iter,
