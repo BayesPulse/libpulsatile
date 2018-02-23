@@ -1,5 +1,5 @@
-#ifndef GUARD_ss_drawlocations_h
-#define GUARD_ss_drawlocations_h
+#ifndef GUARD_ss_draw_locations_h
+#define GUARD_ss_draw_locations_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>

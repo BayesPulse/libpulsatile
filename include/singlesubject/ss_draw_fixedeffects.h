@@ -1,5 +1,5 @@
-#ifndef GUARD_ss_drawfixedeffects_h
-#define GUARD_ss_drawfixedeffects_h
+#ifndef GUARD_ss_draw_fixedeffects_h
+#define GUARD_ss_draw_fixedeffects_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>

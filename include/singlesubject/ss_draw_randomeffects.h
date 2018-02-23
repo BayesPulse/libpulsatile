@@ -30,8 +30,9 @@ class SS_DrawRandomEffects :
                                    in_adjust_iter,
                                    in_max_iter,
                                    in_target_ratio) { };
-    // Pulse level estimates need to be done at the pulse level
-    void sample_pulses(Patient *patient, std::string measure) {
+
+    // Pulse-specific estimate -- this function samples for each pulse
+    void sample_pulses(Patient *patient) { //, std::string measure) {
 
       std::list<PulseEstimate>::iterator pulse = patient->pulses.begin();
       std::list<PulseEstimate>::const_iterator pulse_end = patient->pulses.end();
