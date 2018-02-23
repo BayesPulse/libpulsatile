@@ -425,7 +425,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
       draw_pulse_masses.sample_pulses(patient);
       draw_pulse_tvarscale.sample_pulses(patient);
 
-      std::cout << "Draw " << i << "; Baseline = " << patient->estimates->baseline_halflife(0) << " ; Halflife = " << patient->estimates->baseline_halflife(1) << std::endl; 
+      //std::cout << "Draw " << i << "; Baseline = " << patient->estimates->baseline_halflife(0) << " ; Halflife = " << patient->estimates->baseline_halflife(1) << std::endl; 
 
     }
 
