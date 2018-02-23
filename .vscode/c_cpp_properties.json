@@ -12,7 +12,8 @@
                 "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/RcppArmadillo/include",
                 "${workspaceRoot}/include",
                 "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/RInside/include",
-                "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/Rcpp/include"
+                "/Library/Frameworks/R.framework/Versions/3.4/Resources/library/Rcpp/include",
+                "/Library/Frameworks/R.framework/Versions/3.4/Resources/include"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",

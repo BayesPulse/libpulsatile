@@ -365,8 +365,10 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
 
 
   // Create sampler object 
+  arma::vec bhl_pv = { 0.5, 45 };
   SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35);
   SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500, 25000, 0.35);
+  SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
 
   SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500*11, 25000*11, 0.35);
   SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
@@ -384,6 +386,13 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
 
     REQUIRE( draw_sd_pulse_masses.pv.getpsd() == sqrt(2) );
     REQUIRE( draw_sd_pulse_masses.pv.getpv() == Approx(2) );
+
+    double x, y, xy;
+    x = 0.5; y = 45; xy = -0.9 * sqrt(x * y);
+    arma::mat checkpv = { { x, xy }, { xy, y } };
+    arma::mat checkchol = arma::chol(checkpv);
+    REQUIRE( draw_baselinehalflife.pv.getpsd() == checkchol );
+    REQUIRE( arma::approx_equal(draw_baselinehalflife.pv.getpv(), checkpv, "absdiff", 0.0000001) );
 
     REQUIRE( draw_pulse_locations_strauss.pv.getpsd() == sqrt(10) );
     REQUIRE( draw_pulse_locations_strauss.pv.getpv() == Approx(10.0) );
@@ -407,6 +416,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
     for (int i = 0; i < 100000; i++) {
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
       draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
+      draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife, patient);
       draw_pulse_locations_strauss.sample_pulses(patient);
       draw_pulse_masses.sample_pulses(patient);
       draw_pulse_tvarscale.sample_pulses(patient);

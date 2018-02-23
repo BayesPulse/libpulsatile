@@ -123,6 +123,14 @@ class ProposalVariance2p {
     arma::mat getpv() const  { return pv; };
     arma::mat getpsd() const { return psd; };
 
+    void check_adjust() {
+      int iter = getiter();
+      if (iter < max_iter && iter % adjust_iter == 0 && iter > 0) {
+        adjustpv(-0.90); 
+      }
+    }
+
+
     void adjustpv(double corr = -0.90) {
       // identity matrix
       arma::mat mydiag(2, 2, arma::fill::eye);
@@ -148,12 +156,12 @@ class ProposalVariance2p {
 
     // Counter implementation
     //   NOTE: works, but keep an eye out for a better option
-    void addreject() { count.addreject(); };
-    void addaccept() { count.addaccept(); };
-    double getratio() { return count.getratio(); };
-    void resetratio() { count.resetratio(); };
-    int getiter() { return count.getiter(); };
-    int getaccept() { return count.getaccept(); };
+    void addreject()  { check_adjust(); count.addreject(); };
+    void addaccept()  { check_adjust(); count.addaccept(); };
+    double getratio() { return count.getratio();  } ;
+    void resetratio() { count.resetratio();       } ;
+    int getiter()     { return count.getiter();   } ;
+    int getaccept()   { return count.getaccept(); } ;
 
   private:
 

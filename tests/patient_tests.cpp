@@ -56,15 +56,15 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   Patient pat(data, priors, estimates);
 
   SECTION( "Estimates can be accessed" ) {
-    REQUIRE(pat.estimates->baseline == 2.6);
+    REQUIRE(pat.estimates->baseline_halflife(0) == 2.6);
     REQUIRE(pat.estimates->mass_mean == 3.5);
     REQUIRE(pat.estimates->pulse_count == 12);
     REQUIRE(pat.estimates->mass_sd == 10);
   }
 
   SECTION( "Estimates can be updated" ) {
-    pat.estimates->baseline = 10;
-    REQUIRE(pat.estimates->baseline == 10);
+    pat.estimates->baseline_halflife(0) = 10;
+    REQUIRE(pat.estimates->baseline_halflife(0) == 10);
     pat.estimates->mass_mean = 5.0;
     REQUIRE(pat.estimates->mass_mean == 5.0);
     pat.estimates->pulse_count = 6;
@@ -242,14 +242,14 @@ TEST_CASE( "Patient class constructor for population model works", "[patient]" )
   Patient pat(data, estimates);
 
   SECTION( "Estimates can be accessed" ) {
-    REQUIRE(pat.estimates->baseline == 2.6);
+    REQUIRE(pat.estimates->baseline_halflife(0) == 2.6);
     REQUIRE(pat.estimates->mass_mean == 3.5);
     REQUIRE(pat.estimates->pulse_count == 12);
   }
 
   SECTION( "Estimates can be updated" ) {
-    pat.estimates->baseline = 10;
-    REQUIRE(pat.estimates->baseline == 10);
+    pat.estimates->baseline_halflife(0) = 10;
+    REQUIRE(pat.estimates->baseline_halflife(0) == 10);
     pat.estimates->mass_mean = 5.0;
     REQUIRE(pat.estimates->mass_mean == 5.0);
     pat.estimates->pulse_count = 6;

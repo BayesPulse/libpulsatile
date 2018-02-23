@@ -163,7 +163,7 @@ struct Patient {
     }
 
     // Add the baseline contribution and log
-    mean_conc += estimates->baseline;
+    mean_conc += estimates->baseline_halflife(0);
     mean_conc = log(mean_conc);
 
     return mean_conc;

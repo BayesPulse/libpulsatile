@@ -82,8 +82,8 @@ TEST_CASE( "PatientEstimates population constructor works",
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
-    REQUIRE(pepop.baseline    == 2.6);
-    REQUIRE(pepop.halflife    == 45);
+    REQUIRE(pepop.baseline_halflife(0) == 2.6);
+    REQUIRE(pepop.baseline_halflife(1) == 45);
     REQUIRE(pepop.errorsq     == 0.05);
     REQUIRE(pepop.mass_mean   == 3.5);
     REQUIRE(pepop.width_mean  == 30);
@@ -94,10 +94,10 @@ TEST_CASE( "PatientEstimates population constructor works",
   SECTION( "Accessor methods do correct calculations." ) {
 
     // Change values used in the calculations
-    pepop.halflife = 75;
+    pepop.baseline_halflife(1) = 75;
     pepop.errorsq = 0.01;
 
-    REQUIRE(pepop.get_decay() == (log(2) / pepop.halflife));
+    REQUIRE(pepop.get_decay() == (log(2) / pepop.baseline_halflife(1)));
     REQUIRE(pepop.get_logerrorsq() == log(pepop.errorsq));
 
   }
@@ -112,8 +112,8 @@ TEST_CASE( "PatientEstimates single-subject constructor works",
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
-    REQUIRE(pesingle.baseline    == 2.6);
-    REQUIRE(pesingle.halflife    == 45);
+    REQUIRE(pesingle.baseline_halflife(0) == 2.6);
+    REQUIRE(pesingle.baseline_halflife(1) == 45);
     REQUIRE(pesingle.errorsq     == 0.05);
     REQUIRE(pesingle.mass_mean   == 3.5);
     REQUIRE(pesingle.width_mean  == 30);
@@ -126,10 +126,10 @@ TEST_CASE( "PatientEstimates single-subject constructor works",
   SECTION( "Accessor methods do correct calculations." ) {
 
     // Change values used in the calculations
-    pesingle.halflife = 75;
+    pesingle.baseline_halflife(1) = 75;
     pesingle.errorsq = 0.01;
 
-    REQUIRE(pesingle.get_decay() == (log(2) / pesingle.halflife));
+    REQUIRE(pesingle.get_decay() == (log(2) / pesingle.baseline_halflife(1)));
     REQUIRE(pesingle.get_logerrorsq() == log(pesingle.errorsq));
 
   }
