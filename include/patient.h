@@ -84,6 +84,22 @@ struct Patient {
   //   Get current number of pulses
   int get_pulsecount() { return pulses.size(); };
 
+  // get_sumerrorsquared()
+  //   Sums of squared error for error gibbs
+  double get_sumerrorsquared(bool response_hormone) {
+
+    arma::vec mean = mean_concentration(response_hormone);
+    arma::vec *conc;
+
+    if (response_hormone) {
+      conc = &data->response_concentration;
+    } else {
+      conc = &data->concentration;
+    }
+
+    return arma::accu((*conc - mean) % (*conc - mean)); // % Schur product (elementwise multiplication)
+
+  }
 
   // likelihood()
   //   computes the current likelihood using the observed log-concentrations and
@@ -99,7 +115,6 @@ struct Patient {
                     std::list<PulseEstimate>::const_iterator pulse_excluded) {
 
     double like = 0;
-    arma::vec mean_conc;
     arma::vec *conc;
 
     if (response_hormone) {
@@ -108,12 +123,9 @@ struct Patient {
       conc = &data->concentration;
     }
 
-    // Sum across mean_contribs
-    mean_conc = mean_concentration(response_hormone, pulse_excluded);
-
-    arma::vec tmp = (*conc) - mean_conc;
-    like  = arma::sum(tmp);
-    like  = pow(like, 2);
+    // Calculate likelihood
+    like  = arma::accu(*conc - mean_concentration(response_hormone, pulse_excluded));
+    like  = like * like;
     like /= (-2.0 * estimates->errorsq);
     like += -0.5 * conc->n_elem * (1.8378771 + estimates->get_logerrorsq());
 

@@ -8,6 +8,7 @@
 #include "ss_draw_locations.h"
 #include "ss_draw_randomeffects.h"
 #include "ss_draw_tvarscale.h"
+#include "ss_draw_error.h"
 #include "catch.h"
 
 
@@ -375,6 +376,8 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
   SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
   SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500*11, 25000*11, 0.35);
 
+  SS_DrawError draw_error;
+
 
   //
   // Now, time for testing
@@ -424,7 +427,9 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
       draw_pulse_locations_strauss.sample_pulses(patient);
       draw_pulse_masses.sample_pulses(patient);
       draw_pulse_tvarscale.sample_pulses(patient);
+      draw_error.sample(patient);
 
+      //std::cout << "Draw " << i << " errorsq = " << patient->estimates->errorsq << std::endl;;
       //std::cout << "Draw " << i << "; Baseline = " << patient->estimates->baseline_halflife(0) << " ; Halflife = " << patient->estimates->baseline_halflife(1) << std::endl; 
 
     }
