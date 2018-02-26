@@ -79,8 +79,8 @@ class SS_DrawLocationsStrauss :
 
       // Calculate sum_s_r for proposal value and current value
       // TODO: update arguments
-      int sum_s_r_proposal = calc_sr_strauss(proposal, patient, pulse);
-      int sum_s_r_current  = calc_sr_strauss(pulse->time, patient, pulse);
+      int sum_s_r_proposal = patient->calc_sr_strauss(proposal, pulse);
+      int sum_s_r_current  = patient->calc_sr_strauss(pulse->time, pulse);
 
       // Calculate prior ratio - 
       //      gamma^(sum(s_r*)_proposal - sum(s_r)_current)
@@ -122,35 +122,6 @@ class SS_DrawLocationsStrauss :
       return acceptance_ratio;
 
     }
-
-    // calc_sr_strauss()
-    //   Calculates sum(S(R)), the exponent on the gamma parameter in the Strauss
-    //   process/prior for pulse location. Used for Strauss prior in birth_death
-    //   and mh_time_strauss.
-    int calc_sr_strauss(double location,     // location to test pulses against
-                        Patient *patient,
-                        PulseEstimate *pulse_excluded) {
-
-      int s_r = 0;       // Sum of indicators where diff < 20
-      double difference; // Time difference
-      std::list<PulseEstimate>::iterator pulse = patient->pulses.begin();
-      std::list<PulseEstimate>::const_iterator pulse_end = patient->pulses.end();
-
-      while (pulse != pulse_end) {
-        if (&(*pulse) != pulse_excluded) { // TODO: Test that pulse is actually excluded!
-          // skip if node is same that location is from;
-          difference = fabs(location - pulse->time);
-          // increment by 1 if diff<R
-          s_r = (difference < patient->priors->strauss_repulsion_range) ? s_r + 1 : s_r; 
-        }
-        pulse++;
-      }
-
-      // sum(S(R)) - scalar value for sum of # pulses too close to each other
-      return(s_r); 
-
-    }
-
 
 
 };

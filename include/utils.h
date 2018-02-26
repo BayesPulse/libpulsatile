@@ -51,32 +51,28 @@ class PulseUtils {
 
     //
     // Single random multinomial
-    //  TODO: UPDATE for C++
     //
-    //int one_rmultinom(double *cumprobs, int n_probs) {
+    int one_rmultinom(arma::vec cumprobs, int n_probs) {
 
-    //  int i;
-    //  int rtn = 0;
-    //  int *ans;
-    //  ans = (int *)calloc(n_probs, sizeof(int));
-    //  double *probs;
-    //  probs = (double *)calloc(n_probs, sizeof(double));
+      int i;
+      int rtn = 0;
+      arma::Col<int> ans(n_probs); ans = 0;
+      arma::vec probs(n_probs);
 
-    //  for (i = 0; i < n_probs; i++) {
-    //    if (i == 0) probs[i] = cumprobs[i];
-    //    else probs[i] = cumprobs[i] - cumprobs[i-1];
-    //    ans[i] = 0;
-    //  }
+      for (i = 0; i < n_probs; i++) {
+        if (i == 0) probs(i) = cumprobs(i);
+        else probs(i) = cumprobs(i) - cumprobs(i-1);
+      }
 
-    //  Rf_rmultinom(1, probs, n_probs, ans);
+      ::Rf_rmultinom(1, probs, n_probs, ans);
 
-    //  for (i = 0; i < n_probs; i++) {
-    //    if (ans[i] == 1) rtn = i;
-    //  }
+      for (i = 0; i < n_probs; i++) {
+        if (ans[i] == 1) rtn = i;
+      }
 
-    //  return(rtn);
-    //}
-    //
+      return(rtn);
+    }
+    
 
     //
     // set_seed() 
