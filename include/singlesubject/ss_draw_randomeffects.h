@@ -34,8 +34,8 @@ class SS_DrawRandomEffects :
     // Pulse-specific estimate -- this function samples for each pulse
     void sample_pulses(Patient *patient) { //, std::string measure) {
 
-      std::list<PulseEstimate>::iterator pulse = patient->pulses.begin();
-      std::list<PulseEstimate>::const_iterator pulse_end = patient->pulses.end();
+      PulseIter pulse = patient->pulses.begin();
+      PulseConstIter pulse_end = patient->pulses.end();
 
       while (pulse != pulse_end) {
         // Sample pulse,

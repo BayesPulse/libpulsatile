@@ -33,8 +33,8 @@ class SS_DrawTVarScale : public ModifiedMetropolisHastings<PulseEstimate, Patien
     // Pulse-specific estimate -- this function samples for each pulse
     void sample_pulses(Patient *patient) {
 
-      std::list<PulseEstimate>::iterator pulse = patient->pulses.begin();
-      std::list<PulseEstimate>::const_iterator pulse_end = patient->pulses.end();
+      PulseIter pulse = patient->pulses.begin();
+      PulseConstIter pulse_end = patient->pulses.end();
 
       while (pulse != pulse_end) {
         sample(&(*pulse), &pulse->tvarscale_mass, patient);

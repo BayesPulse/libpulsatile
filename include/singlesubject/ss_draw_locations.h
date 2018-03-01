@@ -37,8 +37,8 @@ class SS_DrawLocationsStrauss :
     // Pulse level estimates need to be done at the pulse level
     void sample_pulses(Patient *patient) {
 
-      std::list<PulseEstimate>::iterator pulse = patient->pulses.begin();
-      std::list<PulseEstimate>::const_iterator pulse_end = patient->pulses.end();
+      PulseIter pulse = patient->pulses.begin();
+      PulseConstIter pulse_end = patient->pulses.end();
 
       while (pulse != pulse_end) {
         // Sample pulse,

@@ -24,6 +24,9 @@
 
 using namespace Rcpp;
 
+typedef std::list<PulseEstimate> PulseList;
+typedef PulseList::iterator PulseIter;
+typedef PulseList::const_iterator PulseConstIter;
 
 
 //
@@ -34,10 +37,10 @@ struct Patient {
   // Member objects for all models
   PatientData *data;
   PatientEstimates *estimates;
-  std::list<PulseEstimate> pulses;
-  std::list<PulseEstimate>::iterator piter = pulses.begin();
-  std::list<PulseEstimate> responses;
-  std::list<PulseEstimate>::iterator riter = responses.begin();
+  PulseList pulses;
+  PulseIter piter = pulses.begin();
+  PulseList responses;
+  PulseIter riter = responses.begin();
 
   //
   // For single-subject model
@@ -109,12 +112,11 @@ struct Patient {
   //   there is a version for a) using all pulses and b) one for excluding one
   //   pulse.
   double likelihood(bool response_hormone) {
-    std::list<PulseEstimate>::iterator emptyiter;
+    PulseIter emptyiter;
     return likelihood(response_hormone, emptyiter);
   }
 
-  double likelihood(bool response_hormone,
-                    std::list<PulseEstimate>::iterator pulse_excluded) {
+  double likelihood(bool response_hormone, PulseIter pulse_excluded) {
 
     double like = 0;
     arma::vec *conc;
@@ -138,8 +140,8 @@ struct Patient {
   // Calculate all partial likelihoods (excluding each pulse(i))
   arma::vec get_partial_likelihood(bool response_hormone) {
 
-    std::list<PulseEstimate>::iterator exclude_pulse = pulses.begin();;
-    std::list<PulseEstimate>::iterator pulse_end     = pulses.begin();;
+    PulseIter exclude_pulse = pulses.begin();;
+    PulseIter pulse_end     = pulses.begin();;
     arma::vec partials(get_pulsecount());
 
     int i = 0;
@@ -159,18 +161,18 @@ struct Patient {
   //   pulse.
   arma::vec mean_concentration(bool response_hormone) {
 
-    std::list<PulseEstimate>::iterator emptyiter;
+    PulseIter emptyiter;
     return mean_concentration(response_hormone, emptyiter);
 
   }
 
-  arma::vec mean_concentration(bool response_hormone,
-                               std::list<PulseEstimate>::iterator pulse_excluded) {
+  arma::vec mean_concentration(bool response_hormone, PulseIter pulse_excluded)
+  {
 
     arma::vec mean_conc(data->concentration.n_elem);
     mean_conc.fill(0);
-    std::list<PulseEstimate>::iterator pulse_iter;
-    std::list<PulseEstimate>::const_iterator pulselist_end;
+    PulseIter pulse_iter;
+    PulseConstIter pulselist_end;
 
     if (response_hormone) {
       pulse_iter    = responses.begin();
@@ -207,18 +209,16 @@ struct Patient {
   //   and mh_time_strauss.
   //   location is time/loc to test against other pulses
   int calc_sr_strauss(double location) {
-
-    PulseEstimate *null_pulse_pointer;
-    return calc_sr_strauss(location, null_pulse_pointer);
-
+    PulseIter emptyiter;
+    return calc_sr_strauss(location, &(*emptyiter));
   }
 
-  int calc_sr_strauss(double location, PulseEstimate *pulse_excluded) {
+  int calc_sr_strauss(double location, PulseEstimate * pulse_excluded) {
 
     int s_r = 0;       // Sum of indicators where diff < 20
     double difference; // Time difference
-    std::list<PulseEstimate>::iterator pulse = pulses.begin();
-    std::list<PulseEstimate>::const_iterator pulse_end = pulses.end();
+    PulseIter pulse = pulses.begin();
+    PulseConstIter pulse_end = pulses.end();
 
     while (pulse != pulse_end) {
       if (&(*pulse) != pulse_excluded) { // TODO: Test that pulse is actually excluded!
