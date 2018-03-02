@@ -8,12 +8,17 @@
 #include "patient.h"
 #include "population.h"
 #include "utils.h"
+#include "birthdeath.h"
 #include "ss_draw_fixedeffects.h"
+#include "ss_draw_fixedeffects_width.h"
 #include "ss_draw_sdrandomeffects.h"
+#include "ss_draw_sdrandomeffects_width.h"
 #include "ss_draw_baselinehalflife.h"
 #include "ss_draw_locations.h"
 #include "ss_draw_randomeffects.h"
+#include "ss_draw_randomeffects_width.h"
 #include "ss_draw_tvarscale.h"
+#include "ss_draw_tvarscale_width.h"
 
 int main(int argc, char **argv) {
 
@@ -21,8 +26,8 @@ int main(int argc, char **argv) {
 
   // Create R instance (for RNGs) and set seed for reproducing test results
   RInside R;
-  PulseUtils pu;
-  pu.set_seed(171227);
+  //PulseUtils pu;
+  //pu.set_seed(171227);
 
   //// Create objects for checking/testing RNG implementation
   //arma::vec initial_means = { 2, 3 };
@@ -139,22 +144,38 @@ int main(int argc, char **argv) {
 
   // Create sampler object 
   arma::vec bhl_pv = { 0.5, 45 };
+  BirthDeathProcess birth_death;
   SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35);
+  SS_DrawFixedEffectsWidths draw_fixed_effects_widths(1.1, 500, 25000, 0.35);
   SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500*11, 25000*11, 0.35);
+  SS_DrawSDRandomEffectsWidths draw_sd_pulse_widths(2, 500*11, 25000*11, 0.35);
   SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
   SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500*11, 25000*11, 0.35);
   SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
+  SS_DrawRandomEffectsWidths draw_pulse_widths(1.1, 500*11, 25000*11, 0.35);
   SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500*11, 25000*11, 0.35);
+  SS_DrawTVarScaleWidths draw_pulse_tvarscale_widths(1.01, 500*11, 25000*11, 0.35);
 
 
   // Sample MMH objects
-  for (int i = 0; i < 250000; i++) {
+  //for (int i = 0; i < 250000; i++) {
+  for (int i = 0; i < 10000; i++) {
+
+    birth_death.sample(patient, false);
     draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
+    draw_fixed_effects_widths.sample(patient, &patient->estimates->mass_mean);
     draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
+    draw_sd_pulse_widths.sample(patient, &patient->estimates->mass_sd, patient);
     draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife);
     draw_pulse_locations_strauss.sample_pulses(patient);
     draw_pulse_masses.sample_pulses(patient);
+    draw_pulse_widths.sample_pulses(patient);
     draw_pulse_tvarscale.sample_pulses(patient);
+    draw_pulse_tvarscale_widths.sample_pulses(patient);
+
+
+    std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;
+
   }
 
   return 0;

@@ -11,24 +11,25 @@ badd +76 include/singlesubject/ss_draw_baselinehalflife.h
 badd +114 include/mh.h
 badd +23 include/proposalvariance.h
 badd +6 include/singlesubject/ss_draw_fixedeffects.h
-badd +162 src/tempmain.cpp
+badd +13 src/tempmain.cpp
 badd +448 tests/mh_tests.cpp
-badd +75 include/singlesubject/ss_draw_locations.h
+badd +1 include/singlesubject/ss_draw_locations.h
 badd +142 tests/proposalvariance_tests.cpp
-badd +68 include/utils.h
+badd +69 include/utils.h
 badd +100 include/datastructures.h
 badd +1391 ~/Projects/BayesPulse/Software/pulsatile/src/mcmc.c
-badd +3 include/patient.h
+badd +221 include/patient.h
 badd +30 include/singlesubject/ss_draw_error.h
 badd +92 include/singlesubject/ss_draw_randomeffects.h
-badd +0 term://.//52974:/bin/bash
+badd +1 term://.//1521:/bin/bash
 badd +269 ~/Projects/BayesPulse/Software/pulsatile/src/birth_death.c
-badd +0 include/birthdeath.h
+badd +166 include/birthdeath.h
 badd +35 ~/Projects/BayesPulse/Software/jointpulsatile/JointModelCode_restructured/src/bd_trigger.c
 badd +153 tests/patient_tests.cpp
-badd +0 include/singlesubject/ss_draw_tvarscale.h
-badd +0 ~/Projects/BayesPulse/Software/pulsatile/R/pulsespec.R
-badd +0 ~/Projects/BayesPulse/Software/pulsatile/src/calculations.c
+badd +1 include/singlesubject/ss_draw_tvarscale.h
+badd +1 ~/Projects/BayesPulse/Software/pulsatile/R/pulsespec.R
+badd +1 ~/Projects/BayesPulse/Software/pulsatile/src/calculations.c
+badd +0 NERD_tree_6
 argglobal
 silent! argdel *
 $argadd include/singlesubject/ss_draw_baselinehalflife.h
@@ -37,28 +38,14 @@ edit include/singlesubject/ss_draw_locations.h
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
-wincmd _ | wincmd |
-vsplit
-2wincmd h
-wincmd w
+1wincmd h
 wincmd w
 wincmd t
 set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 31 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 102 + 119) / 238)
-exe 'vert 3resize ' . ((&columns * 103 + 119) / 238)
-argglobal
-enew
-file NERD_tree_6
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=2
-setlocal fml=1
-setlocal fdn=1
-setlocal nofen
-wincmd w
+exe '1resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 1resize ' . ((&columns * 119 + 182) / 364)
+exe '2resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 2resize ' . ((&columns * 118 + 182) / 364)
 argglobal
 setlocal fdm=syntax
 setlocal fde=0
@@ -85,16 +72,17 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 43 - ((12 * winheight(0) + 28) / 56)
+let s:l = 43 - ((17 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 43
 normal! 03|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 31 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 102 + 119) / 238)
-exe 'vert 3resize ' . ((&columns * 103 + 119) / 238)
+exe '1resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 1resize ' . ((&columns * 119 + 182) / 364)
+exe '2resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 2resize ' . ((&columns * 118 + 182) / 364)
 tabedit include/birthdeath.h
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -103,23 +91,25 @@ vsplit
 wincmd w
 wincmd t
 set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 119 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 118 + 119) / 238)
+exe '1resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 1resize ' . ((&columns * 119 + 182) / 364)
+exe '2resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 2resize ' . ((&columns * 118 + 182) / 364)
 argglobal
 setlocal fdm=syntax
 setlocal fde=0
 setlocal fmr={{{,}}}
 setlocal fdi=#
-setlocal fdl=2
+setlocal fdl=1
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 211 - ((50 * winheight(0) + 28) / 56)
+let s:l = 32 - ((25 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-211
-normal! 07|
+32
+normal! 010|
 wincmd w
 argglobal
 if bufexists('include/utils.h') | buffer include/utils.h | else | edit include/utils.h | endif
@@ -131,15 +121,17 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 68 - ((33 * winheight(0) + 28) / 56)
+let s:l = 3 - ((2 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-68
+3
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 119 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 118 + 119) / 238)
+exe '1resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 1resize ' . ((&columns * 119 + 182) / 364)
+exe '2resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 2resize ' . ((&columns * 118 + 182) / 364)
 tabedit ~/Projects/BayesPulse/Software/pulsatile/src/calculations.c
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -148,8 +140,10 @@ vsplit
 wincmd w
 wincmd t
 set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 118 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 119 + 119) / 238)
+exe '1resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 1resize ' . ((&columns * 119 + 182) / 364)
+exe '2resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 2resize ' . ((&columns * 118 + 182) / 364)
 argglobal
 setlocal fdm=syntax
 setlocal fde=0
@@ -184,15 +178,17 @@ normal! zo
 normal! zo
 712
 normal! zo
-let s:l = 286 - ((45 * winheight(0) + 28) / 56)
+let s:l = 286 - ((63 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 286
 normal! 016|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 118 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 119 + 119) / 238)
+exe '1resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 1resize ' . ((&columns * 119 + 182) / 364)
+exe '2resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 2resize ' . ((&columns * 118 + 182) / 364)
 tabedit include/singlesubject/ss_draw_tvarscale.h
 set splitbelow splitright
 wincmd t
@@ -206,7 +202,7 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 35 - ((34 * winheight(0) + 28) / 56)
+let s:l = 35 - ((24 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -220,8 +216,10 @@ vsplit
 wincmd w
 wincmd t
 set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 118 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 119 + 119) / 238)
+exe '1resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 1resize ' . ((&columns * 181 + 182) / 364)
+exe '2resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 2resize ' . ((&columns * 56 + 182) / 364)
 argglobal
 setlocal fdm=syntax
 setlocal fde=0
@@ -250,15 +248,17 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 183 - ((17 * winheight(0) + 28) / 56)
+let s:l = 183 - ((1 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 183
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 118 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 119 + 119) / 238)
+exe '1resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 1resize ' . ((&columns * 181 + 182) / 364)
+exe '2resize ' . ((&lines * 56 + 41) / 82)
+exe 'vert 2resize ' . ((&columns * 56 + 182) / 364)
 tabedit ~/Projects/BayesPulse/Software/pulsatile/R/pulsespec.R
 set splitbelow splitright
 wincmd t
@@ -297,7 +297,7 @@ exe s:l
 normal! zt
 46
 normal! 03|
-tabedit include/patient.h
+tabedit include/birthdeath.h
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
@@ -305,10 +305,10 @@ vsplit
 wincmd w
 wincmd t
 set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 118 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 119 + 119) / 238)
+exe 'vert 1resize ' . ((&columns * 119 + 182) / 364)
+exe 'vert 2resize ' . ((&columns * 244 + 182) / 364)
 argglobal
-if bufexists('term://.//52974:/bin/bash') | buffer term://.//52974:/bin/bash | else | edit term://.//52974:/bin/bash | endif
+if bufexists('term://.//1521:/bin/bash') | buffer term://.//1521:/bin/bash | else | edit term://.//1521:/bin/bash | endif
 setlocal fdm=syntax
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -317,12 +317,12 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 713 - ((55 * winheight(0) + 28) / 56)
+let s:l = 558 - ((78 * winheight(0) + 39) / 79)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-713
-normal! 038|
+558
+normal! 0
 wincmd w
 argglobal
 setlocal fdm=syntax
@@ -333,15 +333,15 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 150 - ((29 * winheight(0) + 28) / 56)
+let s:l = 177 - ((73 * winheight(0) + 39) / 79)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-150
-normal! 05|
+177
+normal! 09|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 118 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 119 + 119) / 238)
+exe 'vert 1resize ' . ((&columns * 119 + 182) / 364)
+exe 'vert 2resize ' . ((&columns * 244 + 182) / 364)
 tabnext 8
 set stal=1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

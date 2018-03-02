@@ -420,7 +420,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
     double pvpmass  = draw_pulse_masses.pv.getpv();
     double pvpscale = draw_pulse_tvarscale.pv.getpv();
 
-    for (int i = 0; i < 100000; i++) {
+    for (int i = 0; i < 1000; i++) {
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
       draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
       draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife);

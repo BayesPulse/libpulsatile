@@ -141,12 +141,13 @@ struct Patient {
   arma::vec get_partial_likelihood(bool response_hormone) {
 
     PulseIter exclude_pulse = pulses.begin();;
-    PulseIter pulse_end     = pulses.begin();;
+    PulseIter pulse_end     = pulses.end();;
     arma::vec partials(get_pulsecount());
 
     int i = 0;
     while(exclude_pulse != pulse_end) {
       partials(i) = likelihood(response_hormone, exclude_pulse);
+      //std::cout << "partials(" << i << ") = " << partials(i) << std::endl;
       exclude_pulse++;
       i++;
     }
