@@ -10,7 +10,6 @@
 #include "utils.h"
 #include "birthdeath.h"
 #include "ss_draw_fixedeffects.h"
-#include "ss_draw_fixedeffects_width.h"
 #include "ss_draw_sdrandomeffects.h"
 #include "ss_draw_sdrandomeffects_width.h"
 #include "ss_draw_baselinehalflife.h"
@@ -145,8 +144,8 @@ int main(int argc, char **argv) {
   // Create sampler object 
   arma::vec bhl_pv = { 0.5, 45 };
   BirthDeathProcess birth_death;
-  SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35);
-  SS_DrawFixedEffectsWidths draw_fixed_effects_widths(1.1, 500, 25000, 0.35);
+  SS_DrawFixedEffects draw_fixeff_mass(1.1, 500, 25000, 0.35, false);
+  SS_DrawFixedEffects draw_fixeff_width(1.1, 500, 25000, 0.35, true);
   SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500*11, 25000*11, 0.35);
   SS_DrawSDRandomEffectsWidths draw_sd_pulse_widths(2, 500*11, 25000*11, 0.35);
   SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
@@ -162,8 +161,8 @@ int main(int argc, char **argv) {
   for (int i = 0; i < 10000; i++) {
 
     birth_death.sample(patient, false);
-    draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
-    draw_fixed_effects_widths.sample(patient, &patient->estimates->mass_mean);
+    draw_fixeff_mass.sample(patient, &patient->estimates->mass_mean);
+    draw_fixeff_width.sample(patient, &patient->estimates->mass_mean);
     draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
     draw_sd_pulse_widths.sample(patient, &patient->estimates->mass_sd, patient);
     draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife);
