@@ -131,7 +131,7 @@ struct PatientPriors {
                 double prior_width_sd_max,
                 double prior_error_alpha,
                 double prior_error_beta,
-                int    prior_pulse_count,
+                int    prior_pulse_count,  // does this prior really need to be an int? Or can we say 12.2 for prior pulse count?
                 double prior_strauss_repulsion,
                 //double prior_strauss_hardcore_range, // not in single-subj
                 double prior_strauss_repulsion_range) {
@@ -384,7 +384,7 @@ struct PatientData {
 
     time              = as<arma::vec>(in_time);
     concentration     = as<arma::vec>(in_conc);
-    concentration     = log(concentration);
+    concentration     = log(concentration);  // store data on log scale
     number_of_obs     = time.size();
     duration_of_obs   = time(number_of_obs - 1) - time(0); // NOTE: 1430 for typical 24 hour dataset (not 1440)
     avg_period_of_obs = duration_of_obs / (number_of_obs - 1);

@@ -1,5 +1,5 @@
-#ifndef GUARD_ss_draw_randomeffects_h
-#define GUARD_ss_draw_randomeffects_h
+#ifndef GUARD_ss_draw_randomeffectswidths_h
+#define GUARD_ss_draw_randomeffectswidths_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>
@@ -15,13 +15,13 @@
 //   sampling the individual pulse mean and standard deviations
 //
 
-class SS_DrawRandomEffects :
+class SS_DrawRandomEffectsWidths :
   public ModifiedMetropolisHastings<PulseEstimate, Patient, double, ProposalVariance>
 {
 
   public:
     // Constructors
-    SS_DrawRandomEffects(double in_pv, // double or arma::vec
+    SS_DrawRandomEffectsWidths(double in_pv, // double or arma::vec
                          int in_adjust_iter,
                          int in_max_iter,
                          double in_target_ratio) :
@@ -40,8 +40,8 @@ class SS_DrawRandomEffects :
       while (pulse != pulse_end) {
         // Sample pulse,
         //   note: &(*pulse) derefs iter, then gets address of underlying obj
-        //if (measure == "mass") {
-            sample(&(*pulse), &pulse->mass, patient);
+        //if (measure == "width") {
+            sample(&(*pulse), &pulse->width, patient);
         //} else if (measure == "width") {
         //    sample(&(*pulse), &pulse->width, patient);
         //}
@@ -55,7 +55,7 @@ class SS_DrawRandomEffects :
 
     bool parameter_support(double val, Patient *patient) {
       // NOTE: original was:
-      //   mass > 0.0 && width > 0.01 && width < 10
+      //   width > 0.0 && width > 0.01 && width < 10
       return ( val > 0.0 );
     }
 
@@ -67,30 +67,30 @@ class SS_DrawRandomEffects :
                               double proposal,
                               Patient *patient) {
 
-        double prior_old, prior_new, prior_ratio, current_mass, plikelihood;
-        double patient_mass_mean = patient->estimates->mass_mean;
-        double patient_mass_sd   = patient->estimates->mass_sd;
+        double prior_old, prior_new, prior_ratio, current_width, plikelihood;
+        double patient_width_mean = patient->estimates->width_mean;
+        double patient_width_sd   = patient->estimates->width_sd;
         double curr_likelihood   = patient->likelihood(false);
 
         // Compute the log of the ratio of the priors
-        prior_old = pow(pulse->mass - patient_mass_mean, 2);
+        prior_old = pow(pulse->width - patient_width_mean, 2);
         prior_old *= 0.5 * prior_old;
-        prior_new = proposal - patient_mass_mean;
+        prior_new = proposal - patient_width_mean;
         prior_new *= 0.5 * prior_new;
         prior_ratio = prior_old - prior_new;
-        prior_ratio /= patient_mass_sd;
-        prior_ratio /= patient_mass_sd;
+        prior_ratio /= patient_width_sd;
+        prior_ratio /= patient_width_sd;
 
-        // Save the current value of mass/width and set to proposed value
-        current_mass = pulse->mass;
-        pulse->mass  = proposal;
+        // Save the current value of width/width and set to proposed value
+        current_width = pulse->width;
+        pulse->width  = proposal;
 
-        // Calculate likelihood assuming proposed mass/width 
+        // Calculate likelihood assuming proposed width/width 
         plikelihood = patient->likelihood(false);
 
         // Reset pulse->time to current (sample() chooses whether to keep)
         //   and get_mean_contribution() will recalc that when requested.
-        pulse->mass = current_mass;
+        pulse->width = current_width;
 
       return (prior_ratio + (plikelihood - curr_likelihood));
 
