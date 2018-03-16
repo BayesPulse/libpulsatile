@@ -8,6 +8,7 @@
 #include "ss_draw_locations.h"
 #include "ss_draw_randomeffects.h"
 #include "ss_draw_tvarscale.h"
+#include "ss_draw_error.h"
 #include "catch.h"
 
 
@@ -104,7 +105,8 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
   //////////////// END LOADING DATA STRUCTURES ///////////////
 
   // Create sampler object 
-  SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35);
+  SS_DrawFixedEffects draw_fixed_effects_mass(1.1, 500, 25000, 0.35, false);
+  SS_DrawFixedEffects draw_fixed_effects_width(30, 500, 25000, 0.35, true);
 
 
   //
@@ -113,37 +115,39 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
 
   SECTION( "Check sub-functions" ) {
 
-    REQUIRE(draw_fixed_effects.pv.getpsd() == sqrt(1.1));
-    REQUIRE(draw_fixed_effects.pv.getpv() == Approx(1.1));
+    REQUIRE(draw_fixed_effects_mass.pv.getpsd() == sqrt(1.1));
+    REQUIRE(draw_fixed_effects_mass.pv.getpv() == Approx(1.1));
+    REQUIRE(draw_fixed_effects_width.pv.getpsd() == sqrt(30));
+    REQUIRE(draw_fixed_effects_width.pv.getpv() == Approx(30));
 
   }
 
   SECTION( "Check tracking iterations and adjusting pv/psd" ) {
 
     double initial_psd, adjusted_psd, final_psd;
-    initial_psd = draw_fixed_effects.pv.getpsd();
+    initial_psd = draw_fixed_effects_mass.pv.getpsd();
     for (int i = 0; i < 501; i++) {
-      draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
+      draw_fixed_effects_mass.sample(patient, &patient->estimates->mass_mean);
     }
-    adjusted_psd = draw_fixed_effects.pv.getpsd();
+    adjusted_psd = draw_fixed_effects_mass.pv.getpsd();
     REQUIRE(adjusted_psd == sqrt((pow(initial_psd, 2)*1.1)));
 
     for (int i = 500; i < 24499; i++) {
-      draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
+      draw_fixed_effects_mass.sample(patient, &patient->estimates->mass_mean);
     }
 
     // Test before and after the final change
-    adjusted_psd = draw_fixed_effects.pv.getpsd();
-    REQUIRE(draw_fixed_effects.pv.getpsd() == adjusted_psd);
-    draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
-    REQUIRE(draw_fixed_effects.pv.getpsd() != adjusted_psd);
+    adjusted_psd = draw_fixed_effects_mass.pv.getpsd();
+    REQUIRE(draw_fixed_effects_mass.pv.getpsd() == adjusted_psd);
+    draw_fixed_effects_mass.sample(patient, &patient->estimates->mass_mean);
+    REQUIRE(draw_fixed_effects_mass.pv.getpsd() != adjusted_psd);
 
-    final_psd = draw_fixed_effects.pv.getpsd();
-    for (int i = draw_fixed_effects.pv.getiter(); i < 50000; i++) {
-      draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
+    final_psd = draw_fixed_effects_mass.pv.getpsd();
+    for (int i = draw_fixed_effects_mass.pv.getiter(); i < 50000; i++) {
+      draw_fixed_effects_mass.sample(patient, &patient->estimates->mass_mean);
     }
-    REQUIRE(draw_fixed_effects.pv.getpsd() == final_psd);
-    REQUIRE(draw_fixed_effects.pv.getiter() == 50000);
+    REQUIRE(draw_fixed_effects_mass.pv.getpsd() == final_psd);
+    REQUIRE(draw_fixed_effects_mass.pv.getiter() == 50000);
 
 
   }
@@ -367,13 +371,15 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
 
   // Create sampler object 
   arma::vec bhl_pv = { 0.5, 45 };
-  SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35);
+  SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35, false);
   SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500, 25000, 0.35);
   SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
 
   SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500*11, 25000*11, 0.35);
   SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
   SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500*11, 25000*11, 0.35);
+
+  SS_DrawError draw_error;
 
 
   //
@@ -417,14 +423,16 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
     double pvpmass  = draw_pulse_masses.pv.getpv();
     double pvpscale = draw_pulse_tvarscale.pv.getpv();
 
-    for (int i = 0; i < 100000; i++) {
+    for (int i = 0; i < 1000; i++) {
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
       draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
       draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife);
       draw_pulse_locations_strauss.sample_pulses(patient);
       draw_pulse_masses.sample_pulses(patient);
       draw_pulse_tvarscale.sample_pulses(patient);
+      draw_error.sample(patient);
 
+      //std::cout << "Draw " << i << " errorsq = " << patient->estimates->errorsq << std::endl;;
       //std::cout << "Draw " << i << "; Baseline = " << patient->estimates->baseline_halflife(0) << " ; Halflife = " << patient->estimates->baseline_halflife(1) << std::endl; 
 
     }

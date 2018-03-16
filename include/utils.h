@@ -51,32 +51,36 @@ class PulseUtils {
 
     //
     // Single random multinomial
-    //  TODO: UPDATE for C++
     //
-    //int one_rmultinom(double *cumprobs, int n_probs) {
+    int one_rmultinom(arma::vec cumprobs) {
 
-    //  int i;
-    //  int rtn = 0;
-    //  int *ans;
-    //  ans = (int *)calloc(n_probs, sizeof(int));
-    //  double *probs;
-    //  probs = (double *)calloc(n_probs, sizeof(double));
+      int i;
+      int rtn = 0;
+      int n_probs = cumprobs.size();
+      //std::cout << "size of cumprobs = " << n_probs << std::endl;
+      arma::Col<int> ans(n_probs);
+      arma::Col<double> probs(n_probs);
 
-    //  for (i = 0; i < n_probs; i++) {
-    //    if (i == 0) probs[i] = cumprobs[i];
-    //    else probs[i] = cumprobs[i] - cumprobs[i-1];
-    //    ans[i] = 0;
-    //  }
+      for (i = 0; i < n_probs; i++) {
 
-    //  Rf_rmultinom(1, probs, n_probs, ans);
+        if (i == 0) probs(i) = cumprobs(i);
+        else probs(i) = cumprobs(i) - cumprobs(i-1);
 
-    //  for (i = 0; i < n_probs; i++) {
-    //    if (ans[i] == 1) rtn = i;
-    //  }
+        //std::cout << "i = " << i << " and cumprob = " << cumprobs(i) << "and prob = " << probs(i) << std::endl;
+      }
 
-    //  return(rtn);
-    //}
-    //
+      ::Rf_rmultinom(1, probs.begin(), n_probs, ans.begin());
+      //std::cout << "ans = " << ans << std::endl;
+
+      for (int j = 0; j < n_probs; j++) {
+        //std::cout << "j = " << j << " and ans = " << ans(j) << std::endl;
+        if (ans(j) == 1) rtn = j;
+      }
+
+      //std::cout << "return = " << rtn << std::endl;
+      return rtn;
+    }
+
 
     //
     // set_seed() 

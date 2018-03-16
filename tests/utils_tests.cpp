@@ -17,7 +17,7 @@ TEST_CASE( "orderstat_default", "[utils]" ) {
 
   SECTION( "equal to 3" ) {
 
-    REQUIRE(pu.orderstat_default() == 3);
+    REQUIRE( pu.orderstat_default() == 3 );
 
   }
 
@@ -38,6 +38,25 @@ TEST_CASE( "rmvnorm Function", "[utils]" ) {
             arma::approx_equal(pu.rmvnorm(initial_means, pv.getpsd()),
                                answer, "absdiff", 0.0001) 
             );
+  }
+
+}
+
+TEST_CASE( "one_rmultinom Function", "[utils]" ) {
+
+  arma::vec not_cumprobs = { 0.1, 0.05, 0.02, 0.03, 0.8 };
+  arma::vec cumprobs = { 0.1, 0.15, 0.17, 0.2, 1.0 };
+
+  // currently rmultinom accepts non-probability vectors -- don't sum to one --
+  // look into this.
+  //SECTION( "fails on non-cumulative probability vector" ) {
+  //  //pu.set_seed(171227);
+  //  REQUIRE_THROWS( pu.one_rmultinom(not_cumprobs) );
+  //}
+
+  SECTION( "Succeeds on cumulative probability vector" ) {
+    //pu.set_seed(171227);
+    REQUIRE_NOTHROW( pu.one_rmultinom(cumprobs) );
   }
 
 }
