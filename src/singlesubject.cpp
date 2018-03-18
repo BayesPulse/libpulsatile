@@ -1,5 +1,6 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
+#include <RInside.h>
 #include "mh.h"
 #include "patient.h"
 #include "population.h"
@@ -17,6 +18,18 @@
 
 using namespace Rcpp;
 
+//
+// singlesubject.cpp
+//   Implementation of the single-subject model.  Creates Patient object
+//   (containing data, priors, estimates), the samplers (Metropolis Hastings,
+//   birth death process), and output routines (chains, verbose
+//   output/diagnostics).  Intended to be called by a function in the R package.
+//
+// Author: Matt Mulvahill
+// Notes:
+//
+
+
 // [[Rcpp::export]]
 Rcpp::List singlesubject(Rcpp::NumericVector concentration,
                          Rcpp::NumericVector time,
@@ -31,11 +44,12 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
                          double univariate_pv_target_ratio)
 {
 
+  RInside R;
   // Check for valid input
   if ( !priors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
   if ( !priors.inherits("bp_proposalvariance") ) stop("proposalvars argument must be a bp_proposalvariance object");
   if ( !priors.inherits("bp_startingvals") ) stop("startingvals argument must be a bp_startingvals object");
-  if ( concentration.size != time.size ) stop("Time and concentration vectors must be the same size");
+  if ( concentration.size() != time.size() ) stop("Time and concentration vectors must be the same size");
 
   // Create shorter names just for cleaner code appearance
   int adj_iter       = pv_adjust_iter;
@@ -45,7 +59,7 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
 
 
   // Create patient data object
-  PatientData pdone(thistime, conc);
+  PatientData pdone(time, concentration);
 
   //Create priors object
   PatientPriors ppsingle(priors["baseline_mean"],
@@ -75,12 +89,12 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
                             priors["width_sd"]);
 
   // Create pointers
-  PatientData * data = &pdone;
-  PatientPriors * priors = &ppsingle;
-  PatientEstimates * estimates = &pesingle;
+  PatientData * data_obj = &pdone;
+  PatientPriors * priors_obj = &ppsingle;
+  PatientEstimates * estimates_obj = &pesingle;
 
   // Now take all of this and create a Patient object
-  Patient pat(data, priors, estimates);
+  Patient pat(data_obj, priors_obj, estimates_obj);
   Patient * patient = &pat;
 
   //--------------------------------------
@@ -115,10 +129,10 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
     SS_DrawLocationsOS draw_locations(proposalvars["location"], adj_iter,
                                       adj_max, univ_target);
   }
-  SS_DrawRandomEffects draw_pmasses(proposalvars["pulse_mass"], adj_iter,
-                                    adj_max, univ_target, false);
-  SS_DrawRandomEffects draw_pwidths(proposalvars["pulse_width"], adj_iter,
-                                    adj_max, univ_target, true);
+  SS_DrawRandomEffects draw_masses(proposalvars["pulse_mass"], adj_iter,
+                                   adj_max, univ_target, false);
+  SS_DrawRandomEffects draw_widths(proposalvars["pulse_width"], adj_iter,
+                                   adj_max, univ_target, true);
   SS_DrawTVarScale draw_tvarscale_mass(proposalvars["sdscale_pulse_mass"],
                                        adj_iter, adj_max, univ_target, false);
   SS_DrawTVarScale draw_tvarscale_width(proposalvars["sdscale_pulse_width"],
@@ -129,16 +143,16 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
   for (int i = 0; i < mcmc_iterations; i++) {
 
     birth_death.sample(patient, false);
-    draw_fixeff.sample(patient, &patient->estimates->mass_mean);
-    draw_fixeff_widths.sample(patient, &patient->estimates->mass_mean);
-    draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
-    draw_sd_pulse_widths.sample(patient, &patient->estimates->mass_sd, patient);
-    draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife);
-    draw_pulse_locations_strauss.sample_pulses(patient);
-    draw_pulse_masses.sample_pulses(patient);
-    draw_pulse_widths.sample_pulses(patient);
-    draw_pulse_tvarscale.sample_pulses(patient);
-    draw_pulse_tvarscale_widths.sample_pulses(patient);
+    draw_fixeff_mean.sample(patient, &patient->estimates->mass_mean);
+    draw_fixeff_width.sample(patient, &patient->estimates->mass_mean);
+    draw_sd_masses.sample(patient, &patient->estimates->mass_sd, patient);
+    draw_sd_widths.sample(patient, &patient->estimates->mass_sd, patient);
+    draw_blhl.sample(patient, &patient->estimates->baseline_halflife);
+    draw_locations.sample_pulses(patient);
+    draw_masses.sample_pulses(patient);
+    draw_widths.sample_pulses(patient);
+    draw_tvarscale_mass.sample_pulses(patient);
+    draw_tvarscale_width.sample_pulses(patient);
 
     print_diagnostic_output(verbose);
     //std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;

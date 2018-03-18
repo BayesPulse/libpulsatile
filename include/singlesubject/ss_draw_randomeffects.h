@@ -20,38 +20,56 @@ class SS_DrawRandomEffects :
 {
 
   public:
+
     // Constructors
     SS_DrawRandomEffects(double in_pv, // double or arma::vec
                          int in_adjust_iter,
                          int in_max_iter,
-                         double in_target_ratio) :
+                         double in_target_ratio,
+                         bool for_width) :
       ModifiedMetropolisHastings <PulseEstimate, Patient, double, ProposalVariance>::
         ModifiedMetropolisHastings(in_pv,
                                    in_adjust_iter,
                                    in_max_iter,
-                                   in_target_ratio) { };
+                                   in_target_ratio) { 
+
+         // Choose which set of parameters to use: width or mass
+          if (for_width) {
+            //prior_mean_     = &PatientPriors::width_mean;
+            //prior_variance_ = &PatientPriors::width_variance;
+            est_mean_       = &PatientEstimates::width_mean;
+            est_sd_         = &PatientEstimates::width_sd;
+            tvarscale_      = &PulseEstimate::tvarscale_width;
+            randomeffect_   = &PulseEstimate::width;
+          } else {
+            //prior_mean_     = &PatientPriors::mass_mean;
+            //prior_variance_ = &PatientPriors::mass_variance;
+            est_mean_       = &PatientEstimates::mass_mean;
+            est_sd_         = &PatientEstimates::mass_sd;
+            tvarscale_      = &PulseEstimate::tvarscale_mass;
+            randomeffect_   = &PulseEstimate::mass;
+          }
+
+        };
 
     // Pulse-specific estimate -- this function samples for each pulse
     void sample_pulses(Patient *patient) { //, std::string measure) {
 
-      PulseIter pulse = patient->pulses.begin();
-      PulseConstIter pulse_end = patient->pulses.end();
-
-      while (pulse != pulse_end) {
-        // Sample pulse,
-        //   note: &(*pulse) derefs iter, then gets address of underlying obj
-        //if (measure == "mass") {
-            sample(&(*pulse), &pulse->mass, patient);
-        //} else if (measure == "width") {
-        //    sample(&(*pulse), &pulse->width, patient);
-        //}
-        pulse++;
+      for (auto &pulse : patient->pulses) {
+        sample(&(*pulse), (*pulse).*randomeffect_, patient);
       }
 
     }
 
 
   private:
+
+    //double PatientPriors::*prior_mean_;
+    //double PatientPriors::*prior_variance_;
+    double PatientEstimates::*est_mean_;
+    double PatientEstimates::*est_sd_;
+    double PulseEstimate::*tvarscale_;
+    double PulseEstimate::*randomeffect_; //pulse specific mass or width
 
     bool parameter_support(double val, Patient *patient) {
       // NOTE: original was:
@@ -68,12 +86,14 @@ class SS_DrawRandomEffects :
                               Patient *patient) {
 
         double prior_old, prior_new, prior_ratio, current_mass, plikelihood;
-        double patient_mass_mean = patient->estimates->mass_mean;
-        double patient_mass_sd   = patient->estimates->mass_sd;
+        PatientPriors *priors = patient->priors;
+        PatientEstimates *est = patient->estimates;
+        double patient_mean = (*est).*est_mean_;
+        double patient_sd   = (*est).*est_sd_;
         double curr_likelihood   = patient->likelihood(false);
 
         // Compute the log of the ratio of the priors
-        prior_old = pow(pulse->mass - patient_mass_mean, 2);
+        prior_old = pow(pulse.*randomeffect_ - patient_mean, 2);
         prior_old *= 0.5 * prior_old;
         prior_new = proposal - patient_mass_mean;
         prior_new *= 0.5 * prior_new;

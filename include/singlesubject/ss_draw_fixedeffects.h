@@ -19,10 +19,7 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
 
   public:
 
-    //
     // Constructor
-    //   pass the proposal variance parameters to the constructor
-    //
     SS_DrawFixedEffects(double in_pv, // double or arma::vec
                         int in_adjust_iter,
                         int in_max_iter,
@@ -34,7 +31,8 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
                                                      in_adjust_iter,
                                                      in_max_iter,
                                                      in_target_ratio) { 
-         //for_width = in_for_width;
+
+         // Choose which set of parameters to use: width or mass
          if (for_width) {
            prior_mean_     = &PatientPriors::width_mean;
            prior_variance_ = &PatientPriors::width_variance;
@@ -50,6 +48,7 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
            tvarscale_      = &PulseEstimate::tvarscale_mass;
            randomeffect_   = &PulseEstimate::mass;
          }
+
        };
 
   private:
