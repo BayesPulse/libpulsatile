@@ -5,16 +5,7 @@
 #include "patient.h"
 #include "population.h"
 #include "utils.h"
-#include "birthdeath.h"
-#include "ss_draw_fixedeffects.h"
-#include "ss_draw_sdrandomeffects.h"
-#include "ss_draw_sdrandomeffects_width.h"
-#include "ss_draw_baselinehalflife.h"
-#include "ss_draw_locations.h"
-#include "ss_draw_randomeffects.h"
-#include "ss_draw_randomeffects_width.h"
-#include "ss_draw_tvarscale.h"
-#include "ss_draw_tvarscale_width.h"
+#include "model_singlesubject.h"
 
 using namespace Rcpp;
 
@@ -44,11 +35,10 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
                          double univariate_pv_target_ratio)
 {
 
-  RInside R;
   // Check for valid input
   if ( !priors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
-  if ( !priors.inherits("bp_proposalvariance") ) stop("proposalvars argument must be a bp_proposalvariance object");
-  if ( !priors.inherits("bp_startingvals") ) stop("startingvals argument must be a bp_startingvals object");
+  if ( !proposalvars.inherits("bp_proposalvariance") ) stop("proposalvars argument must be a bp_proposalvariance object");
+  if ( !startingvals.inherits("bp_startingvals") ) stop("startingvals argument must be a bp_startingvals object");
   if ( concentration.size() != time.size() ) stop("Time and concentration vectors must be the same size");
 
   // Create shorter names just for cleaner code appearance
@@ -79,14 +69,14 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
                          priors["strauss_repulsion_range"]);
 
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(priors["baseline"],
-                            priors["halflife"],
-                            priors["errorsq"],
-                            priors["mass_mean"],
-                            priors["width_mean"],
-                            priors["pulse_count"],
-                            priors["mass_sd"],
-                            priors["width_sd"]);
+  PatientEstimates pesingle(startingvals["baseline"],
+                            startingvals["halflife"],
+                            startingvals["errorsq"],
+                            startingvals["mass_mean"],
+                            startingvals["width_mean"],
+                            startingvals["pulse_count"],
+                            startingvals["mass_sd"],
+                            startingvals["width_sd"]);
 
   // Create pointers
   PatientData * data_obj = &pdone;
@@ -112,52 +102,57 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
 
   // Modified Metropolis Hastings for the standard deviation of the random
   // effects (sd mass & sd width) (patient level estimate)
-  SS_DrawSDRandomEffects draw_sd_masses(proposalvars["mass_sd"], adj_iter,
-                                        adj_max, univ_target, false);
-  SS_DrawSDRandomEffects draw_sd_widths(proposalvars["width_sd"], adj_iter,
-                                        adj_max, univ_target, true);
+  //SS_DrawSDRandomEffects draw_sd_masses(proposalvars["mass_sd"], adj_iter,
+  //                                      adj_max, univ_target, false);
+  //SS_DrawSDRandomEffects draw_sd_widths(proposalvars["width_sd"], adj_iter,
+  //                                      adj_max, univ_target, true);
 
   // Bivariate Modified Metropolis Hastings for the baseline and half-life
   arma::vec bhl_pv = { proposalvars["baseline"], proposalvars["halflife"] };
   SS_DrawBaselineHalflife draw_blhl(bhl_pv, adj_iter, adj_max, biv_target);
 
   // Modified Metropolis Hastings for pulse locations (pulse level)
-  if ( priors["location_prior_type"] == "strauss" ) {
+  //if ( priors["location_prior_type"] == "strauss" ) {
     SS_DrawLocationsStrauss draw_locations(proposalvars["location"], adj_iter,
                                            adj_max, univ_target);
-  } else {
-    SS_DrawLocationsOS draw_locations(proposalvars["location"], adj_iter,
-                                      adj_max, univ_target);
-  }
+  //} else {
+  //  SS_DrawLocationsOS draw_locations(proposalvars["location"], adj_iter,
+  //                                    adj_max, univ_target);
+  //}
   SS_DrawRandomEffects draw_masses(proposalvars["pulse_mass"], adj_iter,
                                    adj_max, univ_target, false);
   SS_DrawRandomEffects draw_widths(proposalvars["pulse_width"], adj_iter,
                                    adj_max, univ_target, true);
-  SS_DrawTVarScale draw_tvarscale_mass(proposalvars["sdscale_pulse_mass"],
-                                       adj_iter, adj_max, univ_target, false);
-  SS_DrawTVarScale draw_tvarscale_width(proposalvars["sdscale_pulse_width"],
-                                        adj_iter, adj_max, univ_target, true);
+  //SS_DrawTVarScale draw_tvarscale_mass(proposalvars["sdscale_pulse_mass"],
+  //                                     adj_iter, adj_max, univ_target, false);
+  //SS_DrawTVarScale draw_tvarscale_width(proposalvars["sdscale_pulse_width"],
+  //                                      adj_iter, adj_max, univ_target, true);
 
 
   // Sample MMH objects
   for (int i = 0; i < mcmc_iterations; i++) {
 
     birth_death.sample(patient, false);
-    draw_fixeff_mean.sample(patient, &patient->estimates->mass_mean);
+    draw_fixeff_mass.sample(patient, &patient->estimates->mass_mean);
     draw_fixeff_width.sample(patient, &patient->estimates->mass_mean);
-    draw_sd_masses.sample(patient, &patient->estimates->mass_sd, patient);
-    draw_sd_widths.sample(patient, &patient->estimates->mass_sd, patient);
+    //draw_sd_masses.sample(patient, &patient->estimates->mass_sd, patient);
+    //draw_sd_widths.sample(patient, &patient->estimates->mass_sd, patient);
     draw_blhl.sample(patient, &patient->estimates->baseline_halflife);
     draw_locations.sample_pulses(patient);
     draw_masses.sample_pulses(patient);
     draw_widths.sample_pulses(patient);
-    draw_tvarscale_mass.sample_pulses(patient);
-    draw_tvarscale_width.sample_pulses(patient);
+    //draw_tvarscale_mass.sample_pulses(patient);
+    //draw_tvarscale_width.sample_pulses(patient);
 
-    print_diagnostic_output(verbose);
-    //std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;
-    save_sample(thin);
+    //print_diagnostic_output(verbose);
+    ////std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;
+    //save_sample(thin);
 
   }
+
+  NumericVector v1(0); 
+  List L = List::create(Named("name1") = v1);
+
+  return L;
 
 }

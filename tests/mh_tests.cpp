@@ -376,7 +376,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
   SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
 
   SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500*11, 25000*11, 0.35);
-  SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
+  SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35, false);
   SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500*11, 25000*11, 0.35);
 
   SS_DrawError draw_error;

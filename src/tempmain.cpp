@@ -1,23 +1,9 @@
-
 #include <RcppArmadillo.h>
+#include <Rcpp.h>
 #include <RInside.h>
-//#include "catch.h"
-//#include "counter.h"
-//#include "proposalvariance.h"
-#include "mh.h"
-#include "patient.h"
-#include "population.h"
-#include "utils.h"
-#include "birthdeath.h"
-#include "ss_draw_fixedeffects.h"
-#include "ss_draw_sdrandomeffects.h"
-#include "ss_draw_sdrandomeffects_width.h"
-#include "ss_draw_baselinehalflife.h"
-#include "ss_draw_locations.h"
-#include "ss_draw_randomeffects.h"
-#include "ss_draw_randomeffects_width.h"
-#include "ss_draw_tvarscale.h"
-#include "ss_draw_tvarscale_width.h"
+#include "singlesubject.h"
+
+using namespace Rcpp;
 
 int main(int argc, char **argv) {
 
@@ -25,46 +11,9 @@ int main(int argc, char **argv) {
 
   // Create R instance (for RNGs) and set seed for reproducing test results
   RInside R;
-  //PulseUtils pu;
-  //pu.set_seed(171227);
 
-  //// Create objects for checking/testing RNG implementation
-  //arma::vec initial_means = { 2, 3 };
-  //arma::vec initial_pvs   = { 0.7, 0.1 };
-
-  //ProposalVariance2p pv(initial_pvs, 500, 25000, 0.25);
-  //arma::mat cholmat = pv.getpsd();
-  //double cholcov    = cholmat(0, 1);
-
-  //// Test/Print RNG results
-  //std::cout << "PV = " << pv.getpv() << "\n";
-  //std::cout << "Choldecomp of PV (i.e. PSD, upper triangle form)  = " << pv.getpsd() << "\n";
-  //std::cout << "PSD test that actually upper triangular form = " << cholcov << "\n";
-  //std::cout << "rmvnorm = " << pu.rmvnorm(initial_means, pv.getpsd()) << "\n";
-
-  ////double a = 11;
-  ////arma::vec testvec = initial_means;
-  ////testvec += a;
-  ////std::cout << "vector += scalar: " << initial_means << " += " << a <<  " = " << testvec << "\n";
-  ////// TRUE
-
-  //// Testing using R objects in c++
-  //NumericVector time(100); //, conc(100);
-  //NumericVector conc     = rnorm(100, 3, 0.1);
-  //NumericVector response = conc + rnorm(100, 1, 0.001);
-  //for (int i = 0; i < time.size(); i++) time(i) = i + 1;
-
-
-  //std::cout << "Time meta: size=" << time.size() << ", begin=" << time(0) << ", end=" << time(time.size() - 1) << "\n";
-
-  ////std::cout << "NumericVector w/ values from 1 to 100 and 100 random normals and 100 more\n";
-  ////for (int i = 0; i < time.size(); i++) {
-  ////  std::cout << time(i) << ", " << conc(i) << ", " << response(i) << "\n";
-  ////}
 
   //////////////// BEGIN LOADING DATA STRUCTURES ////////////////
-  //               Data and Patient object setup               //
-  ///////////////////////////////////////////////////////////////
 
   // Create patient data
   Rcpp::NumericVector thistime(144);
@@ -92,90 +41,58 @@ int main(int argc, char **argv) {
     2.862694,  5.891940,  6.136203, 6.251388,  6.170612,  5.191264,  4.810252,
     4.989489,  3.951583,  3.793401, 4.320815, 10.128100,  9.961510,  8.155648 };
 
-  // Create patient data object
-  PatientData pdone(thistime, conc);
-  //Create priors object
-  PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
-                         10, 100, 1000, 1000, 12, 0, 40);
+  //
+  // Create priors, starting values, and proposal variances objects
+  //
+  Rcpp::List priors = List::create(Named("baseline_mean")           = 2.6,
+                                   Named("baseline_variance")       = 100,
+                                   Named("halflife_mean")           = 45,
+                                   Named("halflife_variance")       = 100,
+                                   Named("mass_mean")               = 3.5,
+                                   Named("mass_variance")           = 100,
+                                   Named("width_mean")              = 30,
+                                   Named("width_variance")          = 100,
+                                   Named("mass_mean_sd")            = 1000,
+                                   Named("width_mean_sd")           = 1000,
+                                   Named("error_alpha")             = 0.0001,
+                                   Named("error_beta")              = 0.0001,
+                                   Named("pulse_count")             = 12,
+                                   Named("location_prior_type")     = "strauss",
+                                   Named("strauss_repulsion")       = 0,
+                                   Named("strauss_repulsion_range") = 40);
+  priors.attr("class") = "bp_priors";
+
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  Rcpp::List startingvals = List::create(Named("baseline")    = 2.6,
+                                         Named("halflife")    = 45,
+                                         Named("errorsq")     = 0.5,
+                                         Named("mass_mean")   = 3.5,
+                                         Named("width_mean")  = 30,
+                                         Named("pulse_count") = 12,
+                                         Named("mass_sd")     = 10,
+                                         Named("width_sd")    = 10);
+  startingvals.attr("class") = "bp_startingvals";
 
-  // Create pointers
-  PatientData * data = &pdone;
-  PatientPriors * priors = &ppsingle;
-  PatientEstimates * estimates = &pesingle;
+  Rcpp::List proposalvars = List::create(Named("mass_mean") = 1.1,
+                                         Named("width_mean") = 1.1,
+                                         Named("mass_sd") = 2,
+                                         Named("width_sd") = 2,
+                                         Named("baseline") = 0.5,
+                                         Named("halflife") = 45,
+                                         Named("location") = 10,
+                                         Named("pulse_mass") = 1,
+                                         Named("pulse_width") = 10 ,
+                                         Named("sdscale_pulse_mass") = 1,
+                                         Named("sdscale_pulse_width") = 1);
+  proposalvars.attr("class") = "bp_proposalvariance";
 
-  // Now take all of this and create a Patient object
-  Patient pat(data, priors, estimates);
-  Patient * patient = &pat;
-
-  // Now add pulse estimates
-  // Delete initial pulse for these tests
-  ++pat.piter;
-  pat.piter = pat.pulses.erase(pat.piter);
-
-  // Now add a bunch of pulses (from matt's sim data)
-  arma::vec location        { -37.65204, 41.04917, 125.58297, 306.32966,
-                              461.65469, 616.95867, 835.64466, 1000.29703,
-                              1149.08360, 1319.19888, 1414.31830 };
-  arma::vec mass            { 6.635627,  5.940251, 13.463474,  7.649251,
-                              4.309497, 12.285200,  4.241401,  3.734942,
-                              3.553504,  4.589623, 7.364310 };
-  arma::vec width           { 4.596894, 6.740636, 5.986173, 4.476816, 4.701983,
-                              3.829487, 5.917652, 4.932739, 6.367862, 4.915543,
-                              5.692852 };
-  arma::vec tvarscale_mass  { 1.3362258, 0.9683636, 0.2660084, 0.1090139,
-                              0.5613391, 0.4339317, 0.3184480, 0.2060616,
-                              1.4164371, 2.1759781, 1.0744991 };
-  arma::vec tvarscale_width { 1.0301410, 0.7512098, 1.9517880, 1.9834742,
-                              1.2743407, 0.4760933, 1.7499186, 0.6057495,
-                              1.5219036, 0.8946568, 0.8632652 };
-
-  for (int i = 0; i < location.n_elem; i++) {
-    PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
-                        pat.estimates->get_decay(), pat.data->time);
-    pat.pulses.push_back(pulse);
-  }
-  ////////////////////////////////////////////////////////////
   //////////////// END LOADING DATA STRUCTURES ///////////////
-  ////////////////////////////////////////////////////////////
 
 
   // Create sampler object 
-  arma::vec bhl_pv = { 0.5, 45 };
-  BirthDeathProcess birth_death;
-  SS_DrawFixedEffects draw_fixeff_mass(1.1, 500, 25000, 0.35, false);
-  SS_DrawFixedEffects draw_fixeff_width(1.1, 500, 25000, 0.35, true);
-  SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500*11, 25000*11, 0.35);
-  SS_DrawSDRandomEffectsWidths draw_sd_pulse_widths(2, 500*11, 25000*11, 0.35);
-  SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
-  SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500*11, 25000*11, 0.35);
-  SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
-  SS_DrawRandomEffectsWidths draw_pulse_widths(1.1, 500*11, 25000*11, 0.35);
-  SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500*11, 25000*11, 0.35);
-  SS_DrawTVarScaleWidths draw_pulse_tvarscale_widths(1.01, 500*11, 25000*11, 0.35);
-
-
-  // Sample MMH objects
-  //for (int i = 0; i < 250000; i++) {
-  for (int i = 0; i < 10000; i++) {
-
-    birth_death.sample(patient, false);
-    draw_fixeff_mass.sample(patient, &patient->estimates->mass_mean);
-    draw_fixeff_width.sample(patient, &patient->estimates->mass_mean);
-    draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
-    draw_sd_pulse_widths.sample(patient, &patient->estimates->mass_sd, patient);
-    draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife);
-    draw_pulse_locations_strauss.sample_pulses(patient);
-    draw_pulse_masses.sample_pulses(patient);
-    draw_pulse_widths.sample_pulses(patient);
-    draw_pulse_tvarscale.sample_pulses(patient);
-    draw_pulse_tvarscale_widths.sample_pulses(patient);
-
-
-    std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;
-
-  }
+  Rcpp::List rtn_list;
+  rtn_list = singlesubject(conc, thistime, priors, proposalvars, startingvals,
+                           50000, true, 500, 25000, 0.25, 0.35);
 
   return 0;
 
