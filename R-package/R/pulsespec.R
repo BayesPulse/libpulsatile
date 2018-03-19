@@ -126,40 +126,40 @@ pulse_spec <-
     ps_obj <- 
       structure(
         list(strauss_location_prior = strauss,
-             priors = list(pulse_mass     = list(mean  = prior_mass_mean,
-                                                 var   = prior_mass_var),
-                           pulse_width    = list(mean  = prior_width_mean,
-                                                 var   = prior_width_var),
-                           pulse_location = list(gamma = prior_location_gamma,
-                                                 range = prior_location_range,
-                                                 count = prior_mean_pulse_count),
-                           max_sd         = list(mass  = prior_max_sd_mass,
-                                                 width = prior_max_sd_width),
-                           baseline       = list(mean  = prior_baseline_mean,
-                                                 var   = prior_baseline_var),
-                           halflife       = list(mean  = prior_halflife_mean,
-                                                 var   = prior_halflife_var),
-                           error          = list(alpha = prior_error_alpha,
-                                                 beta  = prior_error_beta)),
-             starting_values = list(pulse_mass  = list(mean = sv_mass_mean,
-                                                       sd   = sv_mass_sd),
-                                    pulse_width = list(mean = sv_width_mean,
-                                                       sd   = sv_width_sd),
-                                    baseline    = list(mean = sv_baseline_mean),
-                                    halflife    = list(mean = sv_halflife_mean),
-                                    error       = list(var  = sv_error_var)),
-             proposal_variances = list(mean_pulse_mass  = pv_mean_pulse_mass,
-                                       mean_pulse_width = pv_mean_pulse_width,
-                                       indiv_pulse_mass  = pv_indiv_pulse_mass,
-                                       indiv_pulse_width = pv_indiv_pulse_width,
-                                       sd_pulse_mass    = pv_sd_pulse_mass,
-                                       sd_pulse_width   = pv_sd_pulse_width,
-                                       etamass          = pv_sdscale_pulse_mass,
-                                       etawidth         = pv_sdscale_pulse_width,
-                                       pulse_location   = pv_pulse_location,
-                                       baseline         = pv_baseline,
-                                       halflife         = pv_halflife)),
-        class = "pulse_spec")
+             priors = list(baseline_mean           = prior_baseline_mean,
+                           baseline_variance       = prior_baseline_var,
+                           halflife_mean           = prior_halflife_mean,
+                           halflife_variance       = prior_halflife_var,
+                           mass_mean               = prior_mass_mean,
+                           mass_variance           = prior_mass_var,
+                           width_mean              = prior_width_mean,
+                           width_variance          = prior_width_var,
+                           mass_sdmax            = prior_max_sd_mass,
+                           width_sdmax           = prior_max_sd_width,
+                           error_alpha             = prior_error_alpha,
+                           error_beta              = prior_error_beta,
+                           pulse_count             = prior_mean_pulse_count,
+                           strauss_repulsion       = prior_location_gamma,
+                           strauss_repulsion_range = prior_location_range),
+             proposal_variances = list(mass_mean   = pv_mean_pulse_mass,
+                                       width_mean  = pv_mean_pulse_width,
+                                       mass_sd     = pv_sd_pulse_mass,
+                                       width_sd    = pv_sd_pulse_width,
+                                       baseline    = pv_baseline,
+                                       halflife    = pv_halflife,
+                                       location    = pv_pulse_location,
+                                       pulse_mass  = pv_indiv_pulse_mass,
+                                       pulse_width = pv_indiv_pulse_width,
+                                       sdscale_pulse_mass  = pv_sdscale_pulse_mass ,
+                                       sdscale_pulse_width = pv_sdscale_pulse_width),
+             starting_values = list(baseline       = sv_baseline_mean,
+                                    halflife       = sv_halflife_mean,
+                                    errorsq        = sv_error_var,
+                                    mass_mean      = sv_mass_mean,
+                                    width_mean     = sv_width_mean,
+                                    mass_sd        = sv_mass_sd,
+                                    width_sd       = sv_width_sd)),
+                class = "pulse_spec")
 
     return(ps_obj)
 
@@ -174,13 +174,32 @@ print.pulse_spec <- function(x, ...) {
   cat("Model type:", paste0(x$model$model, "\n"))
   cat("Number of iterations:", 
       formatC(x$model$iterations, format = "d", big.mark = ","), "\n")
-  cat("\nPulse mass:\n")
-  cat("   prior mean =", x$priors$pulse_mass$mean, "\n") 
-  cat("   prior variance =", x$priors$pulse_mass$var, "\n") 
-  cat("   mean starting value =", x$starting_values$pulse_mass$mean, "\n") 
-  cat("   SD starting value =", x$starting_values$pulse_mass$sd, "\n") 
-  cat("   proposal variance =", x$proposal_variances$sd_pulse_mass, "\n")
-  cat("   mean proposal variance =", x$proposal_variances$indiv_pulse_mass, "\n")
+  cat("\n")
+  cat("Pulse mass:\n")
+  cat("  Fixed effect (mean)\n")
+  cat("    prior mean =", x$priors$mass_mean, "\n") 
+  cat("    prior variance =", x$priors$mass_variance, "\n") 
+  cat("    starting value =", x$starting_values$mass_mean, "\n") 
+  cat("    proposal variance =", x$proposal_variances$mass_mean, "\n")
+  cat("  Fixed effect (SD)\n")
+  cat("    prior maximum =", x$priors$mass_sdmax, "\n")
+  cat("    starting value =", x$starting_values$mass_sd, "\n") 
+  cat("    proposal variance =", x$proposal_variances$mass_sd, "\n")
+  cat("  Random effects (individual pulses)\n")
+  cat("    proposal variance =", x$proposal_variances$pulse_mass, "\n")
+  cat("\n")
+  cat("Pulse width:\n")
+  cat("  Fixed effect (mean)\n")
+  cat("    prior mean =", x$priors$width_mean, "\n") 
+  cat("    prior variance =", x$priors$width_variance, "\n") 
+  cat("    starting value =", x$starting_values$width_mean, "\n") 
+  cat("    proposal variance =", x$proposal_variances$width_mean, "\n")
+  cat("  Fixed effect (SD)\n")
+  cat("    prior maximum =", x$priors$width_sdmax, "\n")
+  cat("    starting value =", x$starting_values$width_sd, "\n") 
+  cat("    proposal variance =", x$proposal_variances$width_sd, "\n")
+  cat("  Random effects (individual pulses)\n")
+  cat("    proposal variance =", x$proposal_variances$pulse_width, "\n")
 
 }
 
