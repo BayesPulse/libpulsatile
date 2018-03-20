@@ -9,7 +9,7 @@
 #' hormone data.  Expects a tidy, long-format dataset (columns for time,
 #' concentration, and subject ID; row for every concentration measurement).
 #'
-#' @useDynLib pulsatile decon_r_interface
+#' @useDynLib bayespulse singlesubject
 #' @param .data A dataset containing \code{time} and \code{conc}.  Can
 #'   also be a \code{pulse_sim} object.
 #' @param time A string. Name of the time variable in \code{data}.

@@ -4,7 +4,6 @@
 #' trace plots and posterior densities of the 'common' parameters and pulse
 #' location density (a set of pulse-specific parameter, from 'pulse' chain).
 #' 
-#' @useDynLib pulsatile decon_r_interface
 #' @param fit A model fit from \code{fit_pulse()}.
 #' @param type Either histogram or density.  Only applies to
 #' \code{bp_posteriors} function
