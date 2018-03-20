@@ -1,11 +1,11 @@
-#ifndef GUARD_ss_draw_randomeffects_h
-#define GUARD_ss_draw_randomeffects_h
+#ifndef GUARD_bpmod_singlesubject_draw_randomeffects_h
+#define GUARD_bpmod_singlesubject_draw_randomeffects_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>
 #include <math.h>
-#include "mh.h"
-#include "patient.h"
+#include <bp_mcmc/mh.h>
+#include <bp_datastructures/patient.h>
 //#include "utils.h"
 
 
@@ -16,7 +16,7 @@
 //
 
 class SS_DrawRandomEffects :
-  public ModifiedMetropolisHastings<PulseEstimate, Patient, double, ProposalVariance>
+  public ModifiedMetropolisHastings<PulseEstimates, Patient, double, ProposalVariance>
 {
 
   public:
@@ -27,7 +27,7 @@ class SS_DrawRandomEffects :
                          int in_max_iter,
                          double in_target_ratio,
                          bool for_width) :
-      ModifiedMetropolisHastings <PulseEstimate, Patient, double, ProposalVariance>::
+      ModifiedMetropolisHastings <PulseEstimates, Patient, double, ProposalVariance>::
         ModifiedMetropolisHastings(in_pv,
                                    in_adjust_iter,
                                    in_max_iter,
@@ -37,13 +37,13 @@ class SS_DrawRandomEffects :
           if (for_width) {
             est_mean_       = &PatientEstimates::width_mean;
             est_sd_         = &PatientEstimates::width_sd;
-            tvarscale_      = &PulseEstimate::tvarscale_width;
-            randomeffect_   = &PulseEstimate::width;
+            tvarscale_      = &PulseEstimates::tvarscale_width;
+            randomeffect_   = &PulseEstimates::width;
           } else {
             est_mean_       = &PatientEstimates::mass_mean;
             est_sd_         = &PatientEstimates::mass_sd;
-            tvarscale_      = &PulseEstimate::tvarscale_mass;
-            randomeffect_   = &PulseEstimate::mass;
+            tvarscale_      = &PulseEstimates::tvarscale_mass;
+            randomeffect_   = &PulseEstimates::mass;
           }
 
         };
@@ -62,8 +62,8 @@ class SS_DrawRandomEffects :
 
     double PatientEstimates::*est_mean_;
     double PatientEstimates::*est_sd_;
-    double PulseEstimate::*tvarscale_;
-    double PulseEstimate::*randomeffect_; //pulse specific mass or width
+    double PulseEstimates::*tvarscale_;
+    double PulseEstimates::*randomeffect_; //pulse specific mass or width
 
     bool parameter_support(double val, Patient *patient) {
       // NOTE: original was:
@@ -75,7 +75,7 @@ class SS_DrawRandomEffects :
     // posterior_function()
     //   for strauss location prior mmh
     //
-    double posterior_function(PulseEstimate *pulse,
+    double posterior_function(PulseEstimates *pulse,
                               double proposal,
                               Patient *patient) {
 

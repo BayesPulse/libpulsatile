@@ -1,9 +1,9 @@
 #include <RcppArmadillo.h>
 #include <RInside.h>
-#include "counter.h"
-#include "proposalvariance.h"
-#include "mh.h"
-#include "catch.h"
+#include <bp_mcmc/counter.h>
+#include <bp_mcmc/proposalvariance.h>
+#include <bp_mcmc/mh.h>
+#include <testing/catch.h>
 
 
 //

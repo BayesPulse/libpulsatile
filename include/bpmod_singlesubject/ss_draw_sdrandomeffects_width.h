@@ -1,11 +1,11 @@
-#ifndef GUARD_ss_draw_sd_randomeffectswidths_h
-#define GUARD_ss_draw_sd_randomeffectswidths_h
+#ifndef GUARD_bpmod_singlesubject_draw_sd_randomeffectswidths_h
+#define GUARD_bpmod_singlesubject_draw_sd_randomeffectswidths_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>
 #include <math.h>
-#include "mh.h"
-#include "patient.h"
+#include <bp_mcmc/mh.h>
+#include <bp_datastructures/patient.h>
 
 
 // NOTE: I separated out function definitions here 
@@ -66,8 +66,8 @@ double SS_DrawSDRandomEffectsWidths::posterior_function(Patient *patient,
   double third_part  = 0.0;
   double sd_width     = patient->estimates->width_sd;
   double mean_width   = patient->estimates->width_mean;
-  std::list<PulseEstimate>::const_iterator pulse     = patient->pulses.begin();
-  std::list<PulseEstimate>::const_iterator pulse_end = patient->pulses.end();
+  std::list<PulseEstimates>::const_iterator pulse     = patient->pulses.begin();
+  std::list<PulseEstimates>::const_iterator pulse_end = patient->pulses.end();
 
   // Calculate pulse-specific portion of acceptance ratio
   while (pulse != pulse_end) {

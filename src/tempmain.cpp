@@ -1,7 +1,7 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include <RInside.h>
-#include "singlesubject.h"
+#include <singlesubject.h>
 
 using namespace Rcpp;
 
@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
                                    Named("mass_variance")           = 100,
                                    Named("width_mean")              = 30,
                                    Named("width_variance")          = 100,
-                                   Named("mass_mean_sd")            = 1000,
-                                   Named("width_mean_sd")           = 1000,
+                                   Named("mass_sdmax")            = 1000,
+                                   Named("width_sdmax")           = 1000,
                                    Named("error_alpha")             = 0.0001,
                                    Named("error_beta")              = 0.0001,
                                    Named("pulse_count")             = 12,
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
   // Create sampler object 
   Rcpp::List rtn_list;
   rtn_list = singlesubject(conc, thistime, priors, proposalvars, startingvals,
-                           50000, true, 500, 25000, 0.25, 0.35);
+                           50000, 50, 10000, true, 500, 25000, 0.25, 0.35);
 
   return 0;
 

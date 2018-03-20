@@ -1,10 +1,8 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include <RInside.h>
-//#include "patient.h"
-//#include "population.h"
-//#include "utils.h"
-#include "model_singlesubject.h"
+#include <bpmod_singlesubject/bpmod_singlesubject.h>
+//#include <singlesubject.h>
 
 using namespace Rcpp;
 

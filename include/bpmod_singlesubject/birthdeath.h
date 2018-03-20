@@ -1,9 +1,9 @@
-#ifndef GUARD_birthdeath_h
-#define GUARD_birthdeath_h
+#ifndef GUARD_bpmod_singlesubject_birthdeath_h
+#define GUARD_bpmod_singlesubject_birthdeath_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>                    // for the embedded R via RInside
-#include "datastructures.h"
+#include <bp_datastructures/bp_datastructures.h>
 
 
 
@@ -191,7 +191,7 @@ void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
   //}
 
   // Create new pulse and insert
-  PulseEstimate new_pulse(position, new_mass, new_width, new_tvarscale_mass,
+  PulseEstimates new_pulse(position, new_mass, new_width, new_tvarscale_mass,
                           new_tvarscale_width, patient->estimates->get_decay(),
                           patient->data->time);
 

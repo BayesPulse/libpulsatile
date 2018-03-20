@@ -1,16 +1,24 @@
 #include <RcppArmadillo.h>
 #include <RInside.h>
-#include "patient.h"
-#include "datastructures.h"
-#include "ss_draw_baselinehalflife.h"
-#include "ss_draw_fixedeffects.h"
-#include "ss_draw_sdrandomeffects.h"
-#include "ss_draw_locations.h"
-#include "ss_draw_randomeffects.h"
-#include "ss_draw_tvarscale.h"
-#include "ss_draw_error.h"
-#include "catch.h"
 
+#include <bp_datastructures/patient.h>
+#include <bp_datastructures/patientdata.h>
+#include <bp_datastructures/patientpriors.h>
+#include <bp_datastructures/patientestimates.h>
+#include <bp_datastructures/pulseestimates.h>
+
+#include <bpmod_singlesubject/ss_draw_baselinehalflife.h>
+#include <bpmod_singlesubject/ss_draw_fixedeffects.h>
+#include <bpmod_singlesubject/ss_draw_sdrandomeffects.h>
+#include <bpmod_singlesubject/ss_draw_locations.h>
+#include <bpmod_singlesubject/ss_draw_randomeffects.h>
+#include <bpmod_singlesubject/ss_draw_tvarscale.h>
+#include <bpmod_singlesubject/ss_draw_error.h>
+
+#include <testing/catch.h>
+
+#include <bp_mcmc/utils.h>
+#include <bp_mcmc/proposalvariance.h>
 
 //
 // mh_tests.cpp
@@ -98,7 +106,7 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
                               1.5219036, 0.8946568, 0.8632652 };
 
   for (int i = 0; i < location.n_elem; i++) {
-    PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
+    PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
   }
@@ -227,7 +235,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
                               1.5219036, 0.8946568, 0.8632652 };
 
   for (int i = 0; i < location.n_elem; i++) {
-    PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
+    PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
   }
@@ -360,7 +368,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
                               1.5219036, 0.8946568, 0.8632652 };
 
   for (int i = 0; i < location.n_elem; i++) {
-    PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
+    PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
   }

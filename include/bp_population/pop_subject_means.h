@@ -4,8 +4,8 @@
 #include <RcppArmadillo.h>
 #include <RInside.h>
 #include <math.h>
-#include "mh.h"
-#include "patient.h"
+#include "mcmc/mh.h"
+#include "datastructures/patient.h"
 
 
 //

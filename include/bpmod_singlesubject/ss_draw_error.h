@@ -1,10 +1,10 @@
-#ifndef GUARD_ss_draw_error_h
-#define GUARD_ss_draw_error_h
+#ifndef GUARD_bpmod_singlesubject_draw_error_h
+#define GUARD_bpmod_singlesubject_draw_error_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>
 #include <math.h>
-#include "patient.h"
+#include <bp_datastructures/patient.h>
 
 //
 // SS_DrawError

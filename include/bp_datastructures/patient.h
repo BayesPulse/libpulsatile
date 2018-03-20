@@ -2,8 +2,11 @@
 #define GUARD_patient_h
 
 #include <RcppArmadillo.h>
-#include <RInside.h>                    // for the embedded R via RInside
-#include "datastructures.h"
+#include <RInside.h>
+#include "bp_datastructures/patientdata.h"
+#include "bp_datastructures/patientestimates.h"
+#include "bp_datastructures/patientpriors.h"
+#include "bp_datastructures/pulseestimates.h"
 
 
 
@@ -24,7 +27,7 @@
 
 using namespace Rcpp;
 
-typedef std::list<PulseEstimate> PulseList;
+typedef std::list<PulseEstimates> PulseList;
 typedef PulseList::iterator PulseIter;
 typedef PulseList::const_iterator PulseConstIter;
 
@@ -58,7 +61,7 @@ struct Patient {
     priors    = in_priors;
     estimates = in_parms;
 
-    PulseEstimate firstpulse(in_data->fitstart,
+    PulseEstimates firstpulse(in_data->fitstart,
                              1, 1, 1, 1,
                              in_parms->get_decay(), 
                              in_data->concentration);
@@ -214,7 +217,7 @@ struct Patient {
     return calc_sr_strauss(location, &(*emptyiter));
   }
 
-  int calc_sr_strauss(double location, PulseEstimate * pulse_excluded) {
+  int calc_sr_strauss(double location, PulseEstimates * pulse_excluded) {
 
     int s_r = 0;       // Sum of indicators where diff < 20
     double difference; // Time difference

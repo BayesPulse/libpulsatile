@@ -1,8 +1,11 @@
 #include <RcppArmadillo.h>
 #include <RInside.h>
-#include "patient.h"
-#include "datastructures.h"
-#include "catch.h"
+#include <bp_datastructures/patient.h>
+#include <bp_datastructures/patientdata.h>
+#include <bp_datastructures/patientpriors.h>
+#include <bp_datastructures/patientestimates.h>
+#include <bp_datastructures/pulseestimates.h>
+#include <catch.h>
 
 
 //
@@ -58,7 +61,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   SECTION( "Estimates can be accessed" ) {
     REQUIRE(pat.estimates->baseline_halflife(0) == 2.6);
     REQUIRE(pat.estimates->mass_mean == 3.5);
-    REQUIRE(pat.estimates->pulse_count == 12);
+    REQUIRE(pat.estimates->pulse_count == 1);
     REQUIRE(pat.estimates->mass_sd == 10);
   }
 
@@ -113,7 +116,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   // TODO: This section is causing trouble (initial pulse values), not giving
   // sensible results...
   SECTION( "Has initial pulse" ) {
-    std::list<PulseEstimate>::const_iterator this_piter = pat.pulses.begin();
+    std::list<PulseEstimates>::const_iterator this_piter = pat.pulses.begin();
     REQUIRE(pat.get_pulsecount()        == 1);
     REQUIRE(this_piter->time            == pat.data->fitstart);
     REQUIRE(this_piter->mass            == 1);
@@ -144,7 +147,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
                               1.5219036, 0.8946568, 0.8632652 };
 
   for (int i = 0; i < location.n_elem; i++) {
-    PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
+    PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
   }
@@ -244,7 +247,7 @@ TEST_CASE( "Patient class constructor for population model works", "[patient]" )
   SECTION( "Estimates can be accessed" ) {
     REQUIRE(pat.estimates->baseline_halflife(0) == 2.6);
     REQUIRE(pat.estimates->mass_mean == 3.5);
-    REQUIRE(pat.estimates->pulse_count == 12);
+    REQUIRE(pat.estimates->pulse_count == 1);
   }
 
   SECTION( "Estimates can be updated" ) {

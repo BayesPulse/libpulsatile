@@ -1,12 +1,12 @@
-#ifndef GUARD_ss_draw_locations_h
-#define GUARD_ss_draw_locations_h
+#ifndef GUARD_bpmod_singlesubject_draw_locations_h
+#define GUARD_bpmod_singlesubject_draw_locations_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>
 #include <math.h>
-#include "mh.h"
-#include "patient.h"
-#include "utils.h"
+#include <bp_datastructures/patient.h>
+#include <bp_mcmc/mh.h>
+#include <bp_mcmc/utils.h>
 
 
 // 
@@ -19,7 +19,7 @@
 //
 
 class SS_DrawLocationsStrauss :
-  public ModifiedMetropolisHastings<PulseEstimate, Patient, double, ProposalVariance>
+  public ModifiedMetropolisHastings<PulseEstimates, Patient, double, ProposalVariance>
 {
 
   public:
@@ -29,7 +29,7 @@ class SS_DrawLocationsStrauss :
                             int in_max_iter,
                             double in_target_ratio) :
       ModifiedMetropolisHastings
-      <PulseEstimate, Patient, double,
+      <PulseEstimates, Patient, double,
        ProposalVariance>::ModifiedMetropolisHastings(in_pv,
                                                      in_adjust_iter,
                                                      in_max_iter,
@@ -61,7 +61,7 @@ class SS_DrawLocationsStrauss :
     // posterior_function()
     //   for strauss location prior mmh
     //
-    double posterior_function(PulseEstimate *pulse,
+    double posterior_function(PulseEstimates *pulse,
                               double proposal,
                               Patient *patient) {
 

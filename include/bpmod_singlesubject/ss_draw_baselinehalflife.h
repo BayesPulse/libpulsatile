@@ -1,11 +1,11 @@
-#ifndef GUARD_ss_draw_baselinehalflife_h
-#define GUARD_ss_draw_baselinehalflife_h
+#ifndef GUARD_bpmod_singlesubject_draw_baselinehalflife_h
+#define GUARD_bpmod_singlesubject_draw_baselinehalflife_h
 
 #include <RcppArmadillo.h>
 #include <RInside.h>
 #include <math.h>
-#include "mh.h"
-#include "patient.h"
+#include <bp_mcmc/mh.h>
+#include <bp_datastructures/patient.h>
 
 
 //

@@ -1,5 +1,5 @@
-#ifndef GUARD_counter_h
-#define GUARD_counter_h
+#ifndef GUARD_bp_mcmc_counter_h
+#define GUARD_bp_mcmc_counter_h
 
 #include <RInside.h>
 #include <RcppArmadillo.h>
