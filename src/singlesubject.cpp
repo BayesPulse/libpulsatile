@@ -1,10 +1,9 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include <RInside.h>
-#include "mh.h"
-#include "patient.h"
-#include "population.h"
-#include "utils.h"
+//#include "patient.h"
+//#include "population.h"
+//#include "utils.h"
 #include "model_singlesubject.h"
 
 using namespace Rcpp;
@@ -28,6 +27,8 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
                          Rcpp::List proposalvars,
                          Rcpp::List startingvals,
                          int mcmc_iterations,
+                         int thin,
+                         int burnin,
                          bool verbose,
                          int pv_adjust_iter,
                          int pv_adjust_max_iter,
@@ -60,8 +61,8 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
                          priors["mass_variance"],
                          priors["width_mean"],
                          priors["width_variance"],
-                         priors["mass_mean_sd"],
-                         priors["width_mean_sd"],
+                         priors["mass_sdmax"],
+                         priors["width_sdmax"],
                          priors["error_alpha"],
                          priors["error_beta"],
                          priors["pulse_count"],

@@ -209,12 +209,10 @@ struct PatientEstimates {
                    int    sv_pulse_count) {
 
     baseline_halflife = { sv_baseline, sv_halflife };
-    //baseline    = sv_baseline,
-    //halflife    = sv_halflife;
     errorsq     = sv_errorsq;
     mass_mean   = sv_mass_mean;
     width_mean  = sv_width_mean;
-    pulse_count = sv_pulse_count;
+    pulse_count = 1;
 
   }
 
