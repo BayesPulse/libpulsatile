@@ -9,3 +9,6 @@
 bin/
 build/
 tags
+R-package/src/singlesubject.cpp
+R-package/inst/include
+R-package/src/tests

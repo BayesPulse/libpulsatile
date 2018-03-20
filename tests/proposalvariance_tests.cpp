@@ -1,5 +1,7 @@
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <bp_mcmc/counter.h>
 #include <bp_mcmc/proposalvariance.h>
 #include <bp_mcmc/mh.h>

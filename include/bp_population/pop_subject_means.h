@@ -2,7 +2,9 @@
 #define GUARD_pop_drawsubjectmeans_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <math.h>
 #include "mcmc/mh.h"
 #include "datastructures/patient.h"

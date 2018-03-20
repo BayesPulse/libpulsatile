@@ -2,7 +2,9 @@
 #define GUARD_patientpriors_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <bp_mcmc/utils.h>
 
 //

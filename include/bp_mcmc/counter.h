@@ -1,7 +1,9 @@
 #ifndef GUARD_bp_mcmc_counter_h
 #define GUARD_bp_mcmc_counter_h
 
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <RcppArmadillo.h>
 
 //

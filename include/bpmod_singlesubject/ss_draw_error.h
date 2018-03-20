@@ -2,7 +2,9 @@
 #define GUARD_bpmod_singlesubject_draw_error_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <math.h>
 #include <bp_datastructures/patient.h>
 

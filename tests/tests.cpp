@@ -7,7 +7,9 @@
 //#define CATCH_CONFIG_MAIN
 // Let Catch handle setup/cleanup, but use own main()
 #define CATCH_CONFIG_RUNNER
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <testing/catch.h>
 
 int main( int argc, char* argv[] ) {

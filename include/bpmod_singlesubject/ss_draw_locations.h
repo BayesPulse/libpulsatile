@@ -2,7 +2,9 @@
 #define GUARD_bpmod_singlesubject_draw_locations_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <math.h>
 #include <bp_datastructures/patient.h>
 #include <bp_mcmc/mh.h>

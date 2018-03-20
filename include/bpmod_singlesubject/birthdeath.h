@@ -2,7 +2,9 @@
 #define GUARD_bpmod_singlesubject_birthdeath_h
 
 #include <RcppArmadillo.h>
-#include <RInside.h>                    // for the embedded R via RInside
+#ifndef NORINSIDE
+#include <RInside.h>
+#endif
 #include <bp_datastructures/bp_datastructures.h>
 
 

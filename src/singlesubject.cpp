@@ -1,6 +1,8 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <bpmod_singlesubject/bpmod_singlesubject.h>
 //#include <singlesubject.h>
 
