@@ -46,8 +46,8 @@ concentration, and subject ID; row for every concentration measurement).
 \examples{
 this_pulse <- simulate_pulse()
 this_spec  <- pulse_spec()
-this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10, 
-                        burnin = 100, spec = this_spec)
+#this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10, 
+#                        burnin = 100, spec = this_spec)
 }
 \keyword{fit}
 \keyword{pulse}

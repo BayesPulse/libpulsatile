@@ -41,7 +41,7 @@ struct PatientEstimates {
   double errorsq;    // model error (variance)
   double mass_mean;
   double width_mean;
-  int    pulse_count; // function of linked list instead?;
+  //int    pulse_count; // function of linked list instead?;
   // Always use these functions to get these values.  removed them as separate
   // member variables to ensure the result is always up-to-date
   double get_decay() { return log(2) / baseline_halflife(1); }
@@ -54,14 +54,13 @@ struct PatientEstimates {
                    double sv_halflife,
                    double sv_errorsq,
                    double sv_mass_mean,
-                   double sv_width_mean,
-                   int    sv_pulse_count) {
+                   double sv_width_mean) {
 
     baseline_halflife = { sv_baseline, sv_halflife };
     errorsq     = sv_errorsq;
     mass_mean   = sv_mass_mean;
     width_mean  = sv_width_mean;
-    pulse_count = 1;
+    //pulse_count = 1;
 
   }
 
@@ -78,11 +77,10 @@ struct PatientEstimates {
                    double sv_errorsq,
                    double sv_mass_mean,
                    double sv_width_mean,
-                   int    sv_pulse_count,
                    double sv_mass_sd,
                    double sv_width_sd)
     : PatientEstimates(sv_baseline, sv_halflife, sv_errorsq, sv_mass_mean,
-                       sv_width_mean, sv_pulse_count)
+                       sv_width_mean)
   {
     mass_sd  = sv_mass_sd;
     width_sd = sv_width_sd;

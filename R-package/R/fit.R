@@ -9,7 +9,6 @@
 #' hormone data.  Expects a tidy, long-format dataset (columns for time,
 #' concentration, and subject ID; row for every concentration measurement).
 #'
-#' @useDynLib bayespulse singlesubject
 #' @param .data A dataset containing \code{time} and \code{conc}.  Can
 #'   also be a \code{pulse_sim} object.
 #' @param time A string. Name of the time variable in \code{data}.
@@ -34,8 +33,8 @@
 #' @examples
 #' this_pulse <- simulate_pulse()
 #' this_spec  <- pulse_spec()
-#' this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10, 
-#'                         burnin = 100, spec = this_spec)
+#' #this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10, 
+#' #                        burnin = 100, spec = this_spec)
 #' @export
 fit_pulse <- function(.data,
                       time = "time",
@@ -63,8 +62,25 @@ fit_pulse <- function(.data,
             is.logical(use_tibble), is.logical(verbose))
   if (burnin >= iters) stop("burnin >= iters")
 
+  #---------------------------------------
+  # Temporary work-arounds
+  #---------------------------------------
+  # model type argument -- put in pulse_spec? 
+  #model_type <- match.arg(model_type)
+  # proposal variance tuning parameters -- in pulse_spec?
+  pv_adjust_iter <- 500
+  pv_adjust_max_iter <- 25000
+  univariate_pv_target_ratio <- 0.35
+  bivariate_pv_target_ratio  <- 0.25
+  # priors class type -- Definitely in pulse_spec
+  priors            <- lapply(spec$priors, function(x) ifelse(is.null(x), NA, x))
+  proposalvariances <- lapply(spec$proposal_variances, function(x) ifelse(is.null(x), NA, x))
+  startingvalues    <- lapply(spec$starting_values, function(x) ifelse(is.null(x), NA, x))
+  priors            <- structure(priors, class = "bp_priors")
+  proposalvariances <- structure(proposalvariances, class = "bp_proposalvariance")
+  startingvalues    <- structure(startingvalues, class = "bp_startingvals")
+  #---------------------------------------
 
-  model_type <- match.arg(model_type)
   # ideas via survival::coxph 
   Call  <- match.call()
   arg_indx <- match(c(".data", "time", "conc", "iters", "thin",
@@ -76,11 +92,11 @@ fit_pulse <- function(.data,
          documentation.")
   }
 
-  rtn <- singlesubject(.data$concentration,
-                       .data$time,
-                       spec$priors,
-                       spec$proposal_variances,
-                       spec$starting_values,
+  rtn <- singlesubject(indata$concentration,
+                       indata$time,
+                       priors,
+                       proposalvariances,
+                       startingvalues,
                        iters, thin, burnin, verbose,
                        pv_adjust_iter, pv_adjust_max_iter,
                        bivariate_pv_target_ratio, univariate_pv_target_ratio)

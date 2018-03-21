@@ -7,14 +7,21 @@
 #' @param fit A model fit from \code{fit_pulse()}.
 #' @param type Either histogram or density.  Only applies to
 #' \code{bp_posteriors} function
-#' @import tidyr dplyr ggplot2
+#' @importFrom tidyr gather_
+#' @importFrom dplyr select_vars_
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 aes_string
+#' @importFrom ggplot2 geom_path
+#' @importFrom ggplot2 geom_histogram
+#' @importFrom ggplot2 geom_density
+#' @importFrom ggplot2 facet_wrap
 #' @keywords pulse fit plot diagnostics
 #' @examples
 #' this_pulse <- simulate_pulse()
 #' this_spec  <- pulse_spec()
 #' this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10,
 #'                         spec = this_spec)
-#' bp_trace(this_fit)
+#' #bp_trace(this_fit)
 #' @export
 bp_trace <- function(fit) {
 
@@ -66,9 +73,9 @@ bp_posteriors <- function(fit, type = c("histogram", "density")) {
 bp_location_posterior <- function(fit) {
 
   stopifnot(class(fit) == "pulse_fit")
-  pulse_chain(fit) %>%
-    ggplot(aes(x = location)) +
-    geom_histogram(binwidth = 5) 
+  ggplot2::ggplot(pulse_chain(fit)) +
+    ggplot2::aes_string(x = "location") +
+    ggplot2::geom_histogram(binwidth = 5)
 
 }
 
