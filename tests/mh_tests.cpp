@@ -74,7 +74,7 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
 
   // Create pointers
   PatientData * data = &pdone;
@@ -203,7 +203,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
 
   // Create pointers
   PatientData * data = &pdone;
@@ -336,7 +336,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
 
   // Create pointers
   PatientData * data = &pdone;

@@ -82,7 +82,7 @@ TEST_CASE( "PatientPriors single-subject constructor works",
 TEST_CASE( "PatientEstimates population constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates pepop(2.6, 45, 0.05, 3.5, 30, 12);
+  PatientEstimates pepop(2.6, 45, 0.05, 3.5, 30);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -91,7 +91,6 @@ TEST_CASE( "PatientEstimates population constructor works",
     REQUIRE(pepop.errorsq     == 0.05);
     REQUIRE(pepop.mass_mean   == 3.5);
     REQUIRE(pepop.width_mean  == 30);
-    REQUIRE(pepop.pulse_count == 1);
 
   }
 
@@ -112,7 +111,7 @@ TEST_CASE( "PatientEstimates population constructor works",
 TEST_CASE( "PatientEstimates single-subject constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -121,7 +120,6 @@ TEST_CASE( "PatientEstimates single-subject constructor works",
     REQUIRE(pesingle.errorsq     == 0.05);
     REQUIRE(pesingle.mass_mean   == 3.5);
     REQUIRE(pesingle.width_mean  == 30);
-    REQUIRE(pesingle.pulse_count == 1);
     REQUIRE(pesingle.mass_sd  == 10);
     REQUIRE(pesingle.width_sd == 10);
 

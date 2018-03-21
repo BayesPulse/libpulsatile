@@ -53,7 +53,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   PatientData pdone(time, conc);
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
   PatientData * data = &pdone;
   PatientPriors * priors = &ppsingle;
   PatientEstimates * estimates = &pesingle;
@@ -63,7 +63,6 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   SECTION( "Estimates can be accessed" ) {
     REQUIRE(pat.estimates->baseline_halflife(0) == 2.6);
     REQUIRE(pat.estimates->mass_mean == 3.5);
-    REQUIRE(pat.estimates->pulse_count == 1);
     REQUIRE(pat.estimates->mass_sd == 10);
   }
 
@@ -72,8 +71,6 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
     REQUIRE(pat.estimates->baseline_halflife(0) == 10);
     pat.estimates->mass_mean = 5.0;
     REQUIRE(pat.estimates->mass_mean == 5.0);
-    pat.estimates->pulse_count = 6;
-    REQUIRE(pat.estimates->pulse_count == 6);
     pat.estimates->mass_sd = 50;
     REQUIRE(pat.estimates->mass_sd == 50);
     REQUIRE(pat.estimates->get_decay() == (log(2)/45));
@@ -240,7 +237,7 @@ TEST_CASE( "Patient class constructor for population model works", "[patient]" )
   for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
 
   PatientData pd(time, conc);
-  PatientEstimates pep(2.6, 45, 0.05, 3.5, 30, 12); // population constructor
+  PatientEstimates pep(2.6, 45, 0.05, 3.5, 30); // population constructor
   PatientData * data = &pd;
   PatientEstimates * estimates = &pep;
 
@@ -249,7 +246,6 @@ TEST_CASE( "Patient class constructor for population model works", "[patient]" )
   SECTION( "Estimates can be accessed" ) {
     REQUIRE(pat.estimates->baseline_halflife(0) == 2.6);
     REQUIRE(pat.estimates->mass_mean == 3.5);
-    REQUIRE(pat.estimates->pulse_count == 1);
   }
 
   SECTION( "Estimates can be updated" ) {
@@ -257,8 +253,6 @@ TEST_CASE( "Patient class constructor for population model works", "[patient]" )
     REQUIRE(pat.estimates->baseline_halflife(0) == 10);
     pat.estimates->mass_mean = 5.0;
     REQUIRE(pat.estimates->mass_mean == 5.0);
-    pat.estimates->pulse_count = 6;
-    REQUIRE(pat.estimates->pulse_count == 6);
   }
 
   SECTION( "Data can be accessed" ) {
