@@ -247,14 +247,4 @@ struct Patient {
 
 
 
-
-
-////////////////////////////////////////////////////////////
-// Chains -- use R data types? YES
-////////////////////////////////////////////////////////////
-//struct PulseChain { NumericMatrix pulse };
-//struct PatientChain { NumericMatrix patient };
-//struct PopulationChain { NumericMatrix population };
-//struct AssociationChain { NumericMatrix association };
-
 #endif
