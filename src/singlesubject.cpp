@@ -128,6 +128,9 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
   //                                      adj_iter, adj_max, univ_target, true);
 
 
+  // Create output objects (chains)
+  Chains chains(1, 1, 1, false); 
+
   // Sample MMH objects
   for (int i = 0; i < mcmc_iterations; i++) {
 
@@ -146,7 +149,7 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
 
     //print_diagnostic_output(verbose);
     ////std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;
-    //save_sample(thin);
+    //save_sample(patient, thin);
 
   }
 
