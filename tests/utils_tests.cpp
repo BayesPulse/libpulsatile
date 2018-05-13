@@ -1,8 +1,10 @@
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
-#include "utils.h"
-#include "proposalvariance.h"
-#include "catch.h"
+#endif
+#include <bp_mcmc/utils.h>
+#include <bp_mcmc/proposalvariance.h>
+#include <testing/catch.h>
 
 
 //

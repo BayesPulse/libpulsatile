@@ -1,10 +1,12 @@
-#ifndef GUARD_proposalvariance_h
-#define GUARD_proposalvariance_h
+#ifndef GUARD_bp_mcmc_proposalvariance_h
+#define GUARD_bp_mcmc_proposalvariance_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <math.h>
-#include "counter.h"
+#include <bp_mcmc/counter.h>
 
 
 //

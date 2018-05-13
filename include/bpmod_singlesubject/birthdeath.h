@@ -1,9 +1,11 @@
-#ifndef GUARD_birthdeath_h
-#define GUARD_birthdeath_h
+#ifndef GUARD_bpmod_singlesubject_birthdeath_h
+#define GUARD_bpmod_singlesubject_birthdeath_h
 
 #include <RcppArmadillo.h>
-#include <RInside.h>                    // for the embedded R via RInside
-#include "datastructures.h"
+#ifndef NORINSIDE
+#include <RInside.h>
+#endif
+#include <bp_datastructures/bp_datastructures.h>
 
 
 
@@ -59,8 +61,8 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
 
   // TEMP -- add as argument
   int strauss = 1;
-  std::cout << "In the birth-death sample function" << std::endl;
-  std::cout << "Current likelihood is " << patient->likelihood(false) << std::endl;
+  //std::cout << "In the birth-death sample function" << std::endl;
+  //std::cout << "Current likelihood is " << patient->likelihood(false) << std::endl;
 
   //-----------------------------------------
   // Prepare for birth death loop. Save and
@@ -68,13 +70,13 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
   //-----------------------------------------
   total_birth_rate = (double)patient->priors->pulse_count;
 
-  std::cout << "Total birth rate is " << total_birth_rate << std::endl;
+  //std::cout << "Total birth rate is " << total_birth_rate << std::endl;
 
   // If Strauss, calculate instantaneous birth rate (which is the prior intensity)
   if (strauss == 1) {
     birth_rate = total_birth_rate / (fitend - fitstart);
   }
-  std::cout << "Instantaneous birth rate is " << birth_rate << std::endl;
+  //std::cout << "Instantaneous birth rate is " << birth_rate << std::endl;
 
 
   // Start Birth-death loop Run until break reached
@@ -85,7 +87,7 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
     // Calculate death rate for each component conditional on Strauss or order
     // statistic -- using pulse count and partial likelihoods
     pulse_count = patient->get_pulsecount();
-    std::cout << "Pulse count is " << pulse_count << std::endl;
+    //std::cout << "Pulse count is " << pulse_count << std::endl;
 
     arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);;
     //std::cout << "Partial likelihoods are " << partial_likelihood << std::endl;
@@ -117,17 +119,17 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
 
     // Update virtual time (how long to run BD step) - Draw from exp(B+D) and add to current S 
     double lambda = 1 /( total_birth_rate + total_death_rate);
-    std::cout << "total birth rate = " << total_birth_rate << " total_death_rate = " << total_death_rate << std::endl;
-    std::cout << "lambda = " << lambda << std::endl;
+    //std::cout << "total birth rate = " << total_birth_rate << " total_death_rate = " << total_death_rate << std::endl;
+    //std::cout << "lambda = " << lambda << std::endl;
     S += Rf_rexp(lambda);
     // If S exceeds T or if we've run this too many times, break
     if (S > T)      { 
-      std::cout << "In break 1" << std::endl;
-      std::cout << "S = " << S << " and T = " << T << std::endl;
+      //std::cout << "In break 1" << std::endl;
+      //std::cout << "S = " << S << " and T = " << T << std::endl;
       break; 
     }
     if (aaa > 5000) { 
-      std::cout << "In break 2" << std::endl;
+      //std::cout << "In break 2" << std::endl;
       break; 
     }
 
@@ -135,7 +137,7 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
     // Select Birth or Death and proceed with either
     if (Rf_runif(0, 1) < max) { // If U < B/(B+D), a birth occurs 
 
-      std::cout << "In possible birth step" << std::endl;
+      //std::cout << "In possible birth step" << std::endl;
 
       // Generate new position
       position = Rf_runif(fitstart, fitend);
@@ -152,12 +154,12 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
 
       // If it's a valid position, generate initial parms and insert node
       if (accept_pos == 1) {
-        std::cout << "In for sure birth step" << std::endl;
+        //std::cout << "In for sure birth step" << std::endl;
         add_new_pulse(patient, position);
       }
 
     } else { // Otherwise, a death occurs 
-        std::cout << "In for sure death step" << std::endl;
+        //std::cout << "In for sure death step" << std::endl;
         remove_pulse(patient, death_rate, pulse_count);
     }
 
@@ -191,7 +193,7 @@ void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
   //}
 
   // Create new pulse and insert
-  PulseEstimate new_pulse(position, new_mass, new_width, new_tvarscale_mass,
+  PulseEstimates new_pulse(position, new_mass, new_width, new_tvarscale_mass,
                           new_tvarscale_width, patient->estimates->get_decay(),
                           patient->data->time);
 

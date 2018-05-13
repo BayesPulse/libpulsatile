@@ -1,12 +1,14 @@
-#ifndef GUARD_metropolishastings_h
-#define GUARD_metropolishastings_h
+#ifndef GUARD_bp_mcmc_metropolishastings_h
+#define GUARD_bp_mcmc_metropolishastings_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
-#include "proposalvariance.h"
-#include "patient.h"
-#include "datastructures.h"
-#include "utils.h"
+#endif
+#include <bp_mcmc/proposalvariance.h>
+//#include <bp_datastructures/patient.h>
+//#include <bp_datastructures/datastructures.h>
+#include <bp_mcmc/utils.h>
 
 // metropolishastings.h
 //   Abstract class for defining Modified Metropolis Hastings samplers

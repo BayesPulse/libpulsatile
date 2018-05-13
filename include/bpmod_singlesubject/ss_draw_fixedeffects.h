@@ -1,11 +1,13 @@
-#ifndef GUARD_ss_draw_fixedeffects_h
-#define GUARD_ss_draw_fixedeffects_h
+#ifndef GUARD_bpmod_singlesubject_draw_fixedeffects_h
+#define GUARD_bpmod_singlesubject_draw_fixedeffects_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <math.h>
-#include "mh.h"
-#include "patient.h"
+#include <bp_mcmc/mh.h>
+#include <bp_datastructures/patient.h>
 
 
 //
@@ -38,15 +40,15 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
            prior_variance_ = &PatientPriors::width_variance;
            est_mean_       = &PatientEstimates::width_mean;
            est_sd_         = &PatientEstimates::width_sd;
-           tvarscale_      = &PulseEstimate::tvarscale_width;
-           randomeffect_   = &PulseEstimate::width;
+           tvarscale_      = &PulseEstimates::tvarscale_width;
+           randomeffect_   = &PulseEstimates::width;
          } else {
            prior_mean_     = &PatientPriors::mass_mean;
            prior_variance_ = &PatientPriors::mass_variance;
            est_mean_       = &PatientEstimates::mass_mean;
            est_sd_         = &PatientEstimates::mass_sd;
-           tvarscale_      = &PulseEstimate::tvarscale_mass;
-           randomeffect_   = &PulseEstimate::mass;
+           tvarscale_      = &PulseEstimates::tvarscale_mass;
+           randomeffect_   = &PulseEstimates::mass;
          }
 
        };
@@ -57,8 +59,8 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
     double PatientPriors::*prior_variance_;
     double PatientEstimates::*est_mean_;
     double PatientEstimates::*est_sd_;
-    double PulseEstimate::*tvarscale_;
-    double PulseEstimate::*randomeffect_; //pulse specific mass or width
+    double PulseEstimates::*tvarscale_;
+    double PulseEstimates::*randomeffect_; //pulse specific mass or width
 
     bool parameter_support(double val, bool *notused) { return (val > 0.0); }
 

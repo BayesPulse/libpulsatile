@@ -2,8 +2,14 @@
 #define GUARD_population_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
-#include "patient.h"
+#endif
+#include "bp_datastructures/patient.h"
+#include "bp_datastructures/patientdata.h"
+#include "bp_datastructures/patientestimates.h"
+#include "bp_datastructures/patientpriors.h"
+#include "bp_datastructures/pulseestimates.h"
 
 //
 // population.h

@@ -1,8 +1,10 @@
-#ifndef GUARD_utils_h
-#define GUARD_utils_h
+#ifndef GUARD_bp_mcmc_utils_h
+#define GUARD_bp_mcmc_utils_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 
 
 //

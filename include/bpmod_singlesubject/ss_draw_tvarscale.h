@@ -1,11 +1,13 @@
-#ifndef GUARD_ss_draw_tvarscale_h
-#define GUARD_ss_draw_tvarscale_h
+#ifndef GUARD_bpmod_singlesubject_draw_tvarscale_h
+#define GUARD_bpmod_singlesubject_draw_tvarscale_h
 
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
+#endif
 #include <math.h>
-#include "mh.h"
-#include "patient.h"
+#include <bp_mcmc/mh.h>
+#include <bp_datastructures/patient.h>
 
 
 // NOTE: I separated out function definitions here 
@@ -16,7 +18,7 @@
 //   sample the mean mass & width
 //
 
-class SS_DrawTVarScale : public ModifiedMetropolisHastings<PulseEstimate, Patient, double, ProposalVariance>
+class SS_DrawTVarScale : public ModifiedMetropolisHastings<PulseEstimates, Patient, double, ProposalVariance>
 {
 
   public:
@@ -24,7 +26,7 @@ class SS_DrawTVarScale : public ModifiedMetropolisHastings<PulseEstimate, Patien
     SS_DrawTVarScale(double in_pv, int in_adjust_iter, int in_max_iter,
                      double in_target_ratio) :
       ModifiedMetropolisHastings
-      <PulseEstimate, Patient, double,
+      <PulseEstimates, Patient, double,
        ProposalVariance>::ModifiedMetropolisHastings(in_pv,
                                                      in_adjust_iter,
                                                      in_max_iter,
@@ -45,7 +47,7 @@ class SS_DrawTVarScale : public ModifiedMetropolisHastings<PulseEstimate, Patien
 
   private:
     bool parameter_support(double val, Patient *notused);
-    double posterior_function(PulseEstimate *pulse, double proposal, Patient *patient);
+    double posterior_function(PulseEstimates *pulse, double proposal, Patient *patient);
 
 };
 
@@ -66,7 +68,7 @@ bool SS_DrawTVarScale::parameter_support(double val, Patient *notused) {
 // posterior_function()
 //   Calculates the acceptance ratio for use in modified metropolis hastings
 //   sampler (inherited SS_DrawTVarScale::sample() function)
-double SS_DrawTVarScale::posterior_function(PulseEstimate *pulse, 
+double SS_DrawTVarScale::posterior_function(PulseEstimates *pulse, 
                                             double proposal, 
                                             Patient *patient) {
 

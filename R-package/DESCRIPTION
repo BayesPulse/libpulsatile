@@ -13,9 +13,14 @@ BugReports: https://github.com/BayesPulse/bayespulse/issues
 License: GPL (>= 2)
 Imports: 
   Rcpp (>= 0.12.13), 
-  RcppArmadillo
+  RcppArmadillo,
+  dplyr,
+  ggplot2,
+  tibble,
+  tidyr,
+  magrittr
 Suggests: 
-  testthat
+  testthat,
 LinkingTo: 
   Rcpp, 
   RcppArmadillo, 

@@ -1,10 +1,9 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
+#include <bpmod_singlesubject/bpmod_singlesubject.h>
+#ifndef NORINSIDE
 #include <RInside.h>
-//#include "patient.h"
-//#include "population.h"
-//#include "utils.h"
-#include "model_singlesubject.h"
+#endif
 
 using namespace Rcpp;
 
@@ -75,7 +74,6 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
                             startingvals["errorsq"],
                             startingvals["mass_mean"],
                             startingvals["width_mean"],
-                            startingvals["pulse_count"],
                             startingvals["mass_sd"],
                             startingvals["width_sd"]);
 
@@ -93,7 +91,7 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
   //--------------------------------------
 
   // Birth-death process
-  BirthDeathProcess birth_death;
+  //BirthDeathProcess birth_death;
 
   // Modified Metropolis Hastings for fixed effects (mean mass & mean width)
   SS_DrawFixedEffects draw_fixeff_mass(proposalvars["mass_mean"], adj_iter,
@@ -130,10 +128,14 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
   //                                      adj_iter, adj_max, univ_target, true);
 
 
+  // Create output objects (chains)
+  Chains chains(1, 1, 1, false); 
+
   // Sample MMH objects
   for (int i = 0; i < mcmc_iterations; i++) {
 
-    birth_death.sample(patient, false);
+    checkUserInterrupt();
+    //birth_death.sample(patient, false);
     draw_fixeff_mass.sample(patient, &patient->estimates->mass_mean);
     draw_fixeff_width.sample(patient, &patient->estimates->mass_mean);
     //draw_sd_masses.sample(patient, &patient->estimates->mass_sd, patient);
@@ -147,7 +149,7 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
 
     //print_diagnostic_output(verbose);
     ////std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;
-    //save_sample(thin);
+    //save_sample(patient, thin);
 
   }
 
