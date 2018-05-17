@@ -91,7 +91,7 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
   //--------------------------------------
 
   // Birth-death process
-  //BirthDeathProcess birth_death;
+  BirthDeathProcess birth_death;
 
   // Modified Metropolis Hastings for fixed effects (mean mass & mean width)
   SS_DrawFixedEffects draw_fixeff_mass(proposalvars["mass_mean"], adj_iter,
@@ -129,15 +129,18 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
 
 
   // Create output objects (chains)
-  Chains chains(mcmc_iterations, thin, burnin, false); 
+  Rcpp::Rcout << "mcmc iterations = " << mcmc_iterations << std::endl;
+  Rcpp::Rcout << "thin = " << thin << std::endl;
+  Rcpp::Rcout << "burnin = " << burnin << std::endl;
+  Chains chains(mcmc_iterations, thin, burnin, false);
 
   // Sample MMH objects
   for (int i = 0; i < mcmc_iterations; i++) {
 
     checkUserInterrupt();
-    //birth_death.sample(patient, false);
+    birth_death.sample(patient, false);
     draw_fixeff_mass.sample(patient, &patient->estimates->mass_mean);
-    draw_fixeff_width.sample(patient, &patient->estimates->mass_mean);
+    draw_fixeff_width.sample(patient, &patient->estimates->width_mean);
     //draw_sd_masses.sample(patient, &patient->estimates->mass_sd, patient);
     //draw_sd_widths.sample(patient, &patient->estimates->mass_sd, patient);
     draw_blhl.sample(patient, &patient->estimates->baseline_halflife);
@@ -155,8 +158,9 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
 
   NumericVector v1(0); 
   List L = List::create(Named("name1") = v1);
+  //List out = List::create(Named("name1") = v1);
 
-  //return chains.output();
-  return L;
+  return chains.output();
+  //return L;
 
 }

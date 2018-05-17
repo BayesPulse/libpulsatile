@@ -60,7 +60,7 @@ class Chains {
       //std::fill(patient_chain.begin(), patient_chain.end(), 0.0);
 
       // Model type
-      model_type = "single_subject";
+      //model_type = "single_subject";
 
     }
 
@@ -75,7 +75,7 @@ class Chains {
     //
     // Member scalar definitions
     //
-    String model_type;
+    //String model_type;
     int iterations;
     int thin;
     int burnin;
@@ -175,30 +175,30 @@ void Chains::save_sample(Patient * pat, int iter) {
 
 };
 
-//// Return chains function
-//List Chains::output() {
-//
-//  // Add names to each output chain
-//  NumericMatrix patient_chain_r = as<NumericMatrix>(wrap(patient_chain));
-//  patient_chain_r = addattribs_patient_chain(patient_chain_r);
-//  // would like to do this, but requires patient_chain class:
-//  // patient_chain.add_attribs(); 
-//
-//  //pulse_chains = addattribs_pulse_chain(pulse_chains);
-//
-//  // Create list object combining all chains & other output
-//  List out = List::create(Named("patient_chain") = patient_chain);//,
-//                        //Named("pulse_chains") = pulse_chains);
-//
-//  return out;
-//
-//}
-//
-////void save_sample(Population * pop) {
-//
-////};
-//
-//
+// Return chains function
+List Chains::output() {
+
+  // Add names to each output chain
+  NumericMatrix patient_chain_r = as<NumericMatrix>(wrap(patient_chain));
+  patient_chain_r = addattribs_patient_chain(patient_chain_r);
+  // would like to do this, but requires patient_chain class:
+  // patient_chain.add_attribs(); 
+
+  //pulse_chains = addattribs_pulse_chain(pulse_chains);
+
+  // Create list object combining all chains & other output
+  List out = List::create(Named("patient_chain") = patient_chain_r);
+                          //Named("pulse_chains") = pulse_chains_r);
+
+  return out;
+
+}
+
+//void save_sample(Population * pop) {
+
+//};
+
+
 //
 // Supporting/Internal functions
 //
