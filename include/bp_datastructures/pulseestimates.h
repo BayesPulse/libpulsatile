@@ -56,6 +56,13 @@ class PulseEstimates {
 
     }
 
+    // For returining to chain
+    arma::rowvec get_vector_of_values() 
+    {
+      arma::rowvec out { time, mass, width, tvarscale_mass, tvarscale_width, lambda };
+      return out;
+    }
+
     // Constructor for new PulseEstimates objects
     PulseEstimates(double in_time,
                   double in_mass,
