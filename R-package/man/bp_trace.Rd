@@ -20,7 +20,7 @@ bp_location_posterior(fit)
 }
 \description{
 Plotting functions for mcmc chains from \code{fit_pulse()} models.  Includes
-trace plots and posterior densities of the 'common' parameters and pulse
+trace plots and posterior densities of the 'patient' parameters and pulse
 location density (a set of pulse-specific parameter, from 'pulse' chain).
 }
 \examples{

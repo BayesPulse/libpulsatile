@@ -8,7 +8,7 @@ library(RcppArmadillo)
 library(ggplot2)
 # library(testthat)
 
-source("./build_package.R")
+source("./build_package.R", echo=TRUE)
 
 Rcpp::compileAttributes()
 devtools::document()
@@ -28,8 +28,9 @@ library(bayespulse)
 set.seed(2018-06-21)
 sim <- simulate_pulse()
 spec <- pulse_spec()
-fit <- fit_pulse(sim, spec = spec, iters = 100000, thin = 10, verbose = TRUE)
+fit <- fit_pulse(sim, spec = spec, iters = 100, thin = 1, verbose = TRUE)
 
+# Doesn't yet work -- not yet correct class
 bp_trace(fit)
 
 

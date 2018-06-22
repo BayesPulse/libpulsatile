@@ -9,7 +9,7 @@
 #' hormone data.  Expects a tidy, long-format dataset (columns for time,
 #' concentration, and subject ID; row for every concentration measurement).
 #'
-#' @param .data A dataset containing \code{time} and \code{conc}.  Can
+#' @param data A dataset containing \code{time} and \code{conc}.  Can
 #'   also be a \code{pulse_sim} object.
 #' @param time A string. Name of the time variable in \code{data}.
 #' @param conc A string. Name of the hormone concentration variable in
@@ -33,10 +33,11 @@
 #' @examples
 #' this_pulse <- simulate_pulse()
 #' this_spec  <- pulse_spec()
-#' #this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10, 
+#' #this_fit   <- fit_pulse(data = this_pulse, iters = 1000, thin = 10, 
 #' #                        burnin = 100, spec = this_spec)
+#' importFrom tibble as_data_frame
 #' @export
-fit_pulse <- function(.data,
+fit_pulse <- function(data,
                       time = "time",
                       conc = "concentration",
                       subject_id = NULL,
@@ -52,10 +53,10 @@ fit_pulse <- function(.data,
                       ) {
 
   
-  if (all(class(.data) == "pulse_sim")) {
-    indata <- .data$data
+  if (all(class(data) == "pulse_sim")) {
+    indata <- data$data
   } else {
-    indata <- data.frame("time" = .data[[time]], "concentration" = .data[[conc]])
+    indata <- data.frame("time" = data[[time]], "concentration" = data[[conc]])
   }
 
   stopifnot(is.numeric(indata[[time]]), is.numeric(indata[[conc]]),
@@ -63,7 +64,7 @@ fit_pulse <- function(.data,
   if (burnin >= iters) stop("burnin >= iters")
 
   #---------------------------------------
-  # Temporary work-arounds
+  # TODO: Temporary work-arounds 
   #---------------------------------------
   # model type argument -- put in pulse_spec? 
   #model_type <- match.arg(model_type)
@@ -83,7 +84,7 @@ fit_pulse <- function(.data,
 
   # ideas via survival::coxph 
   Call  <- match.call()
-  arg_indx <- match(c(".data", "time", "conc", "iters", "thin",
+  arg_indx <- match(c("data", "time", "conc", "iters", "thin",
                       "spec"), 
                     names(Call), nomatch = 0)
 
@@ -92,7 +93,7 @@ fit_pulse <- function(.data,
          documentation.")
   }
 
-  rtn <- singlesubject_(indata$concentration,
+  fit <- singlesubject_(indata$concentration,
                         indata$time,
                         priors,
                         proposalvariances,
@@ -101,35 +102,34 @@ fit_pulse <- function(.data,
                         pv_adjust_iter, pv_adjust_max_iter,
                         bivariate_pv_target_ratio, univariate_pv_target_ratio)
 
-  #common_chain <- as.data.frame(rtn[[1]])
-  #pulse_chain  <- as.data.frame(do.call(rbind, rtn[[2]]))
+  patient_chain <- as.data.frame(fit$patient_chain)
+  pulse_chain   <- as.data.frame(do.call(rbind, fit$pulse_chains))
 
-  ## 
-  #pulse_chain$iteration <- as.integer(pulse_chain$iteration)
-  #pulse_chain$total_num_pulses <- as.integer(pulse_chain$total_num_pulses)
-  #pulse_chain$pulse_num <- as.integer(pulse_chain$pulse_num)
-  #common_chain$iteration <- as.integer(common_chain$iteration)
-  #common_chain$num_pulses <- as.integer(common_chain$num_pulses)
+  # Convert doubles to ints -- not strictly necessary -- consider.
+  pulse_chain$iteration        <- as.integer(pulse_chain$iteration)
+  pulse_chain$total_num_pulses <- as.integer(pulse_chain$total_num_pulses)
+  pulse_chain$pulse_num        <- as.integer(pulse_chain$pulse_num)
+  patient_chain$iteration       <- as.integer(patient_chain$iteration)
+  patient_chain$num_pulses      <- as.integer(patient_chain$num_pulses)
 
-  #if (use_tibble) {
-  #  common_chain = tibble::as_data_frame(common_chain)
-  #  pulse_chain = tibble::as_data_frame(pulse_chain)
-  #}
+  if (use_tibble) {
+    patient_chain <- tibble::as_data_frame(patient_chain)
+    pulse_chain  <- tibble::as_data_frame(pulse_chain)
+  }
 
-  #rtn_obj <- 
-  #  structure(list("model"        = "single-subject",
-  #                 "call"         = Call,
-  #                 "common_chain" = common_chain,
-  #                 "pulse_chain"  = pulse_chain,
-  #                 "data"         = .data,
-  #                 "options"      = list("time" = time,
-  #                                       "conc" = conc,
-  #                                       "thinning"   = thin, 
-  #                                       "iterations" = iters),
-  #                 "spec"         = spec),
-  #            class = "pulse_fit")
+  rtn_obj <- 
+    structure(list("model"        = "single-subject",
+                   "call"         = Call,
+                   "patient_chain" = patient_chain,
+                   "pulse_chain"  = pulse_chain,
+                   "data"         = data,
+                   "options"      = list("time" = time,
+                                         "conc" = conc,
+                                         "thinning"   = thin, 
+                                         "iterations" = iters),
+                   "spec"         = spec),
+              class = "pulse_fit")
 
-  #return(rtn_obj)
-  return(rtn)
+  return(rtn_obj)
 
 }

@@ -86,9 +86,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   Patient pat(data_obj, priors_obj, estimates_obj);
   Patient * patient = &pat;
 
-  //--------------------------------------
+
+  //----------------------------------------
   // Create sampler objects
-  //--------------------------------------
+  //----------------------------------------
 
   // Birth-death process
   BirthDeathProcess birth_death;
@@ -134,7 +135,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   Rcpp::Rcout << "burnin = " << burnin << std::endl;
   Chains chains(mcmc_iterations, thin, burnin, false);
 
+
+  //----------------------------------------
   // Sample MMH objects
+  //----------------------------------------
   for (int i = 0; i < mcmc_iterations; i++) {
 
     checkUserInterrupt();
@@ -156,11 +160,6 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
   }
 
-  //NumericVector v1(0); 
-  //List L = List::create(Named("name1") = v1);
-  //List out = List::create(Named("name1") = v1);
-
   return chains.output();
-  //return L;
 
 }

@@ -2,6 +2,10 @@
 unlink("./inst/include", recursive = TRUE)
 unlink("./src/tests", recursive = TRUE)
 unlink("./src/singlesubject.cpp", recursive = TRUE)
+
+compiled_files <- dir(path = "./src", pattern = "\\.so|\\.o")
+if (length(compiled_files) > 0) file.remove(paste0("./src/", compiled_files))
+
 if (!file.copy("./../include", "./inst/", overwrite = TRUE, recursive = TRUE)) {
   stop("Cannot find folder libpulsatile/include")
 }
@@ -11,6 +15,7 @@ if (!file.copy("./../tests", "./src/", overwrite = TRUE, recursive = TRUE)) {
 if (!file.copy("./../src/singlesubject.cpp", "./src/", overwrite = TRUE, recursive = TRUE)) {
   stop("Cannot find folder libpulsatile/src")
 }
+#file.remove("./inst/include/testing/catch.h")
 #if (!file.copy("./../CMakeLists.txt", "./src/", overwrite = TRUE, recursive = TRUE)) {
 #  stop("Cannot find file LightGBM/CMakeLists.txt")
 #}

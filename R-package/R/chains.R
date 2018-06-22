@@ -23,7 +23,7 @@
 #'                    burnin = 100, spec = spec)
 #' #chains(fit)
 #' #pulse_chain(fit)
-#' #common_chain(fit)
+#' #patient_chain(fit)
 #'
 #' @export
 chains <- function(fit) {
@@ -43,11 +43,11 @@ pulse_chain.pulse_fit <- function(fit) {
 
 #' @rdname chains
 #' @export
-common_chain <- function(fit) UseMethod("common_chain")
+patient_chain <- function(fit) UseMethod("patient_chain")
 
 #' @export
-common_chain.pulse_fit <- function(fit) {
-  fit$common_chain
+patient_chain.pulse_fit <- function(fit) {
+  fit$patient_chain
 }
 
 

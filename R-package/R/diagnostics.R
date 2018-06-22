@@ -1,7 +1,7 @@
 #' Diagnostic plots for \code{fit_pulse()} models
 #' 
 #' Plotting functions for mcmc chains from \code{fit_pulse()} models.  Includes
-#' trace plots and posterior densities of the 'common' parameters and pulse
+#' trace plots and posterior densities of the 'patient' parameters and pulse
 #' location density (a set of pulse-specific parameter, from 'pulse' chain).
 #' 
 #' @param fit A model fit from \code{fit_pulse()}.
@@ -27,7 +27,7 @@ bp_trace <- function(fit) {
 
   stopifnot(class(fit) == "pulse_fit")
 
-  dat <- common_chain(fit) 
+  dat <- patient_chain(fit) 
   dat <- tidyr::gather_(dat, key = "key", value = "value",
                         dplyr::select_vars_(names(dat), names(dat),
                                             exclude = "iteration"))
@@ -45,7 +45,7 @@ bp_posteriors <- function(fit, type = c("histogram", "density")) {
 
   stopifnot(class(fit) == "pulse_fit")
 
-  dat <- common_chain(fit) 
+  dat <- patient_chain(fit) 
   dat <- tidyr::gather_(dat, key = "key", value = "value", 
                         dplyr::select_vars_(names(dat), names(dat),
                                             exclude = "iteration"))

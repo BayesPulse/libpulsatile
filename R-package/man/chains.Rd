@@ -3,14 +3,14 @@
 \name{chains}
 \alias{chains}
 \alias{pulse_chain}
-\alias{common_chain}
+\alias{patient_chain}
 \title{chains}
 \usage{
 chains(fit)
 
 pulse_chain(fit)
 
-common_chain(fit)
+patient_chain(fit)
 }
 \arguments{
 \item{fit}{A model fit from \code{fit_pulse}.}
@@ -27,7 +27,7 @@ fit   <- fit_pulse(.data = pulse, iters = 1000, thin = 10,
                    burnin = 100, spec = spec)
 #chains(fit)
 #pulse_chain(fit)
-#common_chain(fit)
+#patient_chain(fit)
 
 }
 \keyword{fit}

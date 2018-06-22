@@ -4,12 +4,12 @@
 \alias{fit_pulse}
 \title{fit_pulse}
 \usage{
-fit_pulse(.data, time = "time", conc = "concentration", subject_id = NULL,
+fit_pulse(data, time = "time", conc = "concentration", subject_id = NULL,
   spec, iters = 250000, thin = 50, burnin = as.integer(0.1 * iters),
   use_tibble = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{.data}{A dataset containing \code{time} and \code{conc}.  Can
+\item{data}{A dataset containing \code{time} and \code{conc}.  Can
 also be a \code{pulse_sim} object.}
 
 \item{time}{A string. Name of the time variable in \code{data}.}
@@ -46,8 +46,9 @@ concentration, and subject ID; row for every concentration measurement).
 \examples{
 this_pulse <- simulate_pulse()
 this_spec  <- pulse_spec()
-#this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10, 
+#this_fit   <- fit_pulse(data = this_pulse, iters = 1000, thin = 10, 
 #                        burnin = 100, spec = this_spec)
+importFrom tibble as_data_frame
 }
 \keyword{fit}
 \keyword{pulse}
