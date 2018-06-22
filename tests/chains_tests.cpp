@@ -98,7 +98,7 @@ TEST_CASE( "first chains test -- single subject, single hormone", "[chains]" ) {
   SECTION( "Check constructor creates empty chain objects" ) {
     REQUIRE( chains.patient_chain.n_rows == 45 );
     REQUIRE( chains.patient_chain.n_cols == 9 );
-    REQUIRE( abs(chains.patient_chain.max() - chains.patient_chain.min()) < 0.000001 );
+    REQUIRE( std::abs(chains.patient_chain.max() - chains.patient_chain.min()) < 0.000001 );
     REQUIRE( chains.patient_chain(11, 1) == 0.0 );
     REQUIRE( chains.patient_chain(12, 1) == 0.0 );
   }
@@ -108,7 +108,7 @@ TEST_CASE( "first chains test -- single subject, single hormone", "[chains]" ) {
   chains.save_sample(&pat, 52);
 
   SECTION( "Check save_sample() function populates common chain" ) {
-    REQUIRE( abs(chains.patient_chain.max() - chains.patient_chain.min()) > 0.000001 );
+    REQUIRE( std::abs(chains.patient_chain.max() - chains.patient_chain.min()) > 0.000001 );
     REQUIRE( chains.patient_chain(10, 0) == 30 );
     REQUIRE( chains.patient_chain(10, 1) == 11 );
     REQUIRE( chains.patient_chain(10, 2) == 2.6 );

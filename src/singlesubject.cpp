@@ -20,19 +20,19 @@ using namespace Rcpp;
 
 
 // [[Rcpp::export]]
-Rcpp::List singlesubject(Rcpp::NumericVector concentration,
-                         Rcpp::NumericVector time,
-                         Rcpp::List priors,
-                         Rcpp::List proposalvars,
-                         Rcpp::List startingvals,
-                         int mcmc_iterations,
-                         int thin,
-                         int burnin,
-                         bool verbose,
-                         int pv_adjust_iter,
-                         int pv_adjust_max_iter,
-                         double bivariate_pv_target_ratio,
-                         double univariate_pv_target_ratio)
+Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
+                          Rcpp::NumericVector time,
+                          Rcpp::List priors,
+                          Rcpp::List proposalvars,
+                          Rcpp::List startingvals,
+                          int mcmc_iterations,
+                          int thin,
+                          int burnin,
+                          bool verbose,
+                          int pv_adjust_iter,
+                          int pv_adjust_max_iter,
+                          double bivariate_pv_target_ratio,
+                          double univariate_pv_target_ratio)
 {
 
   // Check for valid input
@@ -156,8 +156,8 @@ Rcpp::List singlesubject(Rcpp::NumericVector concentration,
 
   }
 
-  NumericVector v1(0); 
-  List L = List::create(Named("name1") = v1);
+  //NumericVector v1(0); 
+  //List L = List::create(Named("name1") = v1);
   //List out = List::create(Named("name1") = v1);
 
   return chains.output();

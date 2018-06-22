@@ -11,6 +11,7 @@
 #include "bp_datastructures/patientpriors.h"
 #include "bp_datastructures/pulseestimates.h"
 
+typedef std::vector<arma::mat>  MatrixVector;
 
 
 //
@@ -20,8 +21,6 @@
 
 //struct PulseChain { NumericMatrix pulse; };
 //struct PatientChain { NumericMatrix patient; };
-//struct PopulationChain { NumericMatrix population; };
-//struct AssociationChain { NumericMatrix association; };
 
 
 //
@@ -30,103 +29,80 @@
 //
 
 // TODO: split out patient chain with constructor bool args for population and
-// assocation, then pop creates X number of these + the pop chain
+// association, then pop creates X number of these + the pop chain
 
 using namespace Rcpp;
 
 
-
-
-
+// Chains class
+//   currently only single-subject (pulse and common)
+//
+// Description:
+//   Key components:
+//     - constructor (response y/n)
+//     - add R attributes
+//     - save_sample() function
+//     - output() function
 class Chains {
 
-  public: 
-
-    //
-    // Constructors
-    //
+  public:
 
     // Base constructor (single subject, single hormone)
     Chains(int in_iterations, int in_thin, int in_burnin, bool in_response_hormone) :
       num_outputs((in_iterations - in_burnin) / in_thin),
       patient_chain(num_outputs, 9, arma::fill::zeros) {
 
-      //patient_chain.fill(0.0);
-      iterations       = in_iterations;
-      thin             = in_thin;
-      burnin           = in_burnin;
-      response_hormone = in_response_hormone;
+        //patient_chain.fill(0.0);
+        iterations       = in_iterations;
+        thin             = in_thin;
+        burnin           = in_burnin;
+        response_hormone = in_response_hormone;
 
-      //std::fill(patient_chain.begin(), patient_chain.end(), 0.0);
+        //std::fill(patient_chain.begin(), patient_chain.end(), 0.0);
 
-      // Model type
-      //model_type = "single_subject";
+        // Model type
+        //model_type = "single_subject";
 
-    }
+      }
 
-    // Population constructor
-    // Chains(int iterations, int thin, int burnin, bool response_hormone, int num_patients) :
-    //   Chains(iterations, thin, burnin, response_hormone) {
-    //   association_chain(num_outputs, 4);
-    //  model_type = "population";
-    //   }
-
-
-    //
+    //----------------------------------------
+    // Member definitions
+    //----------------------------------------
     // Member scalar definitions
-    //
-    //String model_type;
     int iterations;
     int thin;
     int burnin;
     bool response_hormone;
     int num_outputs;
-
-    //
-    // Member object definitions
-    //
-    std::vector<arma::mat> pulse_chains;
-    arma::mat one_set_of_pulses; // objects added to pulse_chains list, ncol=8
+    //String model_type;
+    MatrixVector pulse_chains;
     arma::mat patient_chain;
-    arma::mat association_chain;
-    arma::mat population_chain;
 
-  //
-  // Primary user-facing functions -- adds 1 iteration to Chains object
-  //
+    //----------------------------------------
+    // Primary user-facing functions
+    //----------------------------------------
+    // Record this iteration -- adds 1 iteration to Chains object
+    void save_sample(Patient * pat, int iter);
+    // Return chains function
+    List output();
 
-  // Record this iteration 
-  void save_sample(Patient * pat, int iter);
-  //void save_sample(Population * pop);
-
-  // Return chains function
-  List output();
-
-
-
-  //
-  // Supporting/Internal functions
-  //
-
-  // Functions for adding attributes to chains
-  NumericMatrix addattribs_patient_chain(NumericMatrix out);
-  //NumericMatrix addattribs_association_chain(NumericMatrix out);
-  NumericMatrix addattribs_set_of_pulses(NumericMatrix out);
-  //// Function for adding attributes to population_chain
-  //// TODO: Straighten out variance vs SD terms and why is there a variance AND
-  //// SD term for mass/width
-  //NumericMatrix addattribs_population_chain(NumericMatrix out);
+  private: 
+    //----------------------------------------
+    // Supporting/Internal functions
+    //----------------------------------------
+    // Functions for adding attributes to chains
+    NumericMatrix addattribs_patient_chain(arma::mat out);
+    List addattribs_pulse_chain(MatrixVector out);
+    NumericMatrix addattribs_set_of_pulses(NumericMatrix out);
 
 };
 
 
+//------------------------------------------------------------
+// User-facing functions
+//------------------------------------------------------------
 
-
-
-
-
-
-// Record this iteration 
+// Member Function: Record this iteration
 void Chains::save_sample(Patient * pat, int iter) {
 
   if (iter > burnin & (iter % thin) == 0) {
@@ -175,37 +151,35 @@ void Chains::save_sample(Patient * pat, int iter) {
 
 };
 
-// Return chains function
+// Member Function: Return chains object (R list)
 List Chains::output() {
 
   // Add names to each output chain
-  NumericMatrix patient_chain_r = as<NumericMatrix>(wrap(patient_chain));
-  patient_chain_r = addattribs_patient_chain(patient_chain_r);
-  // would like to do this, but requires patient_chain class:
-  // patient_chain.add_attribs(); 
-
-  //pulse_chains = addattribs_pulse_chain(pulse_chains);
+  NumericMatrix patient_chain_r = addattribs_patient_chain(patient_chain);
+  List pulse_chain_r            = addattribs_pulse_chain(pulse_chains);
 
   // Create list object combining all chains & other output
-  List out = List::create(Named("patient_chain") = patient_chain_r);
-                          //Named("pulse_chains") = pulse_chains_r);
+  List out = List::create(Named("patient_chain") = patient_chain_r,
+                          Named("pulse_chains") = pulse_chains);
 
   return out;
 
 }
 
-//void save_sample(Population * pop) {
-
-//};
 
 
-//
+//------------------------------------------------------------
 // Supporting/Internal functions
-//
+//------------------------------------------------------------
 
-// Function for adding attributes to patient_chain
-NumericMatrix Chains::addattribs_patient_chain(NumericMatrix out) {
+// Member Function: Prep patient_chain for exporting
+NumericMatrix Chains::addattribs_patient_chain(arma::mat in) {
 
+  // Convert arma obj to Rcpp
+  NumericMatrix out = as<NumericMatrix>(wrap(in));
+
+  // Add R attributes
+  out.attr("class") = "patient_chain";
   colnames(out) = CharacterVector::create("iteration",
                                           "num_pulses",
                                           "baseline",
@@ -215,26 +189,12 @@ NumericMatrix Chains::addattribs_patient_chain(NumericMatrix out) {
                                           "model_error",
                                           "mass_sd",
                                           "width_sd");
-  out.attr("class") = "patient_chain";
 
   return out;
 
 }
 
-//// Function for adding attributes to association_chain
-//NumericMatrix Chains::addattribs_association_chain(NumericMatrix out) {
-//
-//  // TODO: clarify names -- check Karen's code and AssocEstimates in population.h
-//  colnames(out) = CharacterVector::create("iteration", 
-//                                          "cluster_size",
-//                                          "cluster_width");
-//  out.attr("class") = "association_chain";
-//
-//  return out;
-//
-//}
-
-// Function for adding attributes to one_set_of_pulses
+// Member Function: Function for adding attributes to one_set_of_pulses
 NumericMatrix Chains::addattribs_set_of_pulses(NumericMatrix out) {
 
   colnames(out) = CharacterVector::create("iteration",
@@ -251,25 +211,23 @@ NumericMatrix Chains::addattribs_set_of_pulses(NumericMatrix out) {
 
 }
 
-// Function for adding attributes to population_chain
-// TODO: Straighten out variance vs SD terms and why is there a variance AND
-// SD term for mass/width
-//NumericMatrix Chains::addattribs_population_chain(NumericMatrix out) {
-//  colnames(out) = CharacterVector::create("iteration",
-//                                          "baseline_mean",
-//                                          "baseline_variance",
-//                                          "halflife_mean",
-//                                          "halflife_variance",
-//                                          "mass_mean",
-//                                          "mass_variance",
-//                                          "mass_mean_sd",
-//                                          "width_mean",
-//                                          "width_variance",
-//                                          "width_mean_sd");
-//  out.attr("class") = "population_chain";
 //
-//  return out;
-//
-//}
+List Chains::addattribs_pulse_chain(std::vector<arma::mat>  in) {
+
+  //MatrixVector::iterator iter = pulse_chains.begin() ;
+  //while( iter != iter.end() ){
+
+  List out;
+  //NumericMatrix out;
+  int i = 0;
+  for (auto &one_iter : out) {  // uses range based loop instead of iterators
+    NumericMatrix this_iter = as<NumericMatrix>(wrap(one_iter));
+    out[i] = addattribs_set_of_pulses(this_iter);
+    i++;
+  }
+
+  return out;
+
+}
 
 #endif
