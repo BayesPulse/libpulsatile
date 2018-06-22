@@ -92,14 +92,14 @@ fit_pulse <- function(.data,
          documentation.")
   }
 
-  rtn <- singlesubject(indata$concentration,
-                       indata$time,
-                       priors,
-                       proposalvariances,
-                       startingvalues,
-                       iters, thin, burnin, verbose,
-                       pv_adjust_iter, pv_adjust_max_iter,
-                       bivariate_pv_target_ratio, univariate_pv_target_ratio)
+  rtn <- singlesubject_(indata$concentration,
+                        indata$time,
+                        priors,
+                        proposalvariances,
+                        startingvalues,
+                        iters, thin, burnin, verbose,
+                        pv_adjust_iter, pv_adjust_max_iter,
+                        bivariate_pv_target_ratio, univariate_pv_target_ratio)
 
   #common_chain <- as.data.frame(rtn[[1]])
   #pulse_chain  <- as.data.frame(do.call(rbind, rtn[[2]]))
