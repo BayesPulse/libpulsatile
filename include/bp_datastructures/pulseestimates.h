@@ -34,7 +34,7 @@ class PulseEstimates {
     double width;
     double tvarscale_mass;   // variance scale for mass t-dist (eta)
     double tvarscale_width;  // variance scale for width t-dist (eta)
-    double lambda; // for fsh pulse only, denomsum - NOT SURE WHAT THIS TERM IS
+    //double lambda; // for fsh pulse only, denomsum - NOT SURE WHAT THIS TERM IS
                    //FOR (from Karen's code)
 
     // Public user-facing access function for mean_contrib. Only calculates
@@ -59,7 +59,7 @@ class PulseEstimates {
     // For returining to chain
     arma::rowvec get_vector_of_values() 
     {
-      arma::rowvec out { time, mass, width, tvarscale_mass, tvarscale_width, lambda };
+      arma::rowvec out { time, mass, width, tvarscale_mass, tvarscale_width}; //, lambda };
       return out;
     }
 

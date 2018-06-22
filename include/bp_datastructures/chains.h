@@ -135,8 +135,9 @@ void Chains::save_sample(Patient * pat, int iter) {
     constructed_parms.col(2) = arma::linspace<arma::vec>(1, pulsecount, pulsecount);
 
     // Create matrix of current pulse-level estimates
-    arma::mat pulseparms(pulsecount, 6, arma::fill::zeros);
+    arma::mat pulseparms(pulsecount, 5, arma::fill::zeros);
     int i = 0;
+    //std::cout << "chain pulseparms size: " << pulseparms.size() << std::endl;
     for (auto &pulse : pat->pulses) {
       pulseparms.row(i) = pulse.get_vector_of_values();
       i++;
@@ -160,7 +161,7 @@ List Chains::output() {
 
   // Create list object combining all chains & other output
   List out = List::create(Named("patient_chain") = patient_chain_r,
-                          Named("pulse_chains") = pulse_chains);
+                          Named("pulse_chains") = pulse_chain_r);
 
   return out;
 
@@ -178,8 +179,12 @@ NumericMatrix Chains::addattribs_patient_chain(arma::mat in) {
   // Convert arma obj to Rcpp
   NumericMatrix out = as<NumericMatrix>(wrap(in));
 
+  //Rcout << "Hello world, I'm addattribs_patient_chain()" << std::endl;
   // Add R attributes
-  out.attr("class") = "patient_chain";
+  //CharacterVector classes = CharacterVector::create("patient_chain");
+  //Rcout << "classes = " << classes << std::endl;
+  //out.attr("class") = classes;
+
   colnames(out) = CharacterVector::create("iteration",
                                           "num_pulses",
                                           "baseline",
@@ -204,8 +209,10 @@ NumericMatrix Chains::addattribs_set_of_pulses(NumericMatrix out) {
                                           "mass",
                                           "width",
                                           "eta_mass",
-                                          "eta_width");
-  out.attr("class") = "one_set_of_pulses";
+                                          "eta_width"//,
+                                          //"lambda"
+                                          );
+  //out.attr("class") = "one_set_of_pulses";
 
   return out;
 
@@ -217,12 +224,14 @@ List Chains::addattribs_pulse_chain(std::vector<arma::mat>  in) {
   //MatrixVector::iterator iter = pulse_chains.begin() ;
   //while( iter != iter.end() ){
 
-  List out;
+  List out(in.size());
   //NumericMatrix out;
   int i = 0;
-  for (auto &one_iter : out) {  // uses range based loop instead of iterators
+  for (auto &one_iter : in) {  // uses range based loop instead of iterators
     NumericMatrix this_iter = as<NumericMatrix>(wrap(one_iter));
-    out[i] = addattribs_set_of_pulses(this_iter);
+    this_iter = addattribs_set_of_pulses(this_iter);
+    out[i] = this_iter;
+    //Rcout << "Class of one set of pulses: " << std::endl;
     i++;
   }
 
