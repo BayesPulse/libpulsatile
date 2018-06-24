@@ -1,10 +1,14 @@
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
-#include "patient.h"
-#include "datastructures.h"
-#include "utils.h"
-#include "proposalvariance.h"
-#include "catch.h"
+#endif
+#include <bp_datastructures/patientdata.h>
+#include <bp_datastructures/patientpriors.h>
+#include <bp_datastructures/patientestimates.h>
+#include <bp_datastructures/pulseestimates.h>
+#include <bp_mcmc/utils.h>
+#include <bp_mcmc/proposalvariance.h>
+#include <testing/catch.h>
 
 
 //
@@ -78,7 +82,7 @@ TEST_CASE( "PatientPriors single-subject constructor works",
 TEST_CASE( "PatientEstimates population constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates pepop(2.6, 45, 0.05, 3.5, 30, 12);
+  PatientEstimates pepop(2.6, 45, 0.05, 3.5, 30);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -87,7 +91,6 @@ TEST_CASE( "PatientEstimates population constructor works",
     REQUIRE(pepop.errorsq     == 0.05);
     REQUIRE(pepop.mass_mean   == 3.5);
     REQUIRE(pepop.width_mean  == 30);
-    REQUIRE(pepop.pulse_count == 12);
 
   }
 
@@ -108,7 +111,7 @@ TEST_CASE( "PatientEstimates population constructor works",
 TEST_CASE( "PatientEstimates single-subject constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -117,7 +120,6 @@ TEST_CASE( "PatientEstimates single-subject constructor works",
     REQUIRE(pesingle.errorsq     == 0.05);
     REQUIRE(pesingle.mass_mean   == 3.5);
     REQUIRE(pesingle.width_mean  == 30);
-    REQUIRE(pesingle.pulse_count == 12);
     REQUIRE(pesingle.mass_sd  == 10);
     REQUIRE(pesingle.width_sd == 10);
 
@@ -211,10 +213,10 @@ TEST_CASE( "PatientData two-hormone constructor works",
 
 
 //
-// PulseEstimate object
+// PulseEstimates object
 //
 
-TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
+TEST_CASE( "PulseEstimates works" , "[datastructures]" ) {
 
   arma::vec data_time(144);
   for (int i = 0; i < 144; i++) data_time(i) = 10 * i + 10;
@@ -225,7 +227,7 @@ TEST_CASE( "PulseEstimate works" , "[datastructures]" ) {
   double tvarscale_width = 0.764;
   //double lambda = 0.5;
   double decay_rate = 0.015;
-  PulseEstimate pulse(time, mass, width, tvarscale_mass, tvarscale_width,
+  PulseEstimates pulse(time, mass, width, tvarscale_mass, tvarscale_width,
                       decay_rate, data_time);
 
   SECTION( "member variables can be access" ) {

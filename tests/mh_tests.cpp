@@ -1,16 +1,26 @@
 #include <RcppArmadillo.h>
+#ifndef NORINSIDE
 #include <RInside.h>
-#include "patient.h"
-#include "datastructures.h"
-#include "ss_draw_baselinehalflife.h"
-#include "ss_draw_fixedeffects.h"
-#include "ss_draw_sdrandomeffects.h"
-#include "ss_draw_locations.h"
-#include "ss_draw_randomeffects.h"
-#include "ss_draw_tvarscale.h"
-#include "ss_draw_error.h"
-#include "catch.h"
+#endif
 
+#include <bp_datastructures/patient.h>
+#include <bp_datastructures/patientdata.h>
+#include <bp_datastructures/patientpriors.h>
+#include <bp_datastructures/patientestimates.h>
+#include <bp_datastructures/pulseestimates.h>
+
+#include <bpmod_singlesubject/ss_draw_baselinehalflife.h>
+#include <bpmod_singlesubject/ss_draw_fixedeffects.h>
+#include <bpmod_singlesubject/ss_draw_sdrandomeffects.h>
+#include <bpmod_singlesubject/ss_draw_locations.h>
+#include <bpmod_singlesubject/ss_draw_randomeffects.h>
+#include <bpmod_singlesubject/ss_draw_tvarscale.h>
+#include <bpmod_singlesubject/ss_draw_error.h>
+
+#include <testing/catch.h>
+
+#include <bp_mcmc/utils.h>
+#include <bp_mcmc/proposalvariance.h>
 
 //
 // mh_tests.cpp
@@ -64,7 +74,7 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
 
   // Create pointers
   PatientData * data = &pdone;
@@ -98,7 +108,7 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
                               1.5219036, 0.8946568, 0.8632652 };
 
   for (int i = 0; i < location.n_elem; i++) {
-    PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
+    PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
   }
@@ -193,7 +203,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
 
   // Create pointers
   PatientData * data = &pdone;
@@ -227,7 +237,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
                               1.5219036, 0.8946568, 0.8632652 };
 
   for (int i = 0; i < location.n_elem; i++) {
-    PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
+    PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
   }
@@ -326,7 +336,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 12, 10, 10);
+  PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
 
   // Create pointers
   PatientData * data = &pdone;
@@ -360,7 +370,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
                               1.5219036, 0.8946568, 0.8632652 };
 
   for (int i = 0; i < location.n_elem; i++) {
-    PulseEstimate pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
+    PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                         pat.estimates->get_decay(), pat.data->time);
     pat.pulses.push_back(pulse);
   }
@@ -372,11 +382,11 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
   // Create sampler object 
   arma::vec bhl_pv = { 0.5, 45 };
   SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35, false);
-  SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500, 25000, 0.35);
+  SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500, 25000, 0.35, false);
   SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
 
   SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500*11, 25000*11, 0.35);
-  SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35);
+  SS_DrawRandomEffects draw_pulse_masses(1.1, 500*11, 25000*11, 0.35, false);
   SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500*11, 25000*11, 0.35);
 
   SS_DrawError draw_error;
@@ -423,7 +433,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
     double pvpmass  = draw_pulse_masses.pv.getpv();
     double pvpscale = draw_pulse_tvarscale.pv.getpv();
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1500; i++) {
       draw_fixed_effects.sample(patient, &patient->estimates->mass_mean);
       draw_sd_pulse_masses.sample(patient, &patient->estimates->mass_sd, patient);
       draw_baselinehalflife.sample(patient, &patient->estimates->baseline_halflife);
