@@ -31,7 +31,7 @@
 # #' as_pulse_list
 # #' 
 # #' @param ... bunch o' pulses
-# as_pulse_list <- function(..., .data = NULL, num_obs = 144, sampling_interval = 10) {
+# as_pulse_list <- function(..., data = NULL, num_obs = 144, sampling_interval = 10) {
 # 
 #   pulses <- list(...) # check all of pulse class
 #   num_pulses <- length(pulses)

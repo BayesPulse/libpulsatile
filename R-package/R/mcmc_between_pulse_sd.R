@@ -15,7 +15,7 @@
 # #' @examples
 # #' this_pulse <- simulate_pulse()
 # #' this_spec  <- pulse_spec()
-# #' this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10,
+# #' this_fit   <- fit_pulse(data = this_pulse, iters = 1000, thin = 10,
 # #'                         spec = this_spec)
 # #' @export
 # draw_sd_between_pulses <- function(pulse_list,

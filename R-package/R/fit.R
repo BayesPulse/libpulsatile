@@ -28,14 +28,13 @@
 #'   columns printed to those which fit in the console.
 #' @param verbose Prints diagnostics and estimates every 5000th iteration.
 #'   Default is \code{FALSE}.
-#' @import tibble
+#' @importFrom tibble as_data_frame
 #' @keywords pulse fit
 #' @examples
 #' this_pulse <- simulate_pulse()
 #' this_spec  <- pulse_spec()
 #' #this_fit   <- fit_pulse(data = this_pulse, iters = 1000, thin = 10, 
 #' #                        burnin = 100, spec = this_spec)
-#' importFrom tibble as_data_frame
 #' @export
 fit_pulse <- function(data,
                       time = "time",

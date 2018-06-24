@@ -48,7 +48,6 @@ this_pulse <- simulate_pulse()
 this_spec  <- pulse_spec()
 #this_fit   <- fit_pulse(data = this_pulse, iters = 1000, thin = 10, 
 #                        burnin = 100, spec = this_spec)
-importFrom tibble as_data_frame
 }
 \keyword{fit}
 \keyword{pulse}

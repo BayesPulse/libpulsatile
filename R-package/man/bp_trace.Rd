@@ -26,7 +26,7 @@ location density (a set of pulse-specific parameter, from 'pulse' chain).
 \examples{
 this_pulse <- simulate_pulse()
 this_spec  <- pulse_spec()
-this_fit   <- fit_pulse(.data = this_pulse, iters = 1000, thin = 10,
+this_fit   <- fit_pulse(data = this_pulse, iters = 1000, thin = 10,
                         spec = this_spec)
 #bp_trace(this_fit)
 }
