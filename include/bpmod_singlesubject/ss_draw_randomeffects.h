@@ -30,25 +30,23 @@ class SS_DrawRandomEffects :
                          double in_target_ratio,
                          bool for_width) :
       ModifiedMetropolisHastings <PulseEstimates, Patient, double, ProposalVariance>::
-        ModifiedMetropolisHastings(in_pv,
-                                   in_adjust_iter,
-                                   in_max_iter,
-                                   in_target_ratio) { 
+      ModifiedMetropolisHastings(in_pv,
+                                 in_adjust_iter,
+                                 in_max_iter,
+                                 in_target_ratio) { 
 
-         // Choose which set of parameters to use: width or mass
-          if (for_width) {
-            est_mean_       = &PatientEstimates::width_mean;
-            est_sd_         = &PatientEstimates::width_sd;
-            tvarscale_      = &PulseEstimates::tvarscale_width;
-            randomeffect_   = &PulseEstimates::width;
-          } else {
-            est_mean_       = &PatientEstimates::mass_mean;
-            est_sd_         = &PatientEstimates::mass_sd;
-            tvarscale_      = &PulseEstimates::tvarscale_mass;
-            randomeffect_   = &PulseEstimates::mass;
-          }
+        // Choose which set of parameters to use: width or mass
+        if (for_width) {
+          est_mean_       = &PatientEstimates::width_mean;
+          est_sd_         = &PatientEstimates::width_sd;
+          randomeffect_   = &PulseEstimates::width;
+        } else {
+          est_mean_       = &PatientEstimates::mass_mean;
+          est_sd_         = &PatientEstimates::mass_sd;
+          randomeffect_   = &PulseEstimates::mass;
+        }
 
-        };
+      };
 
     // Pulse-specific estimate -- this function samples for each pulse
     void sample_pulses(Patient *patient) { //, std::string measure) {
@@ -64,7 +62,6 @@ class SS_DrawRandomEffects :
 
     double PatientEstimates::*est_mean_;
     double PatientEstimates::*est_sd_;
-    double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
 
     bool parameter_support(double val, Patient *patient) {
@@ -81,7 +78,7 @@ class SS_DrawRandomEffects :
                               double proposal,
                               Patient *patient) {
 
-        double prior_old, prior_new, prior_ratio, current_mass, 
+        double prior_old, prior_new, prior_ratio, current_randomeffect, 
                plikelihood;
         PatientEstimates *est  = patient->estimates;
         double patient_mean    = (*est).*est_mean_;
@@ -98,7 +95,7 @@ class SS_DrawRandomEffects :
         prior_ratio /= patient_sd;
 
         // Save the current value of mass/width and set to proposed value
-        current_mass         = (*pulse).*randomeffect_;
+        current_randomeffect    = (*pulse).*randomeffect_;
         (*pulse).*randomeffect_ = proposal;
 
         // Calculate likelihood assuming proposed mass/width 
@@ -106,7 +103,7 @@ class SS_DrawRandomEffects :
 
         // Reset pulse->time to current (sample() chooses whether to keep)
         //   and get_mean_contribution() will recalc that when requested.
-        (*pulse).*randomeffect_ = current_mass;
+        (*pulse).*randomeffect_ = current_randomeffect;
 
       return (prior_ratio + (plikelihood - curr_likelihood));
 
