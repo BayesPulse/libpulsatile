@@ -33,3 +33,12 @@ Once these dependencies are satisfied, build the executable and the test
 executable with `make`.  To run the tests, run `./bin/tests` or `./bin/tests -s`
 to view the detailed test results.
 
+
+# Notes
+
+When compiled outside of the R package, the library is generally dependent on RInside for
+random number generators. The chains class also uses R object types and is
+geared towards structuring the R return object. Gist is, use the R package and C++
+only is for dev work.
+
+
