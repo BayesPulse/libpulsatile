@@ -4,7 +4,7 @@
 #include <bpmod_singlesubject/birthdeath.h>
 #include <bpmod_singlesubject/ss_draw_fixedeffects.h>
 #include <bpmod_singlesubject/ss_draw_sdrandomeffects.h>
-#include <bpmod_singlesubject/ss_draw_sdrandomeffects_width.h>
+//#include <bpmod_singlesubject/ss_draw_sdrandomeffects_width.h>
 #include <bpmod_singlesubject/ss_draw_baselinehalflife.h>
 #include <bpmod_singlesubject/ss_draw_locations.h>
 #include <bpmod_singlesubject/ss_draw_randomeffects.h>

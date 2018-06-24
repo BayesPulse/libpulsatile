@@ -102,10 +102,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
   // Modified Metropolis Hastings for the standard deviation of the random
   // effects (sd mass & sd width) (patient level estimate)
-  //SS_DrawSDRandomEffects draw_sd_masses(proposalvars["mass_sd"], adj_iter,
-  //                                      adj_max, univ_target, false);
-  //SS_DrawSDRandomEffects draw_sd_widths(proposalvars["width_sd"], adj_iter,
-  //                                      adj_max, univ_target, true);
+  SS_DrawSDRandomEffects draw_sd_masses(proposalvars["mass_sd"], adj_iter,
+                                        adj_max, univ_target, false);
+  SS_DrawSDRandomEffects draw_sd_widths(proposalvars["width_sd"], adj_iter,
+                                        adj_max, univ_target, true);
 
   // Bivariate Modified Metropolis Hastings for the baseline and half-life
   arma::vec bhl_pv = { proposalvars["baseline"], proposalvars["halflife"] };
