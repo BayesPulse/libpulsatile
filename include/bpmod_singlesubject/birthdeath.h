@@ -82,6 +82,8 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
   // Start Birth-death loop Run until break reached
   while (1) {
 
+    Rcpp::Rcout << "\n\n\n" << "BIRTH DEATH LOOP NUM: " << aaa << "\n\n\n" << std::endl;
+
     aaa++; // iters counter
 
     // Calculate death rate for each component conditional on Strauss or order
@@ -213,11 +215,24 @@ void BirthDeathProcess::remove_pulse(Patient *patient,
 
   PulseIter pulse = patient->pulses.begin();
   int remove = 0;
+  int i = 0;
 
   // Pick a node to remove, find and remove it
-  remove = pu.one_rmultinom(death_rate) + 1; 
-  for (int i = 0; i < remove; i++)  pulse++;
+  remove = pu.one_rmultinom(death_rate);
+  for (i = 0; i < remove; i++)  pulse++;
+
+  Rcpp::Rcout << "size of death_rate =" << death_rate.size() << std::endl;
+  Rcpp::Rcout << "remove pulse remove =" << remove << std::endl;
+  Rcpp::Rcout << "remove pulse i =" << i << std::endl;
+  Rcpp::Rcout << "death_rate" << death_rate << std::endl;
+  Rcpp::Rcout << "pulses" << &pulse << std::endl;
+  Rcpp::Rcout << "pulse time" << pulse->time << std::endl;
+  Rcpp::Rcout << "total num of pulses=" << patient->get_pulsecount() << std::endl;
+
   pulse = patient->pulses.erase(pulse);
+  //if (pulse == patient->pulses.end()) pulse = patient->pulses.begin();
+
+  //delete pulse;
 
 };
 
@@ -329,6 +344,7 @@ arma::vec BirthDeathProcess::calc_death_rate_strauss(Patient *patient,
 
   // Begin death rate calculations
   if (pulse_count > 1) {
+    Rcpp::Rcout << "Pulse count in calc_death_rate_strauss = " << patient->get_pulsecount() << std::endl;
 
     // Calculate death rates (priors all cancel)
     death_rate = partial_likelihood - patient->likelihood(response_hormone);
