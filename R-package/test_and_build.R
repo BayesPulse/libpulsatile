@@ -2,7 +2,7 @@
 #
 
 # setwd("~/Projects/BayesPulse/Software/libpulsatile/R-package/")
-setwd("~/Projects/BayesPulse/libpulsatile/R-package/")
+setwd("~/Projects/BayesPulse/Software/libpulsatile/R-package/")
 library(devtools)
 library(Rcpp)
 library(RcppArmadillo)
