@@ -7,6 +7,7 @@
 #include <bp_datastructures/patientpriors.h>
 #include <bp_datastructures/patientestimates.h>
 #include <bp_datastructures/pulseestimates.h>
+//#include <testing/testutils.h>
 #include <catch.h>
 
 
@@ -54,62 +55,63 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
                          10, 100, 1000, 1000, 12, 0, 40);
   PatientEstimates pesingle(2.6, 45, 0.05, 3.5, 30, 10, 10);
-  PatientData * data = &pdone;
-  PatientPriors * priors = &ppsingle;
-  PatientEstimates * estimates = &pesingle;
+  //PatientData * data = &pdone;
+  //PatientPriors * priors = &ppsingle;
+  //PatientEstimates * estimates = &pesingle;
 
-  Patient pat(data, priors, estimates);
+  //Patient pat(data, priors, estimates);
+  Patient pat(pdone, ppsingle, pesingle);
 
   SECTION( "Estimates can be accessed" ) {
-    REQUIRE(pat.estimates->baseline_halflife(0) == 2.6);
-    REQUIRE(pat.estimates->mass_mean == 3.5);
-    REQUIRE(pat.estimates->mass_sd == 10);
+    REQUIRE(pat.estimates.baseline_halflife(0) == 2.6);
+    REQUIRE(pat.estimates.mass_mean == 3.5);
+    REQUIRE(pat.estimates.mass_sd == 10);
   }
 
   SECTION( "Estimates can be updated" ) {
-    pat.estimates->baseline_halflife(0) = 10;
-    REQUIRE(pat.estimates->baseline_halflife(0) == 10);
-    pat.estimates->mass_mean = 5.0;
-    REQUIRE(pat.estimates->mass_mean == 5.0);
-    pat.estimates->mass_sd = 50;
-    REQUIRE(pat.estimates->mass_sd == 50);
-    REQUIRE(pat.estimates->get_decay() == (log(2)/45));
+    pat.estimates.baseline_halflife(0) = 10;
+    REQUIRE(pat.estimates.baseline_halflife(0) == 10);
+    pat.estimates.mass_mean = 5.0;
+    REQUIRE(pat.estimates.mass_mean == 5.0);
+    pat.estimates.mass_sd = 50;
+    REQUIRE(pat.estimates.mass_sd == 50);
+    REQUIRE(pat.estimates.get_decay() == (log(2)/45));
   }
 
   SECTION( "Priors can be accessed" ) {
-    REQUIRE(pat.priors->baseline_mean == 1.5);
-    REQUIRE(pat.priors->mass_sd_max == 10);
-    REQUIRE(pat.priors->error_alpha == 1000);
-    REQUIRE(pat.priors->num_orderstat == 3);
-    REQUIRE(pat.priors->strauss_repulsion == 0);
+    REQUIRE(pat.priors.baseline_mean == 1.5);
+    REQUIRE(pat.priors.mass_sd_max == 10);
+    REQUIRE(pat.priors.error_alpha == 1000);
+    REQUIRE(pat.priors.num_orderstat == 3);
+    REQUIRE(pat.priors.strauss_repulsion == 0);
   }
 
   SECTION( "Priors can be updated" ) {
-    pat.priors->baseline_mean     = 2.25;
-    pat.priors->mass_sd_max       = 90;
-    pat.priors->error_alpha       = 700;
-    pat.priors->num_orderstat     = 4;
-    pat.priors->strauss_repulsion = 0.75;
-    REQUIRE(pat.priors->baseline_mean     == 2.25);
-    REQUIRE(pat.priors->mass_sd_max       == 90);
-    REQUIRE(pat.priors->error_alpha       == 700);
-    REQUIRE(pat.priors->num_orderstat     == 4);
-    REQUIRE(pat.priors->strauss_repulsion == 0.75);
+    pat.priors.baseline_mean     = 2.25;
+    pat.priors.mass_sd_max       = 90;
+    pat.priors.error_alpha       = 700;
+    pat.priors.num_orderstat     = 4;
+    pat.priors.strauss_repulsion = 0.75;
+    REQUIRE(pat.priors.baseline_mean     == 2.25);
+    REQUIRE(pat.priors.mass_sd_max       == 90);
+    REQUIRE(pat.priors.error_alpha       == 700);
+    REQUIRE(pat.priors.num_orderstat     == 4);
+    REQUIRE(pat.priors.strauss_repulsion == 0.75);
   }
 
   SECTION( "Data can be accessed" ) {
-    REQUIRE(pat.data->time(1)              == 20);
-    REQUIRE(pat.data->time(143)            == 1440);
-    REQUIRE(pat.data->concentration(1)     == log(5.156800));
-    REQUIRE(pat.data->concentration(143)   == log(8.155648));
-    REQUIRE(pat.data->time.size()          == 144);
-    REQUIRE(pat.data->concentration.size() == 144);
-    REQUIRE(pat.data->response_concentration.size() == 0);
-    REQUIRE(pat.data->avg_period_of_obs    == 10);
-    REQUIRE(pat.data->duration_of_obs      == 1430);
-    REQUIRE(pat.data->number_of_obs        == 144);
-    REQUIRE(pat.data->fitstart             == -40);
-    REQUIRE(pat.data->fitend               == 1460);
+    REQUIRE(pat.data.time(1)              == 20);
+    REQUIRE(pat.data.time(143)            == 1440);
+    REQUIRE(pat.data.concentration(1)     == log(5.156800));
+    REQUIRE(pat.data.concentration(143)   == log(8.155648));
+    REQUIRE(pat.data.time.size()          == 144);
+    REQUIRE(pat.data.concentration.size() == 144);
+    REQUIRE(pat.data.response_concentration.size() == 0);
+    REQUIRE(pat.data.avg_period_of_obs    == 10);
+    REQUIRE(pat.data.duration_of_obs      == 1430);
+    REQUIRE(pat.data.number_of_obs        == 144);
+    REQUIRE(pat.data.fitstart             == -40);
+    REQUIRE(pat.data.fitend               == 1460);
   }
 
   // TODO: This section is causing trouble (initial pulse values), not giving
@@ -117,7 +119,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   SECTION( "Has initial pulse" ) {
     std::list<PulseEstimates>::const_iterator this_piter = pat.pulses.begin();
     REQUIRE(pat.get_pulsecount()        == 1);
-    REQUIRE(this_piter->time            == pat.data->fitstart);
+    REQUIRE(this_piter->time            == pat.data.fitstart);
     REQUIRE(this_piter->mass            == 1);
     REQUIRE(this_piter->width           == 1);
     REQUIRE(this_piter->tvarscale_mass  == 1);
@@ -147,7 +149,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
   for (int i = 0; i < location.n_elem; i++) {
     PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
-                        pat.estimates->get_decay(), pat.data->time);
+                        pat.estimates.get_decay(), pat.data.time);
     pat.pulses.push_back(pulse);
   }
 
@@ -238,33 +240,34 @@ TEST_CASE( "Patient class constructor for population model works", "[patient]" )
 
   PatientData pd(time, conc);
   PatientEstimates pep(2.6, 45, 0.05, 3.5, 30); // population constructor
-  PatientData * data = &pd;
-  PatientEstimates * estimates = &pep;
+  //PatientData * data = &pd;
+  //PatientEstimates * estimates = &pep;
 
-  Patient pat(data, estimates);
+  //Patient pat(data, estimates);
+  Patient pat(pd, pep);
 
   SECTION( "Estimates can be accessed" ) {
-    REQUIRE(pat.estimates->baseline_halflife(0) == 2.6);
-    REQUIRE(pat.estimates->mass_mean == 3.5);
+    REQUIRE(pat.estimates.baseline_halflife(0) == 2.6);
+    REQUIRE(pat.estimates.mass_mean == 3.5);
   }
 
   SECTION( "Estimates can be updated" ) {
-    pat.estimates->baseline_halflife(0) = 10;
-    REQUIRE(pat.estimates->baseline_halflife(0) == 10);
-    pat.estimates->mass_mean = 5.0;
-    REQUIRE(pat.estimates->mass_mean == 5.0);
+    pat.estimates.baseline_halflife(0) = 10;
+    REQUIRE(pat.estimates.baseline_halflife(0) == 10);
+    pat.estimates.mass_mean = 5.0;
+    REQUIRE(pat.estimates.mass_mean == 5.0);
   }
 
   SECTION( "Data can be accessed" ) {
-    REQUIRE(pat.data->time(1) == 20);
-    REQUIRE(pat.data->time(143) == 1440);
-    REQUIRE(pat.data->concentration(1) < 20);
-    REQUIRE(pat.data->concentration(1) > 0);
-    REQUIRE(pat.data->concentration(143) < 20);
-    REQUIRE(pat.data->concentration(143) > 0);
-    REQUIRE(pat.data->time.size() == 144);
-    REQUIRE(pat.data->concentration.size() == 144);
-    REQUIRE(pat.data->response_concentration.size() == 0);
+    REQUIRE(pat.data.time(1) == 20);
+    REQUIRE(pat.data.time(143) == 1440);
+    REQUIRE(pat.data.concentration(1) < 20);
+    REQUIRE(pat.data.concentration(1) > 0);
+    REQUIRE(pat.data.concentration(143) < 20);
+    REQUIRE(pat.data.concentration(143) > 0);
+    REQUIRE(pat.data.time.size() == 144);
+    REQUIRE(pat.data.concentration.size() == 144);
+    REQUIRE(pat.data.response_concentration.size() == 0);
   }
 
   // TODO: look at what is necessary for the pop constructor version

@@ -75,7 +75,7 @@ class SS_DrawSDRandomEffects : public ModifiedMetropolisHastings<Patient, Patien
 //   Defines whether the proposal value is within the parameter support
 bool SS_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
 
-  PatientPriors *priors = patient->priors;
+  PatientPriors *priors = &patient->priors;
   double patient_sd_max = (*priors).*sd_max_;
 
   return (val > 0.0 && val < patient_sd_max);
@@ -97,7 +97,7 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   double first_part  = 0.0;
   double second_part = 0.0;
   double third_part  = 0.0;
-  PatientEstimates *est  = patient->estimates;
+  PatientEstimates *est  = &patient->estimates;
   double patient_mean    = (*est).*est_mean_;
   double patient_sd      = (*est).*est_sd_;
   std::list<PulseEstimates>::const_iterator pulse     = patient->pulses.begin();

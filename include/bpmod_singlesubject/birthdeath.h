@@ -52,8 +52,8 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
   double position         = 0.0; // Value of new pulse's location
   double total_death_rate = 0.0;
   arma::vec death_rate;       // Vector of death rates for each pulse
-  double fitstart = patient->data->fitstart;
-  double fitend   = patient->data->fitend;
+  double fitstart = patient->data.fitstart;
+  double fitend   = patient->data.fitend;
   //// Spatial BD and Strauss declarations
   int sum_s_r = 0;            // Sum(S(R)) for birth of new pulse
   double papas_cif;           // Papangelou's cond'l intensity fn for birthed
@@ -68,7 +68,7 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
   // Prepare for birth death loop. Save and
   // calculate values and allocate memory
   //-----------------------------------------
-  total_birth_rate = (double)patient->priors->pulse_count;
+  total_birth_rate = (double)patient->priors.pulse_count;
 
   //std::cout << "Total birth rate is " << total_birth_rate << std::endl;
 
@@ -146,7 +146,7 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
       // If using Strauss prior, run accept/reject for new position
       if (strauss == 1) {
         sum_s_r    = patient->calc_sr_strauss(position); 
-        papas_cif  = birth_rate * pow(patient->priors->strauss_repulsion, sum_s_r);
+        papas_cif  = birth_rate * pow(patient->priors.strauss_repulsion, sum_s_r);
         b_ratio    = papas_cif / birth_rate;
 
         accept_pos = (Rf_runif(0, 1) < b_ratio) ? 1 : 0;
@@ -182,20 +182,20 @@ void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
   new_tvarscale_mass = new_tvarscale_width = 1.0;
 
   while (new_mass < 0) {
-    new_mass = Rf_rnorm(patient->estimates->mass_mean, patient->estimates->mass_sd);
+    new_mass = Rf_rnorm(patient->estimates.mass_mean, patient->estimates.mass_sd);
   }
   while (new_width < 0) {
-    new_width = Rf_rnorm(patient->estimates->width_mean, patient->estimates->width_sd);
+    new_width = Rf_rnorm(patient->estimates.width_mean, patient->estimates.width_sd);
   }
   // In old version, eta not set. Trying with set to 1.0 
   //while (tvarscale_mass < 0) {
-  //  new_scale_mass = Rf_rnorm(patient->estimates->width_mean, patient->estimates->width_sd);
+  //  new_scale_mass = Rf_rnorm(patient->estimates.width_mean, patient->estimates.width_sd);
   //}
 
   // Create new pulse and insert
   PulseEstimates new_pulse(position, new_mass, new_width, new_tvarscale_mass,
-                          new_tvarscale_width, patient->estimates->get_decay(),
-                          patient->data->time);
+                          new_tvarscale_width, patient->estimates.get_decay(),
+                          patient->data.time);
 
   patient->pulses.push_back(new_pulse);
 

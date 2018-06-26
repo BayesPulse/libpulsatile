@@ -66,17 +66,17 @@ struct AssocEstimates {
 struct Population {
 
   // Member objects
-  std::vector<Patient> *patients;
+  std::vector<Patient> patients;
 
-  PopulationPriors *priors;
-  PopulationEstimates *estimates;
-  AssocEstimates *associations;
+  PopulationPriors priors;
+  PopulationEstimates estimates;
+  AssocEstimates associations;
 
   // Constructor
-  Population(std::vector<Patient> *in_patients,
-             PopulationPriors *in_priors,
-             PopulationEstimates *in_estimates,
-             AssocEstimates *in_associations) {
+  Population(std::vector<Patient> in_patients,
+             PopulationPriors in_priors,
+             PopulationEstimates in_estimates,
+             AssocEstimates in_associations) {
 
     patients     = in_patients;
     priors       = in_priors;

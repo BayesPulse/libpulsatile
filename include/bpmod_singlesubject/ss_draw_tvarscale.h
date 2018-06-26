@@ -80,8 +80,8 @@ double SS_DrawTVarScale::posterior_function(PulseEstimates *pulse,
   double re_old      = 0.0;
   double re_new      = 0.0;
   double re_ratio    = 0.0;
-  double mass_sd     = patient->estimates->mass_sd;
-  double mass_mean   = patient->estimates->mass_mean;
+  double mass_sd     = patient->estimates.mass_sd;
+  double mass_mean   = patient->estimates.mass_mean;
   double pulse_mass  = pulse->mass;
   double curr_scale  = pulse->tvarscale_mass;
 

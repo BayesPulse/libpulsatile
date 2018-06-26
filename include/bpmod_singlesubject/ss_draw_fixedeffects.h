@@ -73,8 +73,8 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
       double oldint            = 0.0 ;
       double normalizing_ratio = 0.0 ;
       double prop_ratio        = 0.0 ;
-      PatientPriors *priors    = patient->priors;
-      PatientEstimates *est    = patient->estimates;
+      PatientPriors *priors    = &patient->priors;
+      PatientEstimates *est    = &patient->estimates;
       double prior_mass_mean   = (*priors).*prior_mean_;
       double prior_mass_var    = (*priors).*prior_variance_;
       double current           = (*est).*est_mean_;

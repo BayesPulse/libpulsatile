@@ -55,8 +55,8 @@ class SS_DrawLocationsStrauss :
   private:
 
     bool parameter_support(double val, Patient *patient) {
-      return ((val <= patient->data->fitend) &&
-              (val > patient->data->fitstart));
+      return ((val <= patient->data.fitend) &&
+              (val > patient->data.fitstart));
     }
 
     //
@@ -72,11 +72,11 @@ class SS_DrawLocationsStrauss :
       double prior_ratio;
       // Extracted variables
       arma::vec curr_mean_contrib = 
-        pulse->get_mean_contribution(patient->data->time,
-                                     patient->estimates->get_decay());
+        pulse->get_mean_contribution(patient->data.time,
+                                     patient->estimates.get_decay());
       double curr_likelihood = patient->likelihood(false); // would prefer get_likelihood()
       double plikelihood;
-      double gamma = patient->priors->strauss_repulsion;
+      double gamma = patient->priors.strauss_repulsion;
       double current_time;
 
       // Calculate sum_s_r for proposal value and current value

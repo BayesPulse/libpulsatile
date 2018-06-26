@@ -80,7 +80,7 @@ class SS_DrawRandomEffects :
 
         double prior_old, prior_new, prior_ratio, current_randomeffect, 
                plikelihood;
-        PatientEstimates *est  = patient->estimates;
+        PatientEstimates *est  = &patient->estimates;
         double patient_mean    = (*est).*est_mean_;
         double patient_sd      = (*est).*est_sd_;
         double curr_likelihood = patient->likelihood(false);

@@ -13,6 +13,9 @@
 
 typedef std::vector<arma::mat>  MatrixVector;
 
+using namespace Rcpp;
+
+
 
 //
 // chains.h
@@ -30,9 +33,6 @@ typedef std::vector<arma::mat>  MatrixVector;
 
 // TODO: split out patient chain with constructor bool args for population and
 // association, then pop creates X number of these + the pop chain
-
-using namespace Rcpp;
-
 
 // Chains class
 //   currently only single-subject (pulse and common)
@@ -114,13 +114,13 @@ void Chains::save_sample(Patient * pat, int iter) {
     // Fill patient chain w/ current patient-level estimates
     patient_chain(output_num, 0) = (double)iter;
     patient_chain(output_num, 1) = pulsecount;
-    patient_chain(output_num, 2) = pat->estimates->baseline_halflife(0);
-    patient_chain(output_num, 3) = pat->estimates->mass_mean;
-    patient_chain(output_num, 4) = pat->estimates->width_mean;
-    patient_chain(output_num, 5) = pat->estimates->baseline_halflife(1);
-    patient_chain(output_num, 6) = pat->estimates->errorsq;
-    patient_chain(output_num, 7) = pat->estimates->mass_sd;
-    patient_chain(output_num, 8) = pat->estimates->width_sd;
+    patient_chain(output_num, 2) = pat->estimates.baseline_halflife(0);
+    patient_chain(output_num, 3) = pat->estimates.mass_mean;
+    patient_chain(output_num, 4) = pat->estimates.width_mean;
+    patient_chain(output_num, 5) = pat->estimates.baseline_halflife(1);
+    patient_chain(output_num, 6) = pat->estimates.errorsq;
+    patient_chain(output_num, 7) = pat->estimates.mass_sd;
+    patient_chain(output_num, 8) = pat->estimates.width_sd;
 
     // Create a matrix of current pulse-level estimates and add matrix to the
     //   vector chain

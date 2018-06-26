@@ -51,11 +51,11 @@ class SS_DrawBaselineHalflife :
       double priorh_new       = 0.0;
       double prior_ratio      = 0.0;
       double acceptance_ratio = 0.0;
-      double prior_baseline_mean     = patient->priors->baseline_mean;
-      double prior_baseline_variance = patient->priors->baseline_variance;
-      double prior_halflife_mean     = patient->priors->halflife_mean;
-      double prior_halflife_variance = patient->priors->halflife_variance;
-      arma::vec current      = patient->estimates->baseline_halflife;
+      double prior_baseline_mean     = patient->priors.baseline_mean;
+      double prior_baseline_variance = patient->priors.baseline_variance;
+      double prior_halflife_mean     = patient->priors.halflife_mean;
+      double prior_halflife_variance = patient->priors.halflife_variance;
+      arma::vec current      = patient->estimates.baseline_halflife;
       double curr_likelihood = patient->likelihood(false);
 
       // Compute ratio of prior densities 
@@ -75,13 +75,13 @@ class SS_DrawBaselineHalflife :
 
       // Update stored estimates to proposal in order to calculate likelihood
       // under proposal
-      patient->estimates->baseline_halflife = proposal;
+      patient->estimates.baseline_halflife = proposal;
 
       // Calculate proposed likelihood and then calculate likelihood ratio 
       acceptance_ratio = prior_ratio + (patient->likelihood(false) - curr_likelihood);
 
       // Reset estimates to current value before exiting (decision made in sample())
-      patient->estimates->baseline_halflife = current;
+      patient->estimates.baseline_halflife = current;
 
       return acceptance_ratio;
 

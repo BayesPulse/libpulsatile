@@ -40,8 +40,8 @@ typedef PulseList::const_iterator PulseConstIter;
 struct Patient {
 
   // Member objects for all models
-  PatientData *data;
-  PatientEstimates *estimates;
+  PatientData data;
+  PatientEstimates estimates;
   PulseList pulses;
   PulseIter piter = pulses.begin();
   PulseList responses;
@@ -52,37 +52,41 @@ struct Patient {
   //
 
   // Member objects
-  PatientPriors *priors;
+  PatientPriors priors;
 
   // Constructor
-  Patient(PatientData *in_data,
-          PatientPriors *in_priors,
-          PatientEstimates *in_parms) {
+  Patient(PatientData in_data,
+          PatientPriors in_priors,
+          PatientEstimates in_parms) :
+      data(in_data)
+    , estimates(in_parms)
+    , priors(in_priors) {
 
-    data      = in_data;
-    priors    = in_priors;
-    estimates = in_parms;
-
-    PulseEstimates firstpulse(in_data->fitstart,
-                             1, 1, 1, 1,
-                             in_parms->get_decay(), 
-                             in_data->concentration);
+    PulseEstimates firstpulse(in_data.fitstart,
+                              1, 1, 1, 1,
+                              in_parms.get_decay(), 
+                              in_data.concentration);
     pulses.push_back(firstpulse);
 
   }
+  // Destructor
+  //~Patient() {
+  //  delete data;
+  //  delete priors;
+  //  delete estimates;
+  //}
 
   //
   // For population models
   //
 
   // Constructor
-  Patient(PatientData *in_data,
-          PatientEstimates *in_parms) {
-
-    data = in_data;
-    estimates = in_parms;
-    // priors member obj not used
-
+  Patient(PatientData in_data,
+          PatientEstimates in_parms) :
+      data(in_data)
+    , estimates(in_parms) 
+    , priors() {
+      // priors member obj not used
   }
 
 
@@ -99,15 +103,15 @@ struct Patient {
   double get_sumerrorsquared(bool response_hormone) {
 
     arma::vec mean = mean_concentration(response_hormone);
-    arma::vec *conc;
+    arma::vec conc;
 
     if (response_hormone) {
-      conc = &data->response_concentration;
+      conc = data.response_concentration;
     } else {
-      conc = &data->concentration;
+      conc = data.concentration;
     }
 
-    return arma::accu((*conc - mean) % (*conc - mean)); // % Schur product (elementwise multiplication)
+    return arma::accu((conc - mean) % (conc - mean)); // % Schur product (elementwise multiplication)
 
   }
 
@@ -124,19 +128,19 @@ struct Patient {
   double likelihood(bool response_hormone, PulseIter pulse_excluded) {
 
     double like = 0;
-    arma::vec *conc;
+    arma::vec conc;
 
     if (response_hormone) {
-      conc = &data->response_concentration;
+      conc = data.response_concentration;
     } else {
-      conc = &data->concentration;
+      conc = data.concentration;
     }
 
     // Calculate likelihood
-    like  = arma::accu(*conc - mean_concentration(response_hormone, pulse_excluded));
+    like  = arma::accu(conc - mean_concentration(response_hormone, pulse_excluded));
     like  = like * like;
-    like /= (-2.0 * estimates->errorsq);
-    like += -0.5 * conc->n_elem * (1.8378771 + estimates->get_logerrorsq());
+    like /= (-2.0 * estimates.errorsq);
+    like += -0.5 * conc.n_elem * (1.8378771 + estimates.get_logerrorsq());
 
     return like;
 
@@ -175,7 +179,7 @@ struct Patient {
   arma::vec mean_concentration(bool response_hormone, PulseIter pulse_excluded)
   {
 
-    arma::vec mean_conc(data->concentration.n_elem);
+    arma::vec mean_conc(data.concentration.n_elem);
     mean_conc.fill(0);
     PulseIter pulse_iter;
     PulseConstIter pulselist_end;
@@ -189,12 +193,12 @@ struct Patient {
     }
 
     // Add the contribution to the mean from each pulse
-    arma::vec mctrb(data->concentration.n_elem);
+    arma::vec mctrb(data.concentration.n_elem);
     int i = 1; // i think this is extraneous
     while (pulse_iter != pulselist_end) {
       if (pulse_iter != pulse_excluded) {
-        mctrb = pulse_iter->get_mean_contribution(data->concentration,
-                                                  estimates->get_decay());
+        mctrb = pulse_iter->get_mean_contribution(data.concentration,
+                                                  estimates.get_decay());
         mean_conc += mctrb;
       }
       ++pulse_iter;
@@ -202,7 +206,7 @@ struct Patient {
     }
 
     // Add the baseline contribution and log
-    mean_conc += estimates->baseline_halflife(0);
+    mean_conc += estimates.baseline_halflife(0);
     mean_conc = log(mean_conc);
 
     return mean_conc;
@@ -231,7 +235,7 @@ struct Patient {
         // skip if node is same that location is from;
         difference = fabs(location - pulse->time);
         // increment by 1 if diff<R
-        s_r = (difference < priors->strauss_repulsion_range) ? s_r + 1 : s_r; 
+        s_r = (difference < priors.strauss_repulsion_range) ? s_r + 1 : s_r; 
       }
       pulse++;
     }

@@ -80,8 +80,8 @@ double SS_DrawTVarScaleWidths::posterior_function(PulseEstimates *pulse,
   double re_old      = 0.0;
   double re_new      = 0.0;
   double re_ratio    = 0.0;
-  double width_sd     = patient->estimates->width_sd;
-  double width_mean   = patient->estimates->width_mean;
+  double width_sd     = patient->estimates.width_sd;
+  double width_mean   = patient->estimates.width_mean;
   double pulse_width  = pulse->width;
   double curr_scale  = pulse->tvarscale_width;
 

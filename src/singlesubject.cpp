@@ -49,41 +49,36 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
 
   // Create patient data object
-  PatientData pdone(time, concentration);
+  PatientData data(time, concentration);
 
   //Create priors object
-  PatientPriors ppsingle(priors["baseline_mean"],
-                         priors["baseline_variance"],
-                         priors["halflife_mean"],
-                         priors["halflife_variance"],
-                         priors["mass_mean"],
-                         priors["mass_variance"],
-                         priors["width_mean"],
-                         priors["width_variance"],
-                         priors["mass_sdmax"],
-                         priors["width_sdmax"],
-                         priors["error_alpha"],
-                         priors["error_beta"],
-                         priors["pulse_count"],
-                         priors["strauss_repulsion"],
-                         priors["strauss_repulsion_range"]);
+  PatientPriors priors(priors["baseline_mean"],
+                       priors["baseline_variance"],
+                       priors["halflife_mean"],
+                       priors["halflife_variance"],
+                       priors["mass_mean"],
+                       priors["mass_variance"],
+                       priors["width_mean"],
+                       priors["width_variance"],
+                       priors["mass_sdmax"],
+                       priors["width_sdmax"],
+                       priors["error_alpha"],
+                       priors["error_beta"],
+                       priors["pulse_count"],
+                       priors["strauss_repulsion"],
+                       priors["strauss_repulsion_range"]);
 
   // Create estimates object (w/ starting vals)
-  PatientEstimates pesingle(startingvals["baseline"],
-                            startingvals["halflife"],
-                            startingvals["errorsq"],
-                            startingvals["mass_mean"],
-                            startingvals["width_mean"],
-                            startingvals["mass_sd"],
-                            startingvals["width_sd"]);
-
-  // Create pointers
-  PatientData * data_obj = &pdone;
-  PatientPriors * priors_obj = &ppsingle;
-  PatientEstimates * estimates_obj = &pesingle;
+  PatientEstimates estimates(startingvals["baseline"],
+                             startingvals["halflife"],
+                             startingvals["errorsq"],
+                             startingvals["mass_mean"],
+                             startingvals["width_mean"],
+                             startingvals["mass_sd"],
+                             startingvals["width_sd"]);
 
   // Now take all of this and create a Patient object
-  Patient pat(data_obj, priors_obj, estimates_obj);
+  Patient pat(data, priors, estimates);
   Patient * patient = &pat;
 
 
@@ -143,11 +138,11 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
     checkUserInterrupt();
     birth_death.sample(patient, false);
-    draw_fixeff_mass.sample(patient, &patient->estimates->mass_mean);
-    draw_fixeff_width.sample(patient, &patient->estimates->width_mean);
-    //draw_sd_masses.sample(patient, &patient->estimates->mass_sd, patient);
-    //draw_sd_widths.sample(patient, &patient->estimates->mass_sd, patient);
-    draw_blhl.sample(patient, &patient->estimates->baseline_halflife);
+    draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean);
+    draw_fixeff_width.sample(patient, &patient->estimates.width_mean);
+    //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient);
+    //draw_sd_widths.sample(patient, &patient->estimates.mass_sd, patient);
+    draw_blhl.sample(patient, &patient->estimates.baseline_halflife);
     draw_locations.sample_pulses(patient);
     draw_masses.sample_pulses(patient);
     draw_widths.sample_pulses(patient);

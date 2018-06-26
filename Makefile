@@ -55,7 +55,7 @@ TARGETDIR := bin
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g -Wall
+CFLAGS := -g -Wall -O0
 LIB := $(LDLIBS)
 INC := -I include -I include/testing $(CPPFLAGS) $(CXXFLAGS) -std=c++11
 

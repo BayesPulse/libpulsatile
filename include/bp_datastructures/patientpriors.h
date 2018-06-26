@@ -107,6 +107,9 @@ struct PatientPriors {
 
   }
 
+  // Null constructor for population, patient object
+  PatientPriors() { };
+
   //
   // For Single-subject model:
   //
