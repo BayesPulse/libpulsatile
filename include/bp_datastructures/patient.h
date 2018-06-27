@@ -69,12 +69,7 @@ struct Patient {
     pulses.push_back(firstpulse);
 
   }
-  // Destructor
-  //~Patient() {
-  //  delete data;
-  //  delete priors;
-  //  delete estimates;
-  //}
+
 
   //
   // For population models

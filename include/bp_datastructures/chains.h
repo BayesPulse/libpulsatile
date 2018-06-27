@@ -105,29 +105,32 @@ class Chains {
 // Member Function: Record this iteration
 void Chains::save_sample(Patient * pat, int iter) {
 
-  if (iter > burnin & (iter % thin) == 0) {
+  int r_iter = iter + 1;
+
+  if ((r_iter > burnin) & ((r_iter % thin) == 0)) {
 
     // Calculations used repeatedly in this function
-    int output_num = (iter - burnin) / thin;
+    int output_index = ((r_iter - burnin) / thin) - 1;
+    std::cout << "current output_index = " << output_index << std::endl;
     double pulsecount = (double)pat->get_pulsecount();
 
     // Fill patient chain w/ current patient-level estimates
-    patient_chain(output_num, 0) = (double)iter;
-    patient_chain(output_num, 1) = pulsecount;
-    patient_chain(output_num, 2) = pat->estimates.baseline_halflife(0);
-    patient_chain(output_num, 3) = pat->estimates.mass_mean;
-    patient_chain(output_num, 4) = pat->estimates.width_mean;
-    patient_chain(output_num, 5) = pat->estimates.baseline_halflife(1);
-    patient_chain(output_num, 6) = pat->estimates.errorsq;
-    patient_chain(output_num, 7) = pat->estimates.mass_sd;
-    patient_chain(output_num, 8) = pat->estimates.width_sd;
+    patient_chain(output_index, 0) = (double)r_iter;
+    patient_chain(output_index, 1) = pulsecount;
+    patient_chain(output_index, 2) = pat->estimates.baseline_halflife(0);
+    patient_chain(output_index, 3) = pat->estimates.mass_mean;
+    patient_chain(output_index, 4) = pat->estimates.width_mean;
+    patient_chain(output_index, 5) = pat->estimates.baseline_halflife(1);
+    patient_chain(output_index, 6) = pat->estimates.errorsq;
+    patient_chain(output_index, 7) = pat->estimates.mass_sd;
+    patient_chain(output_index, 8) = pat->estimates.width_sd;
 
     // Create a matrix of current pulse-level estimates and add matrix to the
     //   vector chain
 
-    // Construct matrix of parameters that need constructiong (current iter,
+    // Construct matrix of parameters that need constructiong (current r_iter,
     // number of pulses, pulse number id) and add to a matrix
-    arma::vec itervec(pulsecount); itervec.fill((double)iter);
+    arma::vec itervec(pulsecount); itervec.fill((double)r_iter);
     arma::vec pcvec(pulsecount); pcvec.fill(pulsecount);
     arma::mat constructed_parms(pulsecount, 3, arma::fill::zeros);
     constructed_parms.col(0) = itervec;
