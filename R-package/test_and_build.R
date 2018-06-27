@@ -31,7 +31,7 @@ sim <- simulate_pulse()
 spec <- pulse_spec()
 fit <- fit_pulse(sim, spec = spec, iters = 100000, thin = 10, burnin = 10000, verbose = TRUE)
 
-# Doesn't yet work -- not yet correct class
+# Plot diagnostics
 bp_trace(fit)
 bp_posteriors(fit)
 bp_location_posterior(fit)

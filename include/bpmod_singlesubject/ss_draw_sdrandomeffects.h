@@ -23,8 +23,8 @@ class SS_DrawSDRandomEffects : public ModifiedMetropolisHastings<Patient, Patien
 
   public:
     // Constructor
-    SS_DrawSDRandomEffects(double in_pv, 
-                           int in_adjust_iter, 
+    SS_DrawSDRandomEffects(double in_pv,
+                           int in_adjust_iter,
                            int in_max_iter,
                            double in_target_ratio,
                            bool for_width) :
@@ -41,7 +41,6 @@ class SS_DrawSDRandomEffects : public ModifiedMetropolisHastings<Patient, Patien
             tvarscale_      = &PulseEstimates::tvarscale_width;
             randomeffect_   = &PulseEstimates::width;
             sd_max_         = &PatientPriors::width_sd_max;
-            // priors->mass_sd_max
           } else {
             est_mean_       = &PatientEstimates::mass_mean;
             est_sd_         = &PatientEstimates::mass_sd;
