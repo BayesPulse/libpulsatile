@@ -22,7 +22,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                           Rcpp::NumericVector time,
-                          Rcpp::List priors,
+                          Rcpp::List inpriors,
                           Rcpp::List proposalvars,
                           Rcpp::List startingvals,
                           int mcmc_iterations,
@@ -36,7 +36,7 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 {
 
   // Check for valid input
-  if ( !priors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
+  if ( !inpriors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
   if ( !proposalvars.inherits("bp_proposalvariance") ) stop("proposalvars argument must be a bp_proposalvariance object");
   if ( !startingvals.inherits("bp_startingvals") ) stop("startingvals argument must be a bp_startingvals object");
   if ( concentration.size() != time.size() ) stop("Time and concentration vectors must be the same size");
@@ -52,21 +52,21 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   PatientData data(time, concentration);
 
   //Create priors object
-  PatientPriors priors(priors["baseline_mean"],
-                       priors["baseline_variance"],
-                       priors["halflife_mean"],
-                       priors["halflife_variance"],
-                       priors["mass_mean"],
-                       priors["mass_variance"],
-                       priors["width_mean"],
-                       priors["width_variance"],
-                       priors["mass_sdmax"],
-                       priors["width_sdmax"],
-                       priors["error_alpha"],
-                       priors["error_beta"],
-                       priors["pulse_count"],
-                       priors["strauss_repulsion"],
-                       priors["strauss_repulsion_range"]);
+  PatientPriors priors(inpriors["baseline_mean"],
+                       inpriors["baseline_variance"],
+                       inpriors["halflife_mean"],
+                       inpriors["halflife_variance"],
+                       inpriors["mass_mean"],
+                       inpriors["mass_variance"],
+                       inpriors["width_mean"],
+                       inpriors["width_variance"],
+                       inpriors["mass_sdmax"],
+                       inpriors["width_sdmax"],
+                       inpriors["error_alpha"],
+                       inpriors["error_beta"],
+                       inpriors["pulse_count"],
+                       inpriors["strauss_repulsion"],
+                       inpriors["strauss_repulsion_range"]);
 
   // Create estimates object (w/ starting vals)
   PatientEstimates estimates(startingvals["baseline"],
@@ -81,13 +81,18 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   Patient pat(data, priors, estimates);
   Patient * patient = &pat;
 
+  // For debugging, add 11 pulses w/ true parms
+  DataStructuresUtils utils;
+  patient = utils.add_default_pulses(patient);
+
+  //std::cout << "pulse count is: " << patient->get_pulsecount() << std::endl;
 
   //----------------------------------------
   // Create sampler objects
   //----------------------------------------
 
   // Birth-death process
-  BirthDeathProcess birth_death;
+  //BirthDeathProcess birth_death;
 
   // Modified Metropolis Hastings for fixed effects (mean mass & mean width)
   SS_DrawFixedEffects draw_fixeff_mass(proposalvars["mass_mean"], adj_iter,
@@ -122,6 +127,7 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   //                                     adj_iter, adj_max, univ_target, false);
   //SS_DrawTVarScale draw_tvarscale_width(proposalvars["sdscale_pulse_width"],
   //                                      adj_iter, adj_max, univ_target, true);
+  SS_DrawError draw_error;
 
 
   // Create output objects (chains)
@@ -137,23 +143,26 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   for (int i = 0; i < mcmc_iterations; i++) {
 
     checkUserInterrupt();
-    birth_death.sample(patient, false);
-    draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean);
-    draw_fixeff_width.sample(patient, &patient->estimates.width_mean);
+    //birth_death.sample(patient, false);
+    //draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean);
+    //draw_fixeff_width.sample(patient, &patient->estimates.width_mean);
     //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient);
-    //draw_sd_widths.sample(patient, &patient->estimates.mass_sd, patient);
-    draw_blhl.sample(patient, &patient->estimates.baseline_halflife);
-    draw_locations.sample_pulses(patient);
-    draw_masses.sample_pulses(patient);
-    draw_widths.sample_pulses(patient);
+    draw_sd_widths.sample(patient, &patient->estimates.mass_sd, patient);
+    //draw_blhl.sample(patient, &patient->estimates.baseline_halflife);
+    //draw_locations.sample_pulses(patient);
+    //draw_masses.sample_pulses(patient);
+    //draw_widths.sample_pulses(patient);
     //draw_tvarscale_mass.sample_pulses(patient);
     //draw_tvarscale_width.sample_pulses(patient);
+    draw_error.sample(patient);
 
     //print_diagnostic_output(verbose);
     ////std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;
     chains.save_sample(patient, i);
 
   }
+
+  //std::cout << "pulse count is: " << patient->get_pulsecount() << std::endl;
 
   return chains.output();
 

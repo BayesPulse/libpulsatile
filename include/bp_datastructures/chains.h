@@ -111,7 +111,6 @@ void Chains::save_sample(Patient * pat, int iter) {
 
     // Calculations used repeatedly in this function
     int output_index = ((r_iter - burnin) / thin) - 1;
-    std::cout << "current output_index = " << output_index << std::endl;
     double pulsecount = (double)pat->get_pulsecount();
 
     // Fill patient chain w/ current patient-level estimates
@@ -140,7 +139,6 @@ void Chains::save_sample(Patient * pat, int iter) {
     // Create matrix of current pulse-level estimates
     arma::mat pulseparms(pulsecount, 5, arma::fill::zeros);
     int i = 0;
-    //std::cout << "chain pulseparms size: " << pulseparms.size() << std::endl;
     for (auto &pulse : pat->pulses) {
       pulseparms.row(i) = pulse.get_vector_of_values();
       i++;

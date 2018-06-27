@@ -61,7 +61,13 @@ class DataStructuresUtils {
 
       // Now take all of this and create a Patient object
       Patient pat(data, priors, estimates);
-      Patient * patient = &pat;
+
+      return pat;
+
+    }
+
+
+    Patient* add_default_pulses(Patient * patient) {
 
       // Now add pulse estimates
       // Delete initial pulse for these tests
@@ -91,7 +97,7 @@ class DataStructuresUtils {
         patient->pulses.push_back(pulse);
       }
 
-      return pat;
+      return patient;
 
     }
 

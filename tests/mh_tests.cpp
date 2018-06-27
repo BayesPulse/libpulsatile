@@ -43,6 +43,7 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
   DataStructuresUtils utils;
   Patient pat = utils.create_new_test_patient_obj();
   Patient * patient = &pat;
+  patient = utils.add_default_pulses(patient);
 
   // Create sampler object 
   SS_DrawFixedEffects draw_fixed_effects_mass(1.1, 500, 25000, 0.35, false);
@@ -101,6 +102,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
   DataStructuresUtils utils;
   Patient pat = utils.create_new_test_patient_obj();
   Patient * patient = &pat;
+  patient = utils.add_default_pulses(patient);
 
   // Create sampler object 
   SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500*11, 25000*11, 0.35);
@@ -160,6 +162,7 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
   DataStructuresUtils utils;
   Patient pat = utils.create_new_test_patient_obj();
   Patient * patient = &pat;
+  patient = utils.add_default_pulses(patient);
 
   // Create sampler object 
   arma::vec bhl_pv = { 0.5, 45 };

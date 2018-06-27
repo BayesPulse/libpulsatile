@@ -20,6 +20,7 @@ TEST_CASE( "first chains test -- single subject, single hormone", "[chains]" ) {
   DataStructuresUtils utils;
   Patient pat = utils.create_new_test_patient_obj();
   Patient * patient = &pat;
+  patient = utils.add_default_pulses(patient);
 
   // Single subject constructor
   Chains chains(100, 2, 10, false);
