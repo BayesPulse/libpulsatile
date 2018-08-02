@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/BayesPulse/libpulsatile.svg?branch=master)](https://travis-ci.org/BayesPulse/libpulsatile)
 [![codecov](https://codecov.io/gh/BayesPulse/libpulsatile/branch/master/graph/badge.svg)](https://codecov.io/gh/BayesPulse/libpulsatile)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/BayesPulse/libpulsatile?branch=master&svg=true)](https://ci.appveyor.com/project/BayesPulse/libpulsatile)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version-ago/BayesPulse)](https://cran.r-project.org/package=BayesPulse) 
 [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/BayesPulse)](https://cran.r-project.org/package=BayesPulse)
 
