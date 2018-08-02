@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.org/BayesPulse/libpulsatile.svg?branch=master)](https://travis-ci.org/BayesPulse/libpulsatile)
 [![codecov](https://codecov.io/gh/BayesPulse/libpulsatile/branch/master/graph/badge.svg)](https://codecov.io/gh/BayesPulse/libpulsatile)
-
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/BayesPulse/libpulsatile?branch=master&svg=true)](https://ci.appveyor.com/project/BayesPulse/libpulsatile)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version-ago/BayesPulse)](https://cran.r-project.org/package=BayesPulse) 
+[![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/BayesPulse)](https://cran.r-project.org/package=BayesPulse)
 
 The development repository for the C++ backend to the unified Bayesian pulsatile
 hormone modeling algorithm used in the poppulsatile R package.
@@ -22,7 +24,7 @@ relies on R's RNGs and datastructures.  The list of dependencies for the
 development phase is rather specific and will be reduced later.
 
 - C++11
-- clang4.0 (on Mac for OpenMP support)
+- > clang4.0 (on Mac for OpenMP support)
 - R (>= 3.4.3)
 - R packages
   - RInside (development version via GitHub)
