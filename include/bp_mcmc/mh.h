@@ -11,7 +11,7 @@
 #include <bp_mcmc/utils.h>
 
 // metropolishastings.h
-//   Abstract class for defining Modified Metropolis Hastings samplers
+//   Abstract template class for defining Modified Metropolis Hastings samplers
 //
 // Author: Matt Mulvahill
 // Created: 10/13/17

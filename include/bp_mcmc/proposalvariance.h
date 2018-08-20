@@ -16,12 +16,23 @@
 // Author: Matt Mulvahill
 // Created: 10/13/17
 //
+// Description:
+//   The ProposalVariance and ProposalVariance2p classes handle the storing and
+//   adjustment of the proposal variances (PV) used in the Metropolis Hastings
+//   algorithms.  The adjustment of the PV occurs automatically since we are
+//   using modified MH algorithms.
+//
+//   These are vanilla C++ classes.  The 2p version handles 2 dimensional matrix
+//   of PVs for the bivariate modifed MH case.
+//
+//   The classes inherit a Counter object that handles tracking the current
+//   iteration and acceptance counts. This object is public, so that the
+//   iteration/acceptance counts and ratios can be accessed directly by the
+//   MetropolisHastings class, which inherits the ProposalVariance[2p] class.
+//
 // NOTE: Sec9.3.1 in Acc C++ define here to tell compiler to avoid function-call
 // overhead, so all simple fn's are defined here -- not sure if this works for
 // non-const functions or virtual functions.
-//
-// NOTE: ProposalVariance has a constructor only to document the requirements
-// for the constructor.  It can't actually be used since its an abstract class.
 //
 
 
@@ -42,12 +53,13 @@ class ProposalVariance {
     ProposalVariance(double in_pv,
                      int in_adjust_iter,   // adjust pv on multiples of adjust_iter
                      int in_max_iter,     // maximum iteration to adjust pv
-                     double in_target_ratio) {
-      adjust_iter  = in_adjust_iter;
-      max_iter     = in_max_iter;
-      target_ratio = in_target_ratio;
-      initialize_proposals(in_pv);
-    }
+                     double in_target_ratio) : 
+      count(),
+      adjust_iter(in_adjust_iter),
+      max_iter(in_max_iter),
+      target_ratio(in_target_ratio) {
+        initialize_proposals(in_pv);
+      }
 
     // ProposalVariance functions
     double getpv()  { return pow(psd, 2); }
@@ -72,6 +84,7 @@ class ProposalVariance {
     void addaccept()  { check_adjust(); count.addaccept(); } ;
     double getratio() { return count.getratio();  } ;
     void resetratio() { count.resetratio();       } ;
+    double gettargetratio()   { return target_ratio; } ;
     int getiter()     { return count.getiter();   } ;
     int getiter_since_reset()     { return count.getiter_since_reset();   } ;
     int getaccept()   { return count.getaccept(); } ;
@@ -113,11 +126,12 @@ class ProposalVariance2p {
     ProposalVariance2p(arma::vec in_pv,
                        int in_adjust_iter,
                        int in_max_iter,
-                       double in_target_ratio) {
-      adjust_iter  = in_adjust_iter;
-      max_iter     = in_max_iter;
-      target_ratio = in_target_ratio;
-      initialize_proposals(in_pv);
+                       double in_target_ratio) :
+      count(),
+      adjust_iter(in_adjust_iter),
+      max_iter(in_max_iter),
+      target_ratio(in_target_ratio) {
+        initialize_proposals(in_pv);
     }
 
 
@@ -162,6 +176,7 @@ class ProposalVariance2p {
     void addaccept()  { check_adjust(); count.addaccept(); };
     double getratio() { return count.getratio();  } ;
     void resetratio() { count.resetratio();       } ;
+    int gettargetratio() { return target_ratio; } ;
     int getiter()     { return count.getiter();   } ;
     int getiter_since_reset() { return count.getiter_since_reset();   } ;
     int getaccept()   { return count.getaccept(); } ;
