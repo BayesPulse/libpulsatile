@@ -91,7 +91,7 @@ class DataStructuresUtils {
         1.2743407, 0.4760933, 1.7499186, 0.6057495,
         1.5219036, 0.8946568, 0.8632652 };
 
-      for (int i = 0; i < location.n_elem; i++) {
+      for (arma::uword i = 0; i < location.n_elem; i++) {
         PulseEstimates pulse(location(i), mass(i), width(i), tvarscale_mass(i), tvarscale_width(i),
                              patient->estimates.get_decay(), patient->data.time);
         patient->pulses.push_back(pulse);
