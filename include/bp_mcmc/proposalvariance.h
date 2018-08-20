@@ -73,6 +73,7 @@ class ProposalVariance {
     double getratio() { return count.getratio();  } ;
     void resetratio() { count.resetratio();       } ;
     int getiter()     { return count.getiter();   } ;
+    int getiter_since_reset()     { return count.getiter_since_reset();   } ;
     int getaccept()   { return count.getaccept(); } ;
 
   private:
@@ -162,6 +163,7 @@ class ProposalVariance2p {
     double getratio() { return count.getratio();  } ;
     void resetratio() { count.resetratio();       } ;
     int getiter()     { return count.getiter();   } ;
+    int getiter_since_reset() { return count.getiter_since_reset();   } ;
     int getaccept()   { return count.getaccept(); } ;
 
   private:

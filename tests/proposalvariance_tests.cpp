@@ -29,6 +29,7 @@ TEST_CASE( "Counter class", "[counter]" ) {
 
     REQUIRE( cnt.getaccept() == 1   );
     REQUIRE( cnt.getiter()   == 2   );
+    REQUIRE( cnt.getiter_since_reset() == 2 );
     REQUIRE( cnt.getratio()  == 0.5 );
   }
 
@@ -36,14 +37,16 @@ TEST_CASE( "Counter class", "[counter]" ) {
   SECTION( "can reset" ) {
 
     REQUIRE( cnt.getaccept() == 0 );
-    REQUIRE( cnt.getiter()   == 0 );
-    REQUIRE( cnt.getratio()  != cnt.getratio() );
+    REQUIRE( cnt.getiter()   == 2 );
+    REQUIRE( cnt.getiter_since_reset() == 0 );
+    REQUIRE( cnt.getratio()  == 0 ); // way to test 0
   }
 
   SECTION( "1-parameter version, core functions." ) {
 
     REQUIRE( cnt.getaccept() == 0 );
-    REQUIRE( cnt.getiter() == 0 );
+    REQUIRE( cnt.getiter() == 2 );
+    REQUIRE( cnt.getiter_since_reset() == 0 );
 
     for (int i = 0; i < 100; ++i) {
       if (i % 4 == 0) cnt.addaccept();
@@ -52,7 +55,8 @@ TEST_CASE( "Counter class", "[counter]" ) {
 
     // double check math on this..
     REQUIRE( cnt.getaccept() == 25 );
-    REQUIRE( cnt.getiter() == 100 );
+    REQUIRE( cnt.getiter() == 102 );
+    REQUIRE( cnt.getiter_since_reset() == 100 );
     REQUIRE( cnt.getratio() == 0.25 );
   }
 
@@ -78,8 +82,9 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
   pv.addreject();
   SECTION( "can iterate/add reject" ) {
 
-    REQUIRE( pv.getiter()   == 1 );
     REQUIRE( pv.getaccept() == 0 );
+    REQUIRE( pv.getiter()   == 1 );
+    REQUIRE( pv.getiter_since_reset()   == 1 );
     REQUIRE( pv.getratio()  == 0 );
   }
 
@@ -88,6 +93,7 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
 
     REQUIRE( pv.getaccept() == 1   );
     REQUIRE( pv.getiter()   == 2   );
+    REQUIRE( pv.getiter_since_reset()   == 2 );
     REQUIRE( pv.getratio()  == 0.5 );
   }
 
@@ -95,8 +101,9 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
   SECTION( "can reset" ) {
 
     REQUIRE( pv.getaccept() == 0 );
-    REQUIRE( pv.getiter()   == 0 );
-    REQUIRE( pv.getratio()  != pv.getratio() );
+    REQUIRE( pv.getiter()   == 2 );
+    REQUIRE( pv.getiter_since_reset()   == 0 );
+    REQUIRE( pv.getratio()  == 0 );
   }
 
   SECTION( "1-parameter version, core functions." ) {
@@ -112,6 +119,7 @@ TEST_CASE( "ProposalVariance class (1 param)", "[ProposalVariance]" ) {
 
     REQUIRE( pv2.getaccept() == 25 );
     REQUIRE( pv2.getiter() == 100 );
+    REQUIRE( pv2.getiter_since_reset()   == 100 );
     REQUIRE( pv2.getratio() == 0.25 );
   }
 
@@ -165,6 +173,7 @@ TEST_CASE( "ProposalVariance class (2 param)", "[ProposalVariance2p]" ) {
   SECTION( "can iterate/add reject" ) {
 
     REQUIRE(pv.getiter() == 1);
+    REQUIRE( pv.getiter_since_reset()   == 1 );
     REQUIRE(pv.getaccept() == 0);
     REQUIRE(pv.getratio() == 0);
   }
@@ -174,6 +183,7 @@ TEST_CASE( "ProposalVariance class (2 param)", "[ProposalVariance2p]" ) {
 
     REQUIRE( pv.getaccept() == 1   );
     REQUIRE( pv.getiter()   == 2   );
+    REQUIRE( pv.getiter_since_reset()   == 2 );
     REQUIRE( pv.getratio()  == 0.5 );
   }
 
@@ -181,8 +191,9 @@ TEST_CASE( "ProposalVariance class (2 param)", "[ProposalVariance2p]" ) {
   SECTION( "can reset" ) {
 
     REQUIRE( pv.getaccept() == 0 );
-    REQUIRE( pv.getiter()   == 0 );
-    REQUIRE( pv.getratio()  != pv.getratio() );
+    REQUIRE( pv.getiter()   == 2 );
+    REQUIRE( pv.getiter_since_reset()   == 0 );
+    REQUIRE( pv.getratio()  == 0 );
   }
 
 
@@ -201,6 +212,7 @@ TEST_CASE( "ProposalVariance class (2 param)", "[ProposalVariance2p]" ) {
 
     REQUIRE( pv.getaccept() == 25 );
     REQUIRE( pv.getiter() == 100 );
+    REQUIRE( pv.getiter_since_reset()   == 100 );
     REQUIRE( pv.getratio() == 0.25 );
 
     // Test adjustpv();
