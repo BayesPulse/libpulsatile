@@ -1,6 +1,7 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include <bpmod_singlesubject/bpmod_singlesubject.h>
+#include <iostream>
 #ifndef NORINSIDE
 #include <RInside.h>
 #endif
@@ -140,29 +141,40 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   //----------------------------------------
   // Sample MMH objects
   //----------------------------------------
-  for (int i = 0; i < mcmc_iterations; i++) {
+  for (int iteration = 0; iteration < mcmc_iterations; iteration++) {
 
     checkUserInterrupt();
-    //birth_death.sample(patient, false);
-    //draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean);
-    //draw_fixeff_width.sample(patient, &patient->estimates.width_mean);
-    //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient);
-    //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient);
-    draw_blhl.sample(patient, &patient->estimates.baseline_halflife);
-    //draw_locations.sample_pulses(patient);
-    //draw_masses.sample_pulses(patient);
-    //draw_widths.sample_pulses(patient);
-    //draw_tvarscale_mass.sample_pulses(patient);
-    //draw_tvarscale_width.sample_pulses(patient);
-    draw_error.sample(patient);
+    //birth_death.sample(patient, false, iteration);
+    //draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
+    //draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
+    //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
+    //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
+    //draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
+    draw_locations.sample_pulses(patient, iteration);
+    //draw_masses.sample_pulses(patient, iteration);
+    //draw_widths.sample_pulses(patient, iteration);
+    //draw_tvarscale_mass.sample_pulses(patient, iteration);
+    //draw_tvarscale_width.sample_pulses(patient, iteration);
+    //draw_error.sample(patient);
 
     //print_diagnostic_output(verbose);
-    ////std::cout << "Iteration " << i << " Number of pulses = " << patient->pulses.size() << std::endl;
-    chains.save_sample(patient, i);
+    //arma::vec locations(patient->get_pulsecount());
+    //int i = 0;
+    //for (auto &pulse : patient->pulses) {
+    //  locations[i] = pulse.time;
+    //  ++i;
+    //}
+
+    //std::cout.precision(11);
+    //std::cout.setf(std::ios::fixed);
+    //std::cout << "Iteration " << iteration <<
+    //  " Number of pulses = " << patient->get_pulsecount() <<
+    //  " pulse locations = " <<  locations <<
+    //  //"; FE Mass = " << patient->estimates.mass_mean <<
+    //  std::endl;
+    chains.save_sample(patient, iteration);
 
   }
-
-  //std::cout << "pulse count is: " << patient->get_pulsecount() << std::endl;
 
   return chains.output();
 

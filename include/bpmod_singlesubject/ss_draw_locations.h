@@ -37,7 +37,7 @@ class SS_DrawLocationsStrauss :
                                                      in_max_iter,
                                                      in_target_ratio) { };
     // Pulse level estimates need to be done at the pulse level
-    void sample_pulses(Patient *patient) {
+    void sample_pulses(Patient *patient, int iter) {
 
       PulseIter pulse = patient->pulses.begin();
       PulseConstIter pulse_end = patient->pulses.end();
@@ -45,7 +45,7 @@ class SS_DrawLocationsStrauss :
       while (pulse != pulse_end) {
         // Sample pulse,
         //   note: &(*pulse) derefs iter, then gets address of underlying obj
-        sample(&(*pulse), &pulse->time, patient);
+        sample(&(*pulse), &pulse->time, patient, iter);
         pulse++;
       }
 

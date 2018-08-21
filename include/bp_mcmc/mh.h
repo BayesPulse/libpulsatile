@@ -1,6 +1,7 @@
 #ifndef GUARD_bp_mcmc_metropolishastings_h
 #define GUARD_bp_mcmc_metropolishastings_h
 
+#include <Rcpp.h>
 #include <RcppArmadillo.h>
 #ifndef NORINSIDE
 #include <RInside.h>
@@ -45,7 +46,7 @@ class ModifiedMetropolisHastings
     //  SAMPLETYPE will be double (or int) or arma::vec depending on single or two
     //    parameter MMH
     //    - pass container (or one level higher in hierarchy) as container
-    void sample(T *sampling_unit, SAMPLETYPE *current_val, U *container) {
+    void sample(T *sampling_unit, SAMPLETYPE *current_val, U *container, int iter) {
 
       double accept_prob, alpha;
 
@@ -55,7 +56,7 @@ class ModifiedMetropolisHastings
 
       if (!supported) {
 
-        pv.addreject();
+        pv.addreject(iter);
 
       } else {
 
@@ -64,21 +65,21 @@ class ModifiedMetropolisHastings
 
         if (log(R::runif(0, 1)) < alpha) {
 
-          pv.addaccept();
+          pv.addaccept(iter);
           *current_val = proposal;
 
         } else {
 
-          pv.addreject();
+          pv.addreject(iter);
 
         }
       }
     }
 
-    void sample(T *sampling_unit, SAMPLETYPE *current_val) {
+    void sample(T *sampling_unit, SAMPLETYPE *current_val, int iter) {
       U empty_container;
       U * empty = &empty_container;
-      sample(sampling_unit, current_val, empty);
+      sample(sampling_unit, current_val, empty, iter);
     }
 
   protected:

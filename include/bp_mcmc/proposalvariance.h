@@ -53,57 +53,55 @@ class ProposalVariance {
     ProposalVariance(double in_pv,
                      int in_adjust_iter,   // adjust pv on multiples of adjust_iter
                      int in_max_iter,     // maximum iteration to adjust pv
-                     double in_target_ratio) : 
+                     double in_target_ratio) :
       count(),
+      pv(in_pv),
       adjust_iter(in_adjust_iter),
       max_iter(in_max_iter),
-      target_ratio(in_target_ratio) {
-        initialize_proposals(in_pv);
-      }
+      target_ratio(in_target_ratio) { }
 
     // ProposalVariance functions
-    double getpv()  { return pow(psd, 2); }
-    double getpsd() { return psd;         }
+    double getpv()  { return pv; }
+    double getpsd() { return sqrt(pv);         }
 
-    void check_adjust() {
-      int iter = getiter();
-      if (iter < max_iter && iter % adjust_iter == 0 && iter > 0) {
+    void check_adjust(int iter) {
+
+      if (iter < (max_iter + 1) && iter % adjust_iter == 0 && iter > 0 &&
+          getiter_since_reset() > (adjust_iter - 1)) {
         adjustpv(); 
       }
+
     }
 
     void adjustpv() {
-      double y = 1.0 + 1000.0 * pow(getratio() - target_ratio, 3);
-      if (y < 0.9)      set_proposals(getpv() * 0.9);
-      else if (y > 1.1) set_proposals(getpv() * 1.1);
+
+      double ratio = getratio();
+      double currentpv = getpv();
+      double y = 1.0 + 1000.0 * pow(ratio - target_ratio, 3);
+
+      if (y < 0.9)      pv = currentpv * 0.9;
+      else if (y > 1.1) pv = currentpv * 1.1;
+      resetratio();
+
     }
 
     // Counter object implementation
     //   works, but keep an eye out for a better option
-    void addreject()  { check_adjust(); count.addreject(); } ;
-    void addaccept()  { check_adjust(); count.addaccept(); } ;
+    void   addreject(int iter)  { check_adjust(iter); count.addreject(); } ;
+    void   addaccept(int iter)  { check_adjust(iter); count.addaccept(); } ;
     double getratio() { return count.getratio();  } ;
-    void resetratio() { count.resetratio();       } ;
+    void   resetratio() { count.resetratio();       } ;
     double gettargetratio()   { return target_ratio; } ;
-    int getiter()     { return count.getiter();   } ;
-    int getiter_since_reset()     { return count.getiter_since_reset();   } ;
+    int    getiter_since_reset()     { return count.getiter_since_reset();   } ;
     int getaccept()   { return count.getaccept(); } ;
 
   private:
 
-    double psd;          // proposal standard deviation
     Counter count;
+    double pv;           // proposal variance
     int adjust_iter;     // iteration to adjust on
     int max_iter;        // iteration to stop adjusting
     double target_ratio; // target proposal variance
-
-    // ProposalVariance internal functions
-    void initialize_proposals(double initial_pv) {
-      set_proposals(initial_pv);
-    }
-    void set_proposals(double this_pv) {
-      psd = sqrt(this_pv);
-    }
 
 };
 
@@ -139,15 +137,18 @@ class ProposalVariance2p {
     arma::mat getpv() const  { return pv; };
     arma::mat getpsd() const { return psd; };
 
-    void check_adjust() {
-      int iter = getiter();
-      if (iter < max_iter && iter % adjust_iter == 0 && iter > 0) {
+    void check_adjust(int iter) {
+
+      if (iter < (max_iter + 1) && iter % adjust_iter == 0 && iter > 0 &&
+          getiter_since_reset() > (adjust_iter - 1)) {
         adjustpv(-0.90); 
       }
+
     }
 
 
     void adjustpv(double corr = -0.90) {
+
       // identity matrix
       arma::mat mydiag(2, 2, arma::fill::eye);
 
@@ -168,16 +169,18 @@ class ProposalVariance2p {
         set_proposals(pv * y, corr);
 
       }
+
+      resetratio();
+
     }
 
     // Counter implementation
     //   NOTE: works, but keep an eye out for a better option
-    void addreject()  { check_adjust(); count.addreject(); };
-    void addaccept()  { check_adjust(); count.addaccept(); };
+    void addreject(int iter)  { check_adjust(iter); count.addreject(); } ;
+    void addaccept(int iter)  { check_adjust(iter); count.addaccept(); } ;
     double getratio() { return count.getratio();  } ;
     void resetratio() { count.resetratio();       } ;
     int gettargetratio() { return target_ratio; } ;
-    int getiter()     { return count.getiter();   } ;
     int getiter_since_reset() { return count.getiter_since_reset();   } ;
     int getaccept()   { return count.getaccept(); } ;
 

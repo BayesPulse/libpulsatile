@@ -33,13 +33,13 @@ class SS_DrawTVarScaleWidths : public ModifiedMetropolisHastings<PulseEstimates,
                                                      in_target_ratio) { };
 
     // Pulse-specific estimate -- this function samples for each pulse
-    void sample_pulses(Patient *patient) {
+    void sample_pulses(Patient *patient, int iter) {
 
       PulseIter pulse = patient->pulses.begin();
       PulseConstIter pulse_end = patient->pulses.end();
 
       while (pulse != pulse_end) {
-        sample(&(*pulse), &pulse->tvarscale_width, patient);
+        sample(&(*pulse), &pulse->tvarscale_width, patient, iter);
         pulse++;
       }
 

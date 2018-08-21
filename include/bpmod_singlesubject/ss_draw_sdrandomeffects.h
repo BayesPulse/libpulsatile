@@ -13,9 +13,9 @@
 // NOTE: I separated out function definitions here 
 
 //
-// SS_DrawFixedEffects
+// SS_DrawSDRandomEffects
 //   Modified Metropolis Hastings sampler instantiating the mmh class for
-//   sample the mean mass & width
+//   sample the sd of the pulse masses & widths
 //
 
 class SS_DrawSDRandomEffects : public ModifiedMetropolisHastings<Patient, Patient, double, ProposalVariance>

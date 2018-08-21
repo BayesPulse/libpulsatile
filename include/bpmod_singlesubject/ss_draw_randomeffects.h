@@ -49,10 +49,10 @@ class SS_DrawRandomEffects :
       };
 
     // Pulse-specific estimate -- this function samples for each pulse
-    void sample_pulses(Patient *patient) { //, std::string measure) {
+    void sample_pulses(Patient *patient, int iter) { //, std::string measure) {
 
       for (auto &pulse : patient->pulses) {
-        sample(&pulse, &(pulse.*randomeffect_), patient);
+        sample(&pulse, &(pulse.*randomeffect_), patient, iter);
       }
 
     }
