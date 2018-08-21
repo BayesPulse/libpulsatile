@@ -101,8 +101,15 @@ class ModifiedMetropolisHastings
     PulseUtils pu;
 
     double draw_proposal(double current, double proposal_sd) {
-      return Rf_rnorm(current, proposal_sd);
+
+      Rcpp::RNGScope rng_scope;
+      double new_value = 0;
+      new_value = Rf_rnorm(current, proposal_sd);
+
+      return new_value;
+
     };
+
     arma::vec draw_proposal(arma::vec current, arma::mat proposal_sd){
       return pu.rmvnorm(current, proposal_sd);
     };
