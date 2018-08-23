@@ -7,15 +7,20 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +125 tests/mh_tests.cpp
+badd +0 include/bpmod_singlesubject/ss_draw_locations.h
+badd +0 src/singlesubject.cpp
+badd +0 include/bpmod_singlesubject/birthdeath.h
+badd +151 include/bp_datastructures/patient.h
+badd +62 include/bp_datastructures/pulseestimates.h
 badd +0 include/bp_mcmc/mh.h
-badd +140 include/bpmod_singlesubject/birthdeath.h
-badd +21 include/bp_mcmc/counter.h
-badd +0 include/bp_mcmc/proposalvariance.h
+badd +678 ~/Projects/BayesPulse/Software/pulsatile/src/mcmc.c
+badd +0 src/tempmain.cpp
+badd +56 include/bpmod_singlesubject/ss_draw_fixedeffects.h
 argglobal
 silent! argdel *
-$argadd tests/mh_tests.cpp
-edit tests/mh_tests.cpp
+$argadd include/bpmod_singlesubject/ss_draw_locations.h
+set stal=2
+edit include/bpmod_singlesubject/ss_draw_locations.h
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
@@ -29,10 +34,94 @@ wincmd w
 wincmd w
 wincmd t
 set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 31 + 159) / 318)
-exe 'vert 2resize ' . ((&columns * 95 + 159) / 318)
-exe 'vert 3resize ' . ((&columns * 94 + 159) / 318)
-exe 'vert 4resize ' . ((&columns * 95 + 159) / 318)
+exe 'vert 1resize ' . ((&columns * 31 + 191) / 382)
+exe 'vert 2resize ' . ((&columns * 116 + 191) / 382)
+exe 'vert 3resize ' . ((&columns * 116 + 191) / 382)
+exe 'vert 4resize ' . ((&columns * 116 + 191) / 382)
+argglobal
+enew
+file NERD_tree_1
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal nofen
+wincmd w
+argglobal
+setlocal fdm=syntax
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal fen
+let s:l = 53 - ((52 * winheight(0) + 51) / 102)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+53
+normal! 0
+wincmd w
+argglobal
+if bufexists('include/bpmod_singlesubject/birthdeath.h') | buffer include/bpmod_singlesubject/birthdeath.h | else | edit include/bpmod_singlesubject/birthdeath.h | endif
+setlocal fdm=syntax
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal fen
+let s:l = 48 - ((47 * winheight(0) + 51) / 102)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+48
+normal! 0
+wincmd w
+argglobal
+if bufexists('src/singlesubject.cpp') | buffer src/singlesubject.cpp | else | edit src/singlesubject.cpp | endif
+setlocal fdm=syntax
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal fen
+let s:l = 159 - ((73 * winheight(0) + 51) / 102)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+159
+normal! 05|
+wincmd w
+exe 'vert 1resize ' . ((&columns * 31 + 191) / 382)
+exe 'vert 2resize ' . ((&columns * 116 + 191) / 382)
+exe 'vert 3resize ' . ((&columns * 116 + 191) / 382)
+exe 'vert 4resize ' . ((&columns * 116 + 191) / 382)
+tabedit include/bp_mcmc/mh.h
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+wincmd _ | wincmd |
+vsplit
+wincmd _ | wincmd |
+vsplit
+3wincmd h
+wincmd w
+wincmd w
+wincmd w
+wincmd t
+set winminheight=1 winminwidth=1 winheight=1 winwidth=1
+exe 'vert 1resize ' . ((&columns * 31 + 191) / 382)
+exe 'vert 2resize ' . ((&columns * 116 + 191) / 382)
+exe 'vert 3resize ' . ((&columns * 116 + 191) / 382)
+exe 'vert 4resize ' . ((&columns * 116 + 191) / 382)
 argglobal
 enew
 file NERD_tree_2
@@ -54,15 +143,15 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 119 - ((9 * winheight(0) + 40) / 81)
+let s:l = 72 - ((71 * winheight(0) + 51) / 102)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-119
-normal! 0
+72
+normal! 029|
 wincmd w
 argglobal
-if bufexists('include/bp_mcmc/mh.h') | buffer include/bp_mcmc/mh.h | else | edit include/bp_mcmc/mh.h | endif
+if bufexists('include/bpmod_singlesubject/ss_draw_locations.h') | buffer include/bpmod_singlesubject/ss_draw_locations.h | else | edit include/bpmod_singlesubject/ss_draw_locations.h | endif
 setlocal fdm=syntax
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -71,15 +160,63 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 85 - ((44 * winheight(0) + 40) / 81)
+let s:l = 117 - ((73 * winheight(0) + 51) / 102)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+117
+normal! 015|
+wincmd w
+argglobal
+if bufexists('~/Projects/BayesPulse/Software/pulsatile/src/mcmc.c') | buffer ~/Projects/BayesPulse/Software/pulsatile/src/mcmc.c | else | edit ~/Projects/BayesPulse/Software/pulsatile/src/mcmc.c | endif
+setlocal fdm=syntax
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal fen
+let s:l = 513 - ((47 * winheight(0) + 51) / 102)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+513
+normal! 032|
+wincmd w
+3wincmd w
+exe 'vert 1resize ' . ((&columns * 31 + 191) / 382)
+exe 'vert 2resize ' . ((&columns * 116 + 191) / 382)
+exe 'vert 3resize ' . ((&columns * 116 + 191) / 382)
+exe 'vert 4resize ' . ((&columns * 116 + 191) / 382)
+tabedit src/tempmain.cpp
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+wincmd t
+set winminheight=1 winminwidth=1 winheight=1 winwidth=1
+exe 'vert 1resize ' . ((&columns * 190 + 191) / 382)
+exe 'vert 2resize ' . ((&columns * 191 + 191) / 382)
+argglobal
+setlocal fdm=syntax
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal fen
+let s:l = 85 - ((84 * winheight(0) + 51) / 102)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 85
-normal! 05|
+normal! 064|
 wincmd w
 argglobal
-if bufexists('include/bp_mcmc/proposalvariance.h') | buffer include/bp_mcmc/proposalvariance.h | else | edit include/bp_mcmc/proposalvariance.h | endif
+if bufexists('src/singlesubject.cpp') | buffer src/singlesubject.cpp | else | edit src/singlesubject.cpp | endif
 setlocal fdm=syntax
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -88,19 +225,36 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 92 - ((11 * winheight(0) + 40) / 81)
+let s:l = 154 - ((68 * winheight(0) + 51) / 102)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-92
-normal! 011|
+154
+normal! 05|
 wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 31 + 159) / 318)
-exe 'vert 2resize ' . ((&columns * 95 + 159) / 318)
-exe 'vert 3resize ' . ((&columns * 94 + 159) / 318)
-exe 'vert 4resize ' . ((&columns * 95 + 159) / 318)
-tabnext 1
+exe 'vert 1resize ' . ((&columns * 190 + 191) / 382)
+exe 'vert 2resize ' . ((&columns * 191 + 191) / 382)
+tabedit include/bpmod_singlesubject/birthdeath.h
+set splitbelow splitright
+wincmd t
+set winminheight=1 winminwidth=1 winheight=1 winwidth=1
+argglobal
+setlocal fdm=syntax
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal fen
+let s:l = 118 - ((96 * winheight(0) + 51) / 102)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+118
+normal! 0
+tabnext 2
+set stal=1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

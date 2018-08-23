@@ -58,20 +58,25 @@ class ModifiedMetropolisHastings
       if (!supported) {
 
         pv.addreject(iter);
+        std::cout << "REJECTED (unsupported) :" << *current_val << std::endl;
 
       } else {
 
         accept_prob = posterior_function(sampling_unit, proposal, container);
         alpha = (0 < accept_prob) ? 0 : accept_prob;
+        std::cout << "Acceptance probability=" << accept_prob <<
+          "; alpha=" << alpha << "  ";
 
         if (log(Rf_runif(0, 1)) < alpha) {
 
           pv.addaccept(iter);
           *current_val = proposal;
+          std::cout << "ACCEPTED :" << *current_val << "\n\n" << std::endl;
 
         } else {
 
           pv.addreject(iter);
+          std::cout << "REJECTED (accept/reject) :" << *current_val << "\n\n" << std::endl;
 
         }
       }

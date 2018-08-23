@@ -75,13 +75,16 @@ class SS_DrawLocationsStrauss :
       double acceptance_ratio;
       double prior_ratio;
       // Extracted variables
-      arma::vec curr_mean_contrib = 
+      arma::vec curr_mean_contrib =
         pulse->get_mean_contribution(patient->data.time,
                                      patient->estimates.get_decay());
       double curr_likelihood = patient->likelihood(false); // would prefer get_likelihood()
       double plikelihood;
       double gamma = patient->priors.strauss_repulsion;
       double current_time;
+
+      //std::cout << "Current mean contrib=" << curr_mean_contrib <<
+      //  "; Current likelihood=" << curr_likelihood << std::endl;
 
       // Calculate sum_s_r for proposal value and current value
       // TODO: update arguments
@@ -93,6 +96,13 @@ class SS_DrawLocationsStrauss :
       // NOTE: updated gamma arg already
       prior_ratio = pow(gamma, sum_s_r_proposal - sum_s_r_current);
 
+      // NOTE: prior ratio is working fine!
+      std::cout << "prior ratio=" << prior_ratio <<
+        "; gamma=" << gamma <<
+        "; sum_s_r_proposal=" << sum_s_r_proposal <<
+        "; sum_s_r_current=" << sum_s_r_current <<
+        std::endl;
+
       // if prior ratio is 0 (~EPS), set acceptance_ratio to 0, 
       // else calculate it 
       // (note: necessary because log(0) = NaN, like_ratio on log scale)
@@ -102,6 +112,7 @@ class SS_DrawLocationsStrauss :
 
       } else {
 
+        // *** ***NOTE: TODO: this is not working*** ***
         // Save current time and set its time to proposed value
         current_time = pulse->time;
         pulse->time  = proposal;

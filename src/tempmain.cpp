@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
                                          Named("width_sd") = 2,
                                          Named("baseline") = 0.5,
                                          Named("halflife") = 45,
-                                         Named("location") = 10,
+                                         Named("location") = 1000,
                                          Named("pulse_mass") = 1,
                                          Named("pulse_width") = 10 ,
                                          Named("sdscale_pulse_mass") = 1,
