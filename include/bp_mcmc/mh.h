@@ -48,6 +48,7 @@ class ModifiedMetropolisHastings
     //    - pass container (or one level higher in hierarchy) as container
     void sample(T *sampling_unit, SAMPLETYPE *current_val, U *container, int iter) {
 
+      Rcpp::RNGScope rng_scope;
       double accept_prob, alpha;
 
       // Draw new proposal
@@ -63,7 +64,7 @@ class ModifiedMetropolisHastings
         accept_prob = posterior_function(sampling_unit, proposal, container);
         alpha = (0 < accept_prob) ? 0 : accept_prob;
 
-        if (log(R::runif(0, 1)) < alpha) {
+        if (log(Rf_runif(0, 1)) < alpha) {
 
           pv.addaccept(iter);
           *current_val = proposal;
