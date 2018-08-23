@@ -28,7 +28,9 @@ library(bayespulse)
 
 set.seed(2018-06-21)
 sim <- simulate_pulse()
-spec <- pulse_spec()
+spec <- pulse_spec(location_prior_type = "strauss", 
+                   prior_location_gamma = 0,
+                   prior_location_range = 30)
 fit <- fit_pulse(sim, spec = spec, iters = 100000, thin = 10, burnin = 10000, verbose = TRUE)
 
 # Plot diagnostics

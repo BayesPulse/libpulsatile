@@ -2,56 +2,50 @@ let SessionLoad = 1
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
-cd ~/Projects/BayesPulse/libpulsatile
+cd ~/Projects/BayesPulse/Software/libpulsatile
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +150 src/singlesubject.cpp
-badd +10 include/counter.h
-badd +0 term://.//15141:/bin/bash
-badd +0 include/patient.h
-badd +54 src/tempmain.cpp
-badd +375 include/datastructures.h
-badd +0 include/singlesubject/ss_draw_randomeffects.h
-badd +8 include/singlesubject/ss_draw_randomeffects_width.h
-badd +0 include/singlesubject/ss_draw_fixedeffects.h
+badd +125 tests/mh_tests.cpp
+badd +0 include/bp_mcmc/mh.h
+badd +140 include/bpmod_singlesubject/birthdeath.h
+badd +21 include/bp_mcmc/counter.h
+badd +0 include/bp_mcmc/proposalvariance.h
 argglobal
 silent! argdel *
-$argadd src/singlesubject.cpp
-set stal=2
-edit include/singlesubject/ss_draw_randomeffects.h
+$argadd tests/mh_tests.cpp
+edit tests/mh_tests.cpp
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
 wincmd _ | wincmd |
 vsplit
-2wincmd h
+wincmd _ | wincmd |
+vsplit
+3wincmd h
+wincmd w
 wincmd w
 wincmd w
 wincmd t
 set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 79 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 79 + 119) / 238)
-exe 'vert 3resize ' . ((&columns * 78 + 119) / 238)
+exe 'vert 1resize ' . ((&columns * 31 + 159) / 318)
+exe 'vert 2resize ' . ((&columns * 95 + 159) / 318)
+exe 'vert 3resize ' . ((&columns * 94 + 159) / 318)
+exe 'vert 4resize ' . ((&columns * 95 + 159) / 318)
 argglobal
-setlocal fdm=syntax
+enew
+file NERD_tree_2
+setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
 setlocal fdi=#
 setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
-setlocal fen
-let s:l = 97 - ((29 * winheight(0) + 28) / 56)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-97
-normal! 037|
+setlocal nofen
 wincmd w
 argglobal
-if bufexists('include/singlesubject/ss_draw_fixedeffects.h') | buffer include/singlesubject/ss_draw_fixedeffects.h | else | edit include/singlesubject/ss_draw_fixedeffects.h | endif
 setlocal fdm=syntax
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -60,54 +54,53 @@ setlocal fdl=2
 setlocal fml=1
 setlocal fdn=1
 setlocal fen
-let s:l = 74 - ((24 * winheight(0) + 28) / 56)
+let s:l = 119 - ((9 * winheight(0) + 40) / 81)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-74
-normal! 07|
-wincmd w
-argglobal
-if bufexists('term://.//15141:/bin/bash') | buffer term://.//15141:/bin/bash | else | edit term://.//15141:/bin/bash | endif
-setlocal fdm=syntax
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=2
-setlocal fml=1
-setlocal fdn=1
-setlocal fen
-let s:l = 988 - ((50 * winheight(0) + 28) / 56)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-988
-normal! 03|
-wincmd w
-exe 'vert 1resize ' . ((&columns * 79 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 79 + 119) / 238)
-exe 'vert 3resize ' . ((&columns * 78 + 119) / 238)
-tabedit include/patient.h
-set splitbelow splitright
-wincmd t
-set winminheight=1 winminwidth=1 winheight=1 winwidth=1
-argglobal
-setlocal fdm=syntax
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=2
-setlocal fml=1
-setlocal fdn=1
-setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 46) / 93)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-1
+119
 normal! 0
+wincmd w
+argglobal
+if bufexists('include/bp_mcmc/mh.h') | buffer include/bp_mcmc/mh.h | else | edit include/bp_mcmc/mh.h | endif
+setlocal fdm=syntax
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal fen
+let s:l = 85 - ((44 * winheight(0) + 40) / 81)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+85
+normal! 05|
+wincmd w
+argglobal
+if bufexists('include/bp_mcmc/proposalvariance.h') | buffer include/bp_mcmc/proposalvariance.h | else | edit include/bp_mcmc/proposalvariance.h | endif
+setlocal fdm=syntax
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=2
+setlocal fml=1
+setlocal fdn=1
+setlocal fen
+let s:l = 92 - ((11 * winheight(0) + 40) / 81)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+92
+normal! 011|
+wincmd w
+2wincmd w
+exe 'vert 1resize ' . ((&columns * 31 + 159) / 318)
+exe 'vert 2resize ' . ((&columns * 95 + 159) / 318)
+exe 'vert 3resize ' . ((&columns * 94 + 159) / 318)
+exe 'vert 4resize ' . ((&columns * 95 + 159) / 318)
 tabnext 1
-set stal=1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

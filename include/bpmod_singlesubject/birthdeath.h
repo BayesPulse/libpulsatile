@@ -19,7 +19,7 @@ class BirthDeathProcess
 {
 
   public:
-    void sample(Patient *patient, bool response_hormone);
+    void sample(Patient *patient, bool response_hormone, int iter);
   private:
     PulseUtils pu;
     void add_new_pulse(Patient *patient, double position);
@@ -39,8 +39,10 @@ class BirthDeathProcess
 
 };
 
-void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
+void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter) {
 
+  //std::cout << "IN BIRTHDEATH" << std::endl;
+  Rcpp::RNGScope rng_scope;
   int aaa                 = 0;   // Counter for # BD iterations
   int max_num_node        = 60;  // Max number of pulses allowed before forced death (hardcoded parm)
   int pulse_count         = 0;
@@ -83,6 +85,7 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
   while (1) {
 
     aaa++; // iters counter
+    //std::cout << "BIRTHDEATH LOOP #" << aaa << std::endl;
 
     // Calculate death rate for each component conditional on Strauss or order
     // statistic -- using pulse count and partial likelihoods
@@ -121,6 +124,7 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
     double lambda = 1 /( total_birth_rate + total_death_rate);
     //std::cout << "total birth rate = " << total_birth_rate << " total_death_rate = " << total_death_rate << std::endl;
     //std::cout << "lambda = " << lambda << std::endl;
+
     S += Rf_rexp(lambda);
     // If S exceeds T or if we've run this too many times, break
     if (S > T)      { 
@@ -156,6 +160,12 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
       if (accept_pos == 1) {
         //std::cout << "In for sure birth step" << std::endl;
         add_new_pulse(patient, position);
+      } else {
+        //std::cout << "not accepted due to strauss condition" << 
+        //  "\n sum_s_r=" << sum_s_r << "; position=" << position << "; fitstart=" << fitstart << "; fitend=" << fitend <<
+        //  "\n papas_cif=" << papas_cif << "; birth_rate=" << birth_rate << "; repulsion=" << patient->priors.strauss_repulsion <<
+        //  "; b_ratio=" << b_ratio <<
+        //  std::endl;
       }
 
     } else { // Otherwise, a death occurs 
@@ -176,10 +186,12 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone) {
 //
 void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
 
+  Rcpp::RNGScope rng_scope;
   double new_mass = 0.0;
   double new_width = 0.0;
   double new_tvarscale_mass, new_tvarscale_width;
   new_tvarscale_mass = new_tvarscale_width = 1.0;
+  //std::cout << "ADDING NEW PULSE" << std::endl;
 
   while (new_mass < 0) {
     new_mass = Rf_rnorm(patient->estimates.mass_mean, patient->estimates.mass_sd);
@@ -211,6 +223,7 @@ void BirthDeathProcess::remove_pulse(Patient *patient,
                                      arma::vec death_rate, 
                                      int pulse_count) {
 
+  //std::cout << "REMOVING PULSE" << std::endl;
   PulseIter pulse = patient->pulses.begin();
   int remove = 0;
 

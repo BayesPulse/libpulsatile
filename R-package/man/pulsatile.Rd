@@ -4,7 +4,6 @@
 \name{pulsatile}
 \alias{pulsatile}
 \alias{pulsatile-package}
-\alias{pulsatile-package}
 \title{Pulsatile package documentation}
 \description{
 Bayesian deconvolution model for the analysis of time-series of

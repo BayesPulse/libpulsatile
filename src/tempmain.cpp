@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
   // Create sampler object 
   Rcpp::List rtn_list;
   rtn_list = singlesubject_(conc, thistime, priors, proposalvars, startingvals,
-                            50000, 50, 10000, true, 500, 25000, 0.25, 0.35);
+                            10000, 50, 10000, true, 500, 25000, 0.25, 0.35);
 
   return 0;
 
