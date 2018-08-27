@@ -99,26 +99,21 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   PatientEstimates *est  = &patient->estimates;
   double patient_mean    = (*est).*est_mean_;
   double patient_sd      = (*est).*est_sd_;
-  std::list<PulseEstimates>::const_iterator pulse     = patient->pulses.begin();
-  std::list<PulseEstimates>::const_iterator pulse_end = patient->pulses.end();
 
   // Calculate pulse-specific portion of acceptance ratio
-  while (pulse != pulse_end) {
-    //std::cout << "Hi, I'm in SS_DrawSDRandomEffects::posterior_function()" << std::endl;
+  for (auto &pulse : patient->pulses) {
 
     // Normalizing constants
-    stdx_old   = patient_mean / ( patient_sd  / sqrt((*pulse).*tvarscale_) );
-    stdx_new   = patient_mean / ( proposal / sqrt((*pulse).*tvarscale_) );
+    stdx_old   = patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
+    stdx_new   = patient_mean / ( proposal / sqrt(pulse.*tvarscale_) );
     new_int   += Rf_pnorm5(stdx_new, 0, 1, 1.0, 1.0);
     old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
 
     // 3rd part of acceptance ratio
-    third_part += (*pulse).*tvarscale_ * 
-                  ((*pulse).*randomeffect_ - patient_mean) * 
-                  ((*pulse).*randomeffect_ - patient_mean);
+    third_part += pulse.*tvarscale_ * 
+                  (pulse.*randomeffect_ - patient_mean) * 
+                  (pulse.*randomeffect_ - patient_mean);
 
-    // Next pulse
-    ++pulse;
   }
 
   // 1st and 2nd 'parts' of acceptance ratio

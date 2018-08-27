@@ -24,8 +24,8 @@ class SS_DrawTVarScale :
   public:
 
     // Constructor
-    SS_DrawTVarScale(double in_pv, 
-                     int in_adjust_iter, 
+    SS_DrawTVarScale(double in_pv,
+                     int in_adjust_iter,
                      int in_max_iter,
                      double in_target_ratio,
                      bool for_width) :
