@@ -128,10 +128,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                                    adj_max, univ_target, false);
   SS_DrawRandomEffects draw_widths(proposalvars["pulse_width"], adj_iter,
                                    adj_max, univ_target, true);
-  //SS_DrawTVarScale draw_tvarscale_mass(proposalvars["sdscale_pulse_mass"],
-  //                                     adj_iter, adj_max, univ_target, false);
-  //SS_DrawTVarScale draw_tvarscale_width(proposalvars["sdscale_pulse_width"],
-  //                                      adj_iter, adj_max, univ_target, true);
+  SS_DrawTVarScale draw_tvarscale_mass(proposalvars["sdscale_pulse_mass"],
+                                       adj_iter, adj_max, univ_target, false);
+  SS_DrawTVarScale draw_tvarscale_width(proposalvars["sdscale_pulse_width"],
+                                        adj_iter, adj_max, univ_target, true);
   SS_DrawError draw_error;
 
 
@@ -157,8 +157,8 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     draw_locations.sample_pulses(patient, iteration);
     //draw_masses.sample_pulses(patient, iteration);
     //draw_widths.sample_pulses(patient, iteration);
-    //draw_tvarscale_mass.sample_pulses(patient, iteration);
-    //draw_tvarscale_width.sample_pulses(patient, iteration);
+    draw_tvarscale_mass.sample_pulses(patient, iteration);
+    draw_tvarscale_width.sample_pulses(patient, iteration);
     draw_error.sample(patient);
     chains.save_sample(patient, iteration);
 
