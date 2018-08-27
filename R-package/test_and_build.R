@@ -36,7 +36,11 @@ fit <- fit_pulse(sim, spec = spec, iters = 100000, thin = 10, burnin = 10000, ve
 # Plot diagnostics
 bp_trace(fit)
 bp_posteriors(fit)
+
 bp_location_posterior(fit)
+plot(sim) +
+  geom_vline(data = sim$parameters, aes(xintercept = location))
+
 
 
 #---------------------------------------

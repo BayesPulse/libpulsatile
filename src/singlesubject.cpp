@@ -82,9 +82,13 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   Patient pat(data, priors, estimates);
   Patient * patient = &pat;
 
-  // For debugging, add 11 pulses w/ true parms
-  //DataStructuresUtils utils;
-  //patient = utils.add_default_pulses(patient);
+  //
+  // ****************************************
+  // TODO: NOTE: For debugging, add 11 pulses w/ true parms
+  // ****************************************
+  //
+  DataStructuresUtils utils;
+  patient = utils.add_default_pulses(patient);
 
   //std::cout << "pulse count is: " << patient->get_pulsecount() << std::endl;
 
@@ -93,7 +97,7 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   //----------------------------------------
 
   // Birth-death process
-  BirthDeathProcess birth_death;
+  //BirthDeathProcess birth_death;
 
   // Modified Metropolis Hastings for fixed effects (mean mass & mean width)
   SS_DrawFixedEffects draw_fixeff_mass(proposalvars["mass_mean"], adj_iter,
@@ -144,11 +148,11 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   for (int iteration = 0; iteration < mcmc_iterations; iteration++) {
 
     checkUserInterrupt();
-    birth_death.sample(patient, false, iteration);
-    //draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
-    //draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
-    //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
-    //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
+    //birth_death.sample(patient, false, iteration);
+    draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
+    draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
+    draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
+    draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
     //draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
     draw_locations.sample_pulses(patient, iteration);
     //draw_masses.sample_pulses(patient, iteration);

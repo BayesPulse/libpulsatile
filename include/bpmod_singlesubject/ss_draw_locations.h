@@ -83,9 +83,6 @@ class SS_DrawLocationsStrauss :
       double gamma = patient->priors.strauss_repulsion;
       double current_time;
 
-      //std::cout << "Current mean contrib=" << curr_mean_contrib <<
-      //  "; Current likelihood=" << curr_likelihood << std::endl;
-
       // Calculate sum_s_r for proposal value and current value
       // TODO: update arguments
       int sum_s_r_proposal = patient->calc_sr_strauss(proposal, pulse);
@@ -95,13 +92,6 @@ class SS_DrawLocationsStrauss :
       //      gamma^(sum(s_r*)_proposal - sum(s_r)_current)
       // NOTE: updated gamma arg already
       prior_ratio = pow(gamma, sum_s_r_proposal - sum_s_r_current);
-
-      // NOTE: prior ratio is working fine!
-      std::cout << "prior ratio=" << prior_ratio <<
-        "; gamma=" << gamma <<
-        "; sum_s_r_proposal=" << sum_s_r_proposal <<
-        "; sum_s_r_current=" << sum_s_r_current <<
-        std::endl;
 
       // if prior ratio is 0 (~EPS), set acceptance_ratio to 0, 
       // else calculate it 

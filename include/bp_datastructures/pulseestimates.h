@@ -65,13 +65,13 @@ class PulseEstimates {
 
     // Constructor for new PulseEstimates objects
     PulseEstimates(double in_time,
-                  double in_mass,
-                  double in_width,
-                  double in_tvarscale_mass,
-                  double in_tvarscale_width,
-                  //double fshlambda,
-                  double patient_decay,
-                  const arma::vec &data_time)
+                   double in_mass,
+                   double in_width,
+                   double in_tvarscale_mass,
+                   double in_tvarscale_width,
+                   //double fshlambda,
+                   double patient_decay,
+                   const arma::vec &data_time)
         : time            (in_time)
         , mass            (in_mass)
         , width           (in_width)
@@ -112,7 +112,7 @@ class PulseEstimates {
       y  = decay_rate * (0.5 * z  + time);
       z += time;
       w  = sqrt(2. * width);
-      x = ((data_time - z) / w) * sqrt(2);
+      x = ((data_time - z) / w) * sqrt(2.);
 
       double N = data_time.n_elem;
       // NOTE: potentially slow piece

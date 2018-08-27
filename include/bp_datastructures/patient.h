@@ -151,7 +151,6 @@ struct Patient {
     int i = 0;
     while(exclude_pulse != pulse_end) {
       partials(i) = likelihood(response_hormone, exclude_pulse);
-      //std::cout << "partials(" << i << ") = " << partials(i) << std::endl;
       exclude_pulse++;
       i++;
     }
@@ -189,15 +188,15 @@ struct Patient {
 
     // Add the contribution to the mean from each pulse
     arma::vec mctrb(data.concentration.n_elem);
-    int i = 1; // i think this is extraneous
+    mctrb.fill(0);
+
     while (pulse_iter != pulselist_end) {
       if (pulse_iter != pulse_excluded) {
-        mctrb = pulse_iter->get_mean_contribution(data.concentration,
+        mctrb = pulse_iter->get_mean_contribution(data.time,
                                                   estimates.get_decay());
         mean_conc += mctrb;
       }
       ++pulse_iter;
-      ++i;
     }
 
     // Add the baseline contribution and log
