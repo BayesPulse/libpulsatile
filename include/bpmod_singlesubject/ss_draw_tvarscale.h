@@ -53,14 +53,6 @@ class SS_DrawTVarScale :
     // Pulse-specific estimate -- this function samples for each pulse
     void sample_pulses(Patient *patient, int iter) {
 
-      //PulseIter pulse = patient->pulses.begin();
-      //PulseConstIter pulse_end = patient->pulses.end();
-
-      //while (pulse != pulse_end) {
-      //  sample(&(*pulse), &pulse->tvarscale_, patient, iter);
-      //  pulse++;
-      //}
-
       for (auto &pulse : patient->pulses) {
         sample(&pulse, &(pulse.*tvarscale_), patient, iter);
       }

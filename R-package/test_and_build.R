@@ -26,12 +26,12 @@ devtools::test()
 
 library(bayespulse)
 
-set.seed(2018-06-21)
+set.seed(2018-08-28)
 sim <- simulate_pulse()
 spec <- pulse_spec(location_prior_type = "strauss", 
                    prior_location_gamma = 0,
                    prior_location_range = 30)
-fit <- fit_pulse(sim, spec = spec, iters = 100000, thin = 10, burnin = 10000, verbose = TRUE)
+fit <- fit_pulse(sim, spec = spec, iters = 250000, thin = 50, burnin = 100000, verbose = TRUE)
 
 # Plot diagnostics
 bp_trace(fit)
@@ -40,6 +40,9 @@ bp_posteriors(fit)
 bp_location_posterior(fit)
 plot(sim) +
   geom_vline(data = sim$parameters, aes(xintercept = location))
+
+fit$pulse_chain %>%
+  ggplot(aes(x = iteration, y = eta_width)) + geom_path(alpha = 0.2)
 
 
 
