@@ -12,7 +12,7 @@
 
 
 // 
-// SS_DrawLocations
+// SS_DrawLocationStrauss
 //   Modified Metropolis Hastings sampler instantiating the mmh class for
 //   sampling the pulse locations
 //
@@ -72,16 +72,16 @@ class SS_DrawLocationsStrauss :
                               Patient *patient) {
 
       // Calculated tmp variables
-      double acceptance_ratio;
-      double prior_ratio;
+      double acceptance_ratio = 0;
+      double prior_ratio = 0;
       // Extracted variables
       arma::vec curr_mean_contrib =
         pulse->get_mean_contribution(patient->data.time,
                                      patient->estimates.get_decay());
       double curr_likelihood = patient->likelihood(false); // would prefer get_likelihood()
-      double plikelihood;
+      double plikelihood = 0;
       double gamma = patient->priors.strauss_repulsion;
-      double current_time;
+      double current_time = 0;
 
       // Calculate sum_s_r for proposal value and current value
       // TODO: update arguments
@@ -96,7 +96,7 @@ class SS_DrawLocationsStrauss :
       // if prior ratio is 0 (~EPS), set acceptance_ratio to 0, 
       // else calculate it 
       // (note: necessary because log(0) = NaN, like_ratio on log scale)
-      if (fabs(prior_ratio) < 1.0e-42) {
+      if (abs(prior_ratio) < 1.0e-42) {
 
         acceptance_ratio = -1e300;
 

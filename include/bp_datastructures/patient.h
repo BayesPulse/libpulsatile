@@ -220,14 +220,14 @@ struct Patient {
   int calc_sr_strauss(double location, PulseEstimates * pulse_excluded) {
 
     int s_r = 0;       // Sum of indicators where diff < 20
-    double difference; // Time difference
+    double difference = 0.; // Time difference
     PulseIter pulse = pulses.begin();
     PulseConstIter pulse_end = pulses.end();
 
     while (pulse != pulse_end) {
       if (&(*pulse) != pulse_excluded) { // TODO: Test that pulse is actually excluded!
         // skip if node is same that location is from;
-        difference = fabs(location - pulse->time);
+        difference = abs(location - pulse->time);
         // increment by 1 if diff<R
         s_r = (difference < priors.strauss_repulsion_range) ? s_r + 1 : s_r; 
       }
