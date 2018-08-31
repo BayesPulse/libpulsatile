@@ -8,6 +8,7 @@
 #include <Rcpp.h>
 Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                           Rcpp::NumericVector time,
+                          Rcpp::CharacterVector location_prior,
                           Rcpp::List priors,
                           Rcpp::List proposalvars,
                           Rcpp::List startingvals,

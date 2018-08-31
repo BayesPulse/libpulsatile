@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
   //
   // Create priors, starting values, and proposal variances objects
   //
+  Rcpp::CharacterVector location_prior = "strauss"; // or "order-statistic"
   Rcpp::List priors = List::create(Named("baseline_mean")           = 2.6,
                                    Named("baseline_variance")       = 100,
                                    Named("halflife_mean")           = 45,
@@ -60,7 +61,6 @@ int main(int argc, char **argv) {
                                    Named("error_alpha")             = 0.0001,
                                    Named("error_beta")              = 0.0001,
                                    Named("pulse_count")             = 12,
-                                   Named("location_prior_type")     = "strauss",
                                    Named("strauss_repulsion")       = 0,
                                    Named("strauss_repulsion_range") = 40);
   priors.attr("class") = "bp_priors";
@@ -94,7 +94,8 @@ int main(int argc, char **argv) {
 
   // Create sampler object 
   Rcpp::List rtn_list;
-  rtn_list = singlesubject_(conc, thistime, priors, proposalvars, startingvals,
+  rtn_list = singlesubject_(conc, thistime, location_prior, priors, proposalvars,
+                            startingvals,
                             10000, 50, 10000, true, 500, 25000, 0.25, 0.35);
                             //100, 1, 1, true, 500, 25000, 0.25, 0.35);
 

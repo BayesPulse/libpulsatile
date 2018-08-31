@@ -95,12 +95,12 @@ class SS_DrawRandomEffects :
         prior_ratio /= patient_sd;
 
         // Save the current value of mass/width and set to proposed value
-        std::cout << "\n\nInitial random effect value: " << (*pulse).*randomeffect_ << std::endl;
+        //std::cout << "\n\nInitial random effect value: " << (*pulse).*randomeffect_ << std::endl;
         current_randomeffect    = (*pulse).*randomeffect_;
-        std::cout << "Saved initial random effect value: " << current_randomeffect << std::endl;
+        //std::cout << "Saved initial random effect value: " << current_randomeffect << std::endl;
         (*pulse).*randomeffect_ = proposal;
-        std::cout << "New random effect value: " << proposal << std::endl;
-        std::cout << "New (in-place) random effect value: " << (*pulse).*randomeffect_ << std::endl;
+        //std::cout << "New random effect value: " << proposal << std::endl;
+        //std::cout << "New (in-place) random effect value: " << (*pulse).*randomeffect_ << std::endl;
 
         // Calculate likelihood assuming proposed mass/width 
         plikelihood          = patient->likelihood(false);

@@ -23,6 +23,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                           Rcpp::NumericVector time,
+                          Rcpp::CharacterVector location_prior,
                           Rcpp::List inpriors,
                           Rcpp::List proposalvars,
                           Rcpp::List startingvals,
@@ -41,16 +42,20 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   if ( !proposalvars.inherits("bp_proposalvariance") ) stop("proposalvars argument must be a bp_proposalvariance object");
   if ( !startingvals.inherits("bp_startingvals") ) stop("startingvals argument must be a bp_startingvals object");
   if ( concentration.size() != time.size() ) stop("Time and concentration vectors must be the same size");
+  if ( location_prior.size() != 1 ) stop("Location prior vector must be length 1");
 
   // Create shorter names just for cleaner code appearance
   int adj_iter       = pv_adjust_iter;
   int adj_max        = pv_adjust_max_iter;
   double biv_target  = bivariate_pv_target_ratio;
   double univ_target = univariate_pv_target_ratio;
+  std::string loc_prior = Rcpp::as<std::string>(location_prior);
 
 
   // Create patient data object
   PatientData data(time, concentration);
+
+  std::cout << "Location prior is: " << loc_prior << std::endl;
 
   //Create priors object
   PatientPriors priors(inpriors["baseline_mean"],
@@ -117,13 +122,19 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   SS_DrawBaselineHalflife draw_blhl(bhl_pv, adj_iter, adj_max, biv_target);
 
   // Modified Metropolis Hastings for pulse locations (pulse level)
-  //if ( priors["location_prior_type"] == "strauss" ) {
-    SS_DrawLocationsStrauss draw_locations(proposalvars["location"], adj_iter,
-                                           adj_max, univ_target);
-  //} else {
-  //  SS_DrawLocationsOS draw_locations(proposalvars["location"], adj_iter,
-  //                                    adj_max, univ_target);
-  //}
+  //SS_DrawLocationsStrauss draw_locations(proposalvars["location"], adj_iter,
+  //                                       adj_max, univ_target);
+  //SS_DrawLocationsOS orderstat_locations(proposalvars["location"], adj_iter,
+  //                                       adj_max, univ_target);
+  SS_DrawLocations * draw_locations;
+  if ( loc_prior =="strauss" ) {
+    std::cout << "USING STRAUSS LOCATION MH" << std::endl;
+    draw_locations = new SS_DrawLocationsStrauss(proposalvars["location"], adj_iter, adj_max, univ_target);
+  } else {
+    std::cout << "USING ORDERSTAT LOCATION MH" << std::endl;
+    draw_locations = new SS_DrawLocationsOS(proposalvars["location"], adj_iter, adj_max, univ_target);
+  }
+
   SS_DrawRandomEffects draw_masses(proposalvars["pulse_mass"], adj_iter,
                                    adj_max, univ_target, false);
   SS_DrawRandomEffects draw_widths(proposalvars["pulse_width"], adj_iter,
@@ -136,9 +147,9 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
 
   // Create output objects (chains)
-  Rcpp::Rcout << "mcmc iterations = " << mcmc_iterations << std::endl;
-  Rcpp::Rcout << "thin = " << thin << std::endl;
-  Rcpp::Rcout << "burnin = " << burnin << std::endl;
+  std::cout << "mcmc iterations = " << mcmc_iterations << std::endl;
+  std::cout << "thin = " << thin << std::endl;
+  std::cout << "burnin = " << burnin << std::endl;
   Chains chains(mcmc_iterations, thin, burnin, false);
 
 
@@ -154,9 +165,9 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
     //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
     //draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
-    draw_locations.sample_pulses(patient, iteration);
-    draw_masses.sample_pulses(patient, iteration);
-    draw_widths.sample_pulses(patient, iteration);
+    draw_locations->sample_pulses(patient, iteration);
+    //draw_masses.sample_pulses(patient, iteration);
+    //draw_widths.sample_pulses(patient, iteration);
     draw_tvarscale_mass.sample_pulses(patient, iteration);
     draw_tvarscale_width.sample_pulses(patient, iteration);
     //draw_error.sample(patient);
@@ -185,6 +196,8 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     //  std::endl;
 
   }
+
+  delete draw_locations;
 
   return chains.output();
 

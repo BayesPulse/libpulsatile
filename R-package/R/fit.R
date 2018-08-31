@@ -63,7 +63,7 @@ fit_pulse <- function(data,
   if (burnin >= iters) stop("burnin >= iters")
 
   #---------------------------------------
-  # TODO: Temporary work-arounds 
+  # TODO: Temporary work-arounds  (What todo for a non-temp work around??)
   #---------------------------------------
   # model type argument -- put in pulse_spec? 
   #model_type <- match.arg(model_type)
@@ -81,7 +81,7 @@ fit_pulse <- function(data,
   startingvalues    <- structure(startingvalues, class = "bp_startingvals")
   #---------------------------------------
 
-  # ideas via survival::coxph 
+  # ideas via survival::coxph
   Call  <- match.call()
   arg_indx <- match(c("data", "time", "conc", "iters", "thin",
                       "spec"), 
@@ -94,6 +94,7 @@ fit_pulse <- function(data,
 
   fit <- singlesubject_(indata$concentration,
                         indata$time,
+                        spec$location_prior,
                         priors,
                         proposalvariances,
                         startingvalues,
