@@ -19,45 +19,17 @@
 //
 
 class SS_DrawLocationsStrauss : public SS_DrawLocations
-  //public ModifiedMetropolisHastings<PulseIter, Patient, double, ProposalVariance>
 {
 
   public:
     // Constructors
     SS_DrawLocationsStrauss(double in_pv, int in_adjust_iter, int in_max_iter,
-                            double in_target_ratio) :
-      SS_DrawLocations(in_pv, in_adjust_iter, in_max_iter, in_target_ratio) { };
+                     double in_target_ratio, bool in_verbose, int in_verbose_iter) :
+      SS_DrawLocations(in_pv, in_adjust_iter, in_max_iter, in_target_ratio,
+                       in_verbose, in_verbose_iter) { };
+
+    // Destructor
     ~SS_DrawLocationsStrauss() { }
-    //SS_DrawLocationsStrauss(double in_pv, // double or arma::vec
-    //                        int in_adjust_iter,
-    //                        int in_max_iter,
-    //                        double in_target_ratio) :
-    //  ModifiedMetropolisHastings
-    //  <PulseIter, Patient, double,
-    //   ProposalVariance>::ModifiedMetropolisHastings(in_pv,
-    //                                                 in_adjust_iter,
-    //                                                 in_max_iter,
-    //                                                 in_target_ratio) { };
-    //// Pulse level estimates need to be done at the pulse level
-    //void sample_pulses(Patient *patient, int iter) {
-
-    //  //PulseIter pulse = patient->pulses.begin();
-    //  //PulseConstIter pulse_end = patient->pulses.end();
-
-    //  //while (pulse != pulse_end) {
-    //  //  // Sample pulse,
-    //  //  //   note: &(*pulse) derefs iter, then gets address of underlying obj
-    //  //  sample(&(*pulse), &pulse->time, patient, iter);
-    //  //  pulse++;
-    //  //}
-    //  //for (auto &pulse : patient->pulses) {
-    //  for (auto pulse = patient->pulses.begin(); pulse != patient->pulses.end(); ++pulse) {
-    //    //sample(&(*pulse), &pulse->time, patient, iter);
-    //    sample(&pulse, &(pulse.time), patient, iter);
-    //  }
-
-    //}
-
 
   private:
 

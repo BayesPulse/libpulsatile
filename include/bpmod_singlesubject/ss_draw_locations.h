@@ -23,32 +23,21 @@ class SS_DrawLocations : public ModifiedMetropolisHastings<PulseIter, Patient, d
 
   public:
     // Constructors
-    SS_DrawLocations(double in_pv, // double or arma::vec
-                     int in_adjust_iter,
-                     int in_max_iter,
-                     double in_target_ratio) :
-      ModifiedMetropolisHastings
-      <PulseIter, Patient, double,
-       ProposalVariance>::ModifiedMetropolisHastings(in_pv,
-                                                     in_adjust_iter,
-                                                     in_max_iter,
-                                                     in_target_ratio) { };
+    SS_DrawLocations(double in_pv, int in_adjust_iter, int in_max_iter,
+                     double in_target_ratio, bool in_verbose, int in_verbose_iter) :
+      ModifiedMetropolisHastings <PulseIter, Patient, double, ProposalVariance> :: 
+      ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
+                                 in_target_ratio, in_verbose, in_verbose_iter) { };
+
     virtual ~SS_DrawLocations() { }
+
+    std::string parameter_name = "pulse locations";
+    std::string get_parameter_name() { return parameter_name; };
+
     // Pulse level estimates need to be done at the pulse level
     void sample_pulses(Patient *patient, int iter) {
 
-      //PulseIter pulse = patient->pulses.begin();
-      //PulseConstIter pulse_end = patient->pulses.end();
-
-      //while (pulse != pulse_end) {
-      //  // Sample pulse,
-      //  //   note: &(*pulse) derefs iter, then gets address of underlying obj
-      //  sample(&(*pulse), &pulse->time, patient, iter);
-      //  pulse++;
-      //}
-      //for (auto &pulse : patient->pulses) {
       for (auto pulse = patient->pulses.begin(); pulse != patient->pulses.end(); ++pulse) {
-        //sample(&(*pulse), &pulse->time, patient, iter);
         sample(&pulse, &(pulse->time), patient, iter);
       }
 

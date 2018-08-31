@@ -58,8 +58,8 @@ TEST_CASE( "first mmh test -- SS_DrawFixedEffects", "[mmh-implementations]" ) {
   patient = utils.add_default_pulses(patient);
 
   // Create sampler object  (small mass pv for testing purposes)
-  SS_DrawFixedEffects draw_fixed_effects_mass(0.5, 500, 25000, 0.35, false);
-  SS_DrawFixedEffects draw_fixed_effects_width(30, 500, 25000, 0.35, true);
+  SS_DrawFixedEffects draw_fixed_effects_mass(0.5, 500, 25000, 0.35, false, false, 5000);
+  SS_DrawFixedEffects draw_fixed_effects_width(30, 500, 25000, 0.35, true, false, 5000);
 
 
   //
@@ -130,7 +130,7 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
   patient = utils.add_default_pulses(patient);
 
   // Create sampler object 
-  SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500, 25000, 0.35);
+  SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500, 25000, 0.35, false, 5000);
 
   //
   // Now, time for tests
@@ -203,12 +203,12 @@ TEST_CASE( "Temporary/partial test of all mmh objects", "[mmh-implementations]" 
 
   // Create sampler object 
   arma::vec bhl_pv = { 0.5, 45 };
-  SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35, false);
-  SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500, 25000, 0.35, false);
-  SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25);
-  SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500, 25000, 0.35);
-  SS_DrawRandomEffects draw_pulse_masses(1.1, 500, 25000, 0.35, false);
-  SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500, 25000, 0.35, false);
+  SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35, false, false, 5000);
+  SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500, 25000, 0.35, false, false, 5000);
+  SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25, false, 5000);
+  SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500, 25000, 0.35, false, 5000);
+  SS_DrawRandomEffects draw_pulse_masses(1.1, 500, 25000, 0.35, false, false, 5000);
+  SS_DrawTVarScale draw_pulse_tvarscale(1.01, 500, 25000, 0.35, false, false, 5000);
 
   SS_DrawError draw_error;
 

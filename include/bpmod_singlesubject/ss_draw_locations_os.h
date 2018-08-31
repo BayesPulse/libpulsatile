@@ -18,45 +18,19 @@
 //   sampling the pulse locations with the every-3rd-order-statistic prior
 //
 
-class SS_DrawLocationsOS : public SS_DrawLocations 
-  //public ModifiedMetropolisHastings<PulseIter, Patient, double, ProposalVariance>
+class SS_DrawLocationsOS : public SS_DrawLocations
 {
 
   public:
+
     // Constructors
-    SS_DrawLocationsOS(double in_pv, int in_adjust_iter, int in_max_iter, 
-                       double in_target_ratio) :
-      SS_DrawLocations(in_pv, in_adjust_iter, in_max_iter, in_target_ratio) { };
+    SS_DrawLocationsOS(double in_pv, int in_adjust_iter, int in_max_iter,
+                     double in_target_ratio, bool in_verbose, int in_verbose_iter) :
+      SS_DrawLocations(in_pv, in_adjust_iter, in_max_iter, in_target_ratio,
+                       in_verbose, in_verbose_iter) { };
+
+    // Destructor
     ~SS_DrawLocationsOS() { }
-    //SS_DrawLocationsOS(double in_pv, // double or arma::vec
-    //                   int in_adjust_iter,
-    //                   int in_max_iter,
-    //                   double in_target_ratio) :
-    //  ModifiedMetropolisHastings
-    //  <PulseIter, Patient, double,
-    //   ProposalVariance>::ModifiedMetropolisHastings(in_pv,
-    //                                                 in_adjust_iter,
-    //                                                 in_max_iter,
-    //                                                 in_target_ratio) { };
-    //// Pulse level estimates need to be done at the pulse level
-    //void sample_pulses(Patient *patient, int iter) {
-
-    //  //PulseIter pulse = patient->pulses.begin();
-    //  //PulseConstIter pulse_end = patient->pulses.end();
-
-    //  //while (pulse != pulse_end) {
-    //  //  // Sample pulse,
-    //  //  //   note: &(*pulse) derefs iter, then gets address of underlying obj
-    //  //  sample(&(*pulse), &pulse->time, patient, iter);
-    //  //  pulse++;
-    //  //}
-    //  for (auto pulse = patient->pulses.begin(); pulse != patient->pulses.end(); ++pulse) {
-    //    //sample(&(*pulse), &pulse->time, patient, iter);
-    //    sample(&pulse, &(pulse->time), patient, iter);
-    //  }
-
-    //}
-
 
   private:
 
@@ -71,55 +45,56 @@ class SS_DrawLocationsOS : public SS_DrawLocations
     //   for strauss location prior mmh
     //
     double posterior_function(PulseIter *pulse,
-                              double proposal,
+                              double proposed_time,
                               Patient *patient) {
 
       // Internal variables
-      PulseIter pulseiter = *pulse;
-      //double fitstart              = 0;
-      //double fitend                = 0;
-      double previoustime          = 0;
-      double nexttime              = 0;
+      PulseIter pulseiter          = *pulse;
+      double previous_time         = 0;
+      double next_time             = 0;
       double timediff_previous     = 0;
       double timediff_previous_new = 0;
       double timediff_next         = 0;
       double timediff_next_new     = 0;
       double prior_ratio           = 0;
-      double current_time          = 0;
       double plikelihood           = 0;
       double acceptance_ratio      = 0;
       // Extracted variables
-      arma::vec curr_mean_contrib =
-        pulseiter->get_mean_contribution(patient->data.time,
-                                         patient->estimates.get_decay());
-      double curr_likelihood = patient->likelihood(false);
+      double current_time         = pulseiter->time;
+      double curr_likelihood      = patient->likelihood(false);
+      arma::vec curr_mean_contrib = pulseiter->get_mean_contribution(patient->data.time,
+                                                                     patient->estimates.get_decay());
 
       // Start calculations
-      previoustime = (pulseiter == patient->pulses.begin()) ?
+      previous_time = (pulseiter == patient->pulses.begin()) ?  
         patient->data.fitstart : std::prev(pulseiter)->time;
-      nexttime = (std::next(pulseiter) == patient->pulses.end()) ?
-        patient->data.fitend : std::next(pulseiter)->time;
+      next_time     = (std::next(pulseiter) == patient->pulses.end()) ?  
+        patient->data.fitend : std::next(pulseiter)->time; 
+      //Rcpp::Rcout << "current_time  = " << current_time   << std::endl;
+      //Rcpp::Rcout << "proposed_time = " << proposed_time  << std::endl;
+      //Rcpp::Rcout << "previous_time = " << previous_time  << std::endl;
+      //Rcpp::Rcout << "next_time     = " << next_time      << std::endl;
 
       //if (pulseiter != patient->pulses.begin()) {
       //  // if we're not at the first pulse, use previous pulse locaiton
-      //  previoustime = pulseiter.prev()->time;
+      //  previous_time = pulseiter.prev()->time;
       //} else {
       //  // Otherwise, use fitstart
-      //  previoustime = patient->data.fitstart;
+      //  previous_time = patient->data.fitstart;
       //}
       //if (pulseiter != patient->pulses.end()) {
       //  // If we're not at the last pulse, use the next pulse location
-      //  nexttime = pulseiter.next()->time;
+      //  next_time = pulseiter.next()->time;
       //} else {
       //  // Otherwise, use fitend
-      //  nexttime = patient->data.fitend;
+      //  next_time = patient->data.fitend;
       //}
 
       // Take time diffs
-      timediff_previous_new  = proposal - previoustime;
-      timediff_previous      = current_time - previoustime;
-      timediff_next_new      = nexttime - proposal;
-      timediff_next          = nexttime - current_time;
+      timediff_previous_new  = proposed_time - previous_time;
+      timediff_previous      = current_time - previous_time;
+      timediff_next_new      = next_time - proposed_time;
+      timediff_next          = next_time - current_time;
 
       // Combine it all for the prior ratio
       prior_ratio = (patient->priors.num_orderstat-1) *
@@ -130,7 +105,7 @@ class SS_DrawLocationsOS : public SS_DrawLocations
       // the likelihood under the proposed value returns log-likelihood  --
       // calculate with new pulse->time
       current_time = pulseiter->time;
-      pulseiter->time  = proposal;
+      pulseiter->time  = proposed_time;
       plikelihood  = patient->likelihood(false); 
 
       // Calculate the likelihood ratio 
