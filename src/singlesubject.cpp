@@ -180,9 +180,9 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
     //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
     //draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
-    draw_locations->sample_pulses(patient, iteration);
-    //draw_masses.sample_pulses(patient, iteration);
-    //draw_widths.sample_pulses(patient, iteration);
+    //draw_locations->sample_pulses(patient, iteration);
+    draw_masses.sample_pulses(patient, iteration);
+    draw_widths.sample_pulses(patient, iteration);
     draw_tvarscale_mass.sample_pulses(patient, iteration);
     draw_tvarscale_width.sample_pulses(patient, iteration);
     //draw_error.sample(patient);
