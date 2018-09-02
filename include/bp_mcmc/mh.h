@@ -38,6 +38,9 @@ class ModifiedMetropolisHastings
     //T * sampling_unit; // either patient or population class
     //SAMPLETYPE current_val;   // current sample value (double or arma::vec)
     PV pv;                   // needs to be a ProposalVariance object
+    bool verbose;
+    int verbose_iter;
+    int last_iter = -1;
 
     // sample from posterior
     //   - runs 1 iteration
@@ -75,6 +78,12 @@ class ModifiedMetropolisHastings
 
         }
       }
+
+      if ( verbose == true && !(iter % verbose_iter) && iter != last_iter) {
+        print_diagnostic_output();
+        last_iter = iter;
+      }
+
     }
 
     void sample(T *sampling_unit, SAMPLETYPE *current_val, int iter) {
@@ -95,8 +104,12 @@ class ModifiedMetropolisHastings
     ModifiedMetropolisHastings(SAMPLETYPE in_pv, // double or arma::vec
                                int in_adjust_iter,
                                int in_max_iter,
-                               double in_target_ratio) :
-      pv(in_pv, in_adjust_iter, in_max_iter, in_target_ratio) { }
+                               double in_target_ratio, 
+                               bool in_verbose,
+                               int in_verbose_iter) 
+      : pv(in_pv, in_adjust_iter, in_max_iter, in_target_ratio) 
+      , verbose(in_verbose)
+      , verbose_iter(in_verbose_iter) { }
 
   private:
 
@@ -121,12 +134,13 @@ class ModifiedMetropolisHastings
     // Posterior function/log(rho) calculation
     virtual double posterior_function(T *sampling_unit, SAMPLETYPE proposal, U *container) = 0;
 
-    // Some estimates can only have one MMH object for multiple objects being
-    // sampled -- since pulses are born/die, we can't have an MMH for each pulse
-    // -- all pulses need one MMH for each location, mass, and widths.
-    // so we need a function for iterating over them, that calls sample() from
-    // within it.
-    //void sample_pulses(U *container, SAMPLETYPE *current_val); 
+    virtual std::string get_parameter_name() = 0;
+
+    void print_diagnostic_output() {
+      Rcpp::Rcout << get_parameter_name() << 
+        ": Proposal Variance=" << pv.getpv() << 
+        ": Acceptance Ratio=" << pv.getratio() <<  std::endl;
+    }
 
 };
 

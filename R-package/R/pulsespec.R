@@ -99,7 +99,6 @@ pulse_spec <-
 
     if (location_prior_type == "strauss") {
 
-      strauss <- 1
       if (is.null(prior_location_gamma) | is.null(prior_location_range)) 
         stop(paste("prior_location_gamma and prior_location_range are required",
                    "arguments when location_prior_type == 'strauss'"))
@@ -112,7 +111,6 @@ pulse_spec <-
 
     } else {
 
-      strauss <- 0
       if (!is.null(prior_location_gamma) | !is.null(prior_location_range))
         message(paste("When location_prior_type is set to 'order-statistic'",
                       "prior_location_gamma and prior_location_range are not used."))  
@@ -125,7 +123,7 @@ pulse_spec <-
     # NOTE: need more clear label for max_sd's 
     ps_obj <- 
       structure(
-        list(strauss_location_prior = strauss,
+        list(location_prior = location_prior_type,
              priors = list(baseline_mean           = prior_baseline_mean,
                            baseline_variance       = prior_baseline_var,
                            halflife_mean           = prior_halflife_mean,

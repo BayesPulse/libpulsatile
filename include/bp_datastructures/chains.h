@@ -48,20 +48,18 @@ class Chains {
   public:
 
     // Base constructor (single subject, single hormone)
-    Chains(int in_iterations, int in_thin, int in_burnin, bool in_response_hormone) :
-      num_outputs((in_iterations - in_burnin) / in_thin),
-      patient_chain(num_outputs, 9, arma::fill::zeros) {
+    Chains(int in_iterations, int in_thin, int in_burnin, bool
+           in_response_hormone, bool in_verbose, int in_verbose_iter)
+      : num_outputs((in_iterations - in_burnin) / in_thin)
+      , patient_chain(num_outputs, 9, arma::fill::zeros) {
 
         //patient_chain.fill(0.0);
         iterations       = in_iterations;
         thin             = in_thin;
         burnin           = in_burnin;
         response_hormone = in_response_hormone;
-
-        //std::fill(patient_chain.begin(), patient_chain.end(), 0.0);
-
-        // Model type
-        //model_type = "single_subject";
+        verbose          = in_verbose;
+        verbose_iter     = in_verbose_iter;
 
       }
 
@@ -74,7 +72,8 @@ class Chains {
     int burnin;
     bool response_hormone;
     int num_outputs;
-    //String model_type;
+    bool verbose; 
+    int verbose_iter;
     MatrixVector pulse_chains;
     arma::mat patient_chain;
 
@@ -83,6 +82,8 @@ class Chains {
     //----------------------------------------
     // Record this iteration -- adds 1 iteration to Chains object
     void save_sample(Patient * pat, int iter);
+    // Print pulse/patient diagnostic info
+    void print_diagnostic_output(Patient * patient, int iter);
     // Return chains function
     List output();
 
@@ -168,6 +169,30 @@ List Chains::output() {
 
 }
 
+// Member Function: Print chain/patient diagnostic info 
+//   (proposal variance diagnostics handled by MH class)
+void Chains::print_diagnostic_output(Patient * patient, int iter) {
+
+  if (verbose == 1 && (iter % verbose_iter == 0)) {
+
+    Rcpp::Rcout            << "\n"                                     <<
+      "Iteration = "       << iter                                     <<
+      " Likelihood = "     << patient->likelihood(false)               << "\n" <<
+      "Baseline = "        << patient->estimates.baseline_halflife(0) <<
+      " Half-life = "      << patient->estimates.baseline_halflife(1) <<
+      " Mass mean = "      << patient->estimates.mass_mean            <<
+      " Mass SD = "        << patient->estimates.mass_sd              <<
+      " Width mean = "     << patient->estimates.width_mean           <<
+      " Width SD = "       << patient->estimates.width_sd             <<
+      " Error variance = " << patient->estimates.errorsq              << "\n" <<
+
+      //" Current pulse-specific parms: " << "\n" << 
+      //"Pulse No. Time  Mass  Width\n" << pulse_chains.back() <<
+      std::endl;
+
+  }
+
+};
 
 
 //------------------------------------------------------------
