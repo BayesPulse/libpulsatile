@@ -117,13 +117,13 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   SS_DrawBaselineHalflife draw_blhl(bhl_pv, adj_iter, adj_max, biv_target);
 
   // Modified Metropolis Hastings for pulse locations (pulse level)
-  //if ( priors["location_prior_type"] == "strauss" ) {
-    SS_DrawLocationsStrauss draw_locations(proposalvars["location"], adj_iter,
-                                           adj_max, univ_target);
-  //} else {
-  //  SS_DrawLocationsOS draw_locations(proposalvars["location"], adj_iter,
-  //                                    adj_max, univ_target);
-  //}
+  SS_DrawLocations * draw_locations;
+  if ( priors["location_prior_type"] == "strauss" ) {
+    draw_locations = new SS_DrawLocationsStrauss(proposalvars["location"], adj_iter, adj_max, univ_target);
+  } else {
+    SS_DrawLocationsOS draw_locations(proposalvars["location"], adj_iter,
+                                      adj_max, univ_target);
+  }
   SS_DrawRandomEffects draw_masses(proposalvars["pulse_mass"], adj_iter,
                                    adj_max, univ_target, false);
   SS_DrawRandomEffects draw_widths(proposalvars["pulse_width"], adj_iter,
@@ -155,8 +155,8 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
     //draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
     draw_locations.sample_pulses(patient, iteration);
-    draw_masses.sample_pulses(patient, iteration);
-    draw_widths.sample_pulses(patient, iteration);
+    //draw_masses.sample_pulses(patient, iteration);
+    //draw_widths.sample_pulses(patient, iteration);
     draw_tvarscale_mass.sample_pulses(patient, iteration);
     draw_tvarscale_width.sample_pulses(patient, iteration);
     //draw_error.sample(patient);
