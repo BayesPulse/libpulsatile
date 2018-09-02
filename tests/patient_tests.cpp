@@ -47,7 +47,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   }
 
   SECTION( "Priors can be accessed" ) {
-    REQUIRE(pat.priors.baseline_mean == 1.5);
+    REQUIRE(pat.priors.baseline_mean == 2.6);
     REQUIRE(pat.priors.mass_sd_max == 10);
     REQUIRE(pat.priors.error_alpha == 1000);
     REQUIRE(pat.priors.num_orderstat == 3);
@@ -70,8 +70,8 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   SECTION( "Data can be accessed" ) {
     REQUIRE(pat.data.time(1)              == 20);
     REQUIRE(pat.data.time(143)            == 1440);
-    REQUIRE(pat.data.concentration(1)     == log(5.156800));
-    REQUIRE(pat.data.concentration(143)   == log(8.155648));
+    REQUIRE(pat.data.concentration(1)     == log(3.619304));
+    REQUIRE(pat.data.concentration(143)   == log(3.079000));
     REQUIRE(pat.data.time.size()          == 144);
     REQUIRE(pat.data.concentration.size() == 144);
     REQUIRE(pat.data.response_concentration.size() == 0);
@@ -97,12 +97,13 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   // Add pulses
   Patient * patient = &pat;
   patient = utils.add_default_pulses(patient);
-  arma::vec location { -37.65204, 41.04917, 125.58297, 306.32966, 461.65469,
-    616.95867, 835.64466, 1000.29703, 1149.08360, 1319.19888, 1414.31830 };
+  arma::vec location { 26.54152, 174.63993, 298.62117, 360.55329, 494.61155,
+    689.09242, 763.89017, 839.80027, 925.80251, 975.47320, 1199.00866,
+    1322.82471 };
 
   SECTION( "Can add pulses and iterate with iterators" ) {
     ++pat.piter;
-    REQUIRE(pat.get_pulsecount() == 11);
+    REQUIRE(pat.get_pulsecount() == 12);
     REQUIRE(pat.piter->time == location(0));
     ++pat.piter;
     REQUIRE(pat.piter->time == location(1));
@@ -117,7 +118,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
     ++pat.piter; ++pat.piter;
     REQUIRE(pat.piter->time == location(1));
     pat.piter = pat.pulses.erase(pat.piter); // this is how you delete and keep iter correct
-    REQUIRE(pat.get_pulsecount() == 10);
+    REQUIRE(pat.get_pulsecount() == 11);
     REQUIRE(pat.piter->time == location(2));
   }
 
@@ -167,7 +168,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
   SECTION( "Can get likelihood" ) {
 
-    REQUIRE(pat.likelihood(false) == Approx(83.36087));
+    REQUIRE(pat.likelihood(false) == Approx(71.8522693142));
 
   }
 
