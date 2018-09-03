@@ -98,6 +98,9 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   DataStructuresUtils utils;
   patient = utils.add_default_pulses(patient);
 
+  //double like = patient->likelihood(false);
+  //Rcpp::Rcout << "initial likelihood is: " << like << std::endl;
+  //Rcpp::Rcout << "Mean conc:\n" << patient->mean_concentration(false) << std::endl;
   //std::cout << "pulse count is: " << patient->get_pulsecount() << std::endl;
 
   //----------------------------------------
@@ -105,7 +108,7 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   //----------------------------------------
 
   // Birth-death process
-  //BirthDeathProcess birth_death;
+  BirthDeathProcess birth_death;
 
   // Modified Metropolis Hastings for fixed effects (mean mass & mean width)
   SS_DrawFixedEffects draw_fixeff_mass(proposalvars["mass_mean"], adj_iter,
@@ -175,17 +178,17 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     chains.print_diagnostic_output(patient, iteration);
 
     //birth_death.sample(patient, false, iteration);
-    //draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
-    //draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
-    //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
-    //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
-    //draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
+    draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
+    draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
+    draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
+    draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
+    draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
     draw_locations->sample_pulses(patient, iteration);
     //draw_masses.sample_pulses(patient, iteration);
     //draw_widths.sample_pulses(patient, iteration);
     draw_tvarscale_mass.sample_pulses(patient, iteration);
     draw_tvarscale_width.sample_pulses(patient, iteration);
-    //draw_error.sample(patient);
+    draw_error.sample(patient);
     chains.save_sample(patient, iteration);
 
     //arma::vec locations(patient->get_pulsecount());
