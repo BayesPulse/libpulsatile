@@ -22,5 +22,5 @@ test_data <-
                  baseline_var = NULL)
 plot(test_data)
 
-test_data
+save(test_data, file = "test_data.RData")
 

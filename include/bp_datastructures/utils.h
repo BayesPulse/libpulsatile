@@ -60,7 +60,7 @@ class DataStructuresUtils {
       PatientPriors priors(2.6, 100, 45, 100, 3.5, 100, 42, 100,
                            10, 150, 1000, 1000, 12, 0, 40);
       // Create estimates object (w/ starting vals)
-      PatientEstimates estimates(2.6, 45, 0.05, 3.5, 30, 10, 10);
+      PatientEstimates estimates(2.6, 45, 0.05, 3.5, 42, 10, 10);
 
       // Now take all of this and create a Patient object
       Patient pat(data, priors, estimates);
