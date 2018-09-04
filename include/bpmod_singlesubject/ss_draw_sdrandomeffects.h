@@ -18,48 +18,56 @@
 //   sample the sd of the pulse masses & widths
 //
 
-class SS_DrawSDRandomEffects : public ModifiedMetropolisHastings<Patient, Patient, double, ProposalVariance>
+class SS_DrawSDRandomEffects : 
+  public ModifiedMetropolisHastings<Patient, Patient, double, ProposalVariance>
 {
 
   public:
+
     // Constructor
     SS_DrawSDRandomEffects(double in_pv,
                            int in_adjust_iter,
                            int in_max_iter,
                            double in_target_ratio,
-                           bool for_width) :
+                           bool for_width,
+                           bool verbose,
+                           int verbose_iter) :
       ModifiedMetropolisHastings <Patient, Patient, double, ProposalVariance>::
-      ModifiedMetropolisHastings(in_pv,
-                                 in_adjust_iter,
-                                 in_max_iter,
-                                 in_target_ratio) {
+      ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
+                                 in_target_ratio, verbose, verbose_iter) {
 
-         // Choose which set of parameters to use: width or mass
-          if (for_width) {
-            est_mean_       = &PatientEstimates::width_mean;
-            est_sd_         = &PatientEstimates::width_sd;
-            tvarscale_      = &PulseEstimates::tvarscale_width;
-            randomeffect_   = &PulseEstimates::width;
-            sd_max_         = &PatientPriors::width_sd_max;
-          } else {
-            est_mean_       = &PatientEstimates::mass_mean;
-            est_sd_         = &PatientEstimates::mass_sd;
-            tvarscale_      = &PulseEstimates::tvarscale_mass;
-            randomeffect_   = &PulseEstimates::mass;
-            sd_max_         = &PatientPriors::mass_sd_max;
-          }
+        // Choose which set of parameters to use: width or mass
+        if (for_width) {
+          est_mean_       = &PatientEstimates::width_mean;
+          est_sd_         = &PatientEstimates::width_sd;
+          tvarscale_      = &PulseEstimates::tvarscale_width;
+          randomeffect_   = &PulseEstimates::width;
+          sd_max_         = &PatientPriors::width_sd_max;
+          parameter_name = "SD of pulse widths";
+        } else {
+          est_mean_       = &PatientEstimates::mass_mean;
+          est_sd_         = &PatientEstimates::mass_sd;
+          tvarscale_      = &PulseEstimates::tvarscale_mass;
+          randomeffect_   = &PulseEstimates::mass;
+          sd_max_         = &PatientPriors::mass_sd_max;
+          parameter_name = "SD of pulse masses";
+        }
 
-       };
+      };
 
   private:
-    bool parameter_support(double val, Patient *patient);
-    double posterior_function(Patient *patient, double proposal, Patient *notused);
 
     double PatientEstimates::*est_mean_;
     double PatientEstimates::*est_sd_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     double PatientPriors::*sd_max_; //pulse specific mass or width
+
+    std::string parameter_name;
+    std::string get_parameter_name() { return parameter_name; };
+
+    bool parameter_support(double val, Patient *patient);
+    double posterior_function(Patient *patient, double proposal, Patient *notused);
 
 };
 

@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
   //
   // Create priors, starting values, and proposal variances objects
   //
+  Rcpp::CharacterVector location_prior = "order-statistic"; // or "order-statistic"
   Rcpp::List priors = List::create(Named("baseline_mean")           = 2.6,
                                    Named("baseline_variance")       = 100,
                                    Named("halflife_mean")           = 45,
@@ -60,9 +61,8 @@ int main(int argc, char **argv) {
                                    Named("error_alpha")             = 0.0001,
                                    Named("error_beta")              = 0.0001,
                                    Named("pulse_count")             = 12,
-                                   Named("location_prior_type")     = "strauss",
-                                   Named("strauss_repulsion")       = 0,
-                                   Named("strauss_repulsion_range") = 40);
+                                   Named("strauss_repulsion")       = NULL, //0,
+                                   Named("strauss_repulsion_range") = NULL); //40);
   priors.attr("class") = "bp_priors";
 
   // Create estimates object (w/ starting vals)
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
                                          Named("width_sd") = 2,
                                          Named("baseline") = 0.5,
                                          Named("halflife") = 45,
-                                         Named("location") = 1000,
+                                         Named("location") = 10,
                                          Named("pulse_mass") = 1,
                                          Named("pulse_width") = 10 ,
                                          Named("sdscale_pulse_mass") = 1,
@@ -94,8 +94,9 @@ int main(int argc, char **argv) {
 
   // Create sampler object 
   Rcpp::List rtn_list;
-  rtn_list = singlesubject_(conc, thistime, priors, proposalvars, startingvals,
-                            10000, 50, 10000, true, 500, 25000, 0.25, 0.35);
+  rtn_list = singlesubject_(conc, thistime, location_prior, priors, proposalvars,
+                            startingvals,
+                            100000, 50, 10000, true, 500, 25000, 0.25, 0.35);
                             //100, 1, 1, true, 500, 25000, 0.25, 0.35);
 
   return 0;

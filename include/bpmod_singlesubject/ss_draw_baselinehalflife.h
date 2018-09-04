@@ -29,14 +29,19 @@ class SS_DrawBaselineHalflife :
     SS_DrawBaselineHalflife(arma::vec in_pv, // double or arma::vec
                             int in_adjust_iter,
                             int in_max_iter,
-                            double in_target_ratio) :
+                            double in_target_ratio,
+                            bool verbose,
+                            int verbose_iter) :
       ModifiedMetropolisHastings<Patient, bool, arma::vec, ProposalVariance2p>::
       ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
-                                 in_target_ratio) { };
+                                 in_target_ratio, verbose, verbose_iter) { };
     ~SS_DrawBaselineHalflife() {};
 
-//  private:
-//
+  private:
+
+    std::string parameter_name = "Baseline/Half-life";
+    std::string get_parameter_name() { return parameter_name; };
+
     bool parameter_support(arma::vec val, bool *notused) { 
       return ( val(0) > 0.0 && val(1) > 0.0 ); 
     }

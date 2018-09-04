@@ -16,42 +16,44 @@
 //   sample the mean mass & width
 //
 
-class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, double, ProposalVariance>
+class SS_DrawFixedEffects :
+  public ModifiedMetropolisHastings<Patient, bool, double, ProposalVariance>
 {
 
   public:
 
     // Constructor
-    SS_DrawFixedEffects(double in_pv, // double or arma::vec
+    SS_DrawFixedEffects(double in_pv,
                         int in_adjust_iter,
                         int in_max_iter,
                         double in_target_ratio,
-                        bool for_width) :
-      ModifiedMetropolisHastings
-      <Patient, bool, double,
-       ProposalVariance>::ModifiedMetropolisHastings(in_pv,
-                                                     in_adjust_iter,
-                                                     in_max_iter,
-                                                     in_target_ratio) { 
+                        bool for_width,
+                        bool verbose,
+                        int verbose_iter) :
+      ModifiedMetropolisHastings <Patient, bool, double, ProposalVariance>::
+      ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
+                                 in_target_ratio, verbose, verbose_iter) { 
 
-         // Choose which set of parameters to use: width or mass
-         if (for_width) {
-           prior_mean_     = &PatientPriors::width_mean;
-           prior_variance_ = &PatientPriors::width_variance;
-           est_mean_       = &PatientEstimates::width_mean;
-           est_sd_         = &PatientEstimates::width_sd;
-           tvarscale_      = &PulseEstimates::tvarscale_width;
-           randomeffect_   = &PulseEstimates::width;
-         } else {
-           prior_mean_     = &PatientPriors::mass_mean;
-           prior_variance_ = &PatientPriors::mass_variance;
-           est_mean_       = &PatientEstimates::mass_mean;
-           est_sd_         = &PatientEstimates::mass_sd;
-           tvarscale_      = &PulseEstimates::tvarscale_mass;
-           randomeffect_   = &PulseEstimates::mass;
-         }
+        // Choose which set of parameters to use: width or mass
+        if (for_width) {
+          prior_mean_     = &PatientPriors::width_mean;
+          prior_variance_ = &PatientPriors::width_variance;
+          est_mean_       = &PatientEstimates::width_mean;
+          est_sd_         = &PatientEstimates::width_sd;
+          tvarscale_      = &PulseEstimates::tvarscale_width;
+          randomeffect_   = &PulseEstimates::width;
+          parameter_name  = "Mean width";
+        } else {
+          prior_mean_     = &PatientPriors::mass_mean;
+          prior_variance_ = &PatientPriors::mass_variance;
+          est_mean_       = &PatientEstimates::mass_mean;
+          est_sd_         = &PatientEstimates::mass_sd;
+          tvarscale_      = &PulseEstimates::tvarscale_mass;
+          randomeffect_   = &PulseEstimates::mass;
+          parameter_name  = "Mean mass";
+        }
 
-       };
+      };
 
   private:
 
@@ -61,6 +63,9 @@ class SS_DrawFixedEffects : public ModifiedMetropolisHastings<Patient, bool, dou
     double PatientEstimates::*est_sd_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
+
+    std::string parameter_name;
+    std::string get_parameter_name() { return parameter_name; };
 
     bool parameter_support(double val, bool *notused) { return (val > 0.0); }
 

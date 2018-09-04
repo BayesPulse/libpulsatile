@@ -17,7 +17,7 @@
 //   pulse mean/widths.
 //
 
-class SS_DrawTVarScale : 
+class SS_DrawTVarScale :
   public ModifiedMetropolisHastings<PulseEstimates, Patient, double, ProposalVariance>
 {
 
@@ -28,12 +28,12 @@ class SS_DrawTVarScale :
                      int in_adjust_iter,
                      int in_max_iter,
                      double in_target_ratio,
-                     bool for_width) :
+                     bool for_width,
+                     bool verbose,
+                     int verbose_iter) :
       ModifiedMetropolisHastings <PulseEstimates, Patient, double, ProposalVariance>::
-      ModifiedMetropolisHastings(in_pv,
-                                 in_adjust_iter,
-                                 in_max_iter,
-                                 in_target_ratio) { 
+      ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
+                                 in_target_ratio, verbose, verbose_iter) {
 
         // Choose which set of parameters to use: width or mass
         if (for_width) {
@@ -41,11 +41,13 @@ class SS_DrawTVarScale :
           est_sd_       = &PatientEstimates::width_sd;
           randomeffect_ = &PulseEstimates::width;
           tvarscale_    = &PulseEstimates::tvarscale_width;
+          parameter_name = "tvarscale width";
         } else {
           est_mean_     = &PatientEstimates::mass_mean;
           est_sd_       = &PatientEstimates::mass_sd;
           randomeffect_ = &PulseEstimates::mass;
           tvarscale_    = &PulseEstimates::tvarscale_mass;
+          parameter_name = "tvarscale mass";
         }
 
       };
@@ -65,6 +67,9 @@ class SS_DrawTVarScale :
     double PatientEstimates::*est_sd_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     double PulseEstimates::*tvarscale_;
+
+    std::string parameter_name;
+    std::string get_parameter_name() { return parameter_name; };
 
     bool parameter_support(double val, Patient *notused);
     double posterior_function(PulseEstimates *pulse, double proposal, Patient *patient);
