@@ -181,8 +181,8 @@ void Chains::print_diagnostic_output(Patient * patient, int iter) {
       "Baseline = "        << patient->estimates.baseline_halflife(0) <<
       " Half-life = "      << patient->estimates.baseline_halflife(1) <<
       " Mass mean = "      << patient->estimates.mass_mean            <<
-      " Mass SD = "        << patient->estimates.mass_sd              <<
-      " Width mean = "     << patient->estimates.width_mean           <<
+      " Mass SD = "        << patient->estimates.mass_sd              << "\n" <<
+      "Width mean = "     << patient->estimates.width_mean           <<
       " Width SD = "       << patient->estimates.width_sd             <<
       " Error variance = " << patient->estimates.errorsq              << "\n" <<
 
