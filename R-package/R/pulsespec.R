@@ -18,14 +18,14 @@
 #' "prior_location_range".
 #' @param prior_mass_mean mass mean hyperparm
 #' @param prior_mass_var mass variance hyperparm
-#' @param prior_width_mean width mean hyperparm
-#' @param prior_width_var width variance hyperparm
+#' @param prior_width_mean width mean hyperparm (on variance scale)
+#' @param prior_width_var width variance hyperparm (on variance scale)
 #' @param prior_baseline_mean mean of prior on baseline
 #' @param prior_baseline_var variance of prior on baseline
 #' @param prior_halflife_mean mean of prior on half-life
 #' @param prior_halflife_var variance of prior on half-life
-#' @param prior_error_alpha placeholder
-#' @param prior_error_beta placeholder
+#' @param prior_error_alpha Gamma shape parameter
+#' @param prior_error_beta Gamma rate parameter
 #' @param prior_location_gamma placeholder
 #' @param prior_location_range placeholder
 #' @param prior_max_sd_mass placeholder
@@ -45,7 +45,7 @@
 #' @param pv_indiv_pulse_mass placeholder
 #' @param pv_indiv_pulse_width placeholder
 #' @param pv_sd_pulse_mass placeholder
-#' @param pv_sd_pulse_width placeholder
+#' @param pv_sd_pulse_width Proposal variance of the SD of the pulse widths (pulse widths are on variance scale)
 #' @param pv_sdscale_pulse_mass placeholder
 #' @param pv_sdscale_pulse_width placeholder
 #' @param pv_pulse_location placeholder
@@ -55,8 +55,8 @@ pulse_spec <-
   function(location_prior_type = c("order-statistic", "strauss"),
            prior_mass_mean        = 4,
            prior_mass_var         = 100,
-           prior_width_mean       = 5,
-           prior_width_var        = 100,
+           prior_width_mean       = 40,
+           prior_width_var        = 1000,
            prior_baseline_mean    = 2.6,
            prior_baseline_var     = 100,
            prior_halflife_mean    = 45,
@@ -66,23 +66,23 @@ pulse_spec <-
            prior_location_gamma   = NULL,
            prior_location_range   = NULL,
            prior_max_sd_mass      = 100,
-           prior_max_sd_width     = 150,
+           prior_max_sd_width     = 1000,
            prior_mean_pulse_count = 12,
            sv_mass_mean           = 4,
-           sv_width_mean          = 5,
+           sv_width_mean          = 40,
            sv_baseline_mean       = 2.6,
            sv_halflife_mean       = 45,
            sv_error_var           = 0.25,
            sv_mass_sd             = 2,
-           sv_width_sd            = 1,
+           sv_width_sd            = 30,
            pv_baseline            = 0.5,
            pv_halflife            = 45,
            pv_mean_pulse_mass     = 2,
-           pv_mean_pulse_width    = 5,
+           pv_mean_pulse_width    = 100,
            pv_indiv_pulse_mass    = 2,
-           pv_indiv_pulse_width   = 2,
+           pv_indiv_pulse_width   = 100,
            pv_sd_pulse_mass       = 2,
-           pv_sd_pulse_width      = 10,
+           pv_sd_pulse_width      = 100,
            pv_sdscale_pulse_mass  = 1,
            pv_sdscale_pulse_width = 1,
            pv_pulse_location      = 10) 
