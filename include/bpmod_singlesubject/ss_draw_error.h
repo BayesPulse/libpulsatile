@@ -28,6 +28,7 @@ class SS_DrawError
       double beta  = patient->priors.error_beta;
       double ssq   = patient->get_sumerrorsquared(false);
 
+      // Rf_gamma is the shape (alpha is shape), scale (beta here is scale) parameterization
       patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, beta + (0.5 * ssq));
 
     }

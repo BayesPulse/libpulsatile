@@ -56,6 +56,7 @@ class PulseUtils {
     //
     int one_rmultinom(arma::vec cumprobs) {
 
+      Rcpp::RNGScope rng_scope;
       int i;
       int rtn = 0;
       int n_probs = cumprobs.size();
@@ -68,7 +69,7 @@ class PulseUtils {
         if (i == 0) probs(i) = cumprobs(i);
         else probs(i) = cumprobs(i) - cumprobs(i-1);
 
-        //std::cout << "i = " << i << " and cumprob = " << cumprobs(i) << "and prob = " << probs(i) << std::endl;
+        //std::cout << "i = " << i << " and cumprob = " << cumprobs(i) << " and prob = " << probs(i) << std::endl;
       }
 
       ::Rf_rmultinom(1, probs.begin(), n_probs, ans.begin());
