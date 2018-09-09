@@ -1,8 +1,10 @@
 # poppulsatile
 #
 
+options(scipen=9999)
+
 # setwd("~/Projects/BayesPulse/Software/libpulsatile/R-package/")
-setwd("~/Projects/BayesPulse/Software/libpulsatile/R-package/")
+setwd("~/Projects/BayesPulse/Software/experiments_libpulsatile/lib/libpulsatile/R-package/")
 library(devtools)
 library(Rcpp)
 library(RcppArmadillo)
@@ -13,7 +15,7 @@ source("./build_package.R", echo=TRUE)
 
 Rcpp::compileAttributes()
 devtools::document()
-devtools::check()
+# devtools::check()
 devtools::install()
 
 devtools::test()
@@ -31,13 +33,14 @@ sim <- simulate_pulse()
 spec <- pulse_spec(location_prior_type = "strauss", 
                    prior_location_gamma = 0,
                    prior_location_range = 30)
-fit <- fit_pulse(sim, spec = spec, iters = 250000, thin = 50, burnin = 100000, verbose = TRUE)
+fit <- fit_pulse(sim, spec = spec, iters = 10, thin = 1, burnin = 0, verbose = TRUE)
 
-# Plot diagnostics
+# plot diagnostics
 bp_trace(fit)
 bp_posteriors(fit)
 
 bp_location_posterior(fit)
+
 plot(sim) +
   geom_vline(data = sim$parameters, aes(xintercept = location))
 

@@ -96,7 +96,7 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   // ****************************************
   //
   DataStructuresUtils utils;
-  patient = utils.add_default_pulses(patient);
+  //patient = utils.add_default_pulses(patient);
 
   //double like = patient->likelihood(false);
   //Rcpp::Rcout << "initial likelihood is: " << like << std::endl;
@@ -177,11 +177,11 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     checkUserInterrupt();
     chains.print_diagnostic_output(patient, iteration);
 
-    //birth_death.sample(patient, false, iteration);
+    birth_death.sample(patient, false, iteration);
     draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
     draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
-    draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
-    draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
+    //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
+    //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
     draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
     draw_locations->sample_pulses(patient, iteration);
     //draw_masses.sample_pulses(patient, iteration);
