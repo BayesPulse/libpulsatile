@@ -27,7 +27,7 @@ class SS_DrawError
       double alpha = patient->priors.error_alpha;
       double beta  = patient->priors.error_beta;
       double ssq   = patient->get_sumerrorsquared(false);
-      Rcpp::Rcout << "SSQ:" << ssq << std::endl;
+      //Rcpp::Rcout << "SSQ:" << ssq << std::endl;
 
       //patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, beta + (0.5 * ssq));
       patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
