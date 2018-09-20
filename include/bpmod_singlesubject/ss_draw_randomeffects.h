@@ -90,12 +90,18 @@ class SS_DrawRandomEffects :
         double patient_sd      = (*est).*est_sd_;
         double curr_likelihood = patient->likelihood(false);
 
+        //Rcpp::Rcout << "Patient mean: " << patient_mean <<
+        //  "; Patient SD: " << patient_sd << 
+        //  "; Current likelihood: " << curr_likelihood <<
+        //  "; Proposal: " << proposal <<
+        //  std::endl;
+
         // Compute the log of the ratio of the priors
-        prior_old = pow((*pulse).*randomeffect_ - patient_mean, 2);
-        prior_old *= 0.5 * prior_old;
-        prior_new = proposal - patient_mean;
-        prior_new *= 0.5 * prior_new;
-        prior_ratio = prior_old - prior_new;
+        prior_old    = (*pulse).*randomeffect_ - patient_mean;
+        prior_old   *= 0.5 * prior_old;
+        prior_new    = proposal - patient_mean;
+        prior_new   *= 0.5 * prior_new;
+        prior_ratio  = prior_old - prior_new;
         prior_ratio /= patient_sd;
         prior_ratio /= patient_sd;
 

@@ -23,9 +23,9 @@ class BirthDeathProcess
   private:
     PulseUtils pu;
     void add_new_pulse(Patient *patient, double position);
-    void remove_pulse(Patient *patient, arma::vec death_rate, int pulse_count);
-    double calculate_total_deathrate(arma::vec death_rate, double pulse_count);
-    double calculate_total_deathrate_original(arma::vec death_rate, double pulse_count);
+    void remove_pulse(Patient *patient, arma::vec death_rates, int pulse_count);
+    double calculate_total_deathrate(arma::vec death_rates, double pulse_count);
+    double calculate_total_deathrate_original(arma::vec death_rates, double pulse_count);
     arma::vec calc_death_rate_strauss(Patient *patient,
                                       arma::vec partial_likelihood,
                                       int pulse_count,
@@ -39,141 +39,151 @@ class BirthDeathProcess
 
 };
 
+
+
+//
+// sample()
+//
 void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter) {
 
-  //std::cout << "IN BIRTHDEATH" << std::endl;
   Rcpp::RNGScope rng_scope;
+
   int aaa                 = 0;   // Counter for # BD iterations
   int max_num_node        = 60;  // Max number of pulses allowed before forced death (hardcoded parm)
   int pulse_count         = 0;
-  double max              = 0.0; // used in two different places (double check this)
   double S                = 0.0; // Current progress in virtual time
   double T                = 1.0; // Stop birthdeath loop when S exceeds T
   double total_birth_rate = 0.0; // A constant birth rate needed for the process
   double birth_rate       = 0.0; // 'Instantaneous' birth rate
-  double position         = 0.0; // Value of new pulse's location
-  double total_death_rate = 0.0;
-  arma::vec death_rate;       // Vector of death rates for each pulse
   double fitstart = patient->data.fitstart;
   double fitend   = patient->data.fitend;
-  //// Spatial BD and Strauss declarations
-  int sum_s_r = 0;            // Sum(S(R)) for birth of new pulse
-  double papas_cif;           // Papangelou's cond'l intensity fn for birthed
-  double b_ratio;             // Ratio of papas_cif/birth_rate for accept/rej
 
-  // TEMP -- add as argument
+  // TODO: Update this ---!!!!--- Add loc_prior argument to sample();
   int strauss = 1;
-  //std::cout << "In the birth-death sample function" << std::endl;
-  //std::cout << "Current likelihood is " << patient->likelihood(false) << std::endl;
 
-  //-----------------------------------------
-  // Prepare for birth death loop. Save and
-  // calculate values and allocate memory
-  //-----------------------------------------
+
+  // Step 1. Calculate total birth rate (and birth rate/min for strauss)
   total_birth_rate = (double)patient->priors.pulse_count;
-
-  //std::cout << "Total birth rate is " << total_birth_rate << std::endl;
-
   // If Strauss, calculate instantaneous birth rate (which is the prior intensity)
   if (strauss == 1) {
     birth_rate = total_birth_rate / (fitend - fitstart);
   }
-  //std::cout << "Instantaneous birth rate is " << birth_rate << std::endl;
 
 
   // Start Birth-death loop Run until break reached
-  while (1) {
+  do {
 
     aaa++; // iters counter
-    //std::cout << "BIRTHDEATH LOOP #" << aaa << std::endl;
 
-    // Calculate death rate for each component conditional on Strauss or order
-    // statistic -- using pulse count and partial likelihoods
+    // 2. Calculate death rate for each component conditional on Strauss or order
+    //    statistic -- using pulse count and partial likelihoods
     pulse_count = patient->get_pulsecount();
-    //std::cout << "Pulse count is " << pulse_count << std::endl;
-
     arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);;
-    //std::cout << "Partial likelihoods are " << partial_likelihood << std::endl;
 
+
+    // 3. Calculate individual death rate for each pulse
+    arma::vec death_rates(pulse_count);
     if (strauss == 1) {
-      death_rate = calc_death_rate_strauss(patient, partial_likelihood,
+      death_rates = calc_death_rate_strauss(patient, partial_likelihood,
                                            pulse_count, response_hormone);
     } //else {
-    //  death_rate = calc_death_rate_os(list, pulse_count, partial_likelihood,
+    //  death_rates = calc_death_rate_os(list, pulse_count, partial_likelihood,
     //                                  full_likelihood, total_birth_rate, 
     //                                  patient->priors->pulse_count, priors->orderstat);
     //}
 
 
-    // Compute total death rate D  -- multi-step due to precision issues
-    //total_death_rate = calculate_total_deathrate(death_rate, pulse_count);
-    total_death_rate = calculate_total_deathrate_original(death_rate, pulse_count);
+    // 4. Calculate Total death rate and convert death_rates to probabilities
+    // (or cumulative probabilities)
+    // can't do in separate functions/steps due to precision issues (need
+    // full precision of total death rate to get probbilits to sum to 1.
+    //total_death_rate = calculate_total_deathrate(death_rates, pulse_count);
+    //total_death_rate = calculate_total_deathrate_original(death_rates, pulse_count);
+    double total_death_rate = 0.0;
+    double max = 0.0;
 
-    // Calculate probability of birth
-    // Set Pr(Birth), force death/birth if too many/few
-    if (pulse_count <= 1) { 
-      max = 1.1;
-    } else if (pulse_count >= max_num_node) { //TODO: may want to remove this upper limit for production..
-      max = -0.1;
+    if (death_rates.size() != 0) {
+
+      total_death_rate = death_rates(0);
+
+      for (int i = 1; i < pulse_count; i++) {
+        max        = (total_death_rate > death_rates(i)) ? total_death_rate : death_rates(i);
+        total_death_rate = log(exp(total_death_rate - max) + exp(death_rates(i) - max)) + max;
+      }
+
+      for (int i = 0; i < pulse_count; i++) {
+        death_rates(i) -= total_death_rate;
+        death_rates(i)  = exp(death_rates(i));
+      }
+
+      // Convert probabilities to cumulative probabilities -- not necessary
+      // anymore for one_rmultinom()
+      //for (int i = 1; i < pulse_count; i++) {
+      //  death_rates(i) += death_rates(i-1);
+      //}
+
+      if (total_death_rate > 500 ) {
+        total_death_rate = 1e300;
+      } else {
+        total_death_rate = exp(total_death_rate); 
+      }
+
     } else { 
-      max = total_birth_rate / (total_birth_rate + total_death_rate); 
+      total_death_rate = 0; 
+    }
+
+    if (pulse_count <= 1) { 
+      total_death_rate = 0; 
     }
 
 
-    // Update virtual time (how long to run BD step) - Draw from exp(B+D) and add to current S 
-    double lambda = 1 /( total_birth_rate + total_death_rate);
-    //std::cout << "total birth rate = " << total_birth_rate << " total_death_rate = " << total_death_rate << std::endl;
-    //std::cout << "lambda = " << lambda << std::endl;
-
+    // 5. Update virtual time (how long to run BD step) - Draw from exp(B+D) and add to current S
+    //    If S exceeds T or if we've run this too many times, break
+    double lambda = 1 / ( total_birth_rate + total_death_rate );
     S += Rf_rexp(lambda);
-    // If S exceeds T or if we've run this too many times, break
-    if (S > T)      { 
-      //std::cout << "In break 1" << std::endl;
-      //std::cout << "S = " << S << " and T = " << T << std::endl;
-      break; 
+    if (S > T)      break;
+    if (aaa > 5000) break;
+
+
+    // 6. Calculate probability of birth - force death/birth if too many/few
+    double probability_of_birth = 0.0;
+    if (pulse_count <= 1) { 
+      probability_of_birth = 1.1;
+    } else if (pulse_count >= max_num_node) { //TODO: may want to remove this upper limit for production..
+      probability_of_birth = -0.1;
+    } else { 
+      probability_of_birth = total_birth_rate / (total_birth_rate + total_death_rate); 
     }
-    if (aaa > 5000) { 
-      //std::cout << "In break 2" << std::endl;
-      break; 
-    }
 
 
-    // Select Birth or Death and proceed with either
-    if (Rf_runif(0, 1) < max) { // If U < B/(B+D), a birth occurs 
-
-      //std::cout << "In possible birth step" << std::endl;
+    // 7. Select birth if random uniform is small than the probability of birth
+    // (and for strauss, if position drawn is valid), otherwise choose a pulse to kill.
+    if (Rf_runif(0, 1) < probability_of_birth) { // If U < B/(B+D), a birth occurs 
 
       // Generate new position
-      position = Rf_runif(fitstart, fitend);
-      int accept_pos = 1;
+      double position = Rf_runif(fitstart, fitend);
+      int accept_pos  = 1;
 
-      // If using Strauss prior, run accept/reject for new position
+      // If using Strauss prior, run accept/reject for new position by finding
+      // the sum of the pulse locations too close to the new position,
+      // calculating Papangelou's conditional intensity function and dividing by
+      // the birth rate
       if (strauss == 1) {
-        sum_s_r    = patient->calc_sr_strauss(position); 
-        papas_cif  = birth_rate * pow(patient->priors.strauss_repulsion, sum_s_r);
-        b_ratio    = papas_cif / birth_rate;
-
-        accept_pos = (Rf_runif(0, 1) < b_ratio) ? 1 : 0;
+        int sum_s_r      = patient->calc_sr_strauss(position);
+        double papas_cif = birth_rate * pow(patient->priors.strauss_repulsion, sum_s_r);
+        double b_ratio   = papas_cif / birth_rate;
+        accept_pos       = (Rf_runif(0, 1) < b_ratio) ? 1 : 0;
       }
 
       // If it's a valid position, generate initial parms and insert node
-      if (accept_pos == 1) {
-        //std::cout << "In for sure birth step" << std::endl;
-        add_new_pulse(patient, position);
-      } else {
-        //std::cout << "not accepted due to strauss condition" << 
-        //  "\n sum_s_r=" << sum_s_r << "; position=" << position << "; fitstart=" << fitstart << "; fitend=" << fitend <<
-        //  "\n papas_cif=" << papas_cif << "; birth_rate=" << birth_rate << "; repulsion=" << patient->priors.strauss_repulsion <<
-        //  "; b_ratio=" << b_ratio <<
-        //  std::endl;
-      }
+      if (accept_pos == 1) add_new_pulse(patient, position);
 
-    } else { // Otherwise, a death occurs 
-        //std::cout << "In for sure death step" << std::endl;
-        remove_pulse(patient, death_rate, pulse_count);
+    } else { 
+      // Choose and remove a pulse
+      remove_pulse(patient, death_rates, pulse_count);
     }
 
-  }
+  } while (true);
 
 
 };
@@ -181,56 +191,51 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
 
 
 
-//
+//-----------------------------------------------------------------------------
 // add_new_pulse()
-//
+//-----------------------------------------------------------------------------
 void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
 
   Rcpp::RNGScope rng_scope;
-  double new_mass = 0.0;
-  double new_width = 0.0;
-  double new_tvarscale_mass, new_tvarscale_width;
-  new_tvarscale_mass = new_tvarscale_width = 1.0;
-  //std::cout << "ADDING NEW PULSE" << std::endl;
+  double new_mass  = -1.;
+  double new_width = -1.;
+  double new_tvarscale_mass  = Rf_rgamma(2, 0.5);
+  double new_tvarscale_width = Rf_rgamma(2, 0.5);
+  double new_t_sd_mass  = patient->estimates.mass_sd / sqrt(new_tvarscale_mass);
+  double new_t_sd_width = patient->estimates.width_sd / sqrt(new_tvarscale_width);
 
   while (new_mass < 0) {
-    new_mass = Rf_rnorm(patient->estimates.mass_mean, patient->estimates.mass_sd);
+    new_mass = Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass);
   }
   while (new_width < 0) {
-    new_width = Rf_rnorm(patient->estimates.width_mean, patient->estimates.width_sd);
+    new_width = Rf_rnorm(patient->estimates.width_mean, new_t_sd_width);
   }
-  // In old version, eta not set. Trying with set to 1.0 
-  //while (tvarscale_mass < 0) {
-  //  new_scale_mass = Rf_rnorm(patient->estimates.width_mean, patient->estimates.width_sd);
-  //}
 
   // Create new pulse and insert
   PulseEstimates new_pulse(position, new_mass, new_width, new_tvarscale_mass,
-                          new_tvarscale_width, patient->estimates.get_decay(),
-                          patient->data.time);
+                           new_tvarscale_width, patient->estimates.get_decay(),
+                           patient->data.time);
 
   patient->pulses.push_back(new_pulse);
+
 
 };
 
 
 
 
-//
+//-----------------------------------------------------------------------------
 // remove_pulse()
-//
+//   Pick a node to remove, find and remove it
+//-----------------------------------------------------------------------------
 void BirthDeathProcess::remove_pulse(Patient *patient, 
-                                     arma::vec death_rate, 
+                                     arma::vec death_rates, 
                                      int pulse_count) {
 
-  //std::cout << "REMOVING PULSE" << std::endl;
   PulseIter pulse = patient->pulses.begin();
-  int remove = 0;
-
-  // Pick a node to remove, find and remove it
-  remove = pu.one_rmultinom(death_rate) + 1; 
+  int remove      = pu.one_rmultinom(death_rates);
   for (int i = 0; i < remove; i++)  pulse++;
-  pulse = patient->pulses.erase(pulse);
+  pulse           = patient->pulses.erase(pulse);
 
 };
 
@@ -241,110 +246,97 @@ void BirthDeathProcess::remove_pulse(Patient *patient,
 // calculate_total_deathrate()
 //
 // new, simplified version (may have numerical problems)
-double BirthDeathProcess::calculate_total_deathrate(arma::vec death_rate, double pulse_count) {
-
-  double total_death_rate = 0.0;
-
-  if (death_rate.size() != 0) {
-    total_death_rate = arma::accu(death_rate);
-
-    if (total_death_rate > 500 ) {
-      total_death_rate = 1e300;
-    } else {
-      total_death_rate = exp(total_death_rate); 
-    }
-
-  } else { 
-    total_death_rate = 0; 
-  }
-
-  if (pulse_count <= 1) { 
-    total_death_rate = 0; 
-  }
-
-  return total_death_rate;
-};
-
-
-
-
-// original version
-double BirthDeathProcess::calculate_total_deathrate_original(arma::vec death_rate, double pulse_count) {
-
-  double total_death_rate = 0.0;
-  double max = 0.0;
-
-  if (death_rate.size() != 0) {
-
-    total_death_rate = death_rate(0);
-
-    for (int i = 1; i < pulse_count; i++) {
-      max        = (total_death_rate > death_rate(i)) ? total_death_rate : death_rate(i);
-      total_death_rate = log(exp(total_death_rate - max) + exp(death_rate(i) - max)) + max;
-    }
-
-    for (int i = 0; i < pulse_count; i++) {
-      death_rate(i) -= total_death_rate;
-      death_rate(i)  = exp(death_rate(i));
-    }
-
-    for (int i = 1; i < pulse_count; i++) {
-      death_rate(i) += death_rate(i-1);
-    }
-
-    if (total_death_rate > 500 ) {
-      total_death_rate = 1e300;
-    } else {
-      total_death_rate = exp(total_death_rate); 
-    }
-
-  } else { 
-    total_death_rate = 0; 
-  }
-
-  if (pulse_count <= 1) { 
-    total_death_rate = 0; 
-  }
-
-  return total_death_rate;
-
-};
-
-
-
-
-// 
-//  calc_death_rate_strauss()
-//    Calculates a vector of death rates, one for each existing pulse
+//double BirthDeathProcess::calculate_total_deathrate(arma::vec death_rates,
+//                                                    double pulse_count) {
 //
-// Notes: 
-//   Two possible version:
-//      1) if we can use distr of birth_rate, it's simple -- just partial -
-//      full likelihoods.
-//      2) if we have to use our set birth_rate (which I suspect based on
-//      Stephens2000), we have to multiply by papas^-1 * birth_rate
+//  double total_death_rate = 0.0;
 //
-//   Resolution:
-//     1) is the correct approach. We aren't actually setting the birth rate.
-//     Instead we are providing the intensity parameter as the strauss and as
-//     long as death rate and birth rate intensity parms are the same, they
-//     cancel. Option 2) would require not using an accept/reject in birth step
-//     and instead generating from the actual Strauss density (i.e. really
-//     difficult and computationally expensive.
-// 
+//  if (death_rates.size() != 0) {
+//    total_death_rate = arma::accu(death_rates);
+//
+//    if (total_death_rate > 500 ) {
+//      total_death_rate = 1e300;
+//    } else {
+//      total_death_rate = exp(total_death_rate); 
+//    }
+//
+//  } else { 
+//    total_death_rate = 0; 
+//  }
+//
+//  if (pulse_count <= 1) { 
+//    total_death_rate = 0; 
+//  }
+//
+//  return total_death_rate;
+//};
+//
+//
+//
+//
+//// original version
+//double BirthDeathProcess::calculate_total_deathrate_original(arma::vec
+//                                                             death_rates, double
+//                                                             pulse_count) {
+//
+//  double total_death_rate = 0.0;
+//  double max = 0.0;
+//
+//  if (death_rates.size() != 0) {
+//
+//    total_death_rate = death_rates(0);
+//
+//    for (int i = 1; i < pulse_count; i++) {
+//      max        = (total_death_rate > death_rates(i)) ? total_death_rate : death_rates(i);
+//      total_death_rate = log(exp(total_death_rate - max) + exp(death_rates(i) - max)) + max;
+//    }
+//
+//    for (int i = 0; i < pulse_count; i++) {
+//      death_rates(i) -= total_death_rate;
+//      death_rates(i)  = exp(death_rates(i));
+//    }
+//
+//    for (int i = 1; i < pulse_count; i++) {
+//      death_rates(i) += death_rates(i-1);
+//    }
+//
+//    if (total_death_rate > 500 ) {
+//      total_death_rate = 1e300;
+//    } else {
+//      total_death_rate = exp(total_death_rate); 
+//    }
+//
+//  } else { 
+//    total_death_rate = 0; 
+//  }
+//
+//  if (pulse_count <= 1) { 
+//    total_death_rate = 0; 
+//  }
+//
+//  return total_death_rate;
+//
+//};
+
+
+
+
+//-----------------------------------------------------------------------------
+//  calc_death_rates_strauss()
+//    Calculates a vector of death rates, one for each existing pulse.
 //-----------------------------------------------------------------------------
 arma::vec BirthDeathProcess::calc_death_rate_strauss(Patient *patient,
                                                      arma::vec partial_likelihood,
                                                      int pulse_count,
                                                      bool response_hormone) {
 
-  arma::vec death_rate(pulse_count); // Individual death rate array;
+  arma::vec death_rates(pulse_count); // Individual death rate array;
 
   // Begin death rate calculations
   if (pulse_count > 1) {
 
     // Calculate death rates (priors all cancel)
-    death_rate = partial_likelihood - patient->likelihood(response_hormone);
+    death_rates = partial_likelihood - patient->likelihood(response_hormone);
 
   } else { 
 
@@ -352,12 +344,12 @@ arma::vec BirthDeathProcess::calc_death_rate_strauss(Patient *patient,
     if (pulse_count == 0) { 
       return NULL;
     } else {
-      death_rate(0) = -1e300;
+      death_rates(0) = -1e300;
     }
 
   }
 
-  return death_rate;
+  return death_rates;
 
 };
 
@@ -377,10 +369,10 @@ arma::vec BirthDeathProcess::calc_death_rate_strauss(Patient *patient,
 //  int i;              // Generic counter
 //  int j;              // Generic counter
 //  double x;           // Individual death rate
-//  double *death_rate; // Vector of death rates
+//  double *death_rates; // Vector of death rates
 //  double coef_denom;  // Part of death rate calculation
 //  double coef_num;    // Part of death rate calculation
-//  arma::vec death_rate(pulse_count);
+//  arma::vec death_rates(pulse_count);
 
 //  if (pulse_count > 1) {
 //    node = list->succ;
@@ -450,7 +442,7 @@ arma::vec BirthDeathProcess::calc_death_rate_strauss(Patient *patient,
 //        x = 1e300;
 //      }
 //      // Save to death rate vector 
-//      death_rate[i] = x;
+//      death_rates[i] = x;
 
 //      // Advance to next pulse
 //      node = node->succ;
@@ -466,13 +458,13 @@ arma::vec BirthDeathProcess::calc_death_rate_strauss(Patient *patient,
 //    if (num_node == 0) {
 //      return NULL;
 //    } else {
-//      death_rate = (double *)calloc(num_node,sizeof(double));
-//      death_rate[0] = -1e300;
+//      death_rates = (double *)calloc(num_node,sizeof(double));
+//      death_rates[0] = -1e300;
 //    }
 
 //  }
 
-//  return death_rate;  
+//  return death_rates;  
 
 //};
 

@@ -8,8 +8,8 @@ pulse_spec(location_prior_type = c("order-statistic", "strauss"),
   prior_mass_mean = 3.5, prior_mass_var = 100, prior_width_mean = 42,
   prior_width_var = 1000, prior_baseline_mean = 2.6,
   prior_baseline_var = 100, prior_halflife_mean = 45,
-  prior_halflife_var = 100, prior_error_alpha = 1e-04,
-  prior_error_beta = 1e-04, prior_location_gamma = NULL,
+  prior_halflife_var = 100, prior_error_alpha = 0.0001,
+  prior_error_beta = 0.0001, prior_location_gamma = NULL,
   prior_location_range = NULL, prior_max_sd_mass = 100,
   prior_max_sd_width = 1000, prior_mean_pulse_count = 12,
   sv_mass_mean = 3.5, sv_width_mean = 42, sv_baseline_mean = 2.6,
@@ -34,9 +34,9 @@ specification of "prior_mean_pulse_count", "prior_location_gamma", and
 
 \item{prior_mass_var}{mass variance hyperparm}
 
-\item{prior_width_mean}{width mean hyperparm}
+\item{prior_width_mean}{width mean hyperparm (on variance scale)}
 
-\item{prior_width_var}{width variance hyperparm}
+\item{prior_width_var}{width variance hyperparm (on variance scale)}
 
 \item{prior_baseline_mean}{mean of prior on baseline}
 
@@ -46,9 +46,9 @@ specification of "prior_mean_pulse_count", "prior_location_gamma", and
 
 \item{prior_halflife_var}{variance of prior on half-life}
 
-\item{prior_error_alpha}{placeholder}
+\item{prior_error_alpha}{Gamma shape parameter}
 
-\item{prior_error_beta}{placeholder}
+\item{prior_error_beta}{Gamma rate parameter}
 
 \item{prior_location_gamma}{placeholder}
 
@@ -88,7 +88,7 @@ specification of "prior_mean_pulse_count", "prior_location_gamma", and
 
 \item{pv_sd_pulse_mass}{placeholder}
 
-\item{pv_sd_pulse_width}{placeholder}
+\item{pv_sd_pulse_width}{Proposal variance of the SD of the pulse widths (pulse widths are on variance scale)}
 
 \item{pv_sdscale_pulse_mass}{placeholder}
 
