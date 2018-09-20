@@ -86,17 +86,22 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                              startingvals["mass_sd"],
                              startingvals["width_sd"]);
 
-  // Now take all of this and create a Patient object
-  Patient pat(data, priors, estimates);
-  Patient * patient = &pat;
+  // TODO: SHOULD WE USE THE INTERNAL TEST DATASET/PATIENT OBJ?
+//  bool TEST = false;
+  Patient * patient;
 
-  //
-  // ****************************************
-  // TODO: NOTE: For debugging, add 11 pulses w/ true parms
-  // ****************************************
-  //
-  DataStructuresUtils utils;
-  patient = utils.add_default_pulses(patient);
+//  if (TEST) {
+//    // NOTE: For debugging, add pulses w/ true parms and data
+    DataStructuresUtils utils;
+    Patient pat = utils.create_new_test_patient_obj();
+    patient = &pat;
+    patient = utils.add_default_pulses(patient);
+//
+//  } else {
+//    // Now take all of this and create a Patient object
+//    Patient pat(data, priors, estimates);
+//    patient = &pat;
+//  }
 
   //std::cout << "pulse count is: " << patient->get_pulsecount() << std::endl;
 
@@ -180,12 +185,12 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
     //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
     //draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
-    draw_locations->sample_pulses(patient, iteration);
+    //draw_locations->sample_pulses(patient, iteration);
     //draw_masses.sample_pulses(patient, iteration);
     //draw_widths.sample_pulses(patient, iteration);
-    draw_tvarscale_mass.sample_pulses(patient, iteration);
-    draw_tvarscale_width.sample_pulses(patient, iteration);
-    //draw_error.sample(patient);
+    //draw_tvarscale_mass.sample_pulses(patient, iteration);
+    //draw_tvarscale_width.sample_pulses(patient, iteration);
+    draw_error.sample(patient);
     chains.save_sample(patient, iteration);
 
     //arma::vec locations(patient->get_pulsecount());
@@ -210,8 +215,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
   }
 
+  // Any objects created with new must be deleted
   delete draw_locations;
 
+  // Return results object
   return chains.output();
 
 }
