@@ -13,53 +13,61 @@
 // NOTE: I separated out function definitions here 
 
 //
-// SS_DrawFixedEffects
+// SS_DrawSDRandomEffects
 //   Modified Metropolis Hastings sampler instantiating the mmh class for
-//   sample the mean mass & width
+//   sample the sd of the pulse masses & widths
 //
 
-class SS_DrawSDRandomEffects : public ModifiedMetropolisHastings<Patient, Patient, double, ProposalVariance>
+class SS_DrawSDRandomEffects : 
+  public ModifiedMetropolisHastings<Patient, Patient, double, ProposalVariance>
 {
 
   public:
+
     // Constructor
     SS_DrawSDRandomEffects(double in_pv,
                            int in_adjust_iter,
                            int in_max_iter,
                            double in_target_ratio,
-                           bool for_width) :
+                           bool for_width,
+                           bool verbose,
+                           int verbose_iter) :
       ModifiedMetropolisHastings <Patient, Patient, double, ProposalVariance>::
-      ModifiedMetropolisHastings(in_pv,
-                                 in_adjust_iter,
-                                 in_max_iter,
-                                 in_target_ratio) {
+      ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
+                                 in_target_ratio, verbose, verbose_iter) {
 
-         // Choose which set of parameters to use: width or mass
-          if (for_width) {
-            est_mean_       = &PatientEstimates::width_mean;
-            est_sd_         = &PatientEstimates::width_sd;
-            tvarscale_      = &PulseEstimates::tvarscale_width;
-            randomeffect_   = &PulseEstimates::width;
-            sd_max_         = &PatientPriors::width_sd_max;
-          } else {
-            est_mean_       = &PatientEstimates::mass_mean;
-            est_sd_         = &PatientEstimates::mass_sd;
-            tvarscale_      = &PulseEstimates::tvarscale_mass;
-            randomeffect_   = &PulseEstimates::mass;
-            sd_max_         = &PatientPriors::mass_sd_max;
-          }
+        // Choose which set of parameters to use: width or mass
+        if (for_width) {
+          est_mean_       = &PatientEstimates::width_mean;
+          est_sd_         = &PatientEstimates::width_sd;
+          tvarscale_      = &PulseEstimates::tvarscale_width;
+          randomeffect_   = &PulseEstimates::width;
+          sd_max_         = &PatientPriors::width_sd_max;
+          parameter_name = "SD of pulse widths";
+        } else {
+          est_mean_       = &PatientEstimates::mass_mean;
+          est_sd_         = &PatientEstimates::mass_sd;
+          tvarscale_      = &PulseEstimates::tvarscale_mass;
+          randomeffect_   = &PulseEstimates::mass;
+          sd_max_         = &PatientPriors::mass_sd_max;
+          parameter_name = "SD of pulse masses";
+        }
 
-       };
+      };
 
   private:
-    bool parameter_support(double val, Patient *patient);
-    double posterior_function(Patient *patient, double proposal, Patient *notused);
 
     double PatientEstimates::*est_mean_;
     double PatientEstimates::*est_sd_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     double PatientPriors::*sd_max_; //pulse specific mass or width
+
+    std::string parameter_name;
+    std::string get_parameter_name() { return parameter_name; };
+
+    bool parameter_support(double val, Patient *patient);
+    double posterior_function(Patient *patient, double proposal, Patient *notused);
 
 };
 
@@ -99,26 +107,21 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   PatientEstimates *est  = &patient->estimates;
   double patient_mean    = (*est).*est_mean_;
   double patient_sd      = (*est).*est_sd_;
-  std::list<PulseEstimates>::const_iterator pulse     = patient->pulses.begin();
-  std::list<PulseEstimates>::const_iterator pulse_end = patient->pulses.end();
 
   // Calculate pulse-specific portion of acceptance ratio
-  while (pulse != pulse_end) {
-    //std::cout << "Hi, I'm in SS_DrawSDRandomEffects::posterior_function()" << std::endl;
+  for (auto &pulse : patient->pulses) {
 
     // Normalizing constants
-    stdx_old   = patient_mean / ( patient_sd  / sqrt((*pulse).*tvarscale_) );
-    stdx_new   = patient_mean / ( proposal / sqrt((*pulse).*tvarscale_) );
+    stdx_old   = patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
+    stdx_new   = patient_mean / ( proposal / sqrt(pulse.*tvarscale_) );
     new_int   += Rf_pnorm5(stdx_new, 0, 1, 1.0, 1.0);
     old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
 
     // 3rd part of acceptance ratio
-    third_part += (*pulse).*tvarscale_ * 
-                  ((*pulse).*randomeffect_ - patient_mean) * 
-                  ((*pulse).*randomeffect_ - patient_mean);
+    third_part += pulse.*tvarscale_ * 
+                  (pulse.*randomeffect_ - patient_mean) * 
+                  (pulse.*randomeffect_ - patient_mean);
 
-    // Next pulse
-    ++pulse;
   }
 
   // 1st and 2nd 'parts' of acceptance ratio

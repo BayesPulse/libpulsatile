@@ -10,42 +10,67 @@
 #include <bp_datastructures/patient.h>
 
 
-// NOTE: I separated out function definitions here 
-
 //
-// SS_DrawFixedEffects
+// SS_DrawTVarScale
 //   Modified Metropolis Hastings sampler instantiating the mmh class for
-//   sample the mean mass & width
+//   sample the scale parameter for the t-distribution prior for drawing the
+//   pulse mean/widths.
 //
 
-class SS_DrawTVarScale : public ModifiedMetropolisHastings<PulseEstimates, Patient, double, ProposalVariance>
+class SS_DrawTVarScale :
+  public ModifiedMetropolisHastings<PulseEstimates, Patient, double, ProposalVariance>
 {
 
   public:
+
     // Constructor
-    SS_DrawTVarScale(double in_pv, int in_adjust_iter, int in_max_iter,
-                     double in_target_ratio) :
-      ModifiedMetropolisHastings
-      <PulseEstimates, Patient, double,
-       ProposalVariance>::ModifiedMetropolisHastings(in_pv,
-                                                     in_adjust_iter,
-                                                     in_max_iter,
-                                                     in_target_ratio) { };
+    SS_DrawTVarScale(double in_pv,
+                     int in_adjust_iter,
+                     int in_max_iter,
+                     double in_target_ratio,
+                     bool for_width,
+                     bool verbose,
+                     int verbose_iter) :
+      ModifiedMetropolisHastings <PulseEstimates, Patient, double, ProposalVariance>::
+      ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
+                                 in_target_ratio, verbose, verbose_iter) {
+
+        // Choose which set of parameters to use: width or mass
+        if (for_width) {
+          est_mean_     = &PatientEstimates::width_mean;
+          est_sd_       = &PatientEstimates::width_sd;
+          randomeffect_ = &PulseEstimates::width;
+          tvarscale_    = &PulseEstimates::tvarscale_width;
+          parameter_name = "tvarscale width";
+        } else {
+          est_mean_     = &PatientEstimates::mass_mean;
+          est_sd_       = &PatientEstimates::mass_sd;
+          randomeffect_ = &PulseEstimates::mass;
+          tvarscale_    = &PulseEstimates::tvarscale_mass;
+          parameter_name = "tvarscale mass";
+        }
+
+      };
 
     // Pulse-specific estimate -- this function samples for each pulse
-    void sample_pulses(Patient *patient) {
+    void sample_pulses(Patient *patient, int iter) {
 
-      PulseIter pulse = patient->pulses.begin();
-      PulseConstIter pulse_end = patient->pulses.end();
-
-      while (pulse != pulse_end) {
-        sample(&(*pulse), &pulse->tvarscale_mass, patient);
-        pulse++;
+      for (auto &pulse : patient->pulses) {
+        sample(&pulse, &(pulse.*tvarscale_), patient, iter);
       }
 
     }
 
   private:
+
+    double PatientEstimates::*est_mean_;
+    double PatientEstimates::*est_sd_;
+    double PulseEstimates::*randomeffect_; //pulse specific mass or width
+    double PulseEstimates::*tvarscale_;
+
+    std::string parameter_name;
+    std::string get_parameter_name() { return parameter_name; };
+
     bool parameter_support(double val, Patient *notused);
     double posterior_function(PulseEstimates *pulse, double proposal, Patient *patient);
 
@@ -80,10 +105,11 @@ double SS_DrawTVarScale::posterior_function(PulseEstimates *pulse,
   double re_old      = 0.0;
   double re_new      = 0.0;
   double re_ratio    = 0.0;
-  double mass_sd     = patient->estimates.mass_sd;
-  double mass_mean   = patient->estimates.mass_mean;
-  double pulse_mass  = pulse->mass;
-  double curr_scale  = pulse->tvarscale_mass;
+  PatientEstimates *est  = &patient->estimates;
+  double patient_mean       = (*est).*est_mean_;
+  double patient_sd         = (*est).*est_sd_;
+  double pulse_randomeffect = (*pulse).*randomeffect_;
+  double curr_scale         = (*pulse).*tvarscale_;
 
   // Shape, scale parameterized: 
   //    https://github.com/mmulvahill/r-source/blob/trunk/src/nmath/dgamma.c
@@ -93,11 +119,11 @@ double SS_DrawTVarScale::posterior_function(PulseEstimates *pulse,
 
   prior_ratio  = log(new_gamma) - log(old_gamma);
 
-  stdold       = (pulse_mass) / (mass_sd / sqrt(curr_scale));
-  stdnew       = (pulse_mass) / (mass_sd / sqrt(proposal));
-  re_old       = (pulse_mass - mass_mean) * 0.5 * re_old * curr_scale;
-  re_new       = (pulse_mass - mass_mean) * 0.5 * re_new * proposal;
-  re_ratio     = (re_old - re_new) / (mass_sd * mass_sd);
+  stdold       = (pulse_randomeffect) / (patient_sd / sqrt(curr_scale));
+  stdnew       = (pulse_randomeffect) / (patient_sd / sqrt(proposal));
+  re_old       = (pulse_randomeffect - patient_mean) * 0.5 * re_old * curr_scale;
+  re_new       = (pulse_randomeffect - patient_mean) * 0.5 * re_new * proposal;
+  re_ratio     = (re_old - re_new) / (patient_sd * patient_sd);
   re_ratio    += Rf_pnorm5(stdold, 0, 1, 1.0, 1.0) -  // second 1.0 does the log xform for us 
                  Rf_pnorm5(stdnew, 0, 1, 1.0, 1.0) -  // first 1.0 says to use lower tail      
                  0.5 * log(curr_scale) + 0.5 * log(proposal); // the 1/2pi term in normal distirbution

@@ -44,9 +44,9 @@ LDLIBS := 		$(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
 #
 # Original working makefile
 #
-#CXX := g++ # This is the main compiler
+CXX := g++ # This is the main compiler
 #CXX := clang++ #--analyze # and comment out the linker last line for sanity
-CXX := $(shell $(R_HOME)/bin/R CMD config CXX)
+#CXX := $(shell $(R_HOME)/bin/R CMD config CXX)
 SRCDIR := src
 BUILDDIR := build
 SRCEXT := cpp
@@ -55,7 +55,7 @@ TARGETDIR := bin
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g -Wall -O0
+CFLAGS := -O0 -g -Wall
 LIB := $(LDLIBS)
 INC := -I include -I include/testing $(CPPFLAGS) $(CXXFLAGS) -std=c++11
 

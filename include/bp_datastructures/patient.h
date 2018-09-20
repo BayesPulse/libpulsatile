@@ -106,9 +106,22 @@ struct Patient {
       conc = data.concentration;
     }
 
-    return arma::accu((conc - mean) % (conc - mean)); // % Schur product (elementwise multiplication)
+    arma::vec diff = conc - mean;
+    arma::vec squareddiff =  diff % diff; // % Schur product (elementwise multiplication)
+    double ssq = arma::accu(squareddiff);
+
+    //Rcpp::Rcout << "Conc vector:\n" << conc << std::endl;
+    //Rcpp::Rcout << "Mean vector:\n" << mean << std::endl;
+    //Rcpp::Rcout << "Diff vector:\n" << diff << std::endl;
+    //Rcpp::Rcout << "Square diff vector:\n" << squareddiff << std::endl;
+    //Rcpp::Rcout << "Sums of squares:" << ssq << std::endl;
+
+    return ssq;
 
   }
+
+
+
 
   // likelihood()
   //   computes the current likelihood using the observed log-concentrations and
@@ -124,6 +137,7 @@ struct Patient {
 
     double like = 0;
     arma::vec conc;
+    arma::vec diffs;
 
     if (response_hormone) {
       conc = data.response_concentration;
@@ -132,8 +146,9 @@ struct Patient {
     }
 
     // Calculate likelihood
-    like  = arma::accu(conc - mean_concentration(response_hormone, pulse_excluded));
-    like  = like * like;
+    diffs = conc - mean_concentration(response_hormone, pulse_excluded);
+    diffs = arma::square(diffs);
+    like  = arma::accu(diffs);
     like /= (-2.0 * estimates.errorsq);
     like += -0.5 * conc.n_elem * (1.8378771 + estimates.get_logerrorsq());
 
@@ -151,7 +166,6 @@ struct Patient {
     int i = 0;
     while(exclude_pulse != pulse_end) {
       partials(i) = likelihood(response_hormone, exclude_pulse);
-      //std::cout << "partials(" << i << ") = " << partials(i) << std::endl;
       exclude_pulse++;
       i++;
     }
@@ -189,15 +203,14 @@ struct Patient {
 
     // Add the contribution to the mean from each pulse
     arma::vec mctrb(data.concentration.n_elem);
-    int i = 1; // i think this is extraneous
+    mctrb.fill(0);
+
     while (pulse_iter != pulselist_end) {
       if (pulse_iter != pulse_excluded) {
-        mctrb = pulse_iter->get_mean_contribution(data.concentration,
-                                                  estimates.get_decay());
+        mctrb      = pulse_iter->get_mean_contribution(data.time, estimates.get_decay());
         mean_conc += mctrb;
       }
       ++pulse_iter;
-      ++i;
     }
 
     // Add the baseline contribution and log
@@ -221,14 +234,14 @@ struct Patient {
   int calc_sr_strauss(double location, PulseEstimates * pulse_excluded) {
 
     int s_r = 0;       // Sum of indicators where diff < 20
-    double difference; // Time difference
+    double difference = 0.; // Time difference
     PulseIter pulse = pulses.begin();
     PulseConstIter pulse_end = pulses.end();
 
     while (pulse != pulse_end) {
       if (&(*pulse) != pulse_excluded) { // TODO: Test that pulse is actually excluded!
         // skip if node is same that location is from;
-        difference = fabs(location - pulse->time);
+        difference = abs(location - pulse->time);
         // increment by 1 if diff<R
         s_r = (difference < priors.strauss_repulsion_range) ? s_r + 1 : s_r; 
       }

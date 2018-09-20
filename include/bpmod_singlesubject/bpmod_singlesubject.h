@@ -6,10 +6,10 @@
 #include <bpmod_singlesubject/ss_draw_error.h>
 #include <bpmod_singlesubject/ss_draw_fixedeffects.h>
 #include <bpmod_singlesubject/ss_draw_locations.h>
+#include <bpmod_singlesubject/ss_draw_locations_strauss.h>
+#include <bpmod_singlesubject/ss_draw_locations_os.h>
 #include <bpmod_singlesubject/ss_draw_randomeffects.h>
 #include <bpmod_singlesubject/ss_draw_sdrandomeffects.h>
-//#include <bpmod_singlesubject/ss_draw_sdrandomeffects_width.h>
 #include <bpmod_singlesubject/ss_draw_tvarscale.h>
-#include <bpmod_singlesubject/ss_draw_tvarscale_width.h>
 
 #endif
