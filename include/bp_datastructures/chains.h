@@ -175,14 +175,14 @@ void Chains::print_diagnostic_output(Patient * patient, int iter) {
 
   if (verbose == 1 && (iter % verbose_iter == 0)) {
 
-    Rcpp::Rcout            << "\n"                                     <<
-      "Iteration = "       << iter                                     <<
-      " Likelihood = "     << patient->likelihood(false)               << "\n" <<
+    Rcpp::Rcout            << "\n\n\n"                                <<
+      "Iteration = "       << iter                                    <<
+      " Likelihood = "     << patient->likelihood(false)              << "\n" <<
       "Baseline = "        << patient->estimates.baseline_halflife(0) <<
       " Half-life = "      << patient->estimates.baseline_halflife(1) <<
       " Mass mean = "      << patient->estimates.mass_mean            <<
-      " Mass SD = "        << patient->estimates.mass_sd              <<
-      " Width mean = "     << patient->estimates.width_mean           <<
+      " Mass SD = "        << patient->estimates.mass_sd              << "\n" <<
+      "Width mean = "      << patient->estimates.width_mean           <<
       " Width SD = "       << patient->estimates.width_sd             <<
       " Error variance = " << patient->estimates.errorsq              << "\n" <<
 

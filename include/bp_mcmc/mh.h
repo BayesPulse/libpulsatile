@@ -137,9 +137,9 @@ class ModifiedMetropolisHastings
     virtual std::string get_parameter_name() = 0;
 
     void print_diagnostic_output() {
-      Rcpp::Rcout << get_parameter_name() << 
-        ": Proposal Variance=" << pv.getpv() << 
-        ": Acceptance Ratio=" << pv.getratio() <<  std::endl;
+      Rcpp::Rcout << std::setw(20) << std::left << get_parameter_name() << 
+        ": PV=" << pv.getpv() << 
+        ": AR=" << pv.getratio() <<  std::endl;
     }
 
 };
