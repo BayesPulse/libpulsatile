@@ -106,9 +106,22 @@ struct Patient {
       conc = data.concentration;
     }
 
-    return arma::accu((conc - mean) % (conc - mean)); // % Schur product (elementwise multiplication)
+    arma::vec diff = conc - mean;
+    arma::vec squareddiff =  diff % diff; // % Schur product (elementwise multiplication)
+    double ssq = arma::accu(squareddiff);
+
+    //Rcpp::Rcout << "Conc vector:\n" << conc << std::endl;
+    //Rcpp::Rcout << "Mean vector:\n" << mean << std::endl;
+    //Rcpp::Rcout << "Diff vector:\n" << diff << std::endl;
+    //Rcpp::Rcout << "Square diff vector:\n" << squareddiff << std::endl;
+    //Rcpp::Rcout << "Sums of squares:" << ssq << std::endl;
+
+    return ssq;
 
   }
+
+
+
 
   // likelihood()
   //   computes the current likelihood using the observed log-concentrations and
@@ -192,8 +205,7 @@ struct Patient {
 
     while (pulse_iter != pulselist_end) {
       if (pulse_iter != pulse_excluded) {
-        mctrb = pulse_iter->get_mean_contribution(data.time,
-                                                  estimates.get_decay());
+        mctrb      = pulse_iter->get_mean_contribution(data.time, estimates.get_decay());
         mean_conc += mctrb;
       }
       ++pulse_iter;
