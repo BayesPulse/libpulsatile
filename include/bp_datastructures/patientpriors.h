@@ -160,7 +160,7 @@ struct PatientPriors {
     mass_sd_max             = prior_mass_sd_max;
     width_sd_max            = prior_width_sd_max;
     error_alpha             = prior_error_alpha;
-    error_beta              = 1/prior_error_beta;
+    error_beta              = 1 / prior_error_beta;
     num_orderstat           = pu.orderstat_default();
     pulse_count             = prior_pulse_count;
     strauss_repulsion       = prior_strauss_repulsion; //gamma
