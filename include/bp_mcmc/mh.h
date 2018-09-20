@@ -138,8 +138,8 @@ class ModifiedMetropolisHastings
 
     void print_diagnostic_output() {
       Rcpp::Rcout << std::setw(20) << std::left << get_parameter_name() << 
-        ": PV=" << pv.getpv() << 
-        ": AR=" << pv.getratio() <<  std::endl;
+        ": PV=" << std::setw(10) << pv.getpv() << 
+        ": AR=" << std::setw(10) << pv.getratio() <<  std::endl;
     }
 
 };

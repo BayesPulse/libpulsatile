@@ -75,17 +75,17 @@ pulse_spec <-
            sv_error_var           = 0.005,
            sv_mass_sd             = 1.6,
            sv_width_sd            = 35,
-           pv_baseline            = 0.5,
-           pv_halflife            = 45,
-           pv_mean_pulse_mass     = 2,
-           pv_mean_pulse_width    = 100,
-           pv_indiv_pulse_mass    = 2,
-           pv_indiv_pulse_width   = 100,
-           pv_sd_pulse_mass       = 2,
-           pv_sd_pulse_width      = 100,
-           pv_sdscale_pulse_mass  = 1,
-           pv_sdscale_pulse_width = 1,
-           pv_pulse_location      = 10) 
+           pv_baseline            = 0.02,
+           pv_halflife            = 1.5,
+           pv_mean_pulse_mass     = 6,
+           pv_mean_pulse_width    = 3700,
+           pv_indiv_pulse_mass    = 1,
+           pv_indiv_pulse_width   = 15000,
+           pv_sd_pulse_mass       = 4.5,
+           pv_sd_pulse_width      = 4000,
+           pv_sdscale_pulse_mass  = 4,
+           pv_sdscale_pulse_width = 4,
+           pv_pulse_location      = 65) 
   {
 
     # TODO: Research better ways to do this range/valid-value checking.  Pretty

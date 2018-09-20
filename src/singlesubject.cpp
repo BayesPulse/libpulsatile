@@ -92,15 +92,15 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
 //  if (TEST) {
 //    // NOTE: For debugging, add pulses w/ true parms and data
-    DataStructuresUtils utils;
-    Patient pat = utils.create_new_test_patient_obj();
-    patient = &pat;
-    patient = utils.add_default_pulses(patient);
+//    DataStructuresUtils utils;
+//    Patient pat = utils.create_new_test_patient_obj();
+//    patient = &pat;
+//    patient = utils.add_default_pulses(patient);
 //
 //  } else {
-//    // Now take all of this and create a Patient object
-//    Patient pat(data, priors, estimates);
-//    patient = &pat;
+    // Now take all of this and create a Patient object
+    Patient pat(data, priors, estimates);
+    patient = &pat;
 //  }
 
   //double like = patient->likelihood(false);
@@ -146,10 +146,11 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                                                  adj_iter, adj_max, univ_target,
                                                  verbose, verbose_iter);
   } else {
+    Rcpp::stop("Order statistic prior is not yet implemented in the birth death process");
     //Rcpp::Rcout << "USING ORDERSTAT LOCATION MH" << std::endl;
-    draw_locations = new SS_DrawLocationsOS(proposalvars["location"], adj_iter,
-                                            adj_max, univ_target, verbose,
-                                            verbose_iter);
+    //draw_locations = new SS_DrawLocationsOS(proposalvars["location"], adj_iter,
+    //                                        adj_max, univ_target, verbose,
+    //                                        verbose_iter);
   }
 
   SS_DrawRandomEffects draw_masses(proposalvars["pulse_mass"], adj_iter,
@@ -182,17 +183,17 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     checkUserInterrupt();
     chains.print_diagnostic_output(patient, iteration);
 
-    //birth_death.sample(patient, false, iteration);
-    //draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
-    //draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
-    //draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
-    //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
-    //draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
-    //draw_locations->sample_pulses(patient, iteration);
-    //draw_masses.sample_pulses(patient, iteration);
-    //draw_widths.sample_pulses(patient, iteration);
-    //draw_tvarscale_mass.sample_pulses(patient, iteration);
-    //draw_tvarscale_width.sample_pulses(patient, iteration);
+    birth_death.sample(patient, false, iteration);
+    draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
+    draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
+    draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
+    draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
+    draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
+    draw_locations->sample_pulses(patient, iteration);
+    draw_masses.sample_pulses(patient, iteration);
+    draw_widths.sample_pulses(patient, iteration);
+    draw_tvarscale_mass.sample_pulses(patient, iteration);
+    draw_tvarscale_width.sample_pulses(patient, iteration);
     draw_error.sample(patient);
     chains.save_sample(patient, iteration);
 

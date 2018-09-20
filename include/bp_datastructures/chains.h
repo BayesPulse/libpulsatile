@@ -178,13 +178,14 @@ void Chains::print_diagnostic_output(Patient * patient, int iter) {
     Rcpp::Rcout            << "\n\n\n"                                <<
       "Iteration = "       << iter                                    <<
       " Likelihood = "     << patient->likelihood(false)              << "\n" <<
-      "Baseline = "        << patient->estimates.baseline_halflife(0) <<
+      "Pulse count = "     << patient->get_pulsecount()               << "\n" <<
+      " Baseline = "       << patient->estimates.baseline_halflife(0) <<
       " Half-life = "      << patient->estimates.baseline_halflife(1) <<
-      " Mass mean = "      << patient->estimates.mass_mean            <<
-      " Mass SD = "        << patient->estimates.mass_sd              << "\n" <<
-      "Width mean = "      << patient->estimates.width_mean           <<
-      " Width SD = "       << patient->estimates.width_sd             <<
-      " Error variance = " << patient->estimates.errorsq              << "\n" <<
+      " Error variance = " << patient->estimates.errorsq              <<
+      "Mass mean = "       << patient->estimates.mass_mean            << "\n" <<
+      " Mass SD = "        << patient->estimates.mass_sd              <<
+      " Width mean = "     << patient->estimates.width_mean           <<
+      " Width SD = "       << patient->estimates.width_sd             << "\n" <<
 
       //" Current pulse-specific parms: " << "\n" << 
       //"Pulse No. Time  Mass  Width\n" << pulse_chains.back() <<

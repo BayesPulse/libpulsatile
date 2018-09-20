@@ -14,7 +14,7 @@ source("./build_package.R", echo=TRUE)
 
 Rcpp::compileAttributes()
 devtools::document()
-# devtools::check()
+#devtools::check()
 devtools::install()
 
 #devtools::test()
@@ -27,12 +27,15 @@ library(bayespulse)
 source("./data-raw/test_data.R")
 
 set.seed(2018-09-18)
+sim <- simulate_pulse()
+plot(sim)
 spec <- pulse_spec(location_prior_type = "strauss", #order-statistic") #, 
                    prior_location_gamma = 0,
                    prior_location_range = 40)
-fit <- fit_pulse(test_data, spec = spec, iters = 1, thin = 1, burnin = 0,
+fit <- fit_pulse(sim, spec = spec, iters = 250000, thin = 50, burnin = 100000,
                  verbose = TRUE)
 bp_trace(fit) + ggtitle("BAYESPULSE")
+bp_posteriors(fit, "histogram") + ggtitle("BAYESPULSE")
 bp_location_posterior(fit) + ggtitle("BAYESPULSE")
 
 pulse_chain(fit) %>%
