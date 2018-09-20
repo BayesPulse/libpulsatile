@@ -54,24 +54,25 @@ class PulseUtils {
     //
     // Single random multinomial
     //
-    int one_rmultinom(arma::vec cumprobs) {
+    int one_rmultinom(arma::vec probs) {
 
       Rcpp::RNGScope rng_scope;
       int i;
       int rtn = 0;
-      int n_probs = cumprobs.size();
+      int n_probs = probs.size();
       //std::cout << "size of cumprobs = " << n_probs << std::endl;
       arma::Col<int> ans(n_probs);
-      arma::Col<double> probs(n_probs);
+      //arma::Col<double> probs(n_probs);
 
-      for (i = 0; i < n_probs; i++) {
+      //for (i = 0; i < n_probs; i++) {
 
-        if (i == 0) probs(i) = cumprobs(i);
-        else probs(i) = cumprobs(i) - cumprobs(i-1);
+      //  if (i == 0) probs(i) = cumprobs(i);
+      //  else probs(i) = cumprobs(i) - cumprobs(i-1);
 
-        //std::cout << "i = " << i << " and cumprob = " << cumprobs(i) << " and prob = " << probs(i) << std::endl;
-      }
+      //  //std::cout << "i = " << i << " and cumprob = " << cumprobs(i) << " and prob = " << probs(i) << std::endl;
+      //}
 
+      //Rcpp::Rcout << "probs sum to: " << arma::accu(probs) << "\n with values of:\n" << probs << std::endl;
       ::Rf_rmultinom(1, probs.begin(), n_probs, ans.begin());
       //std::cout << "ans = " << ans << std::endl;
 

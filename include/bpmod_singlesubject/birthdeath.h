@@ -116,9 +116,11 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
         death_rates(i)  = exp(death_rates(i));
       }
 
-      for (int i = 1; i < pulse_count; i++) {
-        death_rates(i) += death_rates(i-1);
-      }
+      // Convert probabilities to cumulative probabilities -- not necessary
+      // anymore for one_rmultinom()
+      //for (int i = 1; i < pulse_count; i++) {
+      //  death_rates(i) += death_rates(i-1);
+      //}
 
       if (total_death_rate > 500 ) {
         total_death_rate = 1e300;

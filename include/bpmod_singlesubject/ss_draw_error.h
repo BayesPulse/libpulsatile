@@ -27,10 +27,14 @@ class SS_DrawError
       double alpha = patient->priors.error_alpha;
       double beta  = patient->priors.error_beta;
       double ssq   = patient->get_sumerrorsquared(false);
+      //Rcpp::Rcout << "SSQ:" << ssq << std::endl;
 
-      // Rf_gamma is the shape (alpha is shape), scale (beta here is scale) parameterization
-      patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, beta + (0.5 * ssq));
-
+      // Rf_gamma is the shape (alpha is shape), scale (beta here is scale)
+      //   parameterization (converted to scale on creation of patient->priors
+      //   object)
+      //patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, beta + (0.5 * ssq));
+      patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
+      //parms->sigma  = 1 / Rf_rgamma(priors->err_alpha + N / 2, 1 / (1 / priors->err_beta + 0.5 * ssq));
     }
 
 };
