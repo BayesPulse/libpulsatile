@@ -137,6 +137,7 @@ struct Patient {
 
     double like = 0;
     arma::vec conc;
+    arma::vec diffs;
 
     if (response_hormone) {
       conc = data.response_concentration;
@@ -145,8 +146,9 @@ struct Patient {
     }
 
     // Calculate likelihood
-    like  = arma::accu(conc - mean_concentration(response_hormone, pulse_excluded));
-    like  = like * like;
+    diffs = conc - mean_concentration(response_hormone, pulse_excluded);
+    diffs = arma::square(diffs);
+    like  = arma::accu(diffs);
     like /= (-2.0 * estimates.errorsq);
     like += -0.5 * conc.n_elem * (1.8378771 + estimates.get_logerrorsq());
 

@@ -103,6 +103,9 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 //    patient = &pat;
 //  }
 
+  //double like = patient->likelihood(false);
+  //Rcpp::Rcout << "initial likelihood is: " << like << std::endl;
+  //Rcpp::Rcout << "Mean conc:\n" << patient->mean_concentration(false) << std::endl;
   //std::cout << "pulse count is: " << patient->get_pulsecount() << std::endl;
 
   //----------------------------------------
@@ -110,7 +113,7 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   //----------------------------------------
 
   // Birth-death process
-  //BirthDeathProcess birth_death;
+  BirthDeathProcess birth_death;
 
   // Modified Metropolis Hastings for fixed effects (mean mass & mean width)
   SS_DrawFixedEffects draw_fixeff_mass(proposalvars["mass_mean"], adj_iter,
