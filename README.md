@@ -15,7 +15,7 @@ take a look around.
 
 ---
 
-**Installation and dependencies**
+**Dependencies**
 
 This library is intended to be used from within an R package, and therefore
 relies on R's RNGs and datastructures.  The list of dependencies for the
@@ -29,9 +29,40 @@ development phase is rather specific and will be reduced later.
   - Rcpp (CRAN)
   - RcppArmadillo (CRAN)
 
-Once these dependencies are satisfied, build the executable and the test
-executable with `make`.  To run the tests, run `./bin/tests` or `./bin/tests -s`
-to view the detailed test results.
+**Installing R package**
+
+The process for compiling and installing the R package is a bit more complicated
+than normal due to the repository focusin on C++ code, with the R package
+structure in a subdirectory.
+
+First clone the repository and enter the R-package directory
+
+```{sh}
+git clone git@github.com:BayesPulse/libpulsatile.git
+cd libpulsatile/R-package
+```
+
+Then open R, run the build_package.R script, and install with devtools
+
+```{R}
+source("./build_package.R", echo=TRUE)
+Rcpp::compileAttributes()
+devtools::document()
+devtools::install()
+```
+
+**Building the C++ binaries**
+
+*This is only necessary if you are running the binary directly.* To build the C++
+binary, first ensure the dependencies are satisfied, then build the executable
+and the test executable with `make`.  To run the tests, run `./bin/tests` or
+`./bin/tests -s` to view the detailed test results.
+
+```{sh}
+make clean
+make
+./bin/tests -s
+```
 
 
 # Notes

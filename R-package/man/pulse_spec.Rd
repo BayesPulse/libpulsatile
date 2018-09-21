@@ -4,13 +4,13 @@
 \alias{pulse_spec}
 \title{pulse_spec}
 \usage{
-pulse_spec(location_prior_type = c("order-statistic", "strauss"),
+pulse_spec(location_prior_type = c("strauss", "order-statistic"),
   prior_mass_mean = 3.5, prior_mass_var = 100, prior_width_mean = 42,
   prior_width_var = 1000, prior_baseline_mean = 2.6,
   prior_baseline_var = 100, prior_halflife_mean = 45,
   prior_halflife_var = 100, prior_error_alpha = 1e-04,
-  prior_error_beta = 1e-04, prior_location_gamma = NULL,
-  prior_location_range = NULL, prior_max_sd_mass = 100,
+  prior_error_beta = 1e-04, prior_location_gamma = 0,
+  prior_location_range = 40, prior_max_sd_mass = 100,
   prior_max_sd_width = 1000, prior_mean_pulse_count = 12,
   sv_mass_mean = 3.5, sv_width_mean = 42, sv_baseline_mean = 2.6,
   sv_halflife_mean = 45, sv_error_var = 0.005, sv_mass_sd = 1.6,

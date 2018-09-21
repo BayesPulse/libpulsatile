@@ -223,6 +223,6 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   delete draw_locations;
 
   // Return results object
-  return chains.output();
+  return chains.output(patient);
 
 }
