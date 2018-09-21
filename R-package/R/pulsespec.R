@@ -52,7 +52,7 @@
 #' @export
 #' @keywords pulse simulation
 pulse_spec <-
-  function(location_prior_type = c("order-statistic", "strauss"),
+  function(location_prior_type = c("strauss", "order-statistic"),
            prior_mass_mean        = 3.5,
            prior_mass_var         = 100,
            prior_width_mean       = 42,
@@ -63,8 +63,8 @@ pulse_spec <-
            prior_halflife_var     = 100,
            prior_error_alpha      = 0.0001,
            prior_error_beta       = 0.0001,
-           prior_location_gamma   = NULL,
-           prior_location_range   = NULL,
+           prior_location_gamma   = 0,
+           prior_location_range   = 40,
            prior_max_sd_mass      = 100,
            prior_max_sd_width     = 1000,
            prior_mean_pulse_count = 12,

@@ -85,7 +85,7 @@ class Chains {
     // Print pulse/patient diagnostic info
     void print_diagnostic_output(Patient * patient, int iter);
     // Return chains function
-    List output();
+    List output(Patient * pat);
 
   private: 
     //----------------------------------------
@@ -155,15 +155,19 @@ void Chains::save_sample(Patient * pat, int iter) {
 };
 
 // Member Function: Return chains object (R list)
-List Chains::output() {
+List Chains::output(Patient * pat) {
 
   // Add names to each output chain
   NumericMatrix patient_chain_r = addattribs_patient_chain(patient_chain);
   List pulse_chain_r            = addattribs_pulse_chain(pulse_chains);
+  NumericVector fitrange(2); 
+  fitrange(0) = pat->data.fitstart;
+  fitrange(1) = pat->data.fitend;
 
   // Create list object combining all chains & other output
   List out = List::create(Named("patient_chain") = patient_chain_r,
-                          Named("pulse_chains") = pulse_chain_r);
+                          Named("pulse_chains")  = pulse_chain_r,
+                          Named("time_range")     = fitrange);
 
   return out;
 
@@ -178,11 +182,11 @@ void Chains::print_diagnostic_output(Patient * patient, int iter) {
     Rcpp::Rcout            << "\n\n\n"                                <<
       "Iteration = "       << iter                                    <<
       " Likelihood = "     << patient->likelihood(false)              << "\n" <<
-      "Pulse count = "     << patient->get_pulsecount()               << "\n" <<
+      "Pulse count = "     << patient->get_pulsecount()               <<
       " Baseline = "       << patient->estimates.baseline_halflife(0) <<
       " Half-life = "      << patient->estimates.baseline_halflife(1) <<
-      " Error variance = " << patient->estimates.errorsq              <<
-      "Mass mean = "       << patient->estimates.mass_mean            << "\n" <<
+      " Error variance = " << patient->estimates.errorsq              << "\n" <<
+      "Mass mean = "       << patient->estimates.mass_mean            <<
       " Mass SD = "        << patient->estimates.mass_sd              <<
       " Width mean = "     << patient->estimates.width_mean           <<
       " Width SD = "       << patient->estimates.width_sd             << "\n" <<

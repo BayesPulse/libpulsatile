@@ -118,16 +118,17 @@ fit_pulse <- function(data,
   }
 
   rtn_obj <- 
-    structure(list("model"        = "single-subject",
-                   "call"         = Call,
+    structure(list("model"         = "single-subject",
+                   "call"          = Call,
                    "patient_chain" = patient_chain,
-                   "pulse_chain"  = pulse_chain,
-                   "data"         = data,
-                   "options"      = list("time" = time,
-                                         "conc" = conc,
-                                         "thinning"   = thin, 
-                                         "iterations" = iters),
-                   "spec"         = spec),
+                   "pulse_chain"   = pulse_chain,
+                   "data"          = data,
+                   "time_range"    = fit$time_range,
+                   "options"       = list("time"       = time,
+                                          "conc"       = conc,
+                                          "thinning"   = thin,
+                                          "iterations" = iters),
+                   "spec"          = spec),
               class = "pulse_fit")
 
   return(rtn_obj)
