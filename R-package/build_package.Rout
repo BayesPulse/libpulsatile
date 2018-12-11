@@ -1,0 +1,52 @@
+
+R version 3.5.1 (2018-07-02) -- "Feather Spray"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # cribbed from Microsoft's LightGBM package
+> unlink("./inst/include", recursive = TRUE)
+> unlink("./src/tests", recursive = TRUE)
+> unlink("./src/singlesubject.cpp", recursive = TRUE)
+> 
+> compiled_files <- dir(path = "./src", pattern = "\\.so|\\.o")
+> if (length(compiled_files) > 0) file.remove(paste0("./src/", compiled_files))
+> 
+> if (!file.copy("./../include", "./inst/", overwrite = TRUE, recursive = TRUE)) {
++   stop("Cannot find folder libpulsatile/include")
++ }
+> if (!file.copy("./../tests", "./src/", overwrite = TRUE, recursive = TRUE)) {
++   stop("Cannot find folder libpulsatile/tests")
++ }
+> if (!file.copy("./../src/singlesubject.cpp", "./src/", overwrite = TRUE, recursive = TRUE)) {
++   stop("Cannot find folder libpulsatile/src")
++ }
+> #file.remove("./inst/include/testing/catch.h")
+> #if (!file.copy("./../CMakeLists.txt", "./src/", overwrite = TRUE, recursive = TRUE)) {
+> #  stop("Cannot find file LightGBM/CMakeLists.txt")
+> #}
+> if (!file.exists("./src/_IS_FULL_PACKAGE")) {
++   file.create("./src/_IS_FULL_PACKAGE")
++ }
+[1] TRUE
+> #system("R CMD build --no-build-vignettes .")
+> file.remove("./src/_IS_FULL_PACKAGE")
+[1] TRUE
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.209   0.060   0.274 
