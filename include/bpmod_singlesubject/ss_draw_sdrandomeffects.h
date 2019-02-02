@@ -42,17 +42,14 @@ class SS_DrawSDRandomEffects :
           est_sd_         = &PatientEstimates::width_sd;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
-            
-//CHANGE HERE TO CAUCHY PARAM
-          sd_max_         = &PatientPriors::width_sd_max;
+          sd_param_         = &PatientPriors::width_sd_param;
           parameter_name = "SD of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
           est_sd_         = &PatientEstimates::mass_sd;
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
-//CHANGE HERE TO CAUCHY PARAM
-          sd_max_         = &PatientPriors::mass_sd_max;
+          sd_param_         = &PatientPriors::mass_sd_param;
           parameter_name = "SD of pulse masses";
         }
 
@@ -66,7 +63,7 @@ class SS_DrawSDRandomEffects :
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
 //CHANGE HERE
-    double PatientPriors::*sd_max_; //pulse specific mass or width
+    double PatientPriors::*sd_param_; //pulse specific mass or width
 
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };
@@ -85,12 +82,14 @@ class SS_DrawSDRandomEffects :
 
 // parameter_support()
 //   Defines whether the proposal value is within the parameter support
+//   For the Cauchy this is just positive
+//    TO DO: can we remove the Patient part of the function?
 bool SS_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
 
   PatientPriors *priors = &patient->priors;
-  double patient_sd_max = (*priors).*sd_max_;
+  double patient_sd_param = (*priors).*sd_param_;
 
-  return (val > 0.0 && val < patient_sd_max);
+  return (val > 0.0);
 
 }
 
@@ -98,6 +97,7 @@ bool SS_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
 // posterior_function()
 //   Calculates the acceptance ratio for use in modified metropolis hastings
 //   sampler (inherited SS_DrawSDRandomEffects::sample() function)
+//
 double SS_DrawSDRandomEffects::posterior_function(Patient *patient, 
                                                   double proposal, 
                                                   Patient *notused) {
