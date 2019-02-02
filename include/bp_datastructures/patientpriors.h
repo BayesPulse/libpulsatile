@@ -115,8 +115,8 @@ struct PatientPriors {
   //
 
   // Member variables not used in Population model:
-  double mass_sd_max;
-  double width_sd_max;
+  double mass_sd_param;  //parameter in the Cauchy prior on the pulse-to-pulse sd mass
+  double width_sd_param; //parameter in the Cauchy prior on the pulse-to-pulse sd width
   double error_alpha;
   double error_beta;
   double num_orderstat;
@@ -133,8 +133,8 @@ struct PatientPriors {
                 double prior_mass_variance,
                 double prior_width_mean,
                 double prior_width_variance,
-                double prior_mass_sd_max,
-                double prior_width_sd_max,
+                double prior_mass_sd_param,
+                double prior_width_sd_param,
                 double prior_error_alpha,
                 double prior_error_beta,
                 int    prior_pulse_count,  // does this prior really need to be an int? Or can we say 12.2 for prior pulse count?
@@ -157,8 +157,8 @@ struct PatientPriors {
     width_mean_sd = 0;
 
     // Single-subject only
-    mass_sd_max             = prior_mass_sd_max;
-    width_sd_max            = prior_width_sd_max;
+    mass_sd_param             = prior_mass_sd_param;
+    width_sd_param            = prior_width_sd_param;
     error_alpha             = prior_error_alpha;
     error_beta              = 1 / prior_error_beta;
     num_orderstat           = pu.orderstat_default();
