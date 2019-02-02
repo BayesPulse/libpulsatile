@@ -42,6 +42,8 @@ class SS_DrawSDRandomEffects :
           est_sd_         = &PatientEstimates::width_sd;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
+            
+//CHANGE HERE TO CAUCHY PARAM
           sd_max_         = &PatientPriors::width_sd_max;
           parameter_name = "SD of pulse widths";
         } else {
@@ -49,6 +51,7 @@ class SS_DrawSDRandomEffects :
           est_sd_         = &PatientEstimates::mass_sd;
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
+//CHANGE HERE TO CAUCHY PARAM
           sd_max_         = &PatientPriors::mass_sd_max;
           parameter_name = "SD of pulse masses";
         }
@@ -61,6 +64,8 @@ class SS_DrawSDRandomEffects :
     double PatientEstimates::*est_sd_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
+    
+//CHANGE HERE
     double PatientPriors::*sd_max_; //pulse specific mass or width
 
     std::string parameter_name;

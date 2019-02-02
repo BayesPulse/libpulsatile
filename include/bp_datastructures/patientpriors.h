@@ -96,8 +96,8 @@ struct PatientPriors {
     width_mean_sd = prior_width_mean_sd;
 
     // Set single-subject only variables to 0
-    mass_sd_max             = 0;
-    width_sd_max            = 0;
+    mass_sd_param             = 0;
+    width_sd_param            = 0;
     error_alpha             = 0;
     error_beta              = 0;
     num_orderstat           = 0;

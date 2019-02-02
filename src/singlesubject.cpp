@@ -69,8 +69,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                        inpriors["mass_variance"],
                        inpriors["width_mean"],
                        inpriors["width_variance"],
+//NEED TO CHANGE THESE FOR HALF CAUCHY
                        inpriors["mass_sdmax"],
                        inpriors["width_sdmax"],
+//END CHANGE
                        inpriors["error_alpha"],
                        inpriors["error_beta"],
                        inpriors["pulse_count"],
