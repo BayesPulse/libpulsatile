@@ -16,7 +16,7 @@
 // SS_DrawSDRandomEffects
 //   Modified Metropolis Hastings sampler instantiating the mmh class for
 //   sample the sd of the pulse masses & widths
-//
+//   This version has the half-Cauchy prior for the SD of the masses and widths
 
 class SS_DrawSDRandomEffects : 
   public ModifiedMetropolisHastings<Patient, Patient, double, ProposalVariance>
@@ -62,7 +62,6 @@ class SS_DrawSDRandomEffects :
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
-//CHANGE HERE
     double PatientPriors::*sd_param_; //pulse specific mass or width
 
     std::string parameter_name;
@@ -109,29 +108,34 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   double first_part  = 0.0;
   double second_part = 0.0;
   double third_part  = 0.0;
+  double fourth_part = 0.0;
   PatientEstimates *est  = &patient->estimates;
   double patient_mean    = (*est).*est_mean_;
   double patient_sd      = (*est).*est_sd_;
+  double patient_sd_param = (*priors).*sd_param_;
 
   // Calculate pulse-specific portion of acceptance ratio
   for (auto &pulse : patient->pulses) {
 
-    // Normalizing constants
+    // Normalizing constants for ratio of log likelihoods. They are truncated t-distributions
     stdx_old   = patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
     stdx_new   = patient_mean / ( proposal / sqrt(pulse.*tvarscale_) );
     new_int   += Rf_pnorm5(stdx_new, 0, 1, 1.0, 1.0);
     old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
 
-    // 3rd part of acceptance ratio
+    // 3rd part of acceptance ratio: This is for ratio of log likelihoods, which are truncated t-distribuitons
     third_part += pulse.*tvarscale_ * 
                   (pulse.*randomeffect_ - patient_mean) * 
                   (pulse.*randomeffect_ - patient_mean);
 
   }
 
-  // 1st and 2nd 'parts' of acceptance ratio
+  // 1st and 2nd 'parts' of acceptance ratio: This is for the ratio of log likelihoods, which are truncated t-distn.
   first_part  = patient->get_pulsecount() * (log(patient_sd) - log(proposal));
   second_part = 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
+    
+  // 4th part of acceptance ratio: Ratio of priors
+  fourth_part = log(
 
   // Compute and return log rho
   return old_int - new_int + first_part + second_part * third_part;
