@@ -85,8 +85,8 @@ class SS_DrawSDRandomEffects :
 //    TO DO: can we remove the Patient part of the function?
 bool SS_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
 
-  PatientPriors *priors = &patient->priors;
-  double patient_sd_param = (*priors).*sd_param_;
+ // PatientPriors *priors = &patient->priors;
+  //double patient_sd_param = (*priors).*sd_param_;
 
   return (val > 0.0);
 
@@ -110,6 +110,7 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   double third_part  = 0.0;
   double fourth_part = 0.0;
   PatientEstimates *est  = &patient->estimates;
+  PatientPriors *priors = &patient->priors;
   double patient_mean    = (*est).*est_mean_;
   double patient_sd      = (*est).*est_sd_;
   double patient_sd_param = (*priors).*sd_param_;
@@ -135,10 +136,10 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   second_part = 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
     
   // 4th part of acceptance ratio: Ratio of priors
-  fourth_part = log(
+    fourth_part = log(patient_sd_param + patient_sd * patient_sd) - log(patient_sd_param + proposal * proposal);
 
   // Compute and return log rho
-  return old_int - new_int + first_part + second_part * third_part;
+  return old_int - new_int + first_part + second_part * third_part + fourth_part;
 
 };
 
