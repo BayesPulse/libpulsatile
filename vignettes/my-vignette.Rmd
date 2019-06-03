@@ -22,8 +22,7 @@ NOTES: I AM CURRENTLY MODELING THIS OFF OF HTML EXAMPLES IN browseVignettes() fo
 
 Questions for Nichole (or me, for a couple):
 -See issue w/ figure described below
--There are fxs in BayesPulse/libpulsatile that we've never used--which of these should be included in this vignette?
--Is it okay if I push this to actual GitHub? I feel like it has to be at some point, but I was nervous to do that in case that's wrong... (but I need to either create another repo for this or push to GH/BP or I won't be able to add in and test the functions from the other computer)
+-Is it okay if I push this to actual GitHub? I feel like it has to be at some point, but I don't have access to it (but I need to either create another repo for this or push to GH/BP or I won't be able to add in and test the functions from the other computer)
 -Couldn't really tell from other vignettes, but should we simulate & run model from defaults? Or set them?
 -How much detail should we go into for setting the priors? It's all in the ?? documentation, but maybe a table or something would be helpful?
 
