@@ -22,7 +22,6 @@ NOTES: I AM CURRENTLY MODELING THIS OFF OF HTML EXAMPLES IN browseVignettes() fo
 
 Questions for Nichole (or me, for a couple):
 -See issue w/ figure described below
--Is it okay if I push this to actual GitHub? I feel like it has to be at some point, but I don't have access to it (but I need to either create another repo for this or push to GH/BP or I won't be able to add in and test the functions from the other computer)
 -Couldn't really tell from other vignettes, but should we simulate & run model from defaults? Or set them?
 -How much detail should we go into for setting the priors? It's all in the ?? documentation, but maybe a table or something would be helpful?
 
@@ -147,8 +146,6 @@ The posterior distribution of the parameter usually does not have a closed form 
 
 ## 4 Single-subject hormone modeling
 
-I THINK I NEED TO DO THIS ON THE OTHER COMPUTER SO THAT THE FXS WILL WORK.....
-
 ### 4.1 Simulating data with `simulate_pulse()`
 
 The function `simulate_pulse()` can be used to simulate pulsatile hormone series, with the options to specify: 
@@ -167,88 +164,87 @@ The function `simulate_pulse()` can be used to simulate pulsatile hormone series
     * or, a constant specified baseline (`constant_baseline`)
 
 ```{r}
-# simulate_pulse(num_obs = 24, 
-#                interval = 10, 
-#                error_var = 0.005, 
-#                ipi_mean = 6, 
-#                ipi_var = 10, 
-#                ipi_min = 2,
-#                mass_mean = 0.5, 
-#                mass_sd = 0.25, 
-#                width_mean = 25, 
-#                width_sd = 10,                                         
-#                constant_halflife = 60, 
-#                constant_baseline = 0.75)
+
+simdat <- bayespulse::simulate_pulse(num_obs = 60,
+               interval = 10,
+               error_var = 0.005,
+               ipi_mean = 12,
+               ipi_var = 10,
+               ipi_min = 4,
+               mass_mean = 2.5,
+               mass_sd = 0.5,
+               width_mean = 40,
+               width_sd = 5,
+               constant_halflife = 25,
+               constant_baseline = 3)
+
 ```
 
+```{r, echo = F, fig.align='center', fig.width=7, fig.height=5}
 
-THEN ADD IN A FIGURE HERE
+plot(simdat$data$concentration ~ simdat$data$time, xlab = "Time (minutes)", ylab = "Concentration",
+     main = "Simulated Hormone Series", type = 'l')
+
+```
+
 
 ### 4.2 Modeling data with `pulse_spec()`
 
-SET PRIORS
+HEY, DO WE NEED TO GO INTO DETAIL ABOUT SETTING THE PRIOR HERE?
+
+```{r}
+
+all.spec <- bayespulse:::pulse_spec(location_prior_type = "strauss", 
+                                       prior_location_gamma = 0.1,  
+                                       prior_location_range = 30,
+                                       prior_halflife_mean = 30, 
+                                       prior_halflife_var = 1000,
+                                       prior_sd_mass = 0.5,
+                                       prior_sd_width = 5, #not being estimated in version of package
+                                       prior_mass_mean = 0.5, 
+                                       prior_mass_var = 2, 
+                                       prior_mean_pulse_count = 10, 
+                                       prior_width_mean = 35, #
+                                       prior_baseline_mean = 2.5, 
+                                       prior_baseline_var = 100, 
+                                       sv_mass_mean = 2,
+                                       sv_width_sd = 10,
+                                       sv_error_var = 0.005, #less limited than before
+                                       sv_mass_sd = 0.4,
+                                       sv_baseline_mean = 0.4,
+                                       sv_halflife_mean = 25,
+                                       pv_mean_pulse_width = 10,
+                                       pv_indiv_pulse_width = 10,
+                                       pv_sd_pulse_width = 0.1,
+                                       pv_pulse_location = 5,
+                                       pv_sd_pulse_mass = 0.45
+)
+
+#okay, and there's the issue of which version of the package this is in... i think i made it in regular when it should've been in newpriors... but will that have to get merged in? IDKs
+
+```
+
 
 THEN MODEL IT
 
+```{r}
 
-<!-- all.spec <- bayespulse:::pulse_spec(location_prior_type = "strauss", -->
-<!--                                     prior_location_gamma = 0.1, -->
-<!--                                     prior_location_range = 30, -->
-<!--                                     prior_halflife_mean = 45, -->
-<!--                                     prior_halflife_var = 10, -->
-<!--                                     prior_sd_mass = 0.25, -->
-<!--                                     prior_sd_width = 5, -->
-<!--                                     prior_mass_mean = 0.5, -->
-<!--                                     prior_mean_pulse_count = 4, -->
-<!--                                     prior_width_mean = 25, -->
-<!--                                     prior_baseline_mean = 0.5, -->
-<!--                                     prior_baseline_var = 5, -->
-<!--                                     sv_mass_mean = 0.5, -->
-<!--                                     sv_width_sd = 10, -->
-<!--                                     sv_error_var = 0.005, -->
-<!--                                     sv_mass_sd = 0.25, -->
-<!--                                     sv_baseline_mean = 0.4, -->
-<!--                                     sv_halflife_mean = 45, -->
-<!--                                     pv_mean_pulse_width = 10, -->
-<!--                                     pv_indiv_pulse_width = 10, -->
-<!--                                     pv_sd_pulse_width = 0.1, -->
-<!--                                     pv_pulse_location = 5, -->
-<!--                                     pv_sd_pulse_mass = 0.45 -->
-<!-- ) -->
+moddat <- simdat$data
+results <- bayespulse::fit_pulse(data = moddat,
+                                 time = "time",
+                                 concentration = "concentration",
+                                 spec = all.spec,
+                                 verbose = T)
 
+#that weird issue w/ concentration is still happening here
 
-<!-- rundat <- dat$data -->
-<!-- results <- bayespulse:::fit_pulse(rundat, -->
-<!--                                   time = "time", -->
-<!--                                   conc = "concentration", -->
-<!--                                   spec = all.spec, -->
-<!--                                   verbose = T) -->
+```
 
 ### 4.3 Assessing convergence
 
-OUTPUT PLOTS
 
-### References
 
--------------------------------------------
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
-
+## notes from other stuff
 You can enable figure captions by `fig_caption: yes` in YAML:
 
     output:
@@ -256,7 +252,3 @@ You can enable figure captions by `fig_caption: yes` in YAML:
         fig_caption: yes
 
 Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
