@@ -12,3 +12,6 @@ temp.c
 debug.R
 build_package.R
 README.Rmd
+^.*.Rout$
+^Makefile$
+

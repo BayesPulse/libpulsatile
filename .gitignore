@@ -14,3 +14,6 @@ R-package/src/singlesubject.cpp
 R-package/src/tests
 .DS_Store
 .clang_complete
+.document.Rout
+*.Rcheck
+*.tar.gz
