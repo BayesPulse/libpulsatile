@@ -10,6 +10,7 @@ library(ggplot2)
 source("./build_package.R", echo=TRUE)
 
 Rcpp::compileAttributes()
+devtools::load_all(recompile = TRUE)
 devtools::document()
 # devtools::check()
 devtools::install()
