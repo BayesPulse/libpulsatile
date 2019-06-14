@@ -30,9 +30,9 @@ development phase is rather specific and will be reduced later.
   - libomp-dev (Ubuntu)
 - R (>= 3.4.3)
 - R packages
-  - RInside (development version via GitHub)
-  - Rcpp (CRAN)
-  - RcppArmadillo (CRAN)
+  - [Rcpp](https://cran.r-project.org/package=Rcpp)
+  - [RcppArmadillo](https://cran.r-project.org/package=RcppArmadillo)
+  - [RInside](https://cran.r-project.org/package=RInside)
 
 **Installing R package**
 
