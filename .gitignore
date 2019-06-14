@@ -13,3 +13,5 @@ tags
 R-package/src/singlesubject.cpp
 R-package/inst/include
 R-package/src/tests
+.DS_Store
+.clang_complete
