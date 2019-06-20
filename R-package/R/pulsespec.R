@@ -28,8 +28,8 @@
 #' @param prior_error_beta Gamma rate parameter
 #' @param prior_location_gamma placeholder
 #' @param prior_location_range placeholder
-#' @param prior_max_sd_mass placeholder
-#' @param prior_max_sd_width placeholder
+#' @param prior_sd_mass placeholder
+#' @param prior_sd_width placeholder
 #' @param prior_mean_pulse_count placeholder
 #' @param sv_mass_mean placeholder
 #' @param sv_width_mean placeholder
@@ -65,8 +65,8 @@ pulse_spec <-
            prior_error_beta       = 0.0001,
            prior_location_gamma   = 0,
            prior_location_range   = 40,
-           prior_max_sd_mass      = 100,
-           prior_max_sd_width     = 1000,
+           prior_sd_mass      = 5,
+           prior_sd_width     = 5,
            prior_mean_pulse_count = 12,
            sv_mass_mean           = 3.5,
            sv_width_mean          = 42,
@@ -132,8 +132,8 @@ pulse_spec <-
                            mass_variance           = prior_mass_var,
                            width_mean              = prior_width_mean,
                            width_variance          = prior_width_var,
-                           mass_sdmax            = prior_max_sd_mass,
-                           width_sdmax           = prior_max_sd_width,
+                           mass_sd_param            = prior_sd_mass,
+                           width_sd_param           = prior_sd_width,
                            error_alpha             = prior_error_alpha,
                            error_beta              = prior_error_beta,
                            pulse_count             = prior_mean_pulse_count,
@@ -180,7 +180,7 @@ print.pulse_spec <- function(x, ...) {
   cat("    starting value =", x$starting_values$mass_mean, "\n") 
   cat("    proposal variance =", x$proposal_variances$mass_mean, "\n")
   cat("  Fixed effect (SD)\n")
-  cat("    prior maximum =", x$priors$mass_sdmax, "\n")
+  cat("    prior parameter =", x$priors$mass_sd_param, "\n")
   cat("    starting value =", x$starting_values$mass_sd, "\n") 
   cat("    proposal variance =", x$proposal_variances$mass_sd, "\n")
   cat("  Random effects (individual pulses)\n")
@@ -193,7 +193,7 @@ print.pulse_spec <- function(x, ...) {
   cat("    starting value =", x$starting_values$width_mean, "\n") 
   cat("    proposal variance =", x$proposal_variances$width_mean, "\n")
   cat("  Fixed effect (SD)\n")
-  cat("    prior maximum =", x$priors$width_sdmax, "\n")
+  cat("    prior parameter =", x$priors$width_sd_param, "\n")
   cat("    starting value =", x$starting_values$width_sd, "\n") 
   cat("    proposal variance =", x$proposal_variances$width_sd, "\n")
   cat("  Random effects (individual pulses)\n")

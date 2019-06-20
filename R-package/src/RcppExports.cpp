@@ -35,7 +35,7 @@ RcppExport SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_bayespulse_singlesubject_", (DL_FUNC) &_bayespulse_singlesubject_, 14},
-    {"run_testthat_tests",         (DL_FUNC) &run_testthat_tests,          0},
+    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 0},
     {NULL, NULL, 0}
 };
 

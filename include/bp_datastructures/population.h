@@ -27,10 +27,10 @@ struct PopulationPriors {
 
   double baseline_mean;
   double baseline_variance;
-  double baseline_sd_max;  // just fyi, only relevant in pop models
+  double baseline_sd_param;  // just fyi, only relevant in pop models
   double halflife_mean;
   double halflife_variance;
-  double halflife_sd_max;  // just fyi, only relevant in pop models
+  double halflife_sd_param;  // just fyi, only relevant in pop models
 
   double mass_mean;
   double mass_variance;
@@ -38,8 +38,8 @@ struct PopulationPriors {
   double width_variance;
 
   // Objects this class takes over from (single-subject) Patient level classes
-  double mass_sd_max;
-  double width_sd_max;
+  double mass_sd_param;
+  double width_sd_param;
 
   double error_alpha;
   double error_beta;

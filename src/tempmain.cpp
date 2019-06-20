@@ -56,8 +56,8 @@ int main(int argc, char **argv) {
                                    Named("mass_variance")           = 100,
                                    Named("width_mean")              = 30,
                                    Named("width_variance")          = 100,
-                                   Named("mass_sdmax")            = 1000,
-                                   Named("width_sdmax")           = 1000,
+                                   Named("mass_sd_param")            = 5,
+                                   Named("width_sd_param")           = 5,
                                    Named("error_alpha")             = 0.0001,
                                    Named("error_beta")              = 0.0001,
                                    Named("pulse_count")             = 12,
@@ -72,8 +72,8 @@ int main(int argc, char **argv) {
                                          Named("mass_mean")   = 3.5,
                                          Named("width_mean")  = 30,
                                          Named("pulse_count") = 12,
-                                         Named("mass_sd")     = 10,
-                                         Named("width_sd")    = 10);
+                                         Named("mass_sd")     = 1,
+                                         Named("width_sd")    = 1);
   startingvals.attr("class") = "bp_startingvals";
 
   Rcpp::List proposalvars = List::create(Named("mass_mean") = 1.1,
