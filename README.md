@@ -18,7 +18,7 @@ take a look around.
 
 ---
 
-**Dependencies**
+## Dependencies
 
 This library is intended to be used from within an R package, and therefore
 relies on R's RNGs and datastructures.  The list of dependencies for the
@@ -30,33 +30,60 @@ development phase is rather specific and will be reduced later.
   - libomp-dev (Ubuntu)
 - R (>= 3.4.3)
 - R packages
-  - RInside (development version via GitHub)
-  - Rcpp (CRAN)
-  - RcppArmadillo (CRAN)
+  - [Rcpp](https://cran.r-project.org/package=Rcpp)
+  - [RcppArmadillo](https://cran.r-project.org/package=RcppArmadillo)
+  - [RInside](https://cran.r-project.org/package=RInside)
 
-**Installing R package**
 
-The process for compiling and installing the R package is a bit more complicated
-than normal due to the repository focusin on C++ code, with the R package
-structure in a subdirectory.
+## Important Note for Cloning this repo
 
-First clone the repository and enter the R-package directory
+This project structure relies on symbolic links.  If you are working on Linux or
+Mac then you should have not problem cloning and working with this repo.  If,
+however, you are working on a Windows machine there are a few additional steps
+you will need to take.
+
+1. Windows Vista or newer with NTFS file system, not FAT.
+2. You need administrator rights or at least `SeCreateSymbolicLinkPrivilege`
+   privilege
+3. git bash version 2.10.2 or later.  It will be helpful to install with
+   `core.symlinks` option turned on.
+
+In the git bash shell clone the repo.  (The example below uses SSH, change the
+URL as needed for https.)
+
+    git clone -c core.symlinks=true git@github.com:BayesPulse/libpulsitile.git
+
+If you are using Windows and you are not sure that you cloned the repo as noted
+above then please reclone the repo!
+
+
+## Installing R package
+
+**From the command line**
+After cloning the repository navigate to the `R-package` directory and use the
+provided `Makefile`
 
 ```{sh}
-git clone git@github.com:BayesPulse/libpulsatile.git
-cd libpulsatile/R-package
-```
+cd <path-to-libpulsatile>/R-package
+make install
+``` 
 
-Then open R, run the build_package.R script, and install with devtools
+**Within an Interactive R Session**
 
-```{R}
-source("./build_package.R", echo=TRUE)
-Rcpp::compileAttributes()
+```{r}
+setwd("<path-to-libpulsatile>/R-package")
+devtools::load_all(recompile = TRUE)
 devtools::document()
 devtools::install()
 ```
 
-**Building the C++ binaries**
+**Using RStudio**
+Either use the instructions for installing the package in an interactive R
+session or open the project via the file `poppulsatile.Rproj` and use the build
+and install menu options.  The project file should tell RStudio to use the
+`Makefile`.
+
+## Building the C++ binaries
 
 *This is only necessary if you are running the binary directly.* To build the C++
 binary, first ensure the dependencies are satisfied, then build the executable
@@ -69,12 +96,10 @@ make
 ./bin/tests -s
 ```
 
-
 # Notes
 
 When compiled outside of the R package, the library is generally dependent on RInside for
 random number generators. The chains class also uses R object types and is
 geared towards structuring the R return object. Gist is, use the R package and C++
 only is for dev work.
-
 
