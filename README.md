@@ -51,7 +51,7 @@ you will need to take.
 In the git bash shell clone the repo.  (The example below uses SSH, change the
 URL as needed for https.)
 
-    git clone -c core.symlinks=true git@github.com:BayesPulse/libpulsitile.git
+    git clone -c core.symlinks=true git@github.com:BayesPulse/libpulsatile.git
 
 If you are using Windows and you are not sure that you cloned the repo as noted
 above then please reclone the repo!
