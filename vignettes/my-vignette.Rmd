@@ -1,0 +1,266 @@
+---
+title: "Modeling hormone series in a Bayesian framework with bayespulse"
+author: "Rachel L. Johnson"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Modeling hormone series in a Bayesian framework with bayespulse}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## 0 RACHEL'S NOTES THAT WILL BE DELETED LATER
+
+NOTES: I AM CURRENTLY MODELING THIS OFF OF HTML EXAMPLES IN browseVignettes() for different packages for complex modeling situations.
+
+Questions for Nichole (or me, for a couple):
+-See issue w/ figure described below
+-Couldn't really tell from other vignettes, but should we simulate & run model from defaults? Or set them?
+-How much detail should we go into for setting the priors? It's all in the ?? documentation, but maybe a table or something would be helpful?
+
+## Contents
+
+1. Introduction 
+2. The Deconvolution Model
+3. Bayesian Modeling
+4. Single-subject hormone modeling
+
+## 1 Introduction 
+
+Many hormones are secreted into the bloodstream in a pulsatile fashion and are eliminated exponentially. To understand hormone features such as their baseline concentration, half-life, pulse amplitude, or number of pulses in a time period, serial blood sampling is performed over long intervals such that there are regular repeated measurements of hormone levels. 
+
+This package utilizes a Bayesian approach to a deconvolution model to jointly model the number of hormone pulses over a time period along with other pulse parameters. This model combines baseline hormone concentration, pulsatile secretion, the hormone elimination processes, and technical error into an observed concentration value.
+
+This document introduces the functions within the bayespulse package that can simulate hormone series, analyze pulsatile hormone data in a Bayesian framework, and assess convergence of the model. 
+
+## 2 The Deconvolution Model
+
+Let $y_i(t_{j})$ be the observed hormone concentration for subject $i$ at time $t_{ij}$ where $i = 1,...,S$ and $j=1,...,m_i$, where $S$ is the number of subjects in the study, each with $m_i$ time points of observation. Although the number and timing of observations can theoretically differ by subject, in general study designs, the observation times are common across subjects. Thus, in future notation, $t_{ij} = t_j$ and $m_i = m$. $i$ can be eliminated for the single-subject model.
+
+Further, let $C_i(t_j)$ be the true hormone concentration for subject $i$ at time $t_j$. The observed and true concentrations are linked through the following statistical model:
+
+$$
+\log[y_i(t_j)]=\log[C_i(t_j)]+\epsilon_i(t_j)
+$$
+
+\noindent where $\epsilon_i(t_j) \sim N(0,\sigma^2_{\epsilon i})$, and $\epsilon_i(t_j)$ represents technical and biologic variability. Concentrations are limited to positive values, so our model is on the log scale. $C_i(t_j)$ is defined by the following convolution integral:
+
+$$
+C_i(t_j) = B_i(t_j) + \int_{-\infty}^{t_j} S_i(z;\boldsymbol{\theta}_{s,i})*E_i(t_j - z;\boldsymbol{\theta}_{e,i})\,dz
+$$
+
+\noindent where $S_i(z;\boldsymbol{\theta}_{s,i})$ is a function that models secretion and $E_i(t_j-z;\boldsymbol{\theta}_{e,i})$ is a function that models hormone elimination. The deconvolution model combines baseline hormone concentration $B_i(t_j)$, pulsatile secretion $S_i(z;\boldsymbol{\theta}_{s,i})$, the hormone elimination processes $E_i(t_j - z;\boldsymbol{\theta}_{e,i})$ , and technical error $\epsilon_i(t_j)$ into an observed concentration value. $S_i(z;\boldsymbol{\theta}_{s,i})$ models the pulsatile hormone release and depends on a set of parameters $\boldsymbol{\theta}_{s,i}$. The function $E_i(t_j - z;\boldsymbol{\theta}_{e,i})$ describes the removal of the hormone from the blood (elimination) and depends on a set of parameters, $\boldsymbol{\theta}_{e,i}$. $B_i(t_j)$ describes the non-pulsatile (baseline) concentration and is often assumed constant ($B_i(t_j) = B_i$).
+
+# I THINK ADD IN FIGURE SOMEWHERE IN HERE...
+
+Issue: Can't totally figure out what's going on in Karen's figure code...
+I see code for a few figures but no code for deconvolution.pdf, which is what I want to include
+(I think I need to actually create the figure in here, not just pull in a PDF, but IDK)
+I could try to recreate it, but not sure how she gets truth #s in A
+
+
+### 2.1 The secretion function
+
+It is common for pulsatile secretion to be defined by a series of Gaussian components, each with ``pulse specific" parameters. So, assuming subject $i$ experiences $N_i$ pulses by the end of the study,
+
+$$
+S_i(z,\boldsymbol{\theta}_{s,i}) = \sum_{k=1}^{N_i}  \frac{\alpha_{ik}}{\sqrt{2\pi\omega_{ik}}}e^{-\frac{1}{2\omega_{ik}}(z-\tau_{ik})^2}
+$$
+
+The values $\alpha_{ik}$, $\omega_{ik}$, and $\tau_{ik}$ are the mass, width, and location, respectively, for the $k$th pulse. Therefore, $\boldsymbol{\theta}_{s,i} = (\boldsymbol{\alpha}_i,\boldsymbol{\omega}_i,\boldsymbol{\tau}_i)^T$, where $\boldsymbol{\alpha}_i$ represents the vector of pulse masses: $\boldsymbol{\alpha}_i = (\alpha_{i1},\alpha_{i2},...,\alpha_{iN_i})^T$ and $\boldsymbol{\omega}_i$ and $\boldsymbol{\tau}_i$ are defined as the vectors of pulse widths and pulse locations, respectively.
+
+
+We assume that the pulse specific parameters have the following distributions:
+$$
+\log \alpha_{ik} \stackrel{iid}{\sim} N(\mu_{ai},\nu^2_{ai})
+$$
+$$
+\log \omega_{ik} \stackrel{iid}{\sim} N(\mu_{wi}, \nu^2_{wi})
+$$
+$$
+\tau_{ik}|N_i \stackrel{iid}{\sim} U^{(3N_i + 2)}[a,b]
+$$
+
+### 2.2 The elimination function
+
+It is common for elimination to be described by the exponential distribution with decay rate $\lambda_i$, or equivalently, half-life $H_i$.
+
+$$
+E_i(t_j-z,\boldsymbol{\theta}_{e,i}) =e^{-\lambda_i(t_j-z)} = e^{-\frac{\log 2}{H_i}(t_j-z)}
+$$
+
+Therefore, $\boldsymbol{\theta}_{e,i} = H_i$.
+
+### 2.3 Deconvolution
+
+Putting together the secretion (\ref{eq:Secretion}) and elimination (\ref{eq:Elimination}) functions, the statistical model of observed hormone concentration at time $t_j$ is:
+
+$$
+\log[y_i(t_j)]=\log\left[B_i + \int_{-\infty}^{t_j} \sum_{k=1}^{N_i}  \frac{\alpha_{ik}}{\sqrt{2\pi\omega_{ik}}}e^{-\frac{1}{2\omega_{ik}}(z-\tau_{ik})^2} e^{-\lambda_i(t_j-z)}\,dz\right]+\epsilon_i(t_j)
+$$
+
+where $B_i$ is the time constant baseline concentration.
+
+
+In summary, there are 8 common parameters for one subject: number of pulses ($n_i$), Baseline secretion ($B_i$), average pulse mass ($\mu_{ai}$), average pulse duration ($\mu_{wi}$), half-life ($H_i$), model error ($\epsilon_i$), variation between pulse mass ($\nu^2_{ai}$), and variation between pulse width ($\nu^2_{wi}$). The first 5 parameters usually have important physiological indications, while the last three variance parameters can be treated as nuisance parameters.  Estimation of each pulse is composed of 3 parameters: individual pulse mass ($\alpha_{ik}$), individual pulse duration ($\omega_{ik}$), and pulse location ($\lambda_{ik}$). 
+
+
+
+
+A graphic demonstration of the deconvolution model is shown in Figure \ref{fig:deconv}.
+
+
+IF WE CAN FIGURE IT OUT!!!!!!!
+
+
+## 3 Bayesian Modeling
+
+This model estimates the pulse parameters within a Bayesian framework. The most important feature of Bayesian statistics is incorporating subjective knowledge and the confidence of that knowledge, quantified in the form of prior distribution, into interpretation of probabilities. In other words, Bayesian analysis approach makes guesses about the values of the pulse characteristics (masses, widths, number, half-life, etc.) prior to observing any data and then reweights these guesses with knowledge from the observed data. The \emph{a priori} guesses about the values of the pulse features are called priors and are specified by the user. he data reweighted values of the pulse characteristics are called posteriors. The posterior represents the set of values of the pulse characteristic that are likely given the observed data and the prior.  To summarize Bayesian analysis, the mean of the posterior and its standard deviation or a credible interval are reported.  These can be loosely conceptually linked to the estimate and confidence interval in non-Bayesian approaches.
+
+
+The frequentist assumes that a parameter is an unknown constant, and the inference made upon that parameter is presented in a point estimation and a corresponding variance related to the uncertainty. On the other way, a Bayesian considers a parameter as a random variable, and the estimation of the parameter is in the form of a posterior distribution.
+
+
+The Bayes theorem, in its most common form, is
+
+$$
+P(\theta|X)=\frac{P(X|\theta)P(\theta)}{P(\theta)} = \frac{P(X|\theta)P(\theta)}{\sum_\theta P(X|\theta)P(\theta)}
+$$
+
+$P(\theta)$ is the prior distribution of the parameter, $P(\theta|X)$ is the posterior distribution of the parameter of interest, and  $P(X|\theta)$ is the likelihood function of data given the parameter. The prior distribution is pre-specified before collecting data.The priors can be non-informative or informative .  When little is known about the hormone under study, the goal is to limit the influence of the prior to minimum (i.e., to be non-informative) and let the data dominate the estimation.  This is done by setting a large variance in the prior, reflecting lack of information available about the parameter.  When historical or biologic knowledge exists, we can incorporate that knowledge into the model by setting the mean of the prior to match prior information and setting a smaller variance.
+
+### 3.1 Priors
+
+With one exception (pulse number), the priors distributions investigated in our analysis were normal distributions. The user defines the mean and the variance of each prior. The mean reflects historical knowledge regarding the value of the characteristic and the variance controls the confidence the user has about the mean. The priors can be informative (larger variance) or vague (smaller variance).
+
+### 3.2 Bayesian estimation
+
+The posterior distribution of the parameter usually does not have a closed form  when the model have more than one parameters, as in the hormone concentrations. As a consequence, the desired distribution cannot be computed directly. Instead, they need to be simulated using Monte-Carlo Markov Chain (MCMC).In addition, the number of parameters is not fixed from iteration to iteration because the number of pulses is not known and also needs to be simulated. We consider using birth-death MCMC (BDMCMC) given its success in other pulse estimation problems . A single iteration of BDMCMC occurs in two stages. First, the number of components is simulated using a birth-death process. Next, conditional on the number of components, the remaining parameters are updated using traditional MCMC. The full algorithm iterates between these two steps.
+
+## 4 Single-subject hormone modeling
+
+### 4.1 Simulating data with `simulate_pulse()`
+
+The function `simulate_pulse()` can be used to simulate pulsatile hormone series, with the options to specify: 
+
+* number of observations to simulate (`num_obs`)
+* time in minutes between observations, typically 6-10 (`interval`)
+* variance of the error added at each observation, where the error is distributed normally with mean 0 and variance as square root of error_var (`error_var`)
+* mean number of sampling units between pulses, or the mean inter-pulse interval (`ipi_mean`)
+* variance of gamma distribution for drawing interpulse interval (`ipi_var`)
+* minimum number of units between pulses (`ipi_min`)
+* mean and standard deviation of pulse mass (`mass_mean`, `mass_sd`)
+* mean and standard deviation of pulse width in minutes (`width_mean`, `width_sd`)
+* mean and variance of half-life in minutes (`halflife_mean`, `halflife_var`)
+    * or, a constant half-life (`constant_halflife`)
+* mean and variance of baseline concentration (`baseline_mean`, `baseline_sd`)
+    * or, a constant specified baseline (`constant_baseline`)
+
+```{r}
+
+simdat <- bayespulse::simulate_pulse(num_obs = 60,
+               interval = 10,
+               error_var = 0.005,
+               ipi_mean = 12,
+               ipi_var = 10,
+               ipi_min = 4,
+               mass_mean = 2.5,
+               mass_sd = 0.5,
+               width_mean = 40,
+               width_sd = 5,
+               constant_halflife = 40,
+               constant_baseline = 2.5)
+
+```
+
+```{r, echo = F, fig.align='center', fig.width=7, fig.height=5}
+
+plot(simdat$data$concentration ~ simdat$data$time, xlab = "Time (minutes)", ylab = "Concentration",
+     main = "Simulated Hormone Series", type = 'l')
+
+```
+
+
+### 4.2 Modeling data with `pulse_spec()`
+
+HEY, DO WE NEED TO GO INTO DETAIL ABOUT SETTING THE PRIOR HERE?
+
+```{r}
+
+all.spec <- bayespulse:::pulse_spec(location_prior_type = "strauss", 
+                                       prior_location_gamma = 0.1,  
+                                       prior_location_range = 30,
+                                       prior_halflife_mean = 38, 
+                                       prior_halflife_var = 1000,
+                                       prior_sd_mass = 0.5,
+                                       prior_sd_width = 5, #not being estimated in version of package
+                                       prior_mass_mean = 0.5, 
+                                       prior_mass_var = 2, 
+                                       prior_mean_pulse_count = 10, 
+                                       prior_width_mean = 35, #
+                                       prior_baseline_mean = 2.25, 
+                                       prior_baseline_var = 100, 
+                                       sv_mass_mean = 2,
+                                       sv_width_sd = 10,
+                                       sv_error_var = 0.005, #less limited than before
+                                       sv_mass_sd = 0.4,
+                                       sv_baseline_mean = 2,
+                                       sv_halflife_mean = 42,
+                                       pv_mean_pulse_width = 10,
+                                       pv_indiv_pulse_width = 10,
+                                       pv_sd_pulse_width = 0.1,
+                                       pv_pulse_location = 5,
+                                       pv_sd_pulse_mass = 0.45
+)
+
+#okay, and there's the issue of which version of the package this is in... i think i made it in regular when it should've been in newpriors... but will that have to get merged in? IDKs
+
+```
+
+
+THEN MODEL IT
+
+```{r}
+
+moddat <- simdat$data
+results <- bayespulse::fit_pulse(data = moddat,
+                                 spec = all.spec)
+
+#that weird issue w/ concentration is still happening here
+
+```
+
+### 4.3 Assessing convergence
+
+MAYBE ADD IN A PARAGRAPH (SHORT) HERE ABOUT TYPICAL WAYS TO ASSESS CONVERGENCE? AND TALK ABOUT THE CONCENTRATION PLOT
+
+```{r, error = F, warning = F, message = F}
+
+pid_title <- list(ggplot2::ggtitle(results$options$conc))
+bayespulse::bp_trace(results) + pid_title
+bayespulse::bp_posteriors(results, type = "histogram")  + pid_title
+bayespulse::bp_location_posterior(results) + pid_title
+
+  #would ideally like to see better HL mixing before this is done?
+
+
+```
+
+
+
+
+## notes from other stuff
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.

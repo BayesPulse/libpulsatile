@@ -10,16 +10,15 @@ pulse_spec(location_prior_type = c("strauss", "order-statistic"),
   prior_baseline_var = 100, prior_halflife_mean = 45,
   prior_halflife_var = 100, prior_error_alpha = 1e-04,
   prior_error_beta = 1e-04, prior_location_gamma = 0,
-  prior_location_range = 40, prior_max_sd_mass = 100,
-  prior_max_sd_width = 1000, prior_mean_pulse_count = 12,
-  sv_mass_mean = 3.5, sv_width_mean = 42, sv_baseline_mean = 2.6,
-  sv_halflife_mean = 45, sv_error_var = 0.005, sv_mass_sd = 1.6,
-  sv_width_sd = 35, pv_baseline = 0.02, pv_halflife = 1.5,
-  pv_mean_pulse_mass = 6, pv_mean_pulse_width = 3700,
-  pv_indiv_pulse_mass = 1, pv_indiv_pulse_width = 15000,
-  pv_sd_pulse_mass = 4.5, pv_sd_pulse_width = 4000,
-  pv_sdscale_pulse_mass = 4, pv_sdscale_pulse_width = 4,
-  pv_pulse_location = 65)
+  prior_location_range = 40, prior_sd_mass = 5, prior_sd_width = 5,
+  prior_mean_pulse_count = 12, sv_mass_mean = 3.5,
+  sv_width_mean = 42, sv_baseline_mean = 2.6, sv_halflife_mean = 45,
+  sv_error_var = 0.005, sv_mass_sd = 1.6, sv_width_sd = 35,
+  pv_baseline = 0.02, pv_halflife = 1.5, pv_mean_pulse_mass = 6,
+  pv_mean_pulse_width = 3700, pv_indiv_pulse_mass = 1,
+  pv_indiv_pulse_width = 15000, pv_sd_pulse_mass = 4.5,
+  pv_sd_pulse_width = 4000, pv_sdscale_pulse_mass = 4,
+  pv_sdscale_pulse_width = 4, pv_pulse_location = 65)
 }
 \arguments{
 \item{location_prior_type}{Takes on two values: "order-statistic" and
@@ -54,9 +53,9 @@ specification of "prior_mean_pulse_count", "prior_location_gamma", and
 
 \item{prior_location_range}{placeholder}
 
-\item{prior_max_sd_mass}{placeholder}
+\item{prior_sd_mass}{placeholder}
 
-\item{prior_max_sd_width}{placeholder}
+\item{prior_sd_width}{placeholder}
 
 \item{prior_mean_pulse_count}{placeholder}
 
