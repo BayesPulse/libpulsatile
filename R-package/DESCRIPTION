@@ -2,7 +2,7 @@ Package: bayespulse
 Type: Package
 Title:
     Bayesian model for pulsatile hormone concentration data
-Version: 0.0.2
+Version: 0.0.2.9000
 Authors@R: c(
       person("Matt", "Mulvahill", email = "matthew.mulvahill@ucdenver.edu", role = c("cre", "aut")),
       person("Nichole", "Carlson", email = "nichole.carlson@ucdenver.edu", role = c("aut", "cph", "ths")))
