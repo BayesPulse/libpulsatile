@@ -42,4 +42,5 @@ clean:
 	$(RM) -f  $(PKG_NAME)_$(PKG_VERSION).tar.gz
 	$(RM) -rf $(PKG_NAME).Rcheck
 	$(RM) -f .document.Rout
+	$(RM) -f $(PKG_ROOT)/src/*.so -f $(PKG_ROOT)/src/*.o
 
