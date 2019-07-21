@@ -61,7 +61,8 @@ above then please reclone the repo!
 
 **From the command line**
 After cloning the repository navigate to the `R-package` directory and use the
-provided `Makefile`
+provided `Makefile`. Note that `gawk` is required on MacOS.
+
 
 ```{sh}
 cd <path-to-libpulsatile>/R-package
@@ -98,7 +99,7 @@ make
 
 # Notes
 
-When compiled outside of the R package, the library is generally dependent on RInside for
+When compiled outside of the R package, the library is dependent on RInside for
 random number generators. The chains class also uses R object types and is
 geared towards structuring the R return object. Gist is, use the R package and C++
 only is for dev work.

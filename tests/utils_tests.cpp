@@ -56,10 +56,12 @@ TEST_CASE( "one_rmultinom Function", "[utils]" ) {
   //  REQUIRE_THROWS( pu.one_rmultinom(not_cumprobs) );
   //}
 
+  std::cout << "multinom cum prob" << cumprobs << std::endl;
   SECTION( "Succeeds on cumulative probability vector" ) {
     //pu.set_seed(171227);
-    REQUIRE_NOTHROW( pu.one_rmultinom(cumprobs) );
+    REQUIRE_NOTHROW( pu.one_rmultinom(not_cumprobs) );
   }
+  std::cout << "passed multinom test" << std::endl;
 
 }
 
