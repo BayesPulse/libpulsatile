@@ -8,7 +8,7 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 The development repository for the C++ backend to the unified Bayesian pulsatile
-hormone modeling algorithm used in the poppulsatile R package.
+hormone modeling algorithm used in the bayespulse R package.
 
 This library extends (and refactors) the single-subject model to multiple
 subjects and up to two-hormones per patient (driver and response hormones).
@@ -80,7 +80,7 @@ devtools::install()
 
 **Using RStudio**
 Either use the instructions for installing the package in an interactive R
-session or open the project via the file `poppulsatile.Rproj` and use the build
+session or open the project via the file `bayespulse.Rproj` and use the build
 and install menu options.  The project file should tell RStudio to use the
 `Makefile`.
 
