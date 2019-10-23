@@ -4,4 +4,7 @@ Title: Does not matter.
 Version: 0.0.1
 Imports: Rcpp, RcppArmadillo, RInside
 Remotes: eddelbuettel/RInside
-
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

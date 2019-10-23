@@ -1,31 +1,31 @@
 Package: bayespulse
 Type: Package
-Title: 
+Title:
     Bayesian model for pulsatile hormone concentration data
-Version: 0.0.0.9000
+Version: 0.0.2
 Authors@R: c(
       person("Matt", "Mulvahill", email = "matthew.mulvahill@ucdenver.edu", role = c("cre", "aut")),
       person("Nichole", "Carlson", email = "nichole.carlson@ucdenver.edu", role = c("aut", "cph", "ths")))
-Description: 
+Description:
     One paragraph description of what the package does as one or more full sentences.
 URL: https://github.com/BayesPulse/bayespulse
 BugReports: https://github.com/BayesPulse/bayespulse/issues
 License: GPL (>= 2)
-Imports: 
-  Rcpp (>= 0.12.13), 
-  RcppArmadillo,
+Imports:
+  Rcpp (>= 0.12.13),
   dplyr,
   ggplot2,
   tibble,
   tidyr,
-  magrittr,
   rlang
-Suggests: 
+Suggests:
+  magrittr,
+  RcppArmadillo,
   testthat,
-LinkingTo: 
-  Rcpp, 
-  RcppArmadillo, 
+LinkingTo:
+  Rcpp,
+  RcppArmadillo,
   testthat
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1.9000
+RoxygenNote: 6.1.1
