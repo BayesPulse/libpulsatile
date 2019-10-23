@@ -13,8 +13,8 @@ hormone modeling algorithm used in the bayespulse R package.
 This library extends (and refactors) the single-subject model to multiple
 subjects and up to two-hormones per patient (driver and response hormones).
 
-The package is currently in development and not yet functional, but feel free to
-take a look around.
+The package is currently in development, with only the single subject model currently functioning. Feel free to
+take a look around and test it out. 
 
 ---
 
