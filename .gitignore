@@ -1,3 +1,4 @@
+inst/doc
 .Rproj.user
 .Rhistory
 .RData
@@ -10,7 +11,13 @@ bin/
 build/
 tags
 R-package/src/singlesubject.cpp
-R-package/inst/include
 R-package/src/tests
 .DS_Store
+<<<<<<< HEAD
 
+=======
+.clang_complete
+.document.Rout
+*.Rcheck
+*.tar.gz
+>>>>>>> newpriors
