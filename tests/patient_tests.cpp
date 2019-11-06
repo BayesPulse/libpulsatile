@@ -48,20 +48,20 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
   SECTION( "Priors can be accessed" ) {
     REQUIRE(pat.priors.baseline_mean == 2.6);
-    REQUIRE(pat.priors.mass_sd_max == 10);
-    REQUIRE(pat.priors.error_alpha == 1000);
+    REQUIRE(pat.priors.mass_sd_param == 5);
+    REQUIRE(pat.priors.error_alpha == 0.0001);
     REQUIRE(pat.priors.num_orderstat == 3);
     REQUIRE(pat.priors.strauss_repulsion == 0);
   }
 
   SECTION( "Priors can be updated" ) {
     pat.priors.baseline_mean     = 2.25;
-    pat.priors.mass_sd_max       = 90;
+    pat.priors.mass_sd_param       = 5;
     pat.priors.error_alpha       = 700;
     pat.priors.num_orderstat     = 4;
     pat.priors.strauss_repulsion = 0.75;
     REQUIRE(pat.priors.baseline_mean     == 2.25);
-    REQUIRE(pat.priors.mass_sd_max       == 90);
+    REQUIRE(pat.priors.mass_sd_param       == 5);
     REQUIRE(pat.priors.error_alpha       == 700);
     REQUIRE(pat.priors.num_orderstat     == 4);
     REQUIRE(pat.priors.strauss_repulsion == 0.75);
@@ -70,8 +70,8 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   SECTION( "Data can be accessed" ) {
     REQUIRE(pat.data.time(1)              == 20);
     REQUIRE(pat.data.time(143)            == 1440);
-    REQUIRE(pat.data.concentration(1)     == log(3.619304));
-    REQUIRE(pat.data.concentration(143)   == log(3.079000));
+    REQUIRE(pat.data.concentration(1)     == Approx(log(3.619304)));
+    REQUIRE(pat.data.concentration(143)   == Approx(log(3.079000)));
     REQUIRE(pat.data.time.size()          == 144);
     REQUIRE(pat.data.concentration.size() == 144);
     REQUIRE(pat.data.response_concentration.size() == 0);
@@ -104,22 +104,22 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   SECTION( "Can add pulses and iterate with iterators" ) {
     ++pat.piter;
     REQUIRE(pat.get_pulsecount() == 12);
-    REQUIRE(pat.piter->time == location(0));
+    REQUIRE(pat.piter->time == Approx(location(0)));
     ++pat.piter;
-    REQUIRE(pat.piter->time == location(1));
+    REQUIRE(pat.piter->time == Approx(location(1)));
     ++pat.piter;
-    REQUIRE(pat.piter->time == location(2));
+    REQUIRE(pat.piter->time == Approx(location(2)));
     ++pat.piter; ++pat.piter; ++pat.piter; ++pat.piter; ++pat.piter;
     ++pat.piter; ++pat.piter; ++pat.piter;
-    REQUIRE(pat.piter->time == location(10));
+    REQUIRE(pat.piter->time == Approx(location(10)));
   }
 
   SECTION( "Can remove a pulse" ) {
     ++pat.piter; ++pat.piter;
-    REQUIRE(pat.piter->time == location(1));
+    REQUIRE(pat.piter->time == Approx(location(1)));
     pat.piter = pat.pulses.erase(pat.piter); // this is how you delete and keep iter correct
     REQUIRE(pat.get_pulsecount() == 11);
-    REQUIRE(pat.piter->time == location(2));
+    REQUIRE(pat.piter->time == Approx(location(2)));
   }
 
   // Get mean concentration of all pulses
@@ -137,7 +137,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
   SECTION( "Can get mean_concentration, after removing one pulse" ) {
 
     ++pat.piter;
-    REQUIRE( pat.piter->time == location(0) );
+    REQUIRE( pat.piter->time == Approx( location(0) ));
     arma::vec mconc_excl1 = pat.mean_concentration(false, pat.piter);
     REQUIRE( mconc_excl1.n_elem == 144 );
 
@@ -152,7 +152,7 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
     // move to another pulse for excluding
     ++pat.piter; ++pat.piter; ++pat.piter; ++pat.piter;
-    REQUIRE( pat.piter->time == location(3) );
+    REQUIRE( pat.piter->time == Approx( location(3) ));
 
     // calc mean_conc excluding one pulse
     arma::vec mconc_excl3 = pat.mean_concentration(false, pat.piter);
@@ -168,7 +168,8 @@ TEST_CASE( "Patient class constructor for single-subject works", "[patient]" ) {
 
   SECTION( "Can get likelihood" ) {
 
-    REQUIRE(pat.likelihood(false) == Approx(71.8522693142));
+    //REQUIRE(pat.likelihood(false) == Approx(71.8522693142)); changed w/ 
+    REQUIRE(pat.likelihood(false) == Approx(162.4336751778));
 
   }
 

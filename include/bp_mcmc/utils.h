@@ -57,7 +57,7 @@ class PulseUtils {
     int one_rmultinom(arma::vec probs) {
 
       Rcpp::RNGScope rng_scope;
-      int i;
+      //int i;
       int rtn = 0;
       int n_probs = probs.size();
       //std::cout << "size of cumprobs = " << n_probs << std::endl;

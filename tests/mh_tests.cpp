@@ -172,6 +172,10 @@ TEST_CASE( "second mmh test -- SS_DrawLocationsStrauss", "[mmh-implementations]"
     REQUIRE( draw_pulse_locations_strauss.pv.getpsd() == Approx(sqrt(adjusted_pv)) );
     draw_pulse_locations_strauss.sample_pulses(patient, iter);
     ++iter;
+    // Note: failing this test -- believe it's because the decision to adjust pv
+    // is based on success rate of the mh algo and the new Cauchy prior on sds
+    // chages the decision basis/likelihood/estimates at this point.  look into
+    // more.
     REQUIRE( draw_pulse_locations_strauss.pv.getpv() != adjusted_pv );
 
     // Test final psd change

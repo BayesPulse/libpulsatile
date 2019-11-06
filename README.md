@@ -8,13 +8,13 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 The development repository for the C++ backend to the unified Bayesian pulsatile
-hormone modeling algorithm used in the poppulsatile R package.
+hormone modeling algorithm used in the bayespulse R package.
 
 This library extends (and refactors) the single-subject model to multiple
 subjects and up to two-hormones per patient (driver and response hormones).
 
-The package is currently in development and not yet functional, but feel free to
-take a look around.
+The package is currently in development, with only the single subject model currently functioning. Feel free to
+take a look around and test it out. 
 
 ---
 
@@ -61,7 +61,7 @@ above then please reclone the repo!
 
 **From the command line**
 After cloning the repository navigate to the `R-package` directory and use the
-provided `Makefile`
+provided `Makefile`. Note that `gawk` is required on MacOS.
 
 ```{sh}
 cd <path-to-libpulsatile>/R-package
@@ -79,7 +79,7 @@ devtools::install()
 
 **Using RStudio**
 Either use the instructions for installing the package in an interactive R
-session or open the project via the file `poppulsatile.Rproj` and use the build
+session or open the project via the file `bayespulse.Rproj` and use the build
 and install menu options.  The project file should tell RStudio to use the
 `Makefile`.
 
@@ -98,7 +98,7 @@ make
 
 # Notes
 
-When compiled outside of the R package, the library is generally dependent on RInside for
+When compiled outside of the R package, the library is dependent on RInside for
 random number generators. The chains class also uses R object types and is
 geared towards structuring the R return object. Gist is, use the R package and C++
 only is for dev work.

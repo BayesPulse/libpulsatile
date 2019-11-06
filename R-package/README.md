@@ -1,9 +1,9 @@
-poppulsatile
-============
+bayespulse
+==========
 
 [![Build
-Status](https://travis-ci.org/BayesPulse/poppulsatile.svg?branch=master)](https://travis-ci.org/BayesPulse/poppulsatile)
-[![codecov](https://codecov.io/gh/BayesPulse/poppulsatile/branch/master/graph/badge.svg)](https://codecov.io/gh/BayesPulse/poppulsatile)
+Status](https://travis-ci.org/BayesPulse/libpulsatile.svg?branch=master)](https://travis-ci.org/BayesPulse/libpulsatile)
+[![codecov](https://codecov.io/gh/BayesPulse/libpulsatile/branch/master/graph/badge.svg)](https://codecov.io/gh/BayesPulse/libpulsatile)
 
 An R package for analyzing time series of hormone concentrations using
 Bayesian deconvolution analysis. This package extends (and refactors)
@@ -13,13 +13,5 @@ patient (driver and response hormones).
 The package is currently in development and not yet functional, but feel
 free to take a look around.
 
-Run the following code to install the development version:
-
-``` r
-# Need devtools package to install from GitHub
-install.packages("devtools")
-library(devtools)
-
-# install from github
-install_github("BayesPulse/poppulsatile", auth_token)
-```
+To install, use the instructions in the root of the [libpulsatile
+repository](https://github.com/BayesPulse/libpulsatile)

@@ -96,8 +96,8 @@ struct PatientPriors {
     width_mean_sd = prior_width_mean_sd;
 
     // Set single-subject only variables to 0
-    mass_sd_param             = 0;
-    width_sd_param            = 0;
+    mass_sd_param           = 0;
+    width_sd_param          = 0;
     error_alpha             = 0;
     error_beta              = 0;
     num_orderstat           = 0;
@@ -157,8 +157,8 @@ struct PatientPriors {
     width_mean_sd = 0;
 
     // Single-subject only
-    mass_sd_param             = prior_mass_sd_param;
-    width_sd_param            = prior_width_sd_param;
+    mass_sd_param           = prior_mass_sd_param;
+    width_sd_param          = prior_width_sd_param;
     error_alpha             = prior_error_alpha;
     error_beta              = 1 / prior_error_beta;
     num_orderstat           = pu.orderstat_default();
