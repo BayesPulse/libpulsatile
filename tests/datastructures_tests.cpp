@@ -49,7 +49,7 @@ TEST_CASE( "PatientPriors single-subject constructor works",
            "[datastructures]" ) {
 
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
-                         10, 100, 1000, 1000, 12, 0, 40);
+                         5, 7, 1000, 1000, 12, 0, 40);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 
@@ -61,10 +61,10 @@ TEST_CASE( "PatientPriors single-subject constructor works",
     REQUIRE(ppsingle.mass_variance     == 100.0);
     REQUIRE(ppsingle.width_mean        == 30.0);
     REQUIRE(ppsingle.width_variance    == 100.0);
-    REQUIRE(ppsingle.mass_sd_max       == 10);
-    REQUIRE(ppsingle.width_sd_max      == 100);
+    REQUIRE(ppsingle.mass_sd_param     == 5);
+    REQUIRE(ppsingle.width_sd_param    == 7);
     REQUIRE(ppsingle.error_alpha       == 1000);
-    REQUIRE(ppsingle.error_beta        == 1000);
+    REQUIRE(ppsingle.error_beta        == 0.001);
     REQUIRE(ppsingle.pulse_count       == 12);
     REQUIRE(ppsingle.strauss_repulsion == 0);
     REQUIRE(ppsingle.strauss_repulsion_range == 40);
