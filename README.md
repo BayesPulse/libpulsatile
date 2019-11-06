@@ -63,7 +63,6 @@ above then please reclone the repo!
 After cloning the repository navigate to the `R-package` directory and use the
 provided `Makefile`. Note that `gawk` is required on MacOS.
 
-
 ```{sh}
 cd <path-to-libpulsatile>/R-package
 make install
