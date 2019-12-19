@@ -42,11 +42,16 @@ Mac then you should have not problem cloning and working with this repo.  If,
 however, you are working on a Windows machine there are a few additional steps
 you will need to take.
 
-1. Windows Vista or newer with NTFS file system, not FAT.
-2. You need administrator rights or at least `SeCreateSymbolicLinkPrivilege`
+1. Ensure that your system meets the [requirements outlined by CRAN for building R packages on Windows.](https://cran.r-project.org/doc/manuals/r-release/R-admin.html#The-Windows-toolset "The Windows Toolset") This includes installing `Rtools`, and setting the `PATH` variable appropriately.
+2. Windows Vista or newer with NTFS file system, not FAT.
+3. You need administrator rights or at least `SeCreateSymbolicLinkPrivilege`
    privilege
-3. git bash version 2.10.2 or later.  It will be helpful to install with
+4. git bash version 2.10.2 or later.  It will be helpful to install with
    `core.symlinks` option turned on.
+ 
+Prior to cloning the repo, run the following command in the git bash shell to enable creation of symbolic links.
+
+    export MSYS=winsymlinks:nativestrict
 
 In the git bash shell clone the repo.  (The example below uses SSH, change the
 URL as needed for https.)
