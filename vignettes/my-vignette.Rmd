@@ -28,9 +28,9 @@ Questions for Nichole (or me, for a couple):
 ## Contents
 
 1. Introduction 
-2. The Deconvolution Model
-3. Bayesian Modeling
-4. Single-subject hormone modeling
+2. The deconvolution model
+3. Bayesian modeling
+4. Single-subject hormone modeling with `bayespulse`
 
 ## 1 Introduction 
 
@@ -40,7 +40,7 @@ This package utilizes a Bayesian approach to a deconvolution model to jointly mo
 
 This document introduces the functions within the bayespulse package that can simulate hormone series, analyze pulsatile hormone data in a Bayesian framework, and assess convergence of the model. 
 
-## 2 The Deconvolution Model
+## 2 The deconvolution model
 
 Let $y_i(t_{j})$ be the observed hormone concentration for subject $i$ at time $t_{ij}$ where $i = 1,...,S$ and $j=1,...,m_i$, where $S$ is the number of subjects in the study, each with $m_i$ time points of observation. Although the number and timing of observations can theoretically differ by subject, in general study designs, the observation times are common across subjects. Thus, in future notation, $t_{ij} = t_j$ and $m_i = m$. $i$ can be eliminated for the single-subject model.
 
@@ -90,7 +90,7 @@ $$
 
 ### 2.2 The elimination function
 
-It is common for elimination to be described by the exponential distribution with decay rate $\lambda_i$, or equivalently, half-life $H_i$.
+It is common for hormone elimination to be described by the exponential distribution with decay rate $\lambda_i$, or equivalently, half-life $H_i$.
 
 $$
 E_i(t_j-z,\boldsymbol{\theta}_{e,i}) =e^{-\lambda_i(t_j-z)} = e^{-\frac{\log 2}{H_i}(t_j-z)}
@@ -116,11 +116,23 @@ In summary, there are 8 common parameters for one subject: number of pulses ($n_
 
 A graphic demonstration of the deconvolution model is shown in Figure \ref{fig:deconv}.
 
+\if{html}{\figure{deconvolution.pdf}{options: width=6in}}
+\if{latex}{\figure{deconvolution.pdf}{options: width=6in}}
 
-IF WE CAN FIGURE IT OUT!!!!!!!
+\figure{'deconvolution.pdf'}
+
+```{r, error = F, warning = F, message = F, fig.align='center', fig.width = 5, fig.height = 5}
 
 
-## 3 Bayesian Modeling
+
+```
+
+
+
+IF WE CAN FIGURE IT OUT!!!!!!! BC THIS DOESN'T WORK--CAN'T FIGURE OUT HOW TO REDO KAREN'S FIGURE OUT HOW TO DIRECTLY INSERT IT HERE
+
+
+## 3 Bayesian modeling
 
 This model estimates the pulse parameters within a Bayesian framework. The most important feature of Bayesian statistics is incorporating subjective knowledge and the confidence of that knowledge, quantified in the form of prior distribution, into interpretation of probabilities. In other words, Bayesian analysis approach makes guesses about the values of the pulse characteristics (masses, widths, number, half-life, etc.) prior to observing any data and then reweights these guesses with knowledge from the observed data. The \emph{a priori} guesses about the values of the pulse features are called priors and are specified by the user. he data reweighted values of the pulse characteristics are called posteriors. The posterior represents the set of values of the pulse characteristic that are likely given the observed data and the prior.  To summarize Bayesian analysis, the mean of the posterior and its standard deviation or a credible interval are reported.  These can be loosely conceptually linked to the estimate and confidence interval in non-Bayesian approaches.
 
@@ -144,7 +156,7 @@ With one exception (pulse number), the priors distributions investigated in our 
 
 The posterior distribution of the parameter usually does not have a closed form  when the model have more than one parameters, as in the hormone concentrations. As a consequence, the desired distribution cannot be computed directly. Instead, they need to be simulated using Monte-Carlo Markov Chain (MCMC).In addition, the number of parameters is not fixed from iteration to iteration because the number of pulses is not known and also needs to be simulated. We consider using birth-death MCMC (BDMCMC) given its success in other pulse estimation problems . A single iteration of BDMCMC occurs in two stages. First, the number of components is simulated using a birth-death process. Next, conditional on the number of components, the remaining parameters are updated using traditional MCMC. The full algorithm iterates between these two steps.
 
-## 4 Single-subject hormone modeling
+## 4 Single-subject hormone modeling with `bayespulse`
 
 ### 4.1 Simulating data with `simulate_pulse()`
 
@@ -225,12 +237,11 @@ all.spec <- bayespulse:::pulse_spec(location_prior_type = "strauss",
 ```
 
 
-THEN MODEL IT
+After setting the prior values and starting values, the function `pulse_spec()` can be used to fit the deconvolution model. 
 
 ```{r}
 
-moddat <- simdat$data
-results <- bayespulse::fit_pulse(data = moddat,
+results <- bayespulse::fit_pulse(data = simdat$data,
                                  spec = all.spec)
 
 #that weird issue w/ concentration is still happening here
@@ -241,15 +252,20 @@ results <- bayespulse::fit_pulse(data = moddat,
 
 MAYBE ADD IN A PARAGRAPH (SHORT) HERE ABOUT TYPICAL WAYS TO ASSESS CONVERGENCE? AND TALK ABOUT THE CONCENTRATION PLOT
 
-```{r, error = F, warning = F, message = F}
+```{r, error = F, warning = F, message = F, fig.align='center', fig.width = 6, fig.height = 9}
 
-pid_title <- list(ggplot2::ggtitle(results$options$conc))
-bayespulse::bp_trace(results) + pid_title
-bayespulse::bp_posteriors(results, type = "histogram")  + pid_title
-bayespulse::bp_location_posterior(results) + pid_title
+bayespulse::bp_trace(results)
+bayespulse::bp_posteriors(results, type = "histogram")
 
   #would ideally like to see better HL mixing before this is done?
 
+```
+
+```{r, error = F, warning = F, message = F, fig.align='center', fig.width = 5, fig.height = 5}
+
+bayespulse::bp_location_posterior(results) 
+
+  #would ideally like to see better HL mixing before this is done?
 
 ```
 
