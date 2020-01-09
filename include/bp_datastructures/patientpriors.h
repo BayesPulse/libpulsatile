@@ -1,4 +1,4 @@
-#ifndef GUARD_patientpriors_h
+few#ifndef GUARD_patientpriors_h
 #define GUARD_patientpriors_h
 
 #include <RcppArmadillo.h>
