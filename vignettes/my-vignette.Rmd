@@ -4,7 +4,7 @@ author: "Rachel L. Johnson"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Modeling hormone series in a Bayesian framework with bayespulse}
+  %\VignetteIndexEntry{Modeling hormone series in a Bayesian framework with `bayespulse`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+getwd()
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+
 ```
 
 ## 0 RACHEL'S NOTES THAT WILL BE DELETED LATER
@@ -57,14 +61,6 @@ C_i(t_j) = B_i(t_j) + \int_{-\infty}^{t_j} S_i(z;\boldsymbol{\theta}_{s,i})*E_i(
 $$
 
 \noindent where $S_i(z;\boldsymbol{\theta}_{s,i})$ is a function that models secretion and $E_i(t_j-z;\boldsymbol{\theta}_{e,i})$ is a function that models hormone elimination. The deconvolution model combines baseline hormone concentration $B_i(t_j)$, pulsatile secretion $S_i(z;\boldsymbol{\theta}_{s,i})$, the hormone elimination processes $E_i(t_j - z;\boldsymbol{\theta}_{e,i})$ , and technical error $\epsilon_i(t_j)$ into an observed concentration value. $S_i(z;\boldsymbol{\theta}_{s,i})$ models the pulsatile hormone release and depends on a set of parameters $\boldsymbol{\theta}_{s,i}$. The function $E_i(t_j - z;\boldsymbol{\theta}_{e,i})$ describes the removal of the hormone from the blood (elimination) and depends on a set of parameters, $\boldsymbol{\theta}_{e,i}$. $B_i(t_j)$ describes the non-pulsatile (baseline) concentration and is often assumed constant ($B_i(t_j) = B_i$).
-
-# I THINK ADD IN FIGURE SOMEWHERE IN HERE...
-
-Issue: Can't totally figure out what's going on in Karen's figure code...
-I see code for a few figures but no code for deconvolution.pdf, which is what I want to include
-(I think I need to actually create the figure in here, not just pull in a PDF, but IDK)
-I could try to recreate it, but not sure how she gets truth #s in A
-
 
 ### 2.1 The secretion function
 
@@ -111,25 +107,11 @@ where $B_i$ is the time constant baseline concentration.
 
 In summary, there are 8 common parameters for one subject: number of pulses ($n_i$), Baseline secretion ($B_i$), average pulse mass ($\mu_{ai}$), average pulse duration ($\mu_{wi}$), half-life ($H_i$), model error ($\epsilon_i$), variation between pulse mass ($\nu^2_{ai}$), and variation between pulse width ($\nu^2_{wi}$). The first 5 parameters usually have important physiological indications, while the last three variance parameters can be treated as nuisance parameters.  Estimation of each pulse is composed of 3 parameters: individual pulse mass ($\alpha_{ik}$), individual pulse duration ($\omega_{ik}$), and pulse location ($\lambda_{ik}$). 
 
+A graphic demonstration of the deconvolution model is shown in Figure 1.
 
 
+![\textbf{Figure 1} Example observed and actual ('truth') hormone concentrations as defined by the deconvolution model.](images/deconvolution.png)
 
-A graphic demonstration of the deconvolution model is shown in Figure \ref{fig:deconv}.
-
-\if{html}{\figure{deconvolution.pdf}{options: width=6in}}
-\if{latex}{\figure{deconvolution.pdf}{options: width=6in}}
-
-\figure{'deconvolution.pdf'}
-
-```{r, error = F, warning = F, message = F, fig.align='center', fig.width = 5, fig.height = 5}
-
-
-
-```
-
-
-
-IF WE CAN FIGURE IT OUT!!!!!!! BC THIS DOESN'T WORK--CAN'T FIGURE OUT HOW TO REDO KAREN'S FIGURE OUT HOW TO DIRECTLY INSERT IT HERE
 
 
 ## 3 Bayesian modeling
@@ -253,7 +235,6 @@ results <- bayespulse::fit_pulse(data = simdat$data,
 MAYBE ADD IN A PARAGRAPH (SHORT) HERE ABOUT TYPICAL WAYS TO ASSESS CONVERGENCE? AND TALK ABOUT THE CONCENTRATION PLOT
 
 ```{r, error = F, warning = F, message = F, fig.align='center', fig.width = 6, fig.height = 9}
-
 bayespulse::bp_trace(results)
 bayespulse::bp_posteriors(results, type = "histogram")
 
@@ -262,7 +243,6 @@ bayespulse::bp_posteriors(results, type = "histogram")
 ```
 
 ```{r, error = F, warning = F, message = F, fig.align='center', fig.width = 5, fig.height = 5}
-
 bayespulse::bp_location_posterior(results) 
 
   #would ideally like to see better HL mixing before this is done?
