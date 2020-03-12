@@ -11,7 +11,8 @@
 // patientdata.h
 //   defining the object for holding pulse level estimates
 //
-// Author: Matt Mulvahill
+// Authors: Matt Mulvahill
+//          Max McGrath
 // Notes:
 //
 
@@ -64,6 +65,7 @@ struct PatientData {
       response_concentration = log(response_concentration);
 
     }
+
 
 };
 

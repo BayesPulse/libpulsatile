@@ -62,6 +62,14 @@ INC := -I include -I include/testing $(CPPFLAGS) $(CXXFLAGS) -std=c++11
 #	-I include/population -I include/singlesubject -I include/datastructures \
 #	-I include/mcmc  \
 
+# Population test
+#POPSRCDIR := src/population
+#POPBUILDDIR := buildpop
+#POPTARGET := poppulsatile 
+#POPSOURCES := $(shell find $(POPSRCDIR) -type f -name *.$(SRCEXT))
+#POPOBJECTS := $(patsubst $(POPSRCDIR)/%,$(POPBUILDDIR)/%,$(POPSOURCES:.$(SRCEXT)=.o))
+
+
 
 TESTSRCDIR := tests
 TESTBUILDDIR := buildtests
@@ -73,7 +81,7 @@ TESTOBJECTS := $(patsubst $(TESTSRCDIR)/%,$(TESTBUILDDIR)/%,$(TESTSOURCES:.$(SRC
 # Recipes
 #
 
-all: $(TARGETDIR)/$(TARGET) $(TARGETDIR)/$(TESTTARGET)
+all: $(TARGETDIR)/$(TARGET) $(TARGETDIR)/$(TESTTARGET) #$(TARGETDIR)/$(POPTARGET)
 
 $(TARGETDIR)/$(TARGET): $(OBJECTS)
 	@echo " Linking..."
@@ -93,10 +101,20 @@ $(TESTBUILDDIR)/%.o: $(TESTSRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(TESTBUILDDIR)
 	$(CXX)  $(CFLAGS) $(INC) -c -o $@ $<
 
+#$(TARGETDIR)/$(POPTARGET): $(POPOBJECTS)
+#	@echo " Linking population..."
+#	@mkdir -p $(TARGETDIR)
+#	$(CXX) $^ -o $(TARGETDIR)/$(POPTARGET) $(LIB)
+
+# $(POPBUILDDIR)/%.o: $(POPSRCDIR)/%.$(SRCEXT)
+#	@mkdir -p $(POPBUILDDIR)
+#	$(CXX)  $(CFLAGS) $(INC) -c -o $@ $<
+
 clean:
 	@echo " Cleaning...";
 	@echo " $(RM) -r $(BUILDDIR) $(TARGETDIR)/$(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGETDIR)/$(TARGET)
 	@echo " $(RM) -r $(TESTBUILDDIR) $(TARGETDIR)/$(TESTTARGET)"; $(RM) -r $(TESTBUILDDIR) $(TARGETDIR)/$(TESTTARGET)
+#	@echo " $(RM) -r $(POPBUILDDIR) $(TARGETDIR)/$(POPTARGET)"; $(RM) -r $(POPBUILDDIR) $(TARGETDIR)/$(POPTARGET)
 	@echo " $(RM) -rf $(TARGETDIR)"; $(RM) -rf $(TARGETDIR)
 
 # 	$(CXX) $(CFLAGS) -I%CATCH_SINGLE_INCLUDE% $(INC) -c tests/tests.cpp tests/proposalvariance_tests.cpp tests/utils_tests.cpp

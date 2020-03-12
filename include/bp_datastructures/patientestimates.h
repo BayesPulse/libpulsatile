@@ -47,19 +47,45 @@ struct PatientEstimates {
   double get_decay() { return log(2) / baseline_halflife(1); }
   double get_logerrorsq() { return log(errorsq); }
 
-  //
-  // For population-only model (just constructor is unique)
-  //
-  PatientEstimates(double sv_baseline,
-                   double sv_halflife,
-                   double sv_errorsq,
-                   double sv_mass_mean,
-                   double sv_width_mean) {
+  // Population model only:
+  double mass_p2p_sd_var;
+  double mass_s2s_sd_var;
+  double width_p2p_sd_var;
+  double width_s2s_sd_var;
+  double baseline_mean;
+  double baseline_s2s_sd_var;
+  double halflife_mean;
+  double halflife_s2s_sd_var;
+  double error_var;
 
-    baseline_halflife = { sv_baseline, sv_halflife };
-    errorsq     = sv_errorsq;
-    mass_mean   = sv_mass_mean;
-    width_mean  = sv_width_mean;
+  //
+  // For population model
+  //
+  PatientEstimates(double sv_mass_mean,
+                   double sv_mass_p2p_sd_var,
+                   double sv_mass_s2s_sd_var,
+                   double sv_width_mean,
+                   double sv_width_p2p_sd_var,
+                   double sv_width_s2s_sd_var,
+                   double sv_baseline_mean,
+                   double sv_baseline_s2s_sd_var,
+                   double sv_halflife_mean,
+                   double sv_halflife_s2s_sd_var,
+                   double sv_error_var) {
+
+    
+    mass_mean           = sv_mass_mean;
+    mass_p2p_sd_var     = sv_mass_p2p_sd_var;
+    mass_s2s_sd_var     = sv_mass_s2s_sd_var;
+    width_mean          = sv_width_mean;
+    width_p2p_sd_var    = sv_width_p2p_sd_var;
+    width_s2s_sd_var    = sv_width_s2s_sd_var;
+    baseline_mean       = sv_baseline_mean;
+    baseline_s2s_sd_var = sv_baseline_s2s_sd_var;
+    halflife_mean       = sv_halflife_mean;
+    halflife_s2s_sd_var = sv_halflife_s2s_sd_var;
+    error_var           = sv_error_var;
+
     //pulse_count = 1;
 
   }
@@ -78,10 +104,11 @@ struct PatientEstimates {
                    double sv_mass_mean,
                    double sv_width_mean,
                    double sv_mass_sd,
-                   double sv_width_sd)
-    : PatientEstimates(sv_baseline, sv_halflife, sv_errorsq, sv_mass_mean,
-                       sv_width_mean)
-  {
+                   double sv_width_sd){
+    baseline_halflife = { sv_baseline, sv_halflife };
+    errorsq     = sv_errorsq;
+    mass_mean   = sv_mass_mean;
+    width_mean  = sv_width_mean;
     mass_sd  = sv_mass_sd;
     width_sd = sv_width_sd;
   }

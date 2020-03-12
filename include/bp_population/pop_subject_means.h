@@ -6,8 +6,8 @@
 #include <RInside.h>
 #endif
 #include <math.h>
-#include "mcmc/mh.h"
-#include "datastructures/patient.h"
+#include <bp_mcmc/bp_mcmc.h>
+#include <bp_datastructures/patient.h>
 
 
 //
@@ -15,7 +15,7 @@
 //   Modified Metropolis Hastings sampler instantiating the mmh class for
 //   patient-level mean mass & width
 //
-
+/*
 class Pop_DrawSubjectMeans : public ModifiedMetropolisHastings<Patient, double, ProposalVariance>
 {
 
@@ -83,6 +83,8 @@ class Pop_DrawSubjectMeans : public ModifiedMetropolisHastings<Patient, double, 
     }
 
 };
+
+*/
 
 #endif
 
