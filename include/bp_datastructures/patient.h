@@ -82,6 +82,12 @@ struct Patient {
     , estimates(in_parms) 
     , priors() {
       // priors member obj not used
+
+    PulseEstimates firstpulse(in_data.fitstart,
+                              1, 1, 1, 1,
+                              in_parms.get_decay(), 
+                              in_data.concentration);
+    pulses.push_back(firstpulse);
   }
 
 

@@ -56,40 +56,20 @@ struct PatientEstimates {
   double baseline_s2s_sd_var;
   double halflife_mean;
   double halflife_s2s_sd_var;
-  double error_var;
 
   //
   // For population model
   //
-  PatientEstimates(double sv_mass_mean,
-                   double sv_mass_p2p_sd_var,
-                   double sv_mass_s2s_sd_var,
-                   double sv_width_mean,
-                   double sv_width_p2p_sd_var,
-                   double sv_width_s2s_sd_var,
-                   double sv_baseline_mean,
-                   double sv_baseline_s2s_sd_var,
-                   double sv_halflife_mean,
-                   double sv_halflife_s2s_sd_var,
-                   double sv_error_var) {
-
-    
-    mass_mean           = sv_mass_mean;
-    mass_p2p_sd_var     = sv_mass_p2p_sd_var;
-    mass_s2s_sd_var     = sv_mass_s2s_sd_var;
-    width_mean          = sv_width_mean;
-    width_p2p_sd_var    = sv_width_p2p_sd_var;
-    width_s2s_sd_var    = sv_width_s2s_sd_var;
-    baseline_mean       = sv_baseline_mean;
-    baseline_s2s_sd_var = sv_baseline_s2s_sd_var;
-    halflife_mean       = sv_halflife_mean;
-    halflife_s2s_sd_var = sv_halflife_s2s_sd_var;
-    error_var           = sv_error_var;
-
-    //pulse_count = 1;
-
+  PatientEstimates(double sv_baseline,
+                   double sv_halflife,
+                   double sv_error_var,
+                   double sv_mass_mean,
+                   double sv_width_mean){
+    baseline_halflife = { sv_baseline, sv_halflife };
+    errorsq = sv_error_var;
+    mass_mean   = sv_mass_mean;
+    width_mean  = sv_width_mean;
   }
-
 
   //
   // For single-subject model only

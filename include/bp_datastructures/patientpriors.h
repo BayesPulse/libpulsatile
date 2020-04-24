@@ -48,14 +48,14 @@ struct PatientPriors {
   //
   // Used in all models
   //
-  double baseline_mean;
-  double baseline_variance;
-  double halflife_mean;
-  double halflife_variance;
-  double mass_mean;
-  double mass_variance;
-  double width_mean;
-  double width_variance;
+  double baseline_mean; //*
+  double baseline_variance; //*
+  double halflife_mean; //*
+  double halflife_variance; //*
+  double mass_mean; //*
+  double mass_variance; //*
+  double width_mean; //*
+  double width_variance; //*
   double error_alpha;
   double error_beta;
   PulseUtils pu;
@@ -69,8 +69,8 @@ struct PatientPriors {
   double mass_s2s_sd_var_max;
   double width_p2p_sd_var_max;
   double width_s2s_sd_var_max;
-  double baseline_s2s_sd_var_max;
-  double halflife_s2s_sd_var_max;
+  double baseline_s2s_sd_var_max; //*
+  double halflife_s2s_sd_var_max; //*
   double error_mean_pulse_count;
 
   //

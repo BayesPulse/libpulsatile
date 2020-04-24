@@ -78,8 +78,10 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
     // 2. Calculate death rate for each component conditional on Strauss or order
     //    statistic -- using pulse count and partial likelihoods
     pulse_count = patient->get_pulsecount();
-    arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);;
+    arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);
 
+   // std::cout << "Partial_likelihood length: " << partial_likelihood.n_elem << "\n";
+   // std::cout << "First element: " << partial_likelihood[0] << "\n";
 
     // 3. Calculate individual death rate for each pulse
     arma::vec death_rates(pulse_count);
@@ -91,6 +93,7 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
     //                                  full_likelihood, total_birth_rate, 
     //                                  patient->priors->pulse_count, priors->orderstat);
     //}
+    
 
 
     // 4. Calculate Total death rate and convert death_rates to probabilities
@@ -182,6 +185,12 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
       // Choose and remove a pulse
       remove_pulse(patient, death_rates, pulse_count);
     }
+    
+    //std::cout << "Birth Rate: " << birth_rate << "\n";
+    //std::cout << "Death rate size: " << death_rates.size() << "\n";
+    //std::cout << "Probability of Birth: " << probability_of_birth << "\n";
+    //std::cout << "Pulse count: " << patient->get_pulsecount() << "\n\n";
+    
 
   } while (true);
 
