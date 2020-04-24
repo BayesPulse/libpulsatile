@@ -47,7 +47,7 @@ LDLIBS := 		$(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
 CXX := g++ # This is the main compiler
 #CXX := clang++ #--analyze # and comment out the linker last line for sanity
 #CXX := $(shell $(R_HOME)/bin/R CMD config CXX)
-SRCDIR := src
+SRCDIR := src/singlesubject
 BUILDDIR := build
 SRCEXT := cpp
 TARGET := libpulsatile
@@ -63,11 +63,11 @@ INC := -I include -I include/testing $(CPPFLAGS) $(CXXFLAGS) -std=c++11
 #	-I include/mcmc  \
 
 # Population test
-#POPSRCDIR := src/population
-#POPBUILDDIR := buildpop
-#POPTARGET := poppulsatile 
-#POPSOURCES := $(shell find $(POPSRCDIR) -type f -name *.$(SRCEXT))
-#POPOBJECTS := $(patsubst $(POPSRCDIR)/%,$(POPBUILDDIR)/%,$(POPSOURCES:.$(SRCEXT)=.o))
+POPSRCDIR := src/population
+POPBUILDDIR := build
+POPTARGET := poppulsatile 
+POPSOURCES := $(shell find $(POPSRCDIR) -type f -name *.$(SRCEXT))
+POPOBJECTS := $(patsubst $(POPSRCDIR)/%,$(POPBUILDDIR)/%,$(POPSOURCES:.$(SRCEXT)=.o))
 
 
 
@@ -81,7 +81,7 @@ TESTOBJECTS := $(patsubst $(TESTSRCDIR)/%,$(TESTBUILDDIR)/%,$(TESTSOURCES:.$(SRC
 # Recipes
 #
 
-all: $(TARGETDIR)/$(TARGET) $(TARGETDIR)/$(TESTTARGET) #$(TARGETDIR)/$(POPTARGET)
+all: $(TARGETDIR)/$(TARGET) $(TARGETDIR)/$(TESTTARGET) $(TARGETDIR)/$(POPTARGET)
 
 $(TARGETDIR)/$(TARGET): $(OBJECTS)
 	@echo " Linking..."
@@ -99,16 +99,16 @@ $(TARGETDIR)/$(TESTTARGET): $(TESTOBJECTS)
 
 $(TESTBUILDDIR)/%.o: $(TESTSRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(TESTBUILDDIR)
+	$(CXX) $(CFLAGS) $(INC) -c -o $@ $<
+
+$(TARGETDIR)/$(POPTARGET): $(POPOBJECTS)
+	@echo " Linking population..."
+	@mkdir -p $(TARGETDIR)
+	$(CXX) $^ -o $(TARGETDIR)/$(POPTARGET) $(LIB)
+
+$(POPBUILDDIR)/%.o: $(POPSRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(POPBUILDDIR)
 	$(CXX)  $(CFLAGS) $(INC) -c -o $@ $<
-
-#$(TARGETDIR)/$(POPTARGET): $(POPOBJECTS)
-#	@echo " Linking population..."
-#	@mkdir -p $(TARGETDIR)
-#	$(CXX) $^ -o $(TARGETDIR)/$(POPTARGET) $(LIB)
-
-# $(POPBUILDDIR)/%.o: $(POPSRCDIR)/%.$(SRCEXT)
-#	@mkdir -p $(POPBUILDDIR)
-#	$(CXX)  $(CFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";
