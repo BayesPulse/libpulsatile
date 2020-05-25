@@ -22,90 +22,69 @@
 
 
 // The user defined values for the priors on the population level parameters
-// ** This structure contains all the variables that the user sets when setting the priors **
+// ** This structure contains all the variables that the user sets when setting the population priors in the population model **
 struct PopulationPriors {
 
-  // All models
-  double baseline_mean;
-  double baseline_variance;
-  double halflife_mean;
-  double halflife_variance;
+  double baseline_mean;             //Mean of the prior on the pop mean baseline
+  double baseline_variance;         //Variance of the prior on the pop mean baseline
+  double baseline_sd_param;         //Subj to Subj SD of the patient baselines
+    
+  double halflife_mean;             //Mean of the prior on the pop mean halflife
+  double halflife_variance;         //Variance of the prior on the pop mean halflife
+  double halflife_sd_param;         //Subj-to-subj SD of the patient halflives
+  
 
-  double mass_mean;
-  double mass_variance;
-  double width_mean;
-  double width_variance;
-
-  // Population only
-  double mass_p2p_sd_param;
-  double mass_s2s_sd_param;
-  double width_p2p_sd_param;
-  double width_s2s_sd_param;
-  double halflife_sd_param; 
-  double baseline_sd_param;  
-
-  double error_alpha;
-  double error_beta;
-
-  double error_mean_pulse_count;
-
-  double num_orderstat;
-  double num_pulses;              // prior number of pulses, i.e. strauss_rate/beta
-  double strauss_repulsion;       // strauss gamma for secondary/non-hc interaction
-  double strauss_hardcore_range;  // range of hardcore interaction
-  double strauss_repulsion_range; // range of secondary/non-hardcore interaction
+  double mass_mean;                 //Mean of the prior on the pop mean pulse mass
+  double mass_variance;             //Var of the prior on the pop mean pulse mass
+  double mass_p2p_sd_param;         //pulse to pulse SD of the ind. pulse masses
+  double mass_s2s_sd_param;         //subj to subj SD of the subj mean pulse mass
+    
+  double width_mean;                //Mean of the prior on the pop mean pulse width
+  double width_variance;            //Var of the prior on the pop mean pulse width
+  double width_p2p_sd_param;        //pulse to pulse SD of the ind pulse widths
+  double width_s2s_sd_param;        //subj to subj SD of the subj mean pulse widht
+    
 
   // Constructor
   PopulationPriors(double prior_mass_mean,
                    double prior_mass_var,                
-                   double prior_mass_p2p_sd,     
-                   double prior_mass_s2s_sd,     
+                   double prior_mass_p2p_sd_param,
+                   double prior_mass_s2s_sd_param,
                    double prior_width_mean,              
                    double prior_width_var,               
-                   double prior_width_p2p_sd,    
-                   double prior_width_s2s_sd,
+                   double prior_width_p2p_sd_param,
+                   double prior_width_s2s_sd_param,
                    double prior_baseline_mean,
                    double prior_baseline_var,
-                   double prior_baseline_sd, 
+                   double prior_baseline_sd_param,
                    double prior_halflife_mean,           
                    double prior_halflife_var,            
-                   double prior_halflife_sd, 
-                   double prior_error_alpha,             
-                   double prior_error_beta,              
-                   double prior_error_mean_pulse_count){
+                   double prior_halflife_sd_param
+                   ){
 
-    // All models
     mass_mean         = prior_mass_mean;
     mass_variance     = prior_mass_var;
+    mass_p2p_sd_param = prior_mass_s2s_sd_param;
+    mass_s2s_sd_param = prior_mass_s2s_sd_param;
+
     width_mean        = prior_width_mean;
     width_variance    = prior_width_var;
+    width_p2p_sd_param = prior_width_p2p_sd_param;
+    width_s2s_sd_param = prior_width_s2s_sd_param;
+      
     baseline_mean     = prior_baseline_mean;
     baseline_variance = prior_baseline_var;
+    baseline_sd_param = prior_baseline_sd_param;
+      
     halflife_mean     = prior_halflife_mean;
     halflife_variance = prior_halflife_var;
-    error_alpha       = prior_error_alpha;
-    error_beta        = prior_error_beta;
-
-    // Population uniform prior maximums (likely to be altered)
-    mass_p2p_sd_param = prior_mass_s2s_sd;
-    mass_s2s_sd_param = prior_mass_s2s_sd;
-    width_p2p_sd_param = prior_width_p2p_sd;
-    width_s2s_sd_param = prior_width_s2s_sd;
-    baseline_sd_param = prior_baseline_sd;
-    halflife_sd_param = prior_halflife_sd;
-
-    // Other population-only variables
-    error_mean_pulse_count = prior_error_mean_pulse_count;
-
-    // Set single-subject only variables to 0
-    num_orderstat           = 0;
-    num_pulses              = 0;
-    strauss_repulsion       = 0;
-    strauss_repulsion_range = 0;
+    halflife_sd_param = prior_halflife_sd_param;
 
   }
 };
 
+
+//Max: Not sure what any of the below is.  Is it necessary or hold over from previous ideas of Matt's?
 struct PopulationEstimates {
 
   // Used in all models

@@ -47,16 +47,7 @@ struct PatientEstimates {
   double get_decay() { return log(2) / baseline_halflife(1); }
   double get_logerrorsq() { return log(errorsq); }
 
-  // Population model only:
-  double mass_p2p_sd_var;
-  double mass_s2s_sd_var;
-  double width_p2p_sd_var;
-  double width_s2s_sd_var;
-  double baseline_mean;
-  double baseline_s2s_sd_var;
-  double halflife_mean;
-  double halflife_s2s_sd_var;
-
+  
   //
   // For population model
   //

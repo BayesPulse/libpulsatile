@@ -48,16 +48,16 @@ struct PatientPriors {
   //
   // Used in all models
   //
-  double baseline_mean; //*
-  double baseline_variance; //*
-  double halflife_mean; //*
-  double halflife_variance; //*
-  double mass_mean; //*
-  double mass_variance; //*
-  double width_mean; //*
-  double width_variance; //*
-  double error_alpha;
-  double error_beta;
+  double baseline_mean;         //(Pop) mean of the prior on ss baseline
+  double halflife_mean;         //(Pop) mean of the priors on ss half-life
+  double mass_mean;             //(Pop) mean of the priors on ss pulse mass
+  double width_mean;            // (Pop) mean of the priors on ss pulse width
+  double error_alpha;           //Shape Parameter in Gamma prior on model error variance
+  double error_beta;            //Scale parameter in Gamma prior on model error variance
+  double num_orderstat;          //Order statistic input.  Not implemented yet.
+  int    pulse_count;            // prior number of pulses, i.e. strauss_rate/beta
+  double strauss_repulsion;      // strauss gamma for secondary/non-hc interaction
+  double strauss_repulsion_range;// range of secondary/non-hardcore interaction
   PulseUtils pu;
 
   //
@@ -65,77 +65,65 @@ struct PatientPriors {
   //
 
   // Population uniform prior maximums (likely to be altered)
-  double mass_p2p_sd_var_max;
-  double mass_s2s_sd_var_max;
-  double width_p2p_sd_var_max;
-  double width_s2s_sd_var_max;
-  double baseline_s2s_sd_var_max; //*
-  double halflife_s2s_sd_var_max; //*
-  double error_mean_pulse_count;
+  double mass_p2p_sd;           //Subj to subj SD in the mean pulse mass
+  double mass_s2s_sd;           //Pulse to Pulse SD in the ind. pulse masses
+  double width_p2p_sd;          //Subj to subj SD in the mean pulse width
+  double width_s2s_sd;          //Pulse to Pulse SD in the ind. pulse widths
+    
 
   //
   // For Single-subject model:
   //
 
   // Member variables not used in Population model:
+  double mass_variance; //variance of the prior on the mean pulse mass
   double mass_sd_param;  //parameter in the Cauchy prior on the pulse-to-pulse sd mass
+  double width_variance; //variance of the prior on the mean pulse width
   double width_sd_param; //parameter in the Cauchy prior on the pulse-to-pulse sd width
-  double num_orderstat;
-  int    pulse_count;             // prior number of pulses, i.e. strauss_rate/beta
-  double strauss_repulsion;       // strauss gamma for secondary/non-hc interaction
-  double strauss_repulsion_range; // range of secondary/non-hardcore interaction
+  double baseline_variance; //Variance of the priors on the baseline;
+  double halflife_variance; //Variance of the priors on the halflife;
 
   //
   // Population model constructor:
   //
-  PatientPriors(double prior_mass_mean,
-                double prior_mass_var,                
-                double prior_mass_p2p_sd_var_max,     
-                double prior_mass_s2s_sd_var_max,     
-                double prior_width_mean,              
-                double prior_width_var,               
-                double prior_width_p2p_sd_var_max,    
-                double prior_width_s2s_sd_var_max,
-                double prior_baseline_mean,
-                double prior_baseline_var,
-                double prior_baseline_s2s_sd_var_max, 
-                double prior_halflife_mean,           
-                double prior_halflife_var,            
-                double prior_halflife_s2s_sd_var_max, 
+  PatientPriors(double sv_mass_mean,
+                double sv_mass_p2p_sd,
+                double sv_mass_s2s_sd,
+                double sv_width_mean,
+                double sv_width_p2p_sd,
+                double sv_width_s2s_sd,
+                double sv_baseline_mean,
+                double sv_baseline_sd,
+                double sv_halflife_mean,
+                double sv_halflife_sd,
                 double prior_error_alpha,             
                 double prior_error_beta,              
-                double prior_error_mean_pulse_count){
+                int pulse_count,
+                double strauss_repulsion,
+                double strauss_repulsion_range){
 
     // All models
-    mass_mean         = prior_mass_mean;
-    mass_variance     = prior_mass_var;
-    width_mean        = prior_width_mean;
-    width_variance    = prior_width_var;
-    baseline_mean     = prior_baseline_mean;
-    baseline_variance = prior_baseline_var;
-    halflife_mean     = prior_halflife_mean;
-    halflife_variance = prior_halflife_var;
+    mass_mean         = sv_mass_mean;
+    mass_p2p_sd       = sv_mass_p2p_sd;
+    mass_s2s_sd       = sv_mass_s2s_sd;
+    width_mean        = sv_width_mean;
+    width_p2p_sd      = sv_width_p2p_sd;
+    width_s2s_sd      = sv_width_s2s_sd;
+    baseline_mean     = sv_baseline_mean;
+    baseline_sd       = sv_baseline_sd;
+    halflife_mean     = sv_halflife_mean;
+    halflife_sde      = sv_halflife_sd;
     error_alpha       = prior_error_alpha;
-    error_beta        = prior_error_beta;
-
-    // Population uniform prior maximums (likely to be altered)
-    mass_p2p_sd_var_max = prior_mass_s2s_sd_var_max;
-    mass_s2s_sd_var_max = prior_mass_s2s_sd_var_max;
-    width_p2p_sd_var_max = prior_width_p2p_sd_var_max;
-    width_s2s_sd_var_max = prior_width_s2s_sd_var_max;
-    baseline_s2s_sd_var_max = prior_baseline_s2s_sd_var_max;
-    halflife_s2s_sd_var_max = prior_halflife_s2s_sd_var_max;
-
-    // Other population-only variables
-    error_mean_pulse_count = prior_error_mean_pulse_count;
+    error_beta        = 1 / prior_error_beta;
+    num_orderstat     = pu.orderstat_default();
 
     // Set single-subject only variables to 0
     mass_sd_param           = 0;
     width_sd_param          = 0;
-    num_orderstat           = 0;
-    pulse_count             = 0;
-    strauss_repulsion       = 0;
-    strauss_repulsion_range = 0;
+    mass_variance           = 0;
+    width_variance          = 0;
+    baseline_variance       = 0;
+    halflife_variance       = 0;
 
   };
 
@@ -172,14 +160,11 @@ struct PatientPriors {
     width_variance    = prior_width_variance;
 
     // Set population model-only parms to 0
-    mass_p2p_sd_var_max     = 0;
-    mass_s2s_sd_var_max     = 0;
-    width_p2p_sd_var_max    = 0;
-    width_s2s_sd_var_max    = 0;
-    baseline_s2s_sd_var_max = 0;
-    halflife_s2s_sd_var_max = 0;
-    error_mean_pulse_count = 0;
-
+    mass_p2p_sd     = 0;
+    mass_s2s_sd     = 0;
+    width_p2p_sd    = 0;
+    width_s2s_sd    = 0;
+    
     // Single-subject only
     mass_sd_param           = prior_mass_sd_param;
     width_sd_param          = prior_width_sd_param;
