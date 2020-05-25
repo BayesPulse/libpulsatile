@@ -1,4 +1,4 @@
-#ifndef GUARD_population_h
+Po#ifndef GUARD_population_h
 #define GUARD_population_h
 
 #include <RcppArmadillo.h>
