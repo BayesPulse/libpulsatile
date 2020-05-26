@@ -127,7 +127,7 @@ double Pop_DrawS2S_SD::posterior_function(Population *Population,
   double pop_sd_param = (*priors).*sd_param_;
 
   // Calculate pulse-specific portion of acceptance ratio
-  for (auto &patient : population->npatients) {
+  for (auto &patient : Population->patients) {
 
     // Normalizing constants for ratio of log likelihoods. They are truncated t-distributions
     stdx_old   = pop_mean / pop_sd;

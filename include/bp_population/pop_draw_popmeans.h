@@ -109,7 +109,7 @@ class Pop_DrawPopMeans :
 
       // 'likelihood' ratio -- Ratio of p(mu_alpha|m, v) for current and
       // proposed alpha
-      for (auto &patient : population->npatients) {  // uses range based loop instead of iterators. Max: Need check here. Npatients would be the number of patients.  Will this be in a population data structure.
+      for (auto &patient : population->patients) {  // uses range based loop instead of iterators. Max: Need check here. Want to loop through patients in a population structure containing all patients
 
         randomeffect = patient.*randomeffect_;
         psum_old += pow(randomeffect - current, 2);
