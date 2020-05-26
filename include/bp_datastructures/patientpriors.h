@@ -69,6 +69,8 @@ struct PatientPriors {
   double mass_s2s_sd;           //Pulse to Pulse SD in the ind. pulse masses
   double width_p2p_sd;          //Subj to subj SD in the mean pulse width
   double width_s2s_sd;          //Pulse to Pulse SD in the ind. pulse widths
+  double baseline_sd;           //Subj to subj SD in the baseline estimates
+  double halflife_sd;           //Subj to subj SD in the half-life estimates
     
 
   //
