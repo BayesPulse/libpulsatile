@@ -63,7 +63,7 @@ struct PatientPriors {
   //
   // For Population models:
   //
-
+  
   // Population uniform prior maximums (likely to be altered)
   double mass_p2p_sd;           //Subj to subj SD in the mean pulse mass
   double mass_s2s_sd;           //Pulse to Pulse SD in the ind. pulse masses
@@ -71,7 +71,7 @@ struct PatientPriors {
   double width_s2s_sd;          //Pulse to Pulse SD in the ind. pulse widths
   double baseline_sd;           //Subj to subj SD in the baseline estimates
   double halflife_sd;           //Subj to subj SD in the half-life estimates
-    
+  
 
   //
   // For Single-subject model:
@@ -102,7 +102,8 @@ struct PatientPriors {
                 double prior_error_beta,              
                 int pulse_count,
                 double strauss_repulsion,
-                double strauss_repulsion_range){
+                double strauss_repulsion_range,
+                bool not_used){
 
     // All models
     mass_mean         = sv_mass_mean;
@@ -114,7 +115,7 @@ struct PatientPriors {
     baseline_mean     = sv_baseline_mean;
     baseline_sd       = sv_baseline_sd;
     halflife_mean     = sv_halflife_mean;
-    halflife_sde      = sv_halflife_sd;
+    halflife_sd      = sv_halflife_sd;
     error_alpha       = prior_error_alpha;
     error_beta        = 1 / prior_error_beta;
     num_orderstat     = pu.orderstat_default();
@@ -177,7 +178,7 @@ struct PatientPriors {
     strauss_repulsion       = prior_strauss_repulsion; //gamma
     strauss_repulsion_range = prior_strauss_repulsion_range;
 
-  }
+  };
 
 
 // A more appropriate name for the population version

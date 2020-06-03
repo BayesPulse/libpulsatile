@@ -65,27 +65,29 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                           inpriors["baseline_s2s_sd_var"], 
                           inpriors["halflife_mean"],           
                           inpriors["halflife_var"],            
-                          inpriors["halflife_s2s_sd_var"], 
-                          inpriors["error_alpha"],             
-                          inpriors["error_beta"],              
-                          inpriors["error_mean_pulse_count"]);
+                          inpriors["halflife_s2s_sd_var"]);
 
   std::cout << "Priors created\n";
- 
-  // Create population estimates object
-  PopulationEstimates estimates(startingvals["mass_mean"],
-                                startingvals["mass_p2p_sd_var"],
-                                startingvals["mass_s2s_sd_var"],
-                                startingvals["width_mean"],
-                                startingvals["width_p2p_sd_var"],
-                                startingvals["width_s2s_sd_var"],
-                                startingvals["baseline_mean"],
-                                startingvals["baseline_s2s_sd_var"],
-                                startingvals["halflife_mean"],
-                                startingvals["halflife_s2s_sd_var"],
-                                startingvals["error_var"]);
 
-  std::cout << "Population estimates created\n";
+  // Create patient priors object
+  PatientPriors patientPriors(startingvals["mass_mean"],
+                              startingvals["mass_p2p_sd_var"],
+                              startingvals["mass_s2s_sd_var"],
+                              startingvals["width_mean"],
+                              startingvals["width_p2p_sd_var"],
+                              startingvals["width_s2s_sd_var"],
+                              startingvals["baseline_mean"],
+                              startingvals["baseline_s2s_sd_var"],
+                              startingvals["halflife_mean"],
+                              startingvals["halflife_s2s_sd_var"], 
+                              startingvals["error_alpha"],
+                              startingvals["error_beta"],
+                              startingvals["error_mean_pulse_count"],
+                              startingvals["strauss_repulsion"],
+                              startingvals["strauss_repulsion_range"],
+                              true);
+ 
+  std::cout << "Population priors created\n";
 
   // Create subject level estimates object
   PatientEstimates patEstimates(startingvals["baseline_mean"],
@@ -94,8 +96,14 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                                 startingvals["mass_mean"],
                                 startingvals["width_mean"]);
 
+  std::cout << "Patient estimates created\n";
+
+
   // Get number of patients (should this be a function arg?)
   int numPats = concentrations.ncol();
+
+  std::cout << "Number of patients: " << numPats << "\n";
+  std::cout << "Element 5,5: " << concentrations(5, 5) << "\n";
   
   // Create vector of patients
   std::vector<Patient> pats;
@@ -103,23 +111,69 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   // Fill vector of patients
   for(int i = 0; i < numPats; i++) {
     PatientData tempdata(time, concentrations.column(i));
+    std::cout << "Created data\n";
     Patient temppatient(tempdata, patEstimates);
+    std::cout << "Created temp patient\n";
     pats.push_back(temppatient);
+    std::cout << "Patient " << i << " created\n";
   }
 
   std::cout << "Patients created\n";
 
   // Create population object and pointer to it
-  Population pop(pats, priors, estimates);
+  Population pop(pats, priors, patientPriors);
   Population * population = &pop;
     
   std::cout << "Population created\n\n";
+  int j = 1; 
+  // Output diagnostics for each patient
+  for(auto &patient : population->patients) {
+ 
+    std::cout << "Patient " << j << ":\n";
+    std::cout << "First conc: " << patient.data.concentration[0] << "\n";
+    std::cout << "Num obs: "    << patient.data.number_of_obs << "\n";
+    std::cout << "Fit start: "  << patient.data.fitstart << "\n";
+    std::cout << "Fit end: "    << patient.data.fitend << "\n";
+    std::cout << "Avg period: " << patient.data.avg_period_of_obs << "\n";
+    std::cout << "Likelihood: " << patient.likelihood(false) << "\n";
+    std::cout << "Mass P2P sd: " << population->patPriors.mass_p2p_sd << "\n";
+    std::cout << "Width P2P sd: " << population->patPriors.width_p2p_sd << "\n\n";
+    j++;
 
-  //std::cout << population->patients[0].data.concentration[0] << "\n\n";
+  }
 
-  // Initialize birth death object
+  //----------------------------------------
+  // Sample MMH Objects
+  //----------------------------------------
   BirthDeathProcess birth_death;
+  
+  Pop_DrawSDRandomEffects draw_sd_masses(proposalvars["sub_mass_mean"], adj_iter,
+                                         adj_max, univ_target, false,
+                                         verbose, verbose_iter);
 
+  Pop_DrawSDRandomEffects draw_sd_width(proposalvars["sub_width_mean"], adj_iter,
+                                         adj_max, univ_target, false,
+                                         verbose, verbose_iter);
+
+  //----------------------------------------
+  // Sample MMH Objects
+  //----------------------------------------
+  for(int iteration = 0; iteration < 50; iteration++) {
+
+    draw_sd_masses.sample(population, &population->patPriors.mass_p2p_sd, population, iteration);
+    draw_sd_width.sample(population, &population->patPriors.width_p2p_sd, population, iteration);
+
+  }
+
+
+  /*
+  // Declare BDMCMC objects
+  BirthDeathProcess birth_death;
+  Pop_DrawPopMeans draw_mass_mean(proposalvars["pop_mass_mean"], adj_iter,
+                                  adj_max, univ_target, false, true, false,
+                                  verbose, verbose_iter);
+  draw_mass_mean.sample(population, &population->popPriors.mass_mean, iteration);
+  
   // Temporary placeholder to specify iteration (will be loop)
   int i = 0;
 
@@ -140,16 +194,20 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
   }
 
-  // Output diagnostics for each patient
-  for(int j = 0; j < numPats; j++) {
+  */
 
-    std::cout << "Patient " << j << "\n";
-    std::cout << "First conc: " << population->patients[j].data.concentration[0] << "\n";
-    std::cout << "Num obs: " << population->patients[j].data.number_of_obs << "\n";
-    std::cout << "Fit start: " << population->patients[j].data.fitstart << "\n";
-    std::cout << "Fit end: " << population->patients[j].data.fitend << "\n";
-    std::cout << "Avg period: " << population->patients[j].data.avg_period_of_obs << "\n";
-    std::cout << "Likelihood: " << population->patients[j].likelihood(false) << "\n\n";
+
+  j = 1;
+  std::cout << "\n";
+  
+  // Output diagnostics for each patient
+  for(auto &patient : population->patients) {
+
+    std::cout << "Patient " << j << ":\n";
+    std::cout << "Likelihood: " << patient.likelihood(false) << "\n"; 
+    std::cout << "Mass P2P sd: " << population->patPriors.mass_p2p_sd << "\n";
+    std::cout << "Width P2P sd: " << population->patPriors.width_p2p_sd << "\n\n";
+    j++;
 
   }
 

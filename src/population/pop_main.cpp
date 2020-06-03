@@ -358,24 +358,26 @@ int main(int argc, char **argv) {
                                        Named("baseline_s2s_sd_var")     = 10,
                                        Named("halflife_mean")           = 45,
                                        Named("halflife_var")            = 100,
-                                       Named("halflife_s2s_sd_var")     = 10,
-                                       Named("error_alpha")             = .001,
-                                       Named("error_beta")              = .001,
-                                       Named("error_mean_pulse_count")  = 6);
+                                       Named("halflife_s2s_sd_var")     = 10);
   pop_priors.attr("class") = "bp_priors";
 
   // Create estimates object (w/ starting vals)
-  Rcpp::List pop_startingvals = List::create(Named("mass_mean")       = 1,
-                                         Named("mass_p2p_sd_var")     = 1,
-                                         Named("mass_s2s_sd_var")     = 1,
-                                         Named("width_mean")          = 1.5,
-                                         Named("width_p2p_sd_var")    = 1,
-                                         Named("width_s2s_sd_var")    = 1,
-                                         Named("baseline_mean")       = 2.5,
-                                         Named("baseline_s2s_sd_var") = 1,
-                                         Named("halflife_mean")       = 45,
-                                         Named("halflife_s2s_sd_var") = 1,
-                                         Named("error_var")           = .25);
+  Rcpp::List pop_startingvals = List::create(Named("mass_mean")           = 1,
+                                         Named("mass_p2p_sd_var")         = 1,
+                                         Named("mass_s2s_sd_var")         = 1,
+                                         Named("width_mean")              = 1.5,
+                                         Named("width_p2p_sd_var")        = 1,
+                                         Named("width_s2s_sd_var")        = 1,
+                                         Named("baseline_mean")           = 2.5,
+                                         Named("baseline_s2s_sd_var")     = 1,
+                                         Named("halflife_mean")           = 45,
+                                         Named("halflife_s2s_sd_var")     = 1,
+                                         Named("error_var")               = .25,
+                                         Named("error_alpha")             = .001,
+                                         Named("error_beta")              = .001,
+                                         Named("error_mean_pulse_count")  = 6,
+                                         Named("strauss_repulsion")       = .5,
+                                         Named("strauss_repulsion_range") = .05);
   pop_startingvals.attr("class") = "bp_startingvals";
 
   Rcpp::List pop_proposalvars = List::create(Named("sub_mass_mean") = 1,

@@ -19,18 +19,20 @@
 
 class Pop_DrawPopMeans :
   public ModifiedMetropolisHastings<Population, bool, double, ProposalVariance>
-{
+  {
 
   public:
 
     // Constructor
     Pop_DrawPopMeans(double in_pv,
-                        int in_adjust_iter,
-                        int in_max_iter,
-                        double in_target_ratio,
-                        bool for_width,
-                        bool verbose,
-                        int verbose_iter) :
+                     int in_adjust_iter,
+                     int in_max_iter,
+                     double in_target_ratio,
+                     bool for_width,
+                     bool for_mass,
+                     bool for_baseline,
+                     bool verbose,
+                     int verbose_iter) :
       ModifiedMetropolisHastings <Population, bool, double, ProposalVariance>::
       ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
                                  in_target_ratio, verbose, verbose_iter) { 
@@ -43,31 +45,29 @@ class Pop_DrawPopMeans :
           est_sd_         = &PatientPriors::width_s2s_sd;
           randomeffect_   = &PatientEstimates::width_mean;
           parameter_name  = "Pop Mean width";
+        } else if (for_mass) {
+          prior_mean_     = &PopulationPriors::mass_mean;
+          prior_variance_ = &PopulationPriors::mass_variance;
+          est_mean_       = &PatientPriors::mass_mean;
+          est_sd_         = &PatientPriors::mass_s2s_sd;
+          randomeffect_   = &PatientEstimates::mass_mean;
+          parameter_name  = "Pop Mean mass";
+        } else if (for_baseline) {
+          prior_mean_     = &PopulationPriors::baseline_mean;
+          prior_variance_ = &PopulationPriors::baseline_variance;
+          est_mean_       = &PatientPriors::baseline_mean;
+          est_sd_         = &PatientPriors::baseline_sd;
+          //randomeffect_    = &PatientEstimates::baseline;
+          randomeffect_   = &PatientEstimates::baseline_halflife.colptr(0);  //need help to check that this pulls the first value of this vector
+          parameter_name  = "Pop Mean baseline";
         } else {
-            if (for_mass) {
-                prior_mean_     = &PopulationPriors::mass_mean;
-                prior_variance_ = &PopulationPriors::mass_variance;
-                est_mean_       = &PatientPriors::mass_mean;
-                est_sd_         = &PatientPriors::mass_s2s_sd;
-                randomeffect_   = &PatientEstimates::mass_mean;
-                parameter_name  = "Pop Mean mass";
-            } else {
-                if (for_baseline) {
-                    prior_mean_     = &PopulationPriors::baseline_mean;
-                    prior_variance_ = &PopulationPriors::baseline_variance;
-                    est_mean_       = &PatientPriors::baseline_mean;
-                    est_sd_         = &PatientPriors::baseline_sd;
-                    randomeffect_   = &PatientEstimates::baseline_halflife(0);  //need help to check that this pulls the first value of this vector
-                    parameter_name  = "Pop Mean baseline";
-                } else {
-                    prior_mean_     = &PopulationPriors::halflife_mean;
-                    prior_variance_ = &PopulationPriors::halflife_variance;
-                    est_mean_       = &PatientPriors::halflife_mean;
-                    est_sd_         = &PatientPriors::halflife_sd;
-                    randomeffect_   = &PatientEstimates::baseline_halflife(1);  //need help to check that this pulls the 2nd value of this vector
-                    parameter_name  = "Pop Mean halflife";
-                }
-            }
+          prior_mean_     = &PopulationPriors::halflife_mean;
+          prior_variance_ = &PopulationPriors::halflife_variance;
+          est_mean_       = &PatientPriors::halflife_mean;
+          est_sd_         = &PatientPriors::halflife_sd;
+          //randomeffect_    = &PatientEstimates::halflife;
+          randomeffect_   = &PatientEstimates::baseline_halflife.memptr(1);  //need help to check that this pulls the 2nd value of this vector
+          parameter_name  = "Pop Mean halflife";
         }
       };
 
@@ -84,34 +84,34 @@ class Pop_DrawPopMeans :
 
     bool parameter_support(double val, bool *notused) { return (val > 0.0); }
 
-    double posterior_function(Population *Population, double proposal, bool *notused) {
+    double posterior_function(Population *population, double proposal, bool *notused) {
 
-      double prior_ratio       = 0.0 ;
-      double psum_old          = 0.0 ;
-      double psum_new          = 0.0 ;
-      double newint            = 0.0 ;
-      double oldint            = 0.0 ;
-      double normalizing_ratio = 0.0 ;
-      double prop_ratio        = 0.0 ;
-      PopulationPriors *priors    = &population->priors;  //need help here?  This isn't in patient so I put in population which would have all patients and fixed prior info.
-      PatientPriors *est    = &patient->priors;
-      double prior_mass_mean   = (*poppriors).*prior_mean_;  //why mass, can we remove
-      double prior_mass_var    = (*poppriors).*prior_variance_;  //why mass, can we remove.
-      double current           = (*est).*est_mean_;
-      double stddev            = (*est).*est_sd_;
-      double randomeffect      = 0.0;
+      double prior_ratio          = 0.0 ;
+      double psum_old             = 0.0 ;
+      double psum_new             = 0.0 ;
+      double newint               = 0.0 ;
+      double oldint               = 0.0 ;
+      double normalizing_ratio    = 0.0 ;
+      double prop_ratio           = 0.0 ;
+      PopulationPriors *priors    = &population->popPriors;  //need help here?  This isn't in patient so I put in population which would have all patients and fixed prior info.
+      PatientPriors *est          = &population->estimates;
+      double prior_mean           = (*priors).*prior_mean_;  //N: why mass, can we remove, M: removed
+      double prior_var            = (*priors).*prior_variance_;  
+      double current              = (*est).*est_mean_;
+      double stddev               = (*est).*est_sd_;
+      double randomeffect         = 0.0;
 
 
       // Prior Ratio: This is ratio of truncated Normals
-      prior_ratio = (pow(current - prior_mass_mean, 2) -
-                     pow(proposal - prior_mass_mean, 2)) /
-                    (2 * prior_mass_var);
+      prior_ratio = (pow(current - prior_mean, 2) -
+                     pow(proposal - prior_mean, 2)) /
+                    (2 * prior_var);
 
       // 'likelihood' ratio -- Ratio of p(mu_alpha|m, v) for current and
       // proposed alpha
       for (auto &patient : population->patients) {  // uses range based loop instead of iterators. Max: Need check here. Want to loop through patients in a population structure containing all patients
 
-        randomeffect = patient.*randomeffect_;
+        randomeffect = patient.estimates.*randomeffect_;
         psum_old += pow(randomeffect - current, 2);
         psum_new += pow(randomeffect - proposal, 2);
 

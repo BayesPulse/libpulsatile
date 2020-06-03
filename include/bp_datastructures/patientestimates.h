@@ -57,6 +57,8 @@ struct PatientEstimates {
                    double sv_mass_mean,
                    double sv_width_mean){
     baseline_halflife = { sv_baseline, sv_halflife };
+    //baseline = sv_baseline;
+    //halflife = sv_halflife;
     errorsq = sv_error_var;
     mass_mean   = sv_mass_mean;
     width_mean  = sv_width_mean;

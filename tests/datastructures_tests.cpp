@@ -21,7 +21,7 @@
 //
 // PatientPriors based objects
 //
-
+/*
 TEST_CASE( "PopulationEstimates (PatientPriors Population) constructor works", 
            "[datastructures]" ) {
 
@@ -43,6 +43,7 @@ TEST_CASE( "PopulationEstimates (PatientPriors Population) constructor works",
   }
 
 }
+*/
 
 
 TEST_CASE( "PatientPriors single-subject constructor works",

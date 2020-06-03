@@ -1,4 +1,4 @@
-Po#ifndef GUARD_population_h
+#ifndef GUARD_population_h
 #define GUARD_population_h
 
 #include <RcppArmadillo.h>
@@ -64,7 +64,7 @@ struct PopulationPriors {
 
     mass_mean         = prior_mass_mean;
     mass_variance     = prior_mass_var;
-    mass_p2p_sd_param = prior_mass_s2s_sd_param;
+    mass_p2p_sd_param = prior_mass_p2p_sd_param;
     mass_s2s_sd_param = prior_mass_s2s_sd_param;
 
     width_mean        = prior_width_mean;
@@ -83,7 +83,7 @@ struct PopulationPriors {
   }
 };
 
-
+/*
 //Max: Not sure what any of the below is.  Is it necessary or hold over from previous ideas of Matt's?
 struct PopulationEstimates {
 
@@ -136,7 +136,7 @@ struct PopulationEstimates {
     //pulse_count = 1;
 
   }
-};
+};*/
 
 
 
@@ -154,8 +154,8 @@ struct Population {
 
   // Member objects
   std::vector<Patient> patients;
-  PopulationPriors priors;
-  PopulationEstimates estimates;
+  PopulationPriors popPriors;
+  PatientPriors patPriors;
   //AssocEstimates associations;
 
   /*  // Constructor (w/ response hormone)
@@ -174,13 +174,13 @@ struct Population {
   // Constructor (w/o response hormone)
   Population(std::vector<Patient> in_patients,
              PopulationPriors in_priors,
-             PopulationEstimates in_estimates) : 
-         priors(in_priors),
-         estimates(in_estimates) {
+             PatientPriors in_estimates) : 
+         popPriors(in_priors),
+         patPriors(in_estimates) {
 
     patients     = in_patients;
-    priors       = in_priors;
-    estimates    = in_estimates;
+    popPriors    = in_priors;
+    patPriors    = in_estimates;
 
   }
 

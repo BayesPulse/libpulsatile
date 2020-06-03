@@ -40,18 +40,18 @@ class Pop_DrawSDRandomEffects :
         // Choose which set of parameters to use: width or mass
         if (for_width) {
           est_mean_       = &PatientEstimates::width_mean;
-          est_sd_         = &PatientPriors::width_sd;
+          est_sd_         = &PatientPriors::width_p2p_sd;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
-          sd_param_         = &PopulationPriors::width_p2p_sd_param;
-          parameter_name = "SD of pulse widths";
+          sd_param_       = &PopulationPriors::width_p2p_sd_param;
+          parameter_name  = "SD of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
-          est_sd_         = &PatientPriors::mass_sd;
+          est_sd_         = &PatientPriors::mass_p2p_sd;
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
-          sd_param_         = &PopulationPriors::mass_p2p_sd_param;
-          parameter_name = "SD of pulse masses";
+          sd_param_       = &PopulationPriors::mass_p2p_sd_param;
+          parameter_name  = "SD of pulse masses";
         }
 
       };
@@ -68,8 +68,8 @@ class Pop_DrawSDRandomEffects :
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };
 
-    bool parameter_support(double val, Patient *patient);
-    double posterior_function(Population *population, double proposal, Patient *notused);
+    bool parameter_support(double val, Population *population);
+    double posterior_function(Population *population, double proposal, Population *notused);
        //What should be plugged into posterior function, population vs. patient
 };
 
@@ -84,7 +84,7 @@ class Pop_DrawSDRandomEffects :
 //   Defines whether the proposal value is within the parameter support
 //   For the Cauchy this is just positive
 //    TO DO: can we remove the Patient part of the function?
-bool Pop_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
+bool Pop_DrawSDRandomEffects::parameter_support(double val,  Population *population) {
 
  // PatientPriors *priors = &patient->priors;
   //double patient_sd_param = (*priors).*sd_param_;
@@ -99,8 +99,8 @@ bool Pop_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
 //   sampler (inherited SS_DrawSDRandomEffects::sample() function)
 //
 double Pop_DrawSDRandomEffects::posterior_function(Population *population,
-                                                  double proposal, 
-                                                  Patient *notused) {
+                                                   double proposal, 
+                                                   Population *notused) {
 
   // Need to loop through all the patients.
   //Not sure how to do the temp allocations to loop.
@@ -113,31 +113,36 @@ double Pop_DrawSDRandomEffects::posterior_function(Population *population,
   double second_part = 0.0;
   double third_part  = 0.0;
   double fourth_part = 0.0;
-  PatientEstimates *est  = &patient->estimates;
-  PatientPriors *priors = &patient->priors;
-  double patient_mean    = (*est).*est_mean_;
-  double patient_sd      = (*priors).*est_sd_;
-  double patient_sd_param = (*priors).*sd_param_;
+  //PatientEstimates *est  = &patient->estimates;
+  PatientPriors *patPriors = &population->patPriors;
+  PopulationPriors *popPriors = &population->popPriors;
+  //double patient_mean    = (*est).*est_mean_;
+  double patient_sd      = (*patPriors).*est_sd_;
+  double patient_sd_param = (*popPriors).*sd_param_;
 
   // Calculate pulse-specific portion of acceptance ratio
-    for (auto &patient : Population->patients) {
-      for (auto &pulse : patient.patient->pulses) {
+    for (auto &patient : population->patients) {
+
+      PatientEstimates *est = &patient.estimates;
+      double patient_mean   = (*est).*est_mean_;
+
+      for (auto &pulse : patient.pulses) {
 
           // Normalizing constants for ratio of log likelihoods. They are truncated t-distributions
-          stdx_old   = patient.patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
-          stdx_new   = patient.patient_mean / ( proposal / sqrt(patient.pulse.*tvarscale_) );
+          stdx_old   = patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
+          stdx_new   = patient_mean / ( proposal / sqrt(pulse.*tvarscale_) );
           new_int   += Rf_pnorm5(stdx_new, 0, 1, 1.0, 1.0);
           old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
 
           // 3rd part of acceptance ratio: This is for ratio of log likelihoods, which are truncated t-distribuitons
-          third_part += patient.pulse.*tvarscale_ *
-          (patient.pulse.*randomeffect_ - patient.patient_mean) *
-          (patient.pulse.*randomeffect_ - patient.patient_mean);
+          third_part += pulse.*tvarscale_ *
+                        (pulse.*randomeffect_ - patient_mean) *
+                        (pulse.*randomeffect_ - patient_mean);
 
       }
 
         // 1st and 2nd 'parts' of acceptance ratio: This is for the ratio of log likelihoods, which are truncated t-distn.
-        first_part  += patient->get_pulsecount() * (log(patient_sd) - log(proposal));
+        first_part  += patient.get_pulsecount() * (log(patient_sd) - log(proposal));
         second_part += 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
     
         // 4th part of acceptance ratio: Ratio of priors
