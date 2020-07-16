@@ -53,13 +53,13 @@ class Pop_DrawS2S_SD :
         } else if (for_baseline) {
           est_mean_       = &PatientPriors::baseline_mean;
           est_sd_         = &PatientPriors::baseline_sd;
-          randomeffect_   = &PatientEstimates::baseline_halflife(0);
+          randomeffect_   = &PatientEstimates::baseline;
           sd_param_       = &PopulationPriors::baseline_sd_param;
           parameter_name  = "SD of baselines";
         } else {
           est_mean_       = &PatientPriors::halflife_mean;
           est_sd_         = &PatientPriors::halflife_sd;
-          randomeffect_   = &PatientEstimates::baseline_halflife(1);
+          randomeffect_   = &PatientEstimates::halflife;
           sd_param_       = &PopulationPriors::halflife_sd_param;
           parameter_name  = "SD of halflives";
         }
@@ -123,10 +123,12 @@ double Pop_DrawS2S_SD::posterior_function(Population *population,
   double pop_mean          = (*est).*est_mean_;
   double pop_sd            = (*est).*est_sd_;
   double pop_sd_param      = (*priors).*sd_param_;
+  double randomeffect      = 0.0;
 
   // Calculate pulse-specific portion of acceptance ratio
   for (auto &patient : population->patients) {
 
+    randomeffect = patient.estimates.*randomeffect_;
     // Normalizing constants for ratio of log likelihoods. They are truncated t-distributions
     stdx_old   = pop_mean / pop_sd;
     stdx_new   = pop_mean / proposal;
@@ -134,13 +136,13 @@ double Pop_DrawS2S_SD::posterior_function(Population *population,
     old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
 
     // 3rd part of acceptance ratio: This is for ratio of log likelihoods, which are truncated t-distribuitons
-    third_part += (patient.*randomeffect_ - pop_mean) *
-                  (patient.*randomeffect_ - pop_mean);
+    third_part += (randomeffect - pop_mean) *
+                  (randomeffect - pop_mean);
 
   }
 
   // 1st and 2nd 'parts' of acceptance ratio: This is for the ratio of log likelihoods, which are truncated t-distn.
-  first_part  = population->get_pulsecount() * (log(pop_sd) - log(proposal));
+  first_part  = population->get_patientcount() * (log(pop_sd) - log(proposal));
   second_part = 0.5 * ((1 / (pop_sd * pop_sd)) - (1 / (proposal * proposal)));
     
   // 4th part of acceptance ratio: Ratio of priors

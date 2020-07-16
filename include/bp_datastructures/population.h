@@ -182,7 +182,10 @@ struct Population {
     popPriors    = in_priors;
     patPriors    = in_estimates;
 
+
   }
+
+  int get_patientcount() { return patients.size(); };
 
 };
 

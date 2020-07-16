@@ -7,6 +7,7 @@
 #endif
 #include <math.h>
 #include <bp_datastructures/patient.h>
+#include <bp_datastructures/population.h>
 
 //
 // SS_DrawError
@@ -35,6 +36,19 @@ class SS_DrawError
       //patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, beta + (0.5 * ssq));
       patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
       //parms->sigma  = 1 / Rf_rgamma(priors->err_alpha + N / 2, 1 / (1 / priors->err_beta + 0.5 * ssq));
+    }
+
+    void sample(Population *population) {
+      int alpha = population->patPriors.error_alpha;
+      int beta = population->patPriors.error_beta;
+      int N, ssq;
+
+      for(auto &patient : population->patients) {
+        N = patient.data.number_of_obs;
+        ssq = patient.get_sumerrorsquared(false);
+        patient.estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
+        
+      }
     }
 
 };

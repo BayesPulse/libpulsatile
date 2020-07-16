@@ -1,7 +1,9 @@
 #ifndef GUARD_bpmod_singlesubject_birthdeath_h
 #define GUARD_bpmod_singlesubject_birthdeath_h
 
+#include <Rcpp.h>
 #include <RcppArmadillo.h>
+#include <math.h>
 #ifndef NORINSIDE
 #include <RInside.h>
 #endif
@@ -80,8 +82,12 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
     pulse_count = patient->get_pulsecount();
     arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);
 
-   // std::cout << "Partial_likelihood length: " << partial_likelihood.n_elem << "\n";
-   // std::cout << "First element: " << partial_likelihood[0] << "\n";
+/*
+    Rcpp::Rcout << "Partial_likelihood length: " << partial_likelihood.n_elem << "\n"; 
+    Rcpp::Rcout << "Partial_likelihood: ";
+    for(auto like : partial_likelihood) { Rcpp::Rcout << like << " "; }
+    Rcpp::Rcout  << "\nPulse count: " << pulse_count << "\n";
+*/
 
     // 3. Calculate individual death rate for each pulse
     arma::vec death_rates(pulse_count);
@@ -114,6 +120,7 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
         total_death_rate = log(exp(total_death_rate - max) + exp(death_rates(i) - max)) + max;
       }
 
+
       for (int i = 0; i < pulse_count; i++) {
         death_rates(i) -= total_death_rate;
         death_rates(i)  = exp(death_rates(i));
@@ -138,8 +145,15 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
     if (pulse_count <= 1) { 
       total_death_rate = 0; 
     }
+ 
+    for (int i = 1; i < pulse_count; i++) {
+      
+      if (isnan(death_rates(i)) || isinf(death_rates(i))) {
+        std::cout << "Death Rate: " << death_rates(i) << " ";
+      }
+    }
 
-
+    
     // 5. Update virtual time (how long to run BD step) - Draw from exp(B+D) and add to current S
     //    If S exceeds T or if we've run this too many times, break
     double lambda = 1 / ( total_birth_rate + total_death_rate );
@@ -185,11 +199,18 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
       // Choose and remove a pulse
       remove_pulse(patient, death_rates, pulse_count);
     }
-    
+   
+    // Only print if value is NaN or Inf 
+    if (isnan(birth_rate) || isinf(birth_rate)) {
+      std::cout << "Birth Rate: " << birth_rate << "\n";
+    }
+    if (isnan(probability_of_birth) || isinf(probability_of_birth)) {
+      std::cout << "Probability of Birth: " << probability_of_birth << "\n";
+    }
     //std::cout << "Birth Rate: " << birth_rate << "\n";
-    //std::cout << "Death rate size: " << death_rates.size() << "\n";
-    //std::cout << "Probability of Birth: " << probability_of_birth << "\n";
-    //std::cout << "Pulse count: " << patient->get_pulsecount() << "\n\n";
+    //Rcpp::Rcout << "Death rate size: " << death_rates.size() << "\n";
+    //Rcpp::Rcout << "Probability of Birth: " << probability_of_birth << "\n";
+    //Rcpp::Rcout << "Pulse count: " << patient->get_pulsecount() << "\n\n";
     
 
   } while (true);

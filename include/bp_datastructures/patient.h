@@ -220,7 +220,12 @@ struct Patient {
     }
 
     // Add the baseline contribution and log
-    mean_conc += estimates.baseline_halflife(0);
+    if (estimates.baseline_halflife.n_elem == 2) {
+      mean_conc += estimates.baseline_halflife(0);
+    } else {
+      mean_conc += estimates.baseline;
+    }
+
     mean_conc = log(mean_conc);
 
     return mean_conc;

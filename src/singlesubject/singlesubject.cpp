@@ -39,7 +39,7 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
   // every nth iteration for printing verbose screen output
   int verbose_iter = 5000;
-
+ 
   // Check for valid input
   if ( !inpriors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
   if ( !proposalvars.inherits("bp_proposalvariance") ) stop("proposalvars argument must be a bp_proposalvariance object");

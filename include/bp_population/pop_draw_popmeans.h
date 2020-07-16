@@ -57,16 +57,16 @@ class Pop_DrawPopMeans :
           prior_variance_ = &PopulationPriors::baseline_variance;
           est_mean_       = &PatientPriors::baseline_mean;
           est_sd_         = &PatientPriors::baseline_sd;
-          //randomeffect_    = &PatientEstimates::baseline;
-          randomeffect_   = &PatientEstimates::baseline_halflife.colptr(0);  //need help to check that this pulls the first value of this vector
+          randomeffect_    = &PatientEstimates::baseline;
+          //randomeffect_   = &PatientEstimates::baseline_halflife.colptr(0);  //need help to check that this pulls the first value of this vector
           parameter_name  = "Pop Mean baseline";
         } else {
           prior_mean_     = &PopulationPriors::halflife_mean;
           prior_variance_ = &PopulationPriors::halflife_variance;
           est_mean_       = &PatientPriors::halflife_mean;
           est_sd_         = &PatientPriors::halflife_sd;
-          //randomeffect_    = &PatientEstimates::halflife;
-          randomeffect_   = &PatientEstimates::baseline_halflife.memptr(1);  //need help to check that this pulls the 2nd value of this vector
+          randomeffect_    = &PatientEstimates::halflife;
+          //randomeffect_   = &PatientEstimates::baseline_halflife.memptr(1);  //need help to check that this pulls the 2nd value of this vector
           parameter_name  = "Pop Mean halflife";
         }
       };
@@ -94,7 +94,7 @@ class Pop_DrawPopMeans :
       double normalizing_ratio    = 0.0 ;
       double prop_ratio           = 0.0 ;
       PopulationPriors *priors    = &population->popPriors;  //need help here?  This isn't in patient so I put in population which would have all patients and fixed prior info.
-      PatientPriors *est          = &population->estimates;
+      PatientPriors *est          = &population->patPriors;
       double prior_mean           = (*priors).*prior_mean_;  //N: why mass, can we remove, M: removed
       double prior_var            = (*priors).*prior_variance_;  
       double current              = (*est).*est_mean_;

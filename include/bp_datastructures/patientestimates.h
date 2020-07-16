@@ -36,15 +36,21 @@ struct PatientEstimates {
 
   // Used in all models
   arma::vec baseline_halflife;
-  //double baseline;
-  //double halflife;
+  double baseline;
+  double halflife;
   double errorsq;    // model error (variance)
   double mass_mean;
   double width_mean;
   //int    pulse_count; // function of linked list instead?;
   // Always use these functions to get these values.  removed them as separate
   // member variables to ensure the result is always up-to-date
-  double get_decay() { return log(2) / baseline_halflife(1); }
+  double get_decay() { 
+    if (baseline_halflife.n_elem == 2) {
+      return log(2) / baseline_halflife(1);
+    } else {
+      return log(2) / halflife;
+    }
+  }
   double get_logerrorsq() { return log(errorsq); }
 
   
@@ -56,9 +62,9 @@ struct PatientEstimates {
                    double sv_error_var,
                    double sv_mass_mean,
                    double sv_width_mean){
-    baseline_halflife = { sv_baseline, sv_halflife };
-    //baseline = sv_baseline;
-    //halflife = sv_halflife;
+    baseline_halflife = {0};
+    baseline = sv_baseline;
+    halflife = sv_halflife;
     errorsq = sv_error_var;
     mass_mean   = sv_mass_mean;
     width_mean  = sv_width_mean;

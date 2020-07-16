@@ -99,11 +99,7 @@ struct PatientPriors {
                 double sv_halflife_mean,
                 double sv_halflife_sd,
                 double prior_error_alpha,             
-                double prior_error_beta,              
-                int pulse_count,
-                double strauss_repulsion,
-                double strauss_repulsion_range,
-                bool not_used){
+                double prior_error_beta){
 
     // All models
     mass_mean         = sv_mass_mean;
@@ -118,7 +114,6 @@ struct PatientPriors {
     halflife_sd      = sv_halflife_sd;
     error_alpha       = prior_error_alpha;
     error_beta        = 1 / prior_error_beta;
-    num_orderstat     = pu.orderstat_default();
 
     // Set single-subject only variables to 0
     mass_sd_param           = 0;
@@ -129,6 +124,19 @@ struct PatientPriors {
     halflife_variance       = 0;
 
   };
+
+  //
+  // Second population model constructor (holds data for individual patients to be passed to MH fns)
+  //
+  PatientPriors(int sv_pulse_count,
+                double sv_strauss_repulsion,
+                double sv_strauss_repulsion_range) {
+
+    pulse_count       = sv_pulse_count;
+    strauss_repulsion = sv_strauss_repulsion;
+    strauss_repulsion_range = sv_strauss_repulsion_range;
+    num_orderstat     = pu.orderstat_default();
+  }
 
   // Null constructor for population, patient object
   PatientPriors() { };
@@ -180,10 +188,12 @@ struct PatientPriors {
 
   };
 
-
+};
+/*
 // A more appropriate name for the population version
 typedef struct PatientPriors PopulationEstimates;
 
 };
+*/
 
 #endif
