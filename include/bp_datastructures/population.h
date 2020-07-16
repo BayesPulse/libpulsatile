@@ -45,25 +45,6 @@ struct PopulationPriors {
   double width_s2s_sd_param;        //subj to subj SD of the subj mean pulse widht
     
 
-  // Population only
-  double mass_p2p_sd_param;
-  double mass_s2s_sd_param;
-  double width_p2p_sd_param;
-  double width_s2s_sd_param;
-  double halflife_sd_param; 
-  double baseline_sd_param;  
-
-  double error_alpha;
-  double error_beta;
-
-  double pulse_count;
-
-  double num_orderstat;
-  double num_pulses;              // prior number of pulses, i.e. strauss_rate/beta
-  double strauss_repulsion;       // strauss gamma for secondary/non-hc interaction
-  double strauss_hardcore_range;  // range of hardcore interaction
-  double strauss_repulsion_range; // range of secondary/non-hardcore interaction
-
   // Constructor
   PopulationPriors(double prior_mass_mean,
                    double prior_mass_var,                
@@ -99,26 +80,6 @@ struct PopulationPriors {
     halflife_variance = prior_halflife_var;
     halflife_sd_param = prior_halflife_sd_param;
 
-    // Population uniform prior maximums (likely to be altered)
-      // Comment NEC 5/3/20: These are actually the parameters defining the half-Cauchy distn in the new coding
-    mass_p2p_sd_param = prior_mass_s2s_sd;
-    mass_s2s_sd_param = prior_mass_s2s_sd;
-    width_p2p_sd_param = prior_width_p2p_sd;
-    width_s2s_sd_param = prior_width_s2s_sd;
-    baseline_sd_param = prior_baseline_sd;
-    halflife_sd_param = prior_halflife_sd;
-
-    // Other population-only variables
-    //Comment NEC 5/3/20: This is the prior on the "number of pulses" (or rate parameter) in the Strauss process
-    // Need to change the name to match population.cpp but I am not sure if this code is needed then.
-    error_mean_pulse_count = prior_error_mean_pulse_count;
-
-    // Set single-subject only variables to 0
-    num_orderstat           = 0;
-    num_pulses              = 0;
-    strauss_repulsion       = 0;
-    strauss_repulsion_range = 0;
-
   }
 };
 
@@ -137,40 +98,40 @@ struct PopulationEstimates {
   // double get_logerrorsq() { return log(errorsq); }
 
   // Population model only:
-  double mass_p2p_sd;
-  double mass_s2s_sd;
-  double width_p2p_sd;
-  double width_s2s_sd;
+  double mass_p2p_sd_var;
+  double mass_s2s_sd_var;
+  double width_p2p_sd_var;
+  double width_s2s_sd_var;
   double baseline_mean;
-  double baseline_s2s_sd;
+  double baseline_s2s_sd_var;
   double halflife_mean;
-  double halflife_s2s_sd;
+  double halflife_s2s_sd_var;
   double error_var;
 
   PopulationEstimates(double sv_mass_mean,
-                      double sv_mass_p2p_sd,
-                      double sv_mass_s2s_sd,
+                      double sv_mass_p2p_sd_var,
+                      double sv_mass_s2s_sd_var,
                       double sv_width_mean,
-                      double sv_width_p2p_sd,
-                      double sv_width_s2s_sd,
+                      double sv_width_p2p_sd_var,
+                      double sv_width_s2s_sd_var,
                       double sv_baseline_mean,
-                      double sv_baseline_s2s_sd,
+                      double sv_baseline_s2s_sd_var,
                       double sv_halflife_mean,
-                      double sv_halflife_s2s_sd,
+                      double sv_halflife_s2s_sd_var,
                       double sv_error_var) {
 
      
     baseline_halflife = {sv_baseline_mean, sv_halflife_mean};
 
-    mass_mean       = sv_mass_mean;
-    mass_p2p_sd     = sv_mass_p2p_sd;
-    mass_s2s_sd     = sv_mass_s2s_sd;
-    width_mean      = sv_width_mean;
-    width_p2p_sd    = sv_width_p2p_sd;
-    width_s2s_sd    = sv_width_s2s_sd;
-    baseline_s2s_sd = sv_baseline_s2s_sd;
-    halflife_s2s_sd = sv_halflife_s2s_sd;
-    error_var       = sv_error_var;
+    mass_mean           = sv_mass_mean;
+    mass_p2p_sd_var     = sv_mass_p2p_sd_var;
+    mass_s2s_sd_var     = sv_mass_s2s_sd_var;
+    width_mean          = sv_width_mean;
+    width_p2p_sd_var    = sv_width_p2p_sd_var;
+    width_s2s_sd_var    = sv_width_s2s_sd_var;
+    baseline_s2s_sd_var = sv_baseline_s2s_sd_var;
+    halflife_s2s_sd_var = sv_halflife_s2s_sd_var;
+    error_var           = sv_error_var;
 
     //pulse_count = 1;
 

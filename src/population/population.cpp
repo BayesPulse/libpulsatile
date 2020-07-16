@@ -53,26 +53,20 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   Rcpp::Rcout << "Location prior is: " << loc_prior << "\n\n";
   
   // Create priors object
-    // Q NEC 5/3/20: Does the order matter?
   PopulationPriors priors(inpriors["mass_mean"],
-                          inpriors["mass_var"],
-                          inpriors["mass_p2p_sd_param"],
-                          inpriros["mass_s2s_sd_param"],
+                          inpriors["mass_var"],                
+                          inpriors["mass_p2p_sd_var"],     
+                          inpriors["mass_s2s_sd_var"],     
                           inpriors["width_mean"],              
                           inpriors["width_var"],               
-                          inpriors["width_p2p_sd_param"],
-                          inpriors["width_s2s_sd_param"],
+                          inpriors["width_p2p_sd_var"],    
+                          inpriors["width_s2s_sd_var"],
                           inpriors["baseline_mean"],
                           inpriors["baseline_var"],
-                          inpriors["baseline_sd_param"],
+                          inpriors["baseline_s2s_sd_var"], 
                           inpriors["halflife_mean"],           
                           inpriors["halflife_var"],            
-                          inpriors["halflife_sd_param"],
-                          inpriors["error_alpha"],             
-                          inpriors["error_beta"],
-                          inpriors["pulse_count"],
-                          inpriors["strauss_repulsion"],
-                          inpriors["strauss_repulsion_range"]);
+                          inpriors["halflife_s2s_sd_var"]);
 
   std::cout << "Priors created\n";
 
@@ -92,25 +86,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
   PatientPriors patientPriors2(startingvals["error_mean_pulse_count"],
                               startingvals["strauss_repulsion"],
-<<<<<<< HEAD
                               startingvals["strauss_repulsion_range"]);
-=======
-                              startingvals["strauss_repulsion_range"],
-                              true);
- 
-  // Create population estimates object
-  PopulationEstimates estimates(startingvals["mass_mean"],
-                                startingvals["mass_sd"],
-                                startingvals["mass_sd_s2s"],
-                                startingvals["width_mean"],
-                                startingvals["width_sd"],
-                                startingvals["width_sd_s2s"],
-                                startingvals["baseline_mean"],
-                                startingvals["baseline_sd"],
-                                startingvals["halflife_mean"],
-                                startingvals["halflife_sd"],
-                                startingvals["error_var"]);
->>>>>>> d6b50b05be0675081508f4b5cf331d7ab8273a3c
 
   // Create subject level estimates object
   PatientEstimates patEstimates(startingvals["baseline_mean"],
