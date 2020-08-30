@@ -22,9 +22,9 @@ class BirthDeathProcess
 
   public:
     void sample(Patient *patient, bool response_hormone, int iter);
+    void add_new_pulse(Patient *patient, double position); //temporarily public for testing
   private:
     PulseUtils pu;
-    void add_new_pulse(Patient *patient, double position);
     void remove_pulse(Patient *patient, arma::vec death_rates, int pulse_count);
     double calculate_total_deathrate(arma::vec death_rates, double pulse_count);
     double calculate_total_deathrate_original(arma::vec death_rates, double pulse_count);
