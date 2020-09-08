@@ -1,6 +1,7 @@
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include <bp_population/bp_population.h>
+//#include <bpmod_singlesubject/bpmod_singlesubject.h>
 #include <iostream>
 #ifndef NORINSIDE
 #include <RInside.h>

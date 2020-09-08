@@ -1,1 +1,1 @@
-../../src/singlesubject.cpp
+../../src/singlesubject/singlesubject.cpp
