@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
                                          Named("error_var")               = .005,
                                          Named("error_alpha")             = .001,
                                          Named("error_beta")              = .001,
-                                         Named("error_mean_pulse_count")  = 12,
+                                         Named("mean_pulse_count")        = 12,
                                          Named("strauss_repulsion")       = .5,
                                          Named("strauss_repulsion_range") = .05);
   pop_startingvals.attr("class") = "bp_startingvals";
@@ -241,7 +241,7 @@ int main(int argc, char **argv) {
                                          Named("ind_mass")          = 2,
                                          Named("sub_width_mean")    = 1,
                                          Named("pop_width_mean")    = 0.5,
-                                         Named("pv_ind_width")      = 5,
+                                         Named("ind_width")         = 5,
                                          Named("pop_baseline_mean") = 1,
                                          Named("sub_baseline")      = 0.015,
                                          Named("pop_halflife_mean") = 1,

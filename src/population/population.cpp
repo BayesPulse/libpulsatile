@@ -30,7 +30,25 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                        int pv_adjust_iter,
                        int pv_adjust_max_iter,
                        double bivariate_pv_target_ratio,
-                       double univariate_pv_target_ratio)
+                       double univariate_pv_target_ratio,
+                       bool test_birthdeath,
+                       bool test_sd_masses,
+                       bool test_sd_width,
+                       bool test_s2s_sd_width,
+                       bool test_s2s_sd_mass,
+                       bool test_s2s_sd_baseline,
+                       bool test_s2s_sd_halflife,
+                       bool test_pop_means_width,
+                       bool test_pop_means_mass,
+                       bool test_pop_means_baseline,
+                       bool test_pop_means_halflife,
+                       bool test_fixeff_mass,
+                       bool test_fixeff_width,
+                       bool test_error,
+                       bool test_locations,
+                       bool test_masses,
+                       bool test_widths)
+
 {
   // Set to print every nth iteration for verbose screen output  
   int verbose_iter = 5000;
@@ -85,7 +103,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                               startingvals["error_alpha"],
                               startingvals["error_beta"]);
 
-  PatientPriors patientPriors2(startingvals["error_mean_pulse_count"],
+  PatientPriors patientPriors2(startingvals["mean_pulse_count"],
                               startingvals["strauss_repulsion"],
                               startingvals["strauss_repulsion_range"]);
 
@@ -231,29 +249,31 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   //----------------------------------------
   // Add new pulses (for testing purposes)
   //----------------------------------------
-  for(int i = 0; i < 10; i++) {
-    Patient * patient = &population->patients[i];
-    double fitstart = patient->data.fitstart;
-    double fitend = patient->data.fitstart;
-    int j;
+  if(!test_birthdeath) {
+    for(int i = 0; i < 10; i++) {
+      Patient * patient = &population->patients[i];
+      double fitstart = patient->data.fitstart;
+      double fitend = patient->data.fitstart;
+      int j;
 
-    switch(i) {
-      case 0: j = 13; break;
-      case 1: j = 10; break;
-      case 2: j = 14; break;
-      case 3: j = 10; break;
-      case 4: j = 15; break;
-      case 5: j = 13; break;
-      case 6: j = 17; break;
-      case 7: j = 14; break;
-      case 8: j = 13; break;
-      case 9: j = 14; break;
-      default: std::cout << "Problem adding pulses\n";
-    }
+      switch(i) {
+        case 0: j = 13; break;
+        case 1: j = 10; break;
+        case 2: j = 14; break;
+        case 3: j = 10; break;
+        case 4: j = 15; break;
+        case 5: j = 13; break;
+        case 6: j = 17; break;
+        case 7: j = 14; break;
+        case 8: j = 13; break;
+        case 9: j = 14; break;
+        default: std::cout << "Problem adding pulses\n";
+      }
 
-    for(int k = 0; k < j-1; k++) {
-      double position = Rf_runif(fitstart, fitend);
-      birth_death.add_new_pulse(patient, position);
+      for(int k = 0; k < j-1; k++) {
+        double position = Rf_runif(fitstart, fitend);
+        birth_death.add_new_pulse(patient, position);
+      }
     }
   }
 
@@ -267,36 +287,36 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   // Sample MMH Objects
   //----------------------------------------
 
-  for(int iteration = 0; iteration < 15000; iteration++) {
+  for(int iteration = 0; iteration < mcmc_iterations; iteration++) {
 
     chains.print_diagnostic_output(population, iteration);
 
-    //draw_sd_masses.sample(population, &population->patPriors.mass_p2p_sd, population, iteration);
-    //draw_sd_width.sample(population, &population->patPriors.width_p2p_sd, population, iteration);
+    if (test_sd_masses) draw_sd_masses.sample(population, &population->patPriors.mass_p2p_sd, population, iteration);
+    if (test_sd_width) draw_sd_width.sample(population, &population->patPriors.width_p2p_sd, population, iteration);
 
-    //draw_pop_means_width.sample(population, &population->patPriors.width_mean, iteration);
-    //draw_pop_means_mass.sample(population, &population->patPriors.mass_mean, iteration);
-    //draw_pop_means_baseline.sample(population, &population->patPriors.baseline_mean, iteration);
-    //draw_pop_means_halflife.sample(population, &population->patPriors.halflife_mean, iteration);
+    if (test_pop_means_width) draw_pop_means_width.sample(population, &population->patPriors.width_mean, iteration);
+    if (test_pop_means_mass) draw_pop_means_mass.sample(population, &population->patPriors.mass_mean, iteration);
+    if (test_pop_means_baseline) draw_pop_means_baseline.sample(population, &population->patPriors.baseline_mean, iteration);
+    if (test_pop_means_halflife) draw_pop_means_halflife.sample(population, &population->patPriors.halflife_mean, iteration);
 
-    //draw_s2s_sd_width.sample(population, &population->patPriors.width_s2s_sd, population, iteration);
-    //draw_s2s_sd_mass.sample(population, &population->patPriors.mass_s2s_sd, population, iteration);
-    //draw_s2s_sd_baseline.sample(population, &population->patPriors.baseline_sd, population, iteration);
-    //draw_s2s_sd_halflife.sample(population, &population->patPriors.halflife_sd, population, iteration);
+    if (test_s2s_sd_width) draw_s2s_sd_width.sample(population, &population->patPriors.width_s2s_sd, population, iteration);
+    if (test_s2s_sd_mass) draw_s2s_sd_mass.sample(population, &population->patPriors.mass_s2s_sd, population, iteration);
+    if (test_s2s_sd_baseline) draw_s2s_sd_baseline.sample(population, &population->patPriors.baseline_sd, population, iteration);
+    if (test_s2s_sd_halflife) draw_s2s_sd_halflife.sample(population, &population->patPriors.halflife_sd, population, iteration);
 
 
-    //for(auto &pat : population->patients) {
-      //Patient * patient = &pat;
-      //birth_death.sample(patient, false, iteration);
-      //draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
-      //draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
-      //draw_locations->sample_pulses(patient, iteration);
-      //draw_masses.sample_pulses(patient, iteration);
-      //draw_widths.sample_pulses(patient, iteration);
+    for(auto &pat : population->patients) {
+      Patient * patient = &pat;
+      if (test_birthdeath) birth_death.sample(patient, false, iteration);
+      if (test_fixeff_mass) draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
+      if (test_fixeff_width) draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
+      if (test_locations) draw_locations->sample_pulses(patient, iteration);
+      if (test_masses) draw_masses.sample_pulses(patient, iteration);
+      if (test_widths) draw_widths.sample_pulses(patient, iteration);
 
-    //}
+    }
 
-    //draw_error.sample(population);
+    if (test_error) draw_error.sample(population);
 
     chains.save_sample(population, iteration);
 

@@ -2,15 +2,18 @@
 % Please edit documentation in R/chains.R
 \name{chains}
 \alias{chains}
+\alias{population_chain}
 \alias{pulse_chain}
 \alias{patient_chain}
 \title{chains}
 \usage{
 chains(fit)
 
-pulse_chain(fit)
+population_chain(fit)
 
-patient_chain(fit)
+pulse_chain(fit, ...)
+
+patient_chain(fit, ...)
 }
 \arguments{
 \item{fit}{A model fit from \code{fit_pulse}.}

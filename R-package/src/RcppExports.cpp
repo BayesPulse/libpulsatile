@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // population_
-Rcpp::List population_(Rcpp::NumericMatrix concentrations, Rcpp::NumericVector time, Rcpp::CharacterVector location_prior, Rcpp::List inpriors, Rcpp::List proposalvars, Rcpp::List startingvals, int mcmc_iterations, int thin, int burnin, bool verbose, int pv_adjust_iter, int pv_adjust_max_iter, double bivariate_pv_target_ratio, double univariate_pv_target_ratio);
-RcppExport SEXP _bayespulse_population_(SEXP concentrationsSEXP, SEXP timeSEXP, SEXP location_priorSEXP, SEXP inpriorsSEXP, SEXP proposalvarsSEXP, SEXP startingvalsSEXP, SEXP mcmc_iterationsSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP verboseSEXP, SEXP pv_adjust_iterSEXP, SEXP pv_adjust_max_iterSEXP, SEXP bivariate_pv_target_ratioSEXP, SEXP univariate_pv_target_ratioSEXP) {
+Rcpp::List population_(Rcpp::NumericMatrix concentrations, Rcpp::NumericVector time, Rcpp::CharacterVector location_prior, Rcpp::List inpriors, Rcpp::List proposalvars, Rcpp::List startingvals, int mcmc_iterations, int thin, int burnin, bool verbose, int pv_adjust_iter, int pv_adjust_max_iter, double bivariate_pv_target_ratio, double univariate_pv_target_ratio, bool test_birthdeath, bool test_sd_masses, bool test_sd_width, bool test_s2s_sd_width, bool test_s2s_sd_mass, bool test_s2s_sd_baseline, bool test_s2s_sd_halflife, bool test_pop_means_width, bool test_pop_means_mass, bool test_pop_means_baseline, bool test_pop_means_halflife, bool test_fixeff_mass, bool test_fixeff_width, bool test_error, bool test_locations, bool test_masses, bool test_widths);
+RcppExport SEXP _bayespulse_population_(SEXP concentrationsSEXP, SEXP timeSEXP, SEXP location_priorSEXP, SEXP inpriorsSEXP, SEXP proposalvarsSEXP, SEXP startingvalsSEXP, SEXP mcmc_iterationsSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP verboseSEXP, SEXP pv_adjust_iterSEXP, SEXP pv_adjust_max_iterSEXP, SEXP bivariate_pv_target_ratioSEXP, SEXP univariate_pv_target_ratioSEXP, SEXP test_birthdeathSEXP, SEXP test_sd_massesSEXP, SEXP test_sd_widthSEXP, SEXP test_s2s_sd_widthSEXP, SEXP test_s2s_sd_massSEXP, SEXP test_s2s_sd_baselineSEXP, SEXP test_s2s_sd_halflifeSEXP, SEXP test_pop_means_widthSEXP, SEXP test_pop_means_massSEXP, SEXP test_pop_means_baselineSEXP, SEXP test_pop_means_halflifeSEXP, SEXP test_fixeff_massSEXP, SEXP test_fixeff_widthSEXP, SEXP test_errorSEXP, SEXP test_locationsSEXP, SEXP test_massesSEXP, SEXP test_widthsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -26,7 +26,24 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type pv_adjust_max_iter(pv_adjust_max_iterSEXP);
     Rcpp::traits::input_parameter< double >::type bivariate_pv_target_ratio(bivariate_pv_target_ratioSEXP);
     Rcpp::traits::input_parameter< double >::type univariate_pv_target_ratio(univariate_pv_target_ratioSEXP);
-    rcpp_result_gen = Rcpp::wrap(population_(concentrations, time, location_prior, inpriors, proposalvars, startingvals, mcmc_iterations, thin, burnin, verbose, pv_adjust_iter, pv_adjust_max_iter, bivariate_pv_target_ratio, univariate_pv_target_ratio));
+    Rcpp::traits::input_parameter< bool >::type test_birthdeath(test_birthdeathSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_sd_masses(test_sd_massesSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_sd_width(test_sd_widthSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_s2s_sd_width(test_s2s_sd_widthSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_s2s_sd_mass(test_s2s_sd_massSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_s2s_sd_baseline(test_s2s_sd_baselineSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_s2s_sd_halflife(test_s2s_sd_halflifeSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_pop_means_width(test_pop_means_widthSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_pop_means_mass(test_pop_means_massSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_pop_means_baseline(test_pop_means_baselineSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_pop_means_halflife(test_pop_means_halflifeSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_fixeff_mass(test_fixeff_massSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_fixeff_width(test_fixeff_widthSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_error(test_errorSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_locations(test_locationsSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_masses(test_massesSEXP);
+    Rcpp::traits::input_parameter< bool >::type test_widths(test_widthsSEXP);
+    rcpp_result_gen = Rcpp::wrap(population_(concentrations, time, location_prior, inpriors, proposalvars, startingvals, mcmc_iterations, thin, burnin, verbose, pv_adjust_iter, pv_adjust_max_iter, bivariate_pv_target_ratio, univariate_pv_target_ratio, test_birthdeath, test_sd_masses, test_sd_width, test_s2s_sd_width, test_s2s_sd_mass, test_s2s_sd_baseline, test_s2s_sd_halflife, test_pop_means_width, test_pop_means_mass, test_pop_means_baseline, test_pop_means_halflife, test_fixeff_mass, test_fixeff_width, test_error, test_locations, test_masses, test_widths));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -58,7 +75,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_bayespulse_population_", (DL_FUNC) &_bayespulse_population_, 14},
+    {"_bayespulse_population_", (DL_FUNC) &_bayespulse_population_, 31},
     {"_bayespulse_singlesubject_", (DL_FUNC) &_bayespulse_singlesubject_, 14},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 0},
     {NULL, NULL, 0}

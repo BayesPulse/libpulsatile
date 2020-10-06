@@ -158,18 +158,37 @@ void PopChains::save_sample(Population * pop, int iter) {
 // Member Function: Return chains object (R list)
 List PopChains::output(Population * pop) {
 
+  int patientCount = pop->get_patientcount();
+
   // Add names to each output chain
   NumericMatrix pop_chain_r     = addattribs_pop_chain(pop_chain);
-  NumericMatrix patient_chain_r = addattribs_patient_chain(patient_chains[1]);
-  List pulse_chain_r            = addattribs_pulse_chain(pulse_chains[1]);
+  List pulse_chains_r           = List(patientCount);
+  List patient_chains_r         = List(patientCount);
+
+  for(int i = 0; i < patientCount; i++) {
+
+    NumericMatrix patient_chain_r = addattribs_patient_chain(patient_chains[i]);
+    List pulse_chain_r            = addattribs_pulse_chain(pulse_chains[i]);
+
+    String patientString("Patient ");
+    patientString += std::to_string(i+1);    
+
+    patient_chains_r[i] = patient_chain_r;
+    pulse_chains_r[i]   = pulse_chain_r;
+
+  }
+
+  //NumericMatrix patient_chain_r = addattribs_patient_chain(patient_chains[2]);
+  //List pulse_chain_r            = addattribs_pulse_chain(pulse_chains[1]);
+
   NumericVector fitrange(2); 
   fitrange(0) = pop->patients[1].data.fitstart;
   fitrange(1) = pop->patients[1].data.fitend;
 
   // Create list object combining all chains & other output
   List out = List::create(Named("pop_chain") = pop_chain_r,
-                          Named("patient_chains") = patient_chain_r,
-                          Named("pulse_chains")  = pulse_chain_r,
+                          Named("patient_chains") = patient_chains_r,
+                          Named("pulse_chains")  = pulse_chains_r,
                           Named("time_range")     = fitrange);
 
   return out;

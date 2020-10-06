@@ -4,10 +4,18 @@
 \alias{fit_pulse}
 \title{fit_pulse}
 \usage{
-fit_pulse(data, time = "time", conc = "concentration",
-  subject_id = NULL, spec, iters = 250000, thin = 50,
-  burnin = as.integer(0.1 * iters), use_tibble = TRUE,
-  verbose = FALSE)
+fit_pulse(
+  data,
+  time = "time",
+  conc = "concentration",
+  subject_id = NULL,
+  spec,
+  iters = 250000,
+  thin = 50,
+  burnin = as.integer(0.1 * iters),
+  use_tibble = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{data}{A dataset containing \code{time} and \code{conc}.  Can

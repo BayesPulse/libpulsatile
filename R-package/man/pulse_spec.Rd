@@ -4,21 +4,42 @@
 \alias{pulse_spec}
 \title{pulse_spec}
 \usage{
-pulse_spec(location_prior_type = c("strauss", "order-statistic"),
-  prior_mass_mean = 3.5, prior_mass_var = 100, prior_width_mean = 42,
-  prior_width_var = 1000, prior_baseline_mean = 2.6,
-  prior_baseline_var = 100, prior_halflife_mean = 45,
-  prior_halflife_var = 100, prior_error_alpha = 1e-04,
-  prior_error_beta = 1e-04, prior_location_gamma = 0,
-  prior_location_range = 40, prior_sd_mass = 5, prior_sd_width = 5,
-  prior_mean_pulse_count = 12, sv_mass_mean = 3.5,
-  sv_width_mean = 42, sv_baseline_mean = 2.6, sv_halflife_mean = 45,
-  sv_error_var = 0.005, sv_mass_sd = 1.6, sv_width_sd = 35,
-  pv_baseline = 0.02, pv_halflife = 1.5, pv_mean_pulse_mass = 6,
-  pv_mean_pulse_width = 3700, pv_indiv_pulse_mass = 1,
-  pv_indiv_pulse_width = 15000, pv_sd_pulse_mass = 4.5,
-  pv_sd_pulse_width = 4000, pv_sdscale_pulse_mass = 4,
-  pv_sdscale_pulse_width = 4, pv_pulse_location = 65)
+pulse_spec(
+  location_prior_type = c("strauss", "order-statistic"),
+  prior_mass_mean = 3.5,
+  prior_mass_var = 100,
+  prior_width_mean = 42,
+  prior_width_var = 1000,
+  prior_baseline_mean = 2.6,
+  prior_baseline_var = 100,
+  prior_halflife_mean = 45,
+  prior_halflife_var = 100,
+  prior_error_alpha = 1e-04,
+  prior_error_beta = 1e-04,
+  prior_location_gamma = 0,
+  prior_location_range = 40,
+  prior_sd_mass = 5,
+  prior_sd_width = 5,
+  prior_mean_pulse_count = 12,
+  sv_mass_mean = 3.5,
+  sv_width_mean = 42,
+  sv_baseline_mean = 2.6,
+  sv_halflife_mean = 45,
+  sv_error_var = 0.005,
+  sv_mass_sd = 1.6,
+  sv_width_sd = 35,
+  pv_baseline = 0.02,
+  pv_halflife = 1.5,
+  pv_mean_pulse_mass = 6,
+  pv_mean_pulse_width = 3700,
+  pv_indiv_pulse_mass = 1,
+  pv_indiv_pulse_width = 15000,
+  pv_sd_pulse_mass = 4.5,
+  pv_sd_pulse_width = 4000,
+  pv_sdscale_pulse_mass = 4,
+  pv_sdscale_pulse_width = 4,
+  pv_pulse_location = 65
+)
 }
 \arguments{
 \item{location_prior_type}{Takes on two values: "order-statistic" and

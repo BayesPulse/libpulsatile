@@ -24,19 +24,38 @@
 #' @export
 
 
-fit_pop_pulse <- function(data, #1
-                          time = "time",
-                          num_patients, #3
+fit_pop_pulse <- function(data,
+                          time,
+                          num_patients, #Currently not used
+                          location_prior = "strauss",
                           spec,
                           iters = 250000,
                           thin = 50,
                           burnin = as.integer(0.1 * iters),
                           use_tibble = TRUE, 
-                          verbose = FALSE) {
+                          verbose = FALSE,
+                          test_birthdeath = FALSE,
+                          test_sd_masses = FALSE,
+                          test_sd_width = FALSE,
+                          test_s2s_sd_width = FALSE,
+                          test_s2s_sd_mass = FALSE,
+                          test_s2s_sd_baseline = FALSE,
+                          test_s2s_sd_halflife = FALSE,
+                          test_pop_means_width = FALSE,
+                          test_pop_means_mass = FALSE,
+                          test_pop_means_baseline = FALSE,
+                          test_pop_means_halflife = FALSE,
+                          test_fixeff_mass = FALSE,
+                          test_fixeff_width = FALSE,
+                          test_error = FALSE,
+                          test_locations = FALSE,
+                          test_masses = FALSE,
+                          test_widths = FALSE
+                          ) {
   
   #if(num_patients != length(concs)) stop("Number of patients and concentration columns unequal")
   
-  indata <- list("time" = data$time, "concentrations" = as.matrix(data[,-1]))
+  #indata <- list("time" = data$time, "concentrations" = as.matrix(data[,-1]))
   
   #stopifnot(is.numeric(indata[[time]]), is.numeric(indata[[conc]]),
    #         is.logical(use_tibble), is.logical(verbose))
@@ -69,18 +88,73 @@ fit_pop_pulse <- function(data, #1
   }
   
   # Call RCPP population function
-  fit <- population_(indata$concentration,
-                        indata$time,
-                        "temp_location_prior",
-                        priors,
-                        proposalvariances,
-                        startingvalues,
-                        iters, thin, burnin, verbose,
-                        pv_adjust_iter, pv_adjust_max_iter,
-                        bivariate_pv_target_ratio, univariate_pv_target_ratio)
-  
+  fit <- population_(data,
+                     time,
+                     location_prior,
+                     priors,
+                     proposalvariances,
+                     startingvalues,
+                     iters, thin, burnin, verbose,
+                     pv_adjust_iter, pv_adjust_max_iter,
+                     bivariate_pv_target_ratio, univariate_pv_target_ratio,
+                     test_birthdeath,
+                     test_sd_masses,
+                     test_sd_width,
+                     test_s2s_sd_width,
+                     test_s2s_sd_mass,
+                     test_s2s_sd_baseline,
+                     test_s2s_sd_halflife,
+                     test_pop_means_width,
+                     test_pop_means_mass,
+                     test_pop_means_baseline,
+                     test_pop_means_halflife,
+                     test_fixeff_mass,
+                     test_fixeff_width,
+                     test_error,
+                     test_locations,
+                     test_masses,
+                     test_widths)
+
+
+  population_chain <- as.data.frame(fit$pop_chain)
+
+  patient_chains <- lapply(fit$patient_chains, as.data.frame);
+  pulse_chains <- lapply(fit$pulse_chains, 
+                        FUN = function(x){as.data.frame(do.call(rbind, x))})
+  #patient_chains <- as.data.frame(fit$patient_chains)
+  #pulse_chains <- as.data.frame(do.call(rbind, fit$pulse_chains))
+  #pulse_chains <- fit$pulse_chains
+
+
+  # Convert doubles to ints -- not strictly necessary -- consider.
+  #pulse_chain$iteration        <- as.integer(pulse_chain$iteration)
+  #pulse_chain$total_num_pulses <- as.integer(pulse_chain$total_num_pulses)
+  #pulse_chain$pulse_num        <- as.integer(pulse_chain$pulse_num)
+  #patient_chain$iteration       <- as.integer(patient_chain$iteration)
+  #patient_chain$num_pulses      <- as.integer(patient_chain$num_pulses)
+
+  #if (use_tibble) {
+  #  patient_chain <- tibble::as_data_frame(patient_chain)
+  #  pulse_chain  <- tibble::as_data_frame(pulse_chain)
+  #}
   # temp return line
-  return(fit)
-  
+
+  rtn_obj <-
+    structure(list("model"            = "population",
+                   "call"             = Call,
+                   "population_chain" = population_chain,
+                   "patient_chain"    = patient_chains,
+                   "pulse_chain"      = pulse_chains,
+                   "data"             = data,
+                   "time_range"       = fit$time_range,
+                   "options"          = list(#"time"       = time,
+                                             #"conc"       = conc,
+                                             "thinning"   = thin,
+                                             "iterations" = iters),
+                   "spec"             = spec),
+              class = "pop_pulse_fit")
+
+  return(rtn_obj)
+                   
 }
 
