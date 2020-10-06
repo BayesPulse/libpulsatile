@@ -267,7 +267,24 @@ int main(int argc, char **argv) {
                          500,
                          25000,
                          0.25,
-                         0.35);
+                         0.35,
+                         true,  // test_birthdeath,
+                         true,  // test_sd_masses,
+                         true,  // test_sd_width,
+                         true,  // test_s2s_sd_width,
+                         true,  // test_s2s_sd_mass,
+                         true,  // test_s2s_sd_baseline,
+                         true,  // test_s2s_sd_halflife,
+                         true,  // test_pop_means_width,
+                         true,  // test_pop_means_mass,
+                         true,  // test_pop_means_baseline,
+                         true,  // test_pop_means_halflife,
+                         true,  // test_fixeff_mass,
+                         true,  // test_fixeff_width,
+                         true,  // test_error,
+                         true,  // test_locations,
+                         true,  // test_masses,
+                         true); // test_widths
   
 
   return 0;
