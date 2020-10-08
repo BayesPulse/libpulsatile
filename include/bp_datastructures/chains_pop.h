@@ -36,7 +36,7 @@ class PopChains {
       num_patients = in_num_patients;
 
       for (int i = 0; i < num_patients; i++) {
-        patient_chains.push_back(arma::mat(num_outputs, 5, 
+        patient_chains.push_back(arma::mat(num_outputs, 6,
                                            arma::fill::zeros));
       }
 
@@ -119,6 +119,7 @@ void PopChains::save_sample(Population * pop, int iter) {
       patient_chains[pat_iter](output_index, 2) = pat.estimates.mass_mean;
       patient_chains[pat_iter](output_index, 3) = pat.estimates.width_mean;
       patient_chains[pat_iter](output_index, 4) = pat.estimates.errorsq;
+      patient_chains[pat_iter](output_index, 5) = pat.likelihood(false);
 
       // Create a matrix of current pulse-level estimates and add matrix to the
       //   vector chain
@@ -284,7 +285,8 @@ NumericMatrix PopChains::addattribs_patient_chain(arma::mat in) {
                                           "num_pulses",
                                           "mass_mean",
                                           "width_mean",
-                                          "model_error");
+                                          "model_error",
+                                          "likelihood");
 
   return out;
 

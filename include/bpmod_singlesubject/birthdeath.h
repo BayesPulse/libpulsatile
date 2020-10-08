@@ -64,12 +64,12 @@ class BirthDeathProcess
         pulse_count = patient->get_pulsecount();
         arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);
 
-    /*
+        /*
         Rcpp::Rcout << "Partial_likelihood length: " << partial_likelihood.n_elem << "\n"; 
         Rcpp::Rcout << "Partial_likelihood: ";
         for(auto like : partial_likelihood) { Rcpp::Rcout << like << " "; }
         Rcpp::Rcout  << "\nPulse count: " << pulse_count << "\n";
-    */
+        */
 
         // 3. Calculate individual death rate for each pulse
         arma::vec death_rates(pulse_count);

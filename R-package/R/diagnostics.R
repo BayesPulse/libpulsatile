@@ -58,7 +58,7 @@ bp_trace.pop_pulse_fit <- function(fit, patient = NULL) {
   
   if (!is.null(patient)) {
     patDat <- patient_chain(fit, patient)
-    colnames(patDat)[2:5] <- paste0("pat_", colnames(patDat)[2:5])
+    colnames(patDat)[2:6] <- paste0("pat_", colnames(patDat)[2:6])
     patDat <- tidyr::pivot_longer(patDat, !iteration, names_to = "parameter",
                                values_to = "value")
     
