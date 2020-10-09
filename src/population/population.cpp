@@ -202,27 +202,27 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   BirthDeathProcess birth_death;
   
   // Population Level   
-  Pop_DrawSDRandomEffects draw_sd_masses(proposalvars["sub_mass_mean"], adj_iter,
+  Pop_DrawSDRandomEffects draw_sd_masses(proposalvars["ind_mass"], adj_iter,
                                          adj_max, univ_target, false,
                                          verbose, verbose_iter);
-  Pop_DrawSDRandomEffects draw_sd_width(proposalvars["sub_width_mean"], adj_iter,
+  Pop_DrawSDRandomEffects draw_sd_width(proposalvars["ind_width"], adj_iter,
                                          adj_max, univ_target, false,
                                          verbose, verbose_iter);
-  Pop_DrawS2S_SD draw_s2s_sd_width(proposalvars["pop_width_mean"], adj_iter, adj_max, univ_target,
+  Pop_DrawS2S_SD draw_s2s_sd_width(proposalvars["sub_width"], adj_iter, adj_max, univ_target,
                                          true, false, false, verbose, verbose_iter);
-  Pop_DrawS2S_SD draw_s2s_sd_mass(proposalvars["pop_width_mean"], adj_iter, adj_max, univ_target,
+  Pop_DrawS2S_SD draw_s2s_sd_mass(proposalvars["sub_mass"], adj_iter, adj_max, univ_target,
                                          false, true, false, verbose, verbose_iter);
-  Pop_DrawS2S_SD draw_s2s_sd_baseline(proposalvars["pop_width_mean"], adj_iter, adj_max, univ_target,
+  Pop_DrawS2S_SD draw_s2s_sd_baseline(proposalvars["sub_baseline"], adj_iter, adj_max, univ_target,
                                          false, false, true, verbose, verbose_iter);
-  Pop_DrawS2S_SD draw_s2s_sd_halflife(proposalvars["pop_width_mean"], adj_iter, adj_max, univ_target,
+  Pop_DrawS2S_SD draw_s2s_sd_halflife(proposalvars["sub_halflife"], adj_iter, adj_max, univ_target,
                                          false, false, false, verbose, verbose_iter);
   Pop_DrawPopMeans draw_pop_means_width(proposalvars["pop_width_mean"], adj_iter, adj_max, univ_target,
                                          true, false, false, verbose, verbose_iter);
-  Pop_DrawPopMeans draw_pop_means_mass(proposalvars["pop_width_mean"], adj_iter, adj_max, univ_target,
+  Pop_DrawPopMeans draw_pop_means_mass(proposalvars["pop_mass_mean"], adj_iter, adj_max, univ_target,
                                          false, true, false, verbose, verbose_iter);
-  Pop_DrawPopMeans draw_pop_means_baseline(proposalvars["pop_width_mean"], adj_iter, adj_max, univ_target,
+  Pop_DrawPopMeans draw_pop_means_baseline(proposalvars["pop_baseline_mean"], adj_iter, adj_max, univ_target,
                                          false, false, true, verbose, verbose_iter);
-  Pop_DrawPopMeans draw_pop_means_halflife(proposalvars["pop_width_mean"], adj_iter, adj_max, univ_target,
+  Pop_DrawPopMeans draw_pop_means_halflife(proposalvars["pop_halflife_mean"], adj_iter, adj_max, univ_target,
                                          false, false, false, verbose, verbose_iter);
 
   // Subject Level
@@ -254,7 +254,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
       Patient * patient = &population->patients[i];
       double fitstart = patient->data.fitstart;
       double fitend = patient->data.fitstart;
-      int j;
+      int j = 0;
 
       switch(i) {
         case 0: j = 13; break;
