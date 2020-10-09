@@ -14,7 +14,24 @@ fit_pop_pulse(
   thin = 50,
   burnin = as.integer(0.1 * iters),
   use_tibble = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  test_birthdeath = FALSE,
+  test_sd_masses = FALSE,
+  test_sd_width = FALSE,
+  test_s2s_sd_width = FALSE,
+  test_s2s_sd_mass = FALSE,
+  test_s2s_sd_baseline = FALSE,
+  test_s2s_sd_halflife = FALSE,
+  test_pop_means_width = FALSE,
+  test_pop_means_mass = FALSE,
+  test_pop_means_baseline = FALSE,
+  test_pop_means_halflife = FALSE,
+  test_fixeff_mass = FALSE,
+  test_fixeff_width = FALSE,
+  test_error = FALSE,
+  test_locations = FALSE,
+  test_masses = FALSE,
+  test_widths = FALSE
 )
 }
 \arguments{
