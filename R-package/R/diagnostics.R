@@ -47,7 +47,7 @@ bp_trace.pulse_fit <- function(fit) {
 
 }
 
-#' @importFrom tidyr bind_rows
+#' @importFrom dplyr bind_rows
 #' @export
 bp_trace.pop_pulse_fit <- function(fit, patient = NULL) {
   

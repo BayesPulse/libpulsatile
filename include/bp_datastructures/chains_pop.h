@@ -216,17 +216,17 @@ void PopChains::print_diagnostic_output(Population * pop, int iter) {
     " Width S2S sd = "     << pop->patPriors.width_s2s_sd      << "\n" <<
     "Mass S2S sd = "       << pop->patPriors.mass_s2s_sd       <<
     " Baseline S2S sd = "  << pop->patPriors.baseline_sd       <<
-    " Halflife S2S sd = "  << pop->patPriors.halflife_sd       << "\n";
+    " Halflife S2S sd = "  << pop->patPriors.halflife_sd       << "\n\n";
 
   for(auto pat : pop->patients) {
 
-      Rcpp::Rcout            << "\n"                           <<
+      Rcpp::Rcout            <<
         "Patient = "         << pat_iter                       <<
         " Likelihood = "     << pat.likelihood(false)          << "\n" <<
         "Pulse count = "     << pat.get_pulsecount()           <<
         " Error variance = " << pat.estimates.errorsq          << "\n" <<
         "Mass mean = "       << pat.estimates.mass_mean        <<
-        " Width mean = "     << pat.estimates.width_mean       << "\n";
+        " Width mean = "     << pat.estimates.width_mean       << "\n\n";
 
         //" Current pulse-specific parms: " << "\n" << 
         //"Pulse No. Time  Mass  Width\n" << pulse_chains.back() <<
