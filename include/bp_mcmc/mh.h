@@ -53,10 +53,15 @@ class ModifiedMetropolisHastings
 
       Rcpp::RNGScope rng_scope;
       double accept_prob, alpha;
+      
+      Rcpp::Rcout << "Iteration " << iter << "--------------------------------\n";
 
       // Draw new proposal
       SAMPLETYPE proposal = draw_proposal(*current_val, pv.getpsd());
       bool supported      = parameter_support(proposal, container);
+      
+      Rcpp::Rcout << "Proposal: " << proposal << " (Mean: " << *current_val
+                  << " SD: " << pv.getpsd() << ")\n";
 
       if (!supported) {
 
@@ -66,8 +71,13 @@ class ModifiedMetropolisHastings
 
         accept_prob = posterior_function(sampling_unit, proposal, container);
         alpha = (0 < accept_prob) ? 0 : accept_prob;
+        
+        double rand = log(Rf_runif(0, 1));
+        Rcpp::Rcout << "Alpha: " << alpha << "\n" <<
+          "Random: " << rand << "\n\n";
 
-        if (log(Rf_runif(0, 1)) < alpha) {
+
+        if (rand < alpha) {
 
           pv.addaccept(iter);
           *current_val = proposal;
@@ -78,6 +88,9 @@ class ModifiedMetropolisHastings
 
         }
       }
+      
+      print_diagnostic_output();
+      Rcpp::Rcout << "\n";
 
       if ( verbose == true && !(iter % verbose_iter) && iter != last_iter) {
         print_diagnostic_output();

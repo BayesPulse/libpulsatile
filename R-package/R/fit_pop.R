@@ -61,6 +61,8 @@ fit_pop_pulse <- function(data,
    #         is.logical(use_tibble), is.logical(verbose))
   #if (burnin >= iters) stop("burnin >= iters")
   
+  if(thin <= 0) stop("thin must be greater than 0")
+  
   pv_adjust_iter <- 500
   pv_adjust_max_iter <- 25000
   univariate_pv_target_ratio <- 0.35
