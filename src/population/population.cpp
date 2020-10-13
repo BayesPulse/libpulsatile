@@ -67,7 +67,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   double biv_target  = bivariate_pv_target_ratio;
   double univ_target = univariate_pv_target_ratio;
   std::string loc_prior = Rcpp::as<std::string>(location_prior);
-
+  
 
   Rcpp::Rcout << "Location prior is: " << loc_prior << "\n\n";
   
@@ -257,14 +257,14 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
       int j = 0;
 
       switch(i) {
-        case 0: j = 13; break;
-        case 1: j = 10; break;
-        case 2: j = 14; break;
-        case 3: j = 10; break;
-        case 4: j = 15; break;
-        case 5: j = 13; break;
-        case 6: j = 17; break;
-        case 7: j = 14; break;
+        case 0: j = 14; break;
+        case 1: j = 16; break;
+        case 2: j = 15; break;
+        case 3: j = 16; break;
+        case 4: j = 12; break;
+        case 5: j = 15; break;
+        case 6: j = 11; break;
+        case 7: j = 16; break;
         case 8: j = 13; break;
         case 9: j = 14; break;
         default: std::cout << "Problem adding pulses\n";
