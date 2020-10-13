@@ -77,9 +77,9 @@ bp_trace.pop_pulse_fit <- function(fit, patient = NULL) {
     facet_wrap(~ parameter, ncol = nCol, nrow = nRow, scales = "free")
 }
 
+#' Creates chain trace plots
 #' @export
 bp_trace <- function(fit, ...) UseMethod("bp_trace")
-
 
 #' @rdname bp_trace
 #' @export
