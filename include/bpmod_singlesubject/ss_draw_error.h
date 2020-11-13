@@ -39,14 +39,20 @@ class SS_DrawError
     }
 
     void sample(Population *population) {
-      int alpha = population->patPriors.error_alpha;
-      int beta = population->patPriors.error_beta;
-      int N, ssq;
+      double alpha = population->patPriors.error_alpha;
+      double beta = population->patPriors.error_beta;
+      int N;
+      double ssq;
+
+      //Rcpp::Rcout << "Alpha: " << alpha << " Beta: " << beta << " -------------\n";
 
       for(auto &patient : population->patients) {
         N = patient.data.number_of_obs;
         ssq = patient.get_sumerrorsquared(false);
         patient.estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
+
+       // Rcpp::Rcout << "N: " << N << " SSQ: " << ssq
+       //             << "\npatErrorSq: " << patient.estimates.errorsq << "\n\n";
         
       }
     }

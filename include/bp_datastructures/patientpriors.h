@@ -105,13 +105,15 @@ struct PatientPriors {
     mass_mean         = sv_mass_mean;
     mass_p2p_sd       = sv_mass_p2p_sd;
     mass_s2s_sd       = sv_mass_s2s_sd;
+
     width_mean        = sv_width_mean;
     width_p2p_sd      = sv_width_p2p_sd;
     width_s2s_sd      = sv_width_s2s_sd;
+    
     baseline_mean     = sv_baseline_mean;
     baseline_sd       = sv_baseline_sd;
     halflife_mean     = sv_halflife_mean;
-    halflife_sd      = sv_halflife_sd;
+    halflife_sd       = sv_halflife_sd;
     error_alpha       = prior_error_alpha;
     error_beta        = 1 / prior_error_beta;
 
@@ -128,10 +130,17 @@ struct PatientPriors {
   //
   // Second population model constructor (holds data for individual patients to be passed to MH fns)
   //
-  PatientPriors(int sv_pulse_count,
+  PatientPriors(double sv_mass_mean,
+                double sv_width_mean,
+                double sv_mass_s2s_sd,
+                double sv_width_s2s_sd,
+                int    sv_pulse_count,
                 double sv_strauss_repulsion,
                 double sv_strauss_repulsion_range) {
-
+    mass_mean         = sv_mass_mean;
+    width_mean        = sv_width_mean;
+    mass_variance     = sv_mass_s2s_sd;
+    width_variance    = sv_width_s2s_sd;
     pulse_count       = sv_pulse_count;
     strauss_repulsion = sv_strauss_repulsion;
     strauss_repulsion_range = sv_strauss_repulsion_range;

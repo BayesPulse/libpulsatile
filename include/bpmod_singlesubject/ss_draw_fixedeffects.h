@@ -87,7 +87,6 @@ class SS_DrawFixedEffects :
       double scale             = 0.0;
       double randomeffect      = 0.0;
 
-
       // Prior Ratio
       prior_ratio = (pow(current - prior_mass_mean, 2) -
                      pow(proposal - prior_mass_mean, 2)) /
@@ -112,6 +111,11 @@ class SS_DrawFixedEffects :
 
       prop_ratio = 0.5 / pow(stddev, 2) * (psum_old - psum_new);
       normalizing_ratio = oldint - newint;
+
+      //Rcpp::Rcout << "Prior mean: " << prior_mass_mean << " Prior var: " << prior_mass_var 
+      //            << "\nCurrent: " << current << " Current SD: " << stddev << "\n"
+      //            << "Prior ratio: " << prior_ratio << " Prop ratio: " << prop_ratio << "\n"
+      //            << "Normalizing Ratio " << normalizing_ratio << "\n";
 
       return prior_ratio + prop_ratio + normalizing_ratio;
 

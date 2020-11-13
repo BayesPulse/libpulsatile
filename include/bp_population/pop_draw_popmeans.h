@@ -101,8 +101,8 @@ class Pop_DrawPopMeans :
       double stddev               = (*est).*est_sd_;
       double randomeffect         = 0.0;
       
-      Rcpp::Rcout << "Prior mean: " << prior_mean << " Prior var: " << prior_var
-                  << "\nEst mean: " << current << " Est sd: " << stddev << "\n";
+      //Rcpp::Rcout << "Prior mean: " << prior_mean << " Prior var: " << prior_var
+      //            << "\nEst mean: " << current << " Est sd: " << stddev << "\n";
 
 
       // Prior Ratio: This is ratio of truncated Normals
@@ -110,7 +110,7 @@ class Pop_DrawPopMeans :
                      pow(proposal - prior_mean, 2)) /
                     (2 * prior_var);
       
-      Rcpp::Rcout << "Prior ratio: " << prior_ratio << "\n";
+      //Rcpp::Rcout << "Prior ratio: " << prior_ratio << "\n";
 
       // 'likelihood' ratio -- Ratio of p(mu_alpha|m, v) for current and
       // proposed alpha
@@ -131,8 +131,8 @@ class Pop_DrawPopMeans :
       prop_ratio = 0.5 / pow(stddev, 2) * (psum_old - psum_new);
       normalizing_ratio = oldint - newint;
       
-      Rcpp::Rcout << "Prop ratio: " << prop_ratio << " Norm ratio: " << normalizing_ratio
-                  << "\n";
+      //Rcpp::Rcout << "Prop ratio: " << prop_ratio << " Norm ratio: " << normalizing_ratio
+      //            << "\n";
 
       return prior_ratio + prop_ratio + normalizing_ratio;
 

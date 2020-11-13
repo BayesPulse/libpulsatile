@@ -1,7 +1,7 @@
 #ifndef GUARD_bpmod_singlesubject_birthdeath_h
 #define GUARD_bpmod_singlesubject_birthdeath_h
 
-#include <Rcpp.h>
+#include <Rcpp.h> 
 #include <RcppArmadillo.h>
 #include <math.h>
 #ifndef NORINSIDE
@@ -53,6 +53,9 @@ class BirthDeathProcess
         birth_rate = total_birth_rate / (fitend - fitstart);
       }
 
+      //Rcpp::Rcout << "\nNew Loop ------------------------------\n"
+      //            << "TBR: " << total_birth_rate
+      //            << " BR: " << birth_rate << "\n";
 
       // Start Birth-death loop Run until break reached
       do {
@@ -64,12 +67,12 @@ class BirthDeathProcess
         pulse_count = patient->get_pulsecount();
         arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);
 
-        /*
-        Rcpp::Rcout << "Partial_likelihood length: " << partial_likelihood.n_elem << "\n"; 
-        Rcpp::Rcout << "Partial_likelihood: ";
-        for(auto like : partial_likelihood) { Rcpp::Rcout << like << " "; }
-        Rcpp::Rcout  << "\nPulse count: " << pulse_count << "\n";
-        */
+        //Rcpp::Rcout << "BD Iter: " << aaa << "\n"
+        //            << "Partial_likelihood length: " << partial_likelihood.n_elem
+        //            << " Pulse count: " << pulse_count << "\n"
+        //            << "Partial_likelihood: ";
+        //for(auto like : partial_likelihood) { Rcpp::Rcout << like << " "; }
+        //Rcpp::Rcout << "\n";
 
         // 3. Calculate individual death rate for each pulse
         arma::vec death_rates(pulse_count);
@@ -183,17 +186,18 @@ class BirthDeathProcess
         }
        
         // Only print if value is NaN or Inf 
-        if (isnan(birth_rate) || isinf(birth_rate)) {
-          std::cout << "Birth Rate: " << birth_rate << "\n";
-        }
-        if (isnan(probability_of_birth) || isinf(probability_of_birth)) {
-          std::cout << "Probability of Birth: " << probability_of_birth << "\n";
-        }
-        //std::cout << "Birth Rate: " << birth_rate << "\n";
-        //Rcpp::Rcout << "Death rate size: " << death_rates.size() << "\n";
-        //Rcpp::Rcout << "Probability of Birth: " << probability_of_birth << "\n";
-        //Rcpp::Rcout << "Pulse count: " << patient->get_pulsecount() << "\n\n";
-        
+        //if (isnan(birth_rate) || isinf(birth_rate)) {
+        //  std::cout << "Birth Rate: " << birth_rate << "\n";
+        //}
+        //if (isnan(probability_of_birth) || isinf(probability_of_birth)) {
+        //  std::cout << "Probability of Birth: " << probability_of_birth << "\n";
+        //}
+        //Rcpp::Rcout << "Birth Rate: " << birth_rate
+        //            << " Death rate size: " << death_rates.size() << "\n"
+        //            << "Death Rate: ";
+        //for(auto dr : death_rates) { Rcpp::Rcout << dr << " "; } 
+        //Rcpp::Rcout << "\nProbability of Birth: " << probability_of_birth << "\n"
+        //            << "Pulse count: " << patient->get_pulsecount() << "\n\n";
 
       } while (true);
 

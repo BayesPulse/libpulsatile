@@ -51,8 +51,8 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
 {
   // Set to print every nth iteration for verbose screen output  
-  int verbose_iter = 5000;
-
+  int verbose_iter = 1;
+  
 
   // Check for valid input
   if ( !inpriors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
@@ -103,18 +103,25 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                               startingvals["error_alpha"],
                               startingvals["error_beta"]);
 
-  PatientPriors patientPriors2(startingvals["mean_pulse_count"],
-                              startingvals["strauss_repulsion"],
-                              startingvals["strauss_repulsion_range"]);
+  PatientPriors patientPriors2(startingvals["mass_mean"],
+                               startingvals["width_mean"],
+                               startingvals["mass_s2s_sd_var"],
+                               startingvals["width_s2s_sd_var"],
+                               startingvals["mean_pulse_count"],
+                               startingvals["strauss_repulsion"],
+                               startingvals["strauss_repulsion_range"]);
 
   // Create subject level estimates object
   PatientEstimates patEstimates(startingvals["baseline_mean"],
                                 startingvals["halflife_mean"],
                                 startingvals["error_var"],
                                 startingvals["mass_mean"],
-                                startingvals["width_mean"]);
+                                startingvals["width_mean"],
+                                startingvals["mass_p2p_sd_var"],
+                                startingvals["width_p2p_sd_var"]);
 
-  std::cout << "Patient estimates created\n";
+  std::cout << "Patient estimates created\n"
+            << "Error alpha: " << patientPriors.error_alpha << "\n\n";
 
 
   // Get number of patients (should this be a function arg?)
@@ -196,6 +203,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
   }*/
 
+
   //----------------------------------------
   // Sample MMH Objects
   //----------------------------------------
@@ -230,6 +238,8 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                                        false, verbose, verbose_iter);
   SS_DrawFixedEffects draw_fixeff_width(proposalvars["sub_width_mean"], adj_iter, adj_max, univ_target,
                                         true, verbose, verbose_iter);
+  //SS_DrawBaselineHalflife draw_blhl(bhl_pv, adj_iter, adj_max, biv_target,
+  //                                  verbose, verbose_iter);
   SS_DrawError draw_error;
 
   // Pulse Level
@@ -245,6 +255,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                                    false, verbose, verbose_iter);
   SS_DrawRandomEffects draw_widths(proposalvars["sub_width_mean"], adj_iter, adj_max, univ_target,
                                    false, verbose, verbose_iter);
+
  
   //----------------------------------------
   // Add new pulses (for testing purposes)
@@ -253,8 +264,21 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
     for(int i = 0; i < 10; i++) {
       Patient * patient = &population->patients[i];
       double fitstart = patient->data.fitstart;
-      double fitend = patient->data.fitstart;
+      double fitend = patient->data.fitend;
+      int number_of_obs = patient->data.number_of_obs;
+      double avg_period_of_obs = patient->data.avg_period_of_obs;
+      double duration_of_obs = patient->data.duration_of_obs;
       int j = 0;
+
+      Rcpp::Rcout << "Fitstart: " << fitstart
+                  << " Fitend: " << fitend << "\n"
+                  << "NumOfObs: " << number_of_obs
+                  << " Avg Period " << avg_period_of_obs << "\n"
+                  << "Duration: " << duration_of_obs << "\n"
+                  << "Times: ";
+      
+      for(auto t : patient->data.time) { Rcpp::Rcout << t << " "; }
+      Rcpp::Rcout << "\n";
 
       switch(i) {
         case 0: j = 14; break;
@@ -270,14 +294,17 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
         default: std::cout << "Problem adding pulses\n";
       }
 
+      Rcpp::Rcout << "Pat " << i << " times: ";
+
       for(int k = 0; k < j-1; k++) {
         double position = Rf_runif(fitstart, fitend);
+        Rcpp::Rcout << position << " ";
         birth_death.add_new_pulse(patient, position);
       }
+      Rcpp::Rcout << "\n\n";
     }
+  std::cout << "Pulses Added Manually\n";
   }
-
-  std::cout << "Pulses Added\n";
 
   PopChains chains(mcmc_iterations, thin, burnin, false, verbose, verbose_iter, numPats);
 
@@ -304,12 +331,14 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
     if (test_s2s_sd_baseline) draw_s2s_sd_baseline.sample(population, &population->patPriors.baseline_sd, population, iteration);
     if (test_s2s_sd_halflife) draw_s2s_sd_halflife.sample(population, &population->patPriors.halflife_sd, population, iteration);
 
+    population->matchPatPriorsToPop();
 
     for(auto &pat : population->patients) {
       Patient * patient = &pat;
       if (test_birthdeath) birth_death.sample(patient, false, iteration);
       if (test_fixeff_mass) draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
       if (test_fixeff_width) draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
+      //if (test_blhl) draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
       if (test_locations) draw_locations->sample_pulses(patient, iteration);
       if (test_masses) draw_masses.sample_pulses(patient, iteration);
       if (test_widths) draw_widths.sample_pulses(patient, iteration);

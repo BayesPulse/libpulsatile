@@ -87,23 +87,27 @@ bp_posteriors <- function(fit, type = c("histogram", "density")) {
 
   stopifnot(class(fit) == "pulse_fit")
 
-  dat <- patient_chain(fit) 
-  dat <- tidyr::gather_(dat, key = "key", value = "value", 
-                        dplyr::select_vars_(names(dat), names(dat),
-                                            exclude = "iteration"))
+  # dat <- patient_chain(fit) 
+  # dat <- tidyr::gather_(dat, key = "key", value = "value", 
+  #                       dplyr::select_vars_(names(dat), names(dat),
+  #                                           exclude = "iteration"))
+  
+  dat <- patient_chain(fit)
+  dat <- tidyr::pivot_longer(dat, !iteration, names_to = "parameter",
+                                values_to = "value")
 
   if (type == "histogram") {
     plt <- 
       ggplot2::ggplot(dat) +
       ggplot2::aes_string(x = "value", y = "..density..") +
       ggplot2::geom_histogram(size = 0.15) + #aes(y = ..density..), size = 0.15) +
-      ggplot2::facet_wrap( ~ key, ncol = 2, nrow = 4, scales = "free")
+      ggplot2::facet_wrap( ~ parameter, ncol = 2, nrow = 4, scales = "free")
   } else if (type == "density") {
     plt <-
       ggplot2::ggplot(dat) +
       ggplot2::aes_string(x = "value") +
       ggplot2::geom_density(alpha = .2) +
-      ggplot2::facet_wrap( ~ key, ncol = 2, nrow = 4, scales = "free")
+      ggplot2::facet_wrap( ~ parameter, ncol = 2, nrow = 4, scales = "free")
   }
 
   return(plt)

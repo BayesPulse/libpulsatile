@@ -187,6 +187,20 @@ struct Population {
 
   int get_patientcount() { return patients.size(); };
 
+  void matchPatPriorsToPop() {
+    for(auto &pat : patients) {
+      // For draw_fixeff
+      pat.priors.mass_mean = patPriors.mass_mean;
+      pat.priors.width_mean = patPriors.width_mean;
+      pat.priors.mass_variance = pow(patPriors.mass_s2s_sd, 2);
+      pat.priors.width_variance = pow(patPriors.width_s2s_sd, 2);
+
+      // For draw_randomeff
+      pat.estimates.mass_sd = patPriors.mass_p2p_sd;
+      pat.estimates.width_sd = patPriors.width_p2p_sd;
+    }
+  };
+
 };
 
 
