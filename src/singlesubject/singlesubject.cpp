@@ -55,7 +55,6 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   double univ_target = univariate_pv_target_ratio;
   std::string loc_prior = Rcpp::as<std::string>(location_prior);
 
-
   // Create patient data object
   PatientData data(time, concentration);
 
@@ -174,7 +173,6 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   Rcpp::Rcout << "thin = " << thin << std::endl;
   Rcpp::Rcout << "burnin = " << burnin << std::endl;
   Chains chains(mcmc_iterations, thin, burnin, false, verbose, verbose_iter);
-
 
   //----------------------------------------
   // Sample MMH objects

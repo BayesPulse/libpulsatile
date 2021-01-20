@@ -83,7 +83,7 @@ TEST_CASE( "PatientPriors single-subject constructor works",
 TEST_CASE( "PatientEstimates population constructor works",
            "[datastructures]" ) {
 
-  PatientEstimates pepop(2.6, 45, 0.05, 3.5, 30);
+  PatientEstimates pepop(2.6, 45, 0.05, 3.5, 30, 10, 10, false);
 
   SECTION( "Variables included in constructor are initialized as expected." ) {
 

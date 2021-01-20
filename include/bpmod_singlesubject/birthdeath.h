@@ -186,12 +186,12 @@ class BirthDeathProcess
         }
        
         // Only print if value is NaN or Inf 
-        //if (isnan(birth_rate) || isinf(birth_rate)) {
-        //  std::cout << "Birth Rate: " << birth_rate << "\n";
-        //}
-        //if (isnan(probability_of_birth) || isinf(probability_of_birth)) {
-        //  std::cout << "Probability of Birth: " << probability_of_birth << "\n";
-        //}
+        if (isnan(birth_rate) || isinf(birth_rate)) {
+          std::cout << "Birth Rate: " << birth_rate << "\n";
+        }
+        if (isnan(probability_of_birth) || isinf(probability_of_birth)) {
+          std::cout << "Probability of Birth: " << probability_of_birth << "\n";
+        }
         //Rcpp::Rcout << "Birth Rate: " << birth_rate
         //            << " Death rate size: " << death_rates.size() << "\n"
         //            << "Death Rate: ";

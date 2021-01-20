@@ -85,62 +85,75 @@ struct PatientPriors {
   double baseline_variance; //Variance of the priors on the baseline;
   double halflife_variance; //Variance of the priors on the halflife;
 
-  //
+  // Delete this once everything works
   // Population model constructor:
   //
-  PatientPriors(double sv_mass_mean,
-                double sv_mass_p2p_sd,
-                double sv_mass_s2s_sd,
-                double sv_width_mean,
-                double sv_width_p2p_sd,
-                double sv_width_s2s_sd,
-                double sv_baseline_mean,
-                double sv_baseline_sd,
-                double sv_halflife_mean,
-                double sv_halflife_sd,
-                double prior_error_alpha,             
-                double prior_error_beta){
+  //PatientPriors(double sv_mass_mean,
+  //              double sv_mass_p2p_sd,
+  //              double sv_mass_s2s_sd,
+  //              double sv_width_mean,
+  //              double sv_width_p2p_sd,
+  //              double sv_width_s2s_sd,
+  //              double sv_baseline_mean,
+  //              double sv_baseline_sd,
+  //              double sv_halflife_mean,
+  //              double sv_halflife_sd,
+  //              double prior_error_alpha,             
+  //              double prior_error_beta){
 
-    // All models
-    mass_mean         = sv_mass_mean;
-    mass_p2p_sd       = sv_mass_p2p_sd;
-    mass_s2s_sd       = sv_mass_s2s_sd;
+  //  // All models
+  //  mass_mean         = sv_mass_mean;
+  //  mass_p2p_sd       = sv_mass_p2p_sd;
+  //  mass_s2s_sd       = sv_mass_s2s_sd;
 
-    width_mean        = sv_width_mean;
-    width_p2p_sd      = sv_width_p2p_sd;
-    width_s2s_sd      = sv_width_s2s_sd;
-    
-    baseline_mean     = sv_baseline_mean;
-    baseline_sd       = sv_baseline_sd;
-    halflife_mean     = sv_halflife_mean;
-    halflife_sd       = sv_halflife_sd;
-    error_alpha       = prior_error_alpha;
-    error_beta        = 1 / prior_error_beta;
+  //  width_mean        = sv_width_mean;
+  //  width_p2p_sd      = sv_width_p2p_sd;
+  //  width_s2s_sd      = sv_width_s2s_sd;
+  //  
+  //  baseline_mean     = sv_baseline_mean;
+  //  baseline_sd       = sv_baseline_sd;
+  //  halflife_mean     = sv_halflife_mean;
+  //  halflife_sd       = sv_halflife_sd;
+  //  error_alpha       = prior_error_alpha;
+  //  error_beta        = 1 / prior_error_beta;
 
-    // Set single-subject only variables to 0
-    mass_sd_param           = 0;
-    width_sd_param          = 0;
-    mass_variance           = 0;
-    width_variance          = 0;
-    baseline_variance       = 0;
-    halflife_variance       = 0;
+  //  // Set single-subject only variables to 0
+  //  mass_sd_param           = 0;
+  //  width_sd_param          = 0;
+  //  mass_variance           = 0;
+  //  width_variance          = 0;
+  //  baseline_variance       = 0;
+  //  halflife_variance       = 0;
 
-  };
+  //};
 
   //
   // Second population model constructor (holds data for individual patients to be passed to MH fns)
   //
   PatientPriors(double sv_mass_mean,
                 double sv_width_mean,
+                double sv_baseline_mean,
+                double sv_halflife_mean,
                 double sv_mass_s2s_sd,
                 double sv_width_s2s_sd,
+                double sv_baseline_sd,
+                double sv_halflife_sd,
                 int    sv_pulse_count,
                 double sv_strauss_repulsion,
                 double sv_strauss_repulsion_range) {
     mass_mean         = sv_mass_mean;
     width_mean        = sv_width_mean;
-    mass_variance     = sv_mass_s2s_sd;
-    width_variance    = sv_width_s2s_sd;
+    baseline_mean     = sv_baseline_mean;
+    halflife_mean     = sv_halflife_mean;
+
+    mass_variance     = pow(sv_mass_s2s_sd, 2);
+    width_variance    = pow(sv_width_s2s_sd, 2);
+    baseline_variance = pow(sv_baseline_sd, 2);
+    halflife_variance = pow(sv_halflife_sd, 2);
+
+    //mass_sd_param     = mass_p2p_sd;
+    //width_sd_param    = width_p2p_sd;
+    
     pulse_count       = sv_pulse_count;
     strauss_repulsion = sv_strauss_repulsion;
     strauss_repulsion_range = sv_strauss_repulsion_range;

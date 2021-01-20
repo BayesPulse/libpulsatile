@@ -188,7 +188,7 @@ TEST_CASE( "Patient class constructor for population model works", "[patient]" )
   for (int i = 0; i < time.size(); i++)  time(i) = (i + 1) * 10;
 
   PatientData data(time, conc);
-  PatientEstimates estimates(2.6, 45, 0.05, 3.5, 30); // population constructor
+  PatientEstimates estimates(2.6, 45, 0.05, 3.5, 30, 10, 10, false); // population constructor
   //PatientData * data = &pd;
   //PatientEstimates * estimates = &pep;
 

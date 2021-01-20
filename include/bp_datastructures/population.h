@@ -10,6 +10,7 @@
 #include "bp_datastructures/patientestimates.h"
 #include "bp_datastructures/patientpriors.h"
 #include "bp_datastructures/pulseestimates.h"
+#include "bp_datastructures/populationestimates.h"
 
 //
 // population.h
@@ -42,7 +43,10 @@ struct PopulationPriors {
   double width_mean;                //Mean of the prior on the pop mean pulse width
   double width_variance;            //Var of the prior on the pop mean pulse width
   double width_p2p_sd_param;        //pulse to pulse SD of the ind pulse widths
-  double width_s2s_sd_param;        //subj to subj SD of the subj mean pulse widht
+  double width_s2s_sd_param;        //subj to subj SD of the subj mean pulse width
+
+  double error_alpha;               // Alpha for gamma prior on model error
+  double error_beta;                // Beta for gamma prior on model error
     
 
   // Constructor
@@ -59,85 +63,77 @@ struct PopulationPriors {
                    double prior_baseline_sd_param,
                    double prior_halflife_mean,           
                    double prior_halflife_var,            
-                   double prior_halflife_sd_param
+                   double prior_halflife_sd_param,
+                   double prior_error_alpha,
+                   double prior_error_beta
                    ){
 
-    mass_mean         = prior_mass_mean;
-    mass_variance     = prior_mass_var;
-    mass_p2p_sd_param = prior_mass_p2p_sd_param;
-    mass_s2s_sd_param = prior_mass_s2s_sd_param;
+    mass_mean          = prior_mass_mean;
+    mass_variance      = prior_mass_var;
+    mass_p2p_sd_param  = prior_mass_p2p_sd_param;
+    mass_s2s_sd_param  = prior_mass_s2s_sd_param;
 
-    width_mean        = prior_width_mean;
-    width_variance    = prior_width_var;
+    width_mean         = prior_width_mean;
+    width_variance     = prior_width_var;
     width_p2p_sd_param = prior_width_p2p_sd_param;
     width_s2s_sd_param = prior_width_s2s_sd_param;
       
-    baseline_mean     = prior_baseline_mean;
-    baseline_variance = prior_baseline_var;
-    baseline_sd_param = prior_baseline_sd_param;
+    baseline_mean      = prior_baseline_mean;
+    baseline_variance  = prior_baseline_var;
+    baseline_sd_param  = prior_baseline_sd_param;
       
-    halflife_mean     = prior_halflife_mean;
-    halflife_variance = prior_halflife_var;
-    halflife_sd_param = prior_halflife_sd_param;
+    halflife_mean      = prior_halflife_mean;
+    halflife_variance  = prior_halflife_var;
+    halflife_sd_param  = prior_halflife_sd_param;
+
+    error_alpha        = prior_error_alpha;
+    error_beta         = prior_error_beta;
 
   }
 };
 
-/*
-//Max: Not sure what any of the below is.  Is it necessary or hold over from previous ideas of Matt's?
+
 struct PopulationEstimates {
-
-  // Used in all models
-  arma::vec baseline_halflife;
   double mass_mean;
-  double width_mean;
-  //int    pulse_count; // function of linked list instead?;
-  // Always use these functions to get these values.  removed them as separate
-  // member variables to ensure the result is always up-to-date
-  double get_decay() { return log(2) / baseline_halflife(1); }
-  // double get_logerrorsq() { return log(errorsq); }
+  double mass_s2s_sd;
+  double mass_p2p_sd;
 
-  // Population model only:
-  double mass_p2p_sd_var;
-  double mass_s2s_sd_var;
-  double width_p2p_sd_var;
-  double width_s2s_sd_var;
+  double width_mean;
+  double width_s2s_sd;
+  double width_p2p_sd;
+
   double baseline_mean;
-  double baseline_s2s_sd_var;
+  double baseline_sd;
+
   double halflife_mean;
-  double halflife_s2s_sd_var;
-  double error_var;
+  double halflife_sd;
 
   PopulationEstimates(double sv_mass_mean,
-                      double sv_mass_p2p_sd_var,
-                      double sv_mass_s2s_sd_var,
+                      double sv_mass_s2s_sd,
+                      double sv_mass_p2p_sd,
                       double sv_width_mean,
-                      double sv_width_p2p_sd_var,
-                      double sv_width_s2s_sd_var,
+                      double sv_width_s2s_sd,
+                      double sv_width_p2p_sd,
                       double sv_baseline_mean,
-                      double sv_baseline_s2s_sd_var,
+                      double sv_baseline_sd,
                       double sv_halflife_mean,
-                      double sv_halflife_s2s_sd_var,
-                      double sv_error_var) {
+                      double sv_halflife_sd) {
 
-     
-    baseline_halflife = {sv_baseline_mean, sv_halflife_mean};
-
-    mass_mean           = sv_mass_mean;
-    mass_p2p_sd_var     = sv_mass_p2p_sd_var;
-    mass_s2s_sd_var     = sv_mass_s2s_sd_var;
-    width_mean          = sv_width_mean;
-    width_p2p_sd_var    = sv_width_p2p_sd_var;
-    width_s2s_sd_var    = sv_width_s2s_sd_var;
-    baseline_s2s_sd_var = sv_baseline_s2s_sd_var;
-    halflife_s2s_sd_var = sv_halflife_s2s_sd_var;
-    error_var           = sv_error_var;
-
-    //pulse_count = 1;
+  mass_mean = sv_mass_mean;
+  mass_s2s_sd = sv_mass_s2s_sd;
+  mass_p2p_sd = sv_mass_p2p_sd;
+  width_mean = sv_width_mean;
+  width_s2s_sd = sv_width_s2s_sd;
+  width_p2p_sd = sv_width_p2p_sd;
+  baseline_mean = sv_baseline_mean;
+  baseline_sd = sv_baseline_sd;
+  halflife_mean = sv_halflife_mean;
+  halflife_sd = sv_halflife_sd;
 
   }
-};*/
 
+
+};
 
 
 // Parameters in the cox process for the response hormone intensity
@@ -154,8 +150,9 @@ struct Population {
 
   // Member objects
   std::vector<Patient> patients;
-  PopulationPriors popPriors;
-  PatientPriors patPriors;
+  PopulationPriors priors;
+  PopulationEstimates estimates;
+  //PatientPriors patPriors;
   //AssocEstimates associations;
 
   /*  // Constructor (w/ response hormone)
@@ -174,13 +171,13 @@ struct Population {
   // Constructor (w/o response hormone)
   Population(std::vector<Patient> in_patients,
              PopulationPriors in_priors,
-             PatientPriors in_estimates) : 
-         popPriors(in_priors),
-         patPriors(in_estimates) {
+             PopulationEstimates in_estimates) : 
+         priors(in_priors),
+         estimates(in_estimates) {
 
-    patients     = in_patients;
-    popPriors    = in_priors;
-    patPriors    = in_estimates;
+    patients  = in_patients;
+    priors    = in_priors;
+    estimates = in_estimates;
 
 
   }
@@ -190,14 +187,18 @@ struct Population {
   void matchPatPriorsToPop() {
     for(auto &pat : patients) {
       // For draw_fixeff
-      pat.priors.mass_mean = patPriors.mass_mean;
-      pat.priors.width_mean = patPriors.width_mean;
-      pat.priors.mass_variance = pow(patPriors.mass_s2s_sd, 2);
-      pat.priors.width_variance = pow(patPriors.width_s2s_sd, 2);
+      pat.priors.mass_mean = estimates.mass_mean;
+      pat.priors.width_mean = estimates.width_mean;
+      pat.priors.baseline_mean = estimates.baseline_mean;
+      pat.priors.halflife_mean = estimates.halflife_mean;
+      pat.priors.mass_variance = pow(estimates.mass_s2s_sd, 2);
+      pat.priors.width_variance = pow(estimates.width_s2s_sd, 2);
+      pat.priors.baseline_variance = pow(estimates.baseline_sd, 2);
+      pat.priors.halflife_variance = pow(estimates.halflife_sd, 2);
 
       // For draw_randomeff
-      pat.estimates.mass_sd = patPriors.mass_p2p_sd;
-      pat.estimates.width_sd = patPriors.width_p2p_sd;
+      pat.estimates.mass_sd = estimates.mass_p2p_sd;
+      pat.estimates.width_sd = estimates.width_p2p_sd;
     }
   };
 

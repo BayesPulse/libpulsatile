@@ -44,15 +44,22 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                        bool test_pop_means_halflife,
                        bool test_fixeff_mass,
                        bool test_fixeff_width,
+                       bool test_blhl,
                        bool test_error,
                        bool test_locations,
                        bool test_masses,
-                       bool test_widths)
-
+                       bool test_widths,
+                       bool test_tvarscale_mass,
+                       bool test_tvarscale_width,
+                       Rcpp::NumericVector testMassVec,
+                       Rcpp::NumericVector testWidthVec,
+                       Rcpp::NumericVector testMKappaVec,
+                       Rcpp::NumericVector testWKappaVec,
+                       Rcpp::NumericVector testLocVec)
 {
   // Set to print every nth iteration for verbose screen output  
-  int verbose_iter = 1;
-  
+  int verbose_iter = 5000;
+
 
   // Check for valid input
   if ( !inpriors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
@@ -71,45 +78,48 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
   Rcpp::Rcout << "Location prior is: " << loc_prior << "\n\n";
   
-  // Create priors object
-  PopulationPriors priors(inpriors["mass_mean"],
-                          inpriors["mass_var"],                
-                          inpriors["mass_p2p_sd_var"],     
-                          inpriors["mass_s2s_sd_var"],     
-                          inpriors["width_mean"],              
-                          inpriors["width_var"],               
-                          inpriors["width_p2p_sd_var"],    
-                          inpriors["width_s2s_sd_var"],
-                          inpriors["baseline_mean"],
-                          inpriors["baseline_var"],
-                          inpriors["baseline_s2s_sd_var"], 
-                          inpriors["halflife_mean"],           
-                          inpriors["halflife_var"],            
-                          inpriors["halflife_s2s_sd_var"]);
+  // Create population priors and estimates objects
+  PopulationPriors popPriors(inpriors["mass_mean"],
+                             inpriors["mass_var"],                
+                             inpriors["mass_p2p_sd_var"],     
+                             inpriors["mass_s2s_sd_var"],     
+                             inpriors["width_mean"],              
+                             inpriors["width_var"],               
+                             inpriors["width_p2p_sd_var"],    
+                             inpriors["width_s2s_sd_var"],
+                             inpriors["baseline_mean"],
+                             inpriors["baseline_var"],
+                             inpriors["baseline_s2s_sd_var"], 
+                             inpriors["halflife_mean"],           
+                             inpriors["halflife_var"],            
+                             inpriors["halflife_s2s_sd_var"],
+                             inpriors["error_alpha"],
+                             inpriors["error_beta"]);
 
-  std::cout << "Priors created\n";
+  PopulationEstimates popEstimates(startingvals["mass_mean"],
+                                   startingvals["mass_s2s_sd_var"],
+                                   startingvals["mass_p2p_sd_var"],
+                                   startingvals["width_mean"],
+                                   startingvals["width_s2s_sd_var"],
+                                   startingvals["width_p2p_sd_var"],
+                                   startingvals["baseline_mean"],
+                                   startingvals["baseline_s2s_sd_var"],
+                                   startingvals["halflife_mean"],
+                                   startingvals["halflife_s2s_sd_var"]);
 
-  // Create patient priors object
+  Rcpp::Rcout << "Population priors and estimates created\n";
+
   PatientPriors patientPriors(startingvals["mass_mean"],
-                              startingvals["mass_p2p_sd_var"],
-                              startingvals["mass_s2s_sd_var"],
                               startingvals["width_mean"],
-                              startingvals["width_p2p_sd_var"],
-                              startingvals["width_s2s_sd_var"],
                               startingvals["baseline_mean"],
-                              startingvals["baseline_s2s_sd_var"],
                               startingvals["halflife_mean"],
-                              startingvals["halflife_s2s_sd_var"], 
-                              startingvals["error_alpha"],
-                              startingvals["error_beta"]);
-
-  PatientPriors patientPriors2(startingvals["mass_mean"],
-                               startingvals["width_mean"],
-                               startingvals["mass_s2s_sd_var"],
-                               startingvals["width_s2s_sd_var"],
-                               startingvals["mean_pulse_count"],
-                               startingvals["strauss_repulsion"],
-                               startingvals["strauss_repulsion_range"]);
+                              startingvals["mass_s2s_sd_var"],
+                              startingvals["width_s2s_sd_var"],
+                              startingvals["baseline_s2s_sd_var"],
+                              startingvals["halflife_s2s_sd_var"],
+                              startingvals["mean_pulse_count"],
+                              startingvals["strauss_repulsion"],
+                              startingvals["strauss_repulsion_range"]);
 
   // Create subject level estimates object
   PatientEstimates patEstimates(startingvals["baseline_mean"],
@@ -118,17 +128,11 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                                 startingvals["mass_mean"],
                                 startingvals["width_mean"],
                                 startingvals["mass_p2p_sd_var"],
-                                startingvals["width_p2p_sd_var"]);
-
-  std::cout << "Patient estimates created\n"
-            << "Error alpha: " << patientPriors.error_alpha << "\n\n";
-
+                                startingvals["width_p2p_sd_var"],
+                                false);
 
   // Get number of patients (should this be a function arg?)
   int numPats = concentrations.ncol();
-
-  std::cout << "Number of patients: " << numPats << "\n";
-  std::cout << "Element 5,5: " << concentrations(5, 5) << "\n" << "\n";
   
   // Create vector of patients
   std::vector<Patient> pats;
@@ -136,76 +140,16 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   // Fill vector of patients
   for(int i = 0; i < numPats; i++) {
     PatientData tempdata(time, concentrations.column(i));
-    Patient temppatient(tempdata, patientPriors2, patEstimates);
+    Patient temppatient(tempdata, patientPriors, patEstimates);
     pats.push_back(temppatient);
   }
 
-  std::cout << "Patients created\n";
-
   // Create population object and pointer to it
-  Population pop(pats, priors, patientPriors);
+  Population pop(pats, popPriors, popEstimates);
   Population * population = &pop;
     
-  std::cout << "Population created\n";
-
-  std::cout << "Patient count: " << population->get_patientcount() << "\n";
-
-  /*int j = 1; 
-  // Output diagnostics for each patient
-  for(auto patient : population->patients) {
- 
-    std::cout << "------------- Patient " << j << " ------------------\n";
-    std::cout << "Data: \n";
-    std::cout << "First conc: " << patient.data.concentration[0] << "\n";
-    std::cout << "Last conc: " << patient.data.concentration[143] << "\n";
-    std::cout << "Num obs: "    << patient.data.number_of_obs << "\n";
-    std::cout << "Fit start: "  << patient.data.fitstart << "\n";
-    std::cout << "Fit end: "    << patient.data.fitend << "\n";
-    std::cout << "Avg period: " << patient.data.avg_period_of_obs << "\n";
-    std::cout << "Likelihood: " << patient.likelihood(false) << "\n";
-    std::cout << "Pulse count: " << patient.get_pulsecount() << "\n\n";
-
-    arma::vec partial_likelihood = patient.get_partial_likelihood(false);
-    std::cout << "Partial_likelihood length: " << partial_likelihood.n_elem << "\n"; 
-    //std::cout << "First element: " << partial_likelihood[0] << "\n";
-    std::cout << "Partial_likelihood: ";
-    for(auto like : partial_likelihood) { std::cout << like << " "; }
-    std::cout << "\n\n";
-    
-    std::cout << "Population Level:\n";
-    std::cout << "Mass P2P sd: " << population->patPriors.mass_p2p_sd << "\n";
-    std::cout << "Width P2P sd: " << population->patPriors.width_p2p_sd << "\n";
-    std::cout << "Width mean: " << population->patPriors.width_mean << "\n";
-    std::cout << "Mass mean: " << population->patPriors.mass_mean << "\n";
-    std::cout << "Baseline mean: " << population->patPriors.baseline_mean << "\n";
-    std::cout << "Halflife mean: " << population->patPriors.halflife_mean << "\n";
-    std::cout << "Width S2S sd: " << population->patPriors.width_s2s_sd << "\n";
-    std::cout << "Mass S2S sd: " << population->patPriors.mass_s2s_sd << "\n";
-    std::cout << "Baseline S2S sd: " << population->patPriors.baseline_sd << "\n";
-    std::cout << "Halflife S2S sd: " << population->patPriors.halflife_sd << "\n";
-
-    std::cout << "Subject Level\n";
-    std::cout << "Mass mean: " << patient.estimates.mass_mean << "\n";
-    std::cout << "Width mean: " << patient.estimates.width_mean << "\n";
-    std::cout << "Error: " << patient.estimates.errorsq << "\n\n";
-
-    std::cout << "Pulse Level\n";
-    std::cout << "Pulse times: ";
-    for(auto pulse : patient.pulses) { std::cout << pulse.time << " "; }
-    std::cout << "\nPulse masses: ";
-    for(auto pulse : patient.pulses) { std::cout << pulse.mass << " "; }
-    std::cout << "\nPulse widths: ";
-    for(auto pulse : patient.pulses) { std::cout << pulse.width << " "; }
-    std::cout << "\n\n";
-
-    std::cout << "SSQ: " << patient.get_sumerrorsquared(false) << "\n\n";
-    j++;
-
-  }*/
-
-
   //----------------------------------------
-  // Sample MMH Objects
+  // Construct MMH Objects
   //----------------------------------------
   BirthDeathProcess birth_death;
   
@@ -214,7 +158,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                                          adj_max, univ_target, false,
                                          verbose, verbose_iter);
   Pop_DrawSDRandomEffects draw_sd_width(proposalvars["ind_width"], adj_iter,
-                                         adj_max, univ_target, false,
+                                         adj_max, univ_target, true,
                                          verbose, verbose_iter);
   Pop_DrawS2S_SD draw_s2s_sd_width(proposalvars["sub_width"], adj_iter, adj_max, univ_target,
                                          true, false, false, verbose, verbose_iter);
@@ -238,8 +182,10 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                                        false, verbose, verbose_iter);
   SS_DrawFixedEffects draw_fixeff_width(proposalvars["sub_width_mean"], adj_iter, adj_max, univ_target,
                                         true, verbose, verbose_iter);
-  //SS_DrawBaselineHalflife draw_blhl(bhl_pv, adj_iter, adj_max, biv_target,
-  //                                  verbose, verbose_iter);
+
+  arma::vec blhl_pv = { proposalvars["sub_baseline"], proposalvars["sub_halflife"] };
+  SS_DrawBaselineHalflife draw_blhl(blhl_pv, adj_iter, adj_max, biv_target,
+                                    verbose, verbose_iter);
   SS_DrawError draw_error;
 
   // Pulse Level
@@ -254,31 +200,164 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   SS_DrawRandomEffects draw_masses(proposalvars["sub_mass_mean"], adj_iter, adj_max, univ_target,
                                    false, verbose, verbose_iter);
   SS_DrawRandomEffects draw_widths(proposalvars["sub_width_mean"], adj_iter, adj_max, univ_target,
-                                   false, verbose, verbose_iter);
+                                   true, verbose, verbose_iter);
+  SS_DrawTVarScale draw_tvarscale_mass(proposalvars["sdscale_pulse_mass"],
+                                       adj_iter, adj_max, univ_target, false,
+                                       verbose, verbose_iter);
+  SS_DrawTVarScale draw_tvarscale_width(proposalvars["sdscale_pulse_width"],
+                                        adj_iter, adj_max, univ_target, true,
+                                        verbose, verbose_iter);
 
- 
-  //----------------------------------------
-  // Add new pulses (for testing purposes)
-  //----------------------------------------
+  // Initialize object to store chains 
+  PopChains chains(mcmc_iterations, thin, burnin, false, verbose, verbose_iter, numPats);
+
+  //---------------------------------------------------------
+  // Set population parameters (for testing)
+  //---------------------------------------------------------
+  if(!test_pop_means_mass) population->estimates.mass_mean = 4.36547;
+  if(!test_pop_means_width) population->estimates.width_mean = 35.23362;
+  if(!test_pop_means_halflife) population->estimates.halflife_mean = 43.13908;
+  if(!test_pop_means_baseline) population->estimates.baseline_mean = 2.542657;
+
+  if(!test_s2s_sd_mass) population->estimates.mass_s2s_sd = 1.0;
+  if(!test_s2s_sd_width) population->estimates.width_s2s_sd = 1.4;
+  if(!test_s2s_sd_halflife) population->estimates.halflife_sd = 5;
+  if(!test_s2s_sd_baseline) population->estimates.baseline_sd = 0.55;
+
+  if(!test_sd_width) population->estimates.mass_p2p_sd = 1.6;
+  if(!test_sd_masses) population->estimates.width_p2p_sd = 5;
+
+  //---------------------------------------------------------
+  // Set individual mass means (for testing)
+  //---------------------------------------------------------
+  
+  double j = 0;
+  double l = 0;
+
+  if(!test_fixeff_mass) {
+    int i = 0;
+    j = 0;
+    for(auto &pat : population->patients) {
+
+      switch(i) {
+        case 0: j = 5.0156; break;
+        case 1: j = 4.2086; break;
+        case 2: j = 4.1829; break;
+        case 3: j = 4.1347; break;
+        case 4: j = 6.6892; break;
+        case 5: j = 4.1205; break;
+        case 6: j = 3.1993; break;
+        case 7: j = 3.1900; break;
+        case 8: j = 4.6209; break;
+        case 9: j = 4.2930; break;
+        default: std::cout << "Problem setting mass means\n";
+      }
+
+      pat.estimates.mass_mean = j;
+      i++;
+    }
+  
+  std::cout << "Patient mass means set\n";
+  }
+
+  //---------------------------------------------------------
+  // Set individual width means (for testing)
+  //---------------------------------------------------------
+  if(!test_fixeff_width) {
+    int i = 0;
+    j = 0;
+    for(auto &pat : population->patients) {
+
+      switch(i) {
+        case 0: j = 32.8066; break;
+        case 1: j = 35.9662; break;
+        case 2: j = 35.1099; break;
+        case 3: j = 33.0451; break;
+        case 4: j = 36.1311; break;
+        case 5: j = 34.6148; break;
+        case 6: j = 36.0120; break;
+        case 7: j = 37.2471; break;
+        case 8: j = 35.2640; break;
+        case 9: j = 36.0495; break;
+        default: std::cout << "Problem setting width means\n";
+      }
+
+      pat.estimates.width_mean = j;
+      i++;
+    }
+  
+  }
+  
+  //---------------------------------------------------------
+  // Set individual baseline (for testing)
+  //---------------------------------------------------------
+  if(!test_blhl) {
+    int i = 0;
+    j = 0;
+    for(auto &pat : population->patients) {
+
+      switch(i) {
+        case 0: j = 2.8690; break;
+        case 1: j = 3.1813; break;
+        case 2: j = 2.6171; break;
+        case 3: j = 2.4126; break;
+        case 4: j = 2.4754; break;
+        case 5: j = 2.1407; break;
+        case 6: j = 1.4205; break;
+        case 7: j = 3.3326; break;
+        case 8: j = 2.3291; break;
+        case 9: j = 2.6481; break;
+        default: std::cout << "Problem setting baselines\n";
+      }
+
+      pat.estimates.baseline = j;
+      pat.estimates.baseline_halflife(0) = j;
+      i++;
+    }
+  
+  }
+
+  //---------------------------------------------------------
+  // Set individual halflives (for testing)
+  //---------------------------------------------------------
+  if(!test_blhl) {
+    int i = 0;
+    j = 0;
+    for(auto &pat : population->patients) {
+
+      switch(i) {
+        case 0: j = 41.4493; break;
+        case 1: j = 34.6105; break;
+        case 2: j = 42.9464; break;
+        case 3: j = 50.9084; break;
+        case 4: j = 49.6113; break;
+        case 5: j = 46.7311; break;
+        case 6: j = 44.2629; break;
+        case 7: j = 41.9211; break;
+        case 8: j = 38.0089; break;
+        case 9: j = 40.9405; break;
+        default: std::cout << "Problem setting halflives\n";
+      }
+
+      pat.estimates.halflife = j;
+      pat.estimates.baseline_halflife(1) = j;
+      i++;
+    }
+  
+  }
+  
+  //---------------------------------------------------------
+  // Add pulses (for testing)
+  //---------------------------------------------------------
+  double position, new_mass, new_width, new_tvarscale_mass, new_tvarscale_width,
+         new_t_sd_mass, new_t_sd_width;
+  l = 0;
+
   if(!test_birthdeath) {
-    for(int i = 0; i < 10; i++) {
-      Patient * patient = &population->patients[i];
-      double fitstart = patient->data.fitstart;
-      double fitend = patient->data.fitend;
-      int number_of_obs = patient->data.number_of_obs;
-      double avg_period_of_obs = patient->data.avg_period_of_obs;
-      double duration_of_obs = patient->data.duration_of_obs;
-      int j = 0;
 
-      Rcpp::Rcout << "Fitstart: " << fitstart
-                  << " Fitend: " << fitend << "\n"
-                  << "NumOfObs: " << number_of_obs
-                  << " Avg Period " << avg_period_of_obs << "\n"
-                  << "Duration: " << duration_of_obs << "\n"
-                  << "Times: ";
-      
-      for(auto t : patient->data.time) { Rcpp::Rcout << t << " "; }
-      Rcpp::Rcout << "\n";
+    for(int i = 0; i < 10; i++) {
+
+      Patient * patient = &population->patients[i];
 
       switch(i) {
         case 0: j = 14; break;
@@ -294,22 +373,112 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
         default: std::cout << "Problem adding pulses\n";
       }
 
-      Rcpp::Rcout << "Pat " << i << " times: ";
+      Rcpp::RNGScope rng_scope;
+      position = (!test_locations) ? testLocVec(l) : Rf_runif(patient->data.fitstart, patient->data.fitend);
+      //new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : Rf_rgamma(2, 0.5);
+      new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : 10;
+      //new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : Rf_rgamma(2, 0.5);
+      new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : 10;
+  
+      if(!test_masses) {
+        new_mass = testMassVec(l);
+      } else {
+        new_t_sd_mass = patient->estimates.mass_sd / sqrt(new_tvarscale_mass);
+        new_mass = -1.0;
+        while (new_mass < 0) {
+          //new_mass = Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass);
+          new_mass = Rf_rnorm(10, .1);
+        }
+      }
+
+      if(!test_widths) {
+        new_width = testWidthVec(l);
+      } else {
+        new_t_sd_width = patient->estimates.width_sd / sqrt(new_tvarscale_width);
+        new_width = -1.0;
+        while (new_width < 0) {
+          //new_width = Rf_rnorm(patient->estimates.width_mean, new_t_sd_width);
+          new_width = Rf_rnorm(70, 1);
+        }
+      }
+    
+      PulseEstimates new_pulse(position, new_mass, new_width, new_tvarscale_mass,
+                               new_tvarscale_width, patient->estimates.get_decay(),
+                               patient->data.time);
+
+      patient->pulses.front() = new_pulse;
+
+      l++;
 
       for(int k = 0; k < j-1; k++) {
-        double position = Rf_runif(fitstart, fitend);
-        Rcpp::Rcout << position << " ";
-        birth_death.add_new_pulse(patient, position);
+
+        Rcpp::RNGScope rng_scope;
+        position = (!test_locations) ? testLocVec(l) : Rf_runif(patient->data.fitstart, patient->data.fitend);
+        //new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : Rf_rgamma(2, 0.5);
+        new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : 10;
+        //new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : Rf_rgamma(2, 0.5);
+        new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : 10;
+
+        if(!test_masses) {
+          new_mass = testMassVec(l);
+        } else {
+          new_t_sd_mass = patient->estimates.mass_sd / sqrt(new_tvarscale_mass);
+          new_mass = -1.0;
+          while (new_mass < 0) {
+            //new_mass = Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass);
+            new_mass = Rf_rnorm(10, .1);
+          }
+        }
+
+        if(!test_widths) {
+          new_width = testWidthVec(l);
+        } else {
+          new_t_sd_width = patient->estimates.width_sd / sqrt(new_tvarscale_width);
+          new_width = -1.0;
+          while (new_width < 0) {
+            //new_width = Rf_rnorm(patient->estimates.width_mean, new_t_sd_width);
+            new_width = Rf_rnorm(70, 1);
+          }
+        }
+        
+        PulseEstimates new_pulse(position, new_mass, new_width, new_tvarscale_mass,
+                                 new_tvarscale_width, patient->estimates.get_decay(),
+                                 patient->data.time);
+
+        patient->pulses.push_back(new_pulse);
+
+        l++;
+
       }
-      Rcpp::Rcout << "\n\n";
+
     }
-  std::cout << "Pulses Added Manually\n";
+
+  Rcpp::Rcout << "Pulses Added Manually\n";
+
+  Rcpp::Rcout << "Details:\n";
+  j = l = 1;
+  for(auto pat : population->patients) {
+    for(auto pulse : pat.pulses) {
+      Rcpp::Rcout << std::setprecision(3) << j << " "
+                  << l << " "
+                  << pulse.mass << " "
+                  << pulse.width << " "
+                  << pulse.time << " "
+                  << pulse.tvarscale_mass << " "
+                  << pulse.tvarscale_width << " " << "\n";
+      l++;
+    }
+    l = 1;
+    j++;
   }
 
-  PopChains chains(mcmc_iterations, thin, burnin, false, verbose, verbose_iter, numPats);
+  Rcpp::Rcout << "\n";
 
-  std::cout << "Chains initialized\n";
-  
+  }
+
+
+
+
   //----------------------------------------
   // Sample MMH Objects
   //----------------------------------------
@@ -318,30 +487,51 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
     chains.print_diagnostic_output(population, iteration);
 
-    if (test_sd_masses) draw_sd_masses.sample(population, &population->patPriors.mass_p2p_sd, population, iteration);
-    if (test_sd_width) draw_sd_width.sample(population, &population->patPriors.width_p2p_sd, population, iteration);
+    if (test_sd_masses) draw_sd_masses.sample(population, &population->estimates.mass_p2p_sd, population, iteration);
+    if (test_sd_width) draw_sd_width.sample(population, &population->estimates.width_p2p_sd, population, iteration);
 
-    if (test_pop_means_width) draw_pop_means_width.sample(population, &population->patPriors.width_mean, iteration);
-    if (test_pop_means_mass) draw_pop_means_mass.sample(population, &population->patPriors.mass_mean, iteration);
-    if (test_pop_means_baseline) draw_pop_means_baseline.sample(population, &population->patPriors.baseline_mean, iteration);
-    if (test_pop_means_halflife) draw_pop_means_halflife.sample(population, &population->patPriors.halflife_mean, iteration);
+    if (test_pop_means_width) draw_pop_means_width.sample(population, &population->estimates.width_mean, iteration);
+    if (test_pop_means_mass) draw_pop_means_mass.sample(population, &population->estimates.mass_mean, iteration);
+    if (test_pop_means_baseline) draw_pop_means_baseline.sample(population, &population->estimates.baseline_mean, iteration);
+    if (test_pop_means_halflife) draw_pop_means_halflife.sample(population, &population->estimates.halflife_mean, iteration);
 
-    if (test_s2s_sd_width) draw_s2s_sd_width.sample(population, &population->patPriors.width_s2s_sd, population, iteration);
-    if (test_s2s_sd_mass) draw_s2s_sd_mass.sample(population, &population->patPriors.mass_s2s_sd, population, iteration);
-    if (test_s2s_sd_baseline) draw_s2s_sd_baseline.sample(population, &population->patPriors.baseline_sd, population, iteration);
-    if (test_s2s_sd_halflife) draw_s2s_sd_halflife.sample(population, &population->patPriors.halflife_sd, population, iteration);
+    if (test_s2s_sd_width) draw_s2s_sd_width.sample(population, &population->estimates.width_s2s_sd, population, iteration);
+    if (test_s2s_sd_mass) draw_s2s_sd_mass.sample(population, &population->estimates.mass_s2s_sd, population, iteration);
+    if (test_s2s_sd_baseline) draw_s2s_sd_baseline.sample(population, &population->estimates.baseline_sd, population, iteration);
+    if (test_s2s_sd_halflife) draw_s2s_sd_halflife.sample(population, &population->estimates.halflife_sd, population, iteration);
 
     population->matchPatPriorsToPop();
+
+    int j = 1;
 
     for(auto &pat : population->patients) {
       Patient * patient = &pat;
       if (test_birthdeath) birth_death.sample(patient, false, iteration);
       if (test_fixeff_mass) draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
       if (test_fixeff_width) draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
-      //if (test_blhl) draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
+      if (test_blhl){ 
+        draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
+
+        //Rcpp::Rcout << "Patient " << j << " Vector: " << patient->estimates.baseline_halflife(0)
+        //            << " " << patient->estimates.baseline_halflife(1) << "\n"
+        //            << "Before BL: " << patient->estimates.baseline 
+        //            << " HL: " << patient->estimates.halflife
+        //            << "\n";
+
+        patient->estimates.matchBLHL();
+
+        //Rcpp::Rcout << "After  BL: " << patient->estimates.baseline
+        //            << " HL: " << patient->estimates.halflife
+        //            << "\n\n";
+
+      }
       if (test_locations) draw_locations->sample_pulses(patient, iteration);
       if (test_masses) draw_masses.sample_pulses(patient, iteration);
       if (test_widths) draw_widths.sample_pulses(patient, iteration);
+      if (test_tvarscale_mass) draw_tvarscale_mass.sample_pulses(patient, iteration);
+      if (test_tvarscale_width) draw_tvarscale_width.sample_pulses(patient, iteration);
+
+      j++;
 
     }
 
@@ -351,59 +541,6 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
   }
 
-  //j = 1;
-  //std::cout << "\n";  
-
-  // Output diagnostics for each patient
-  /*for(auto patient : population->patients) {
- 
-    std::cout << "------------- Patient " << j << " ------------------\n";
-    std::cout << "Data: \n";
-    std::cout << "First conc: " << patient.data.concentration[0] << "\n";
-    std::cout << "Num obs: "    << patient.data.number_of_obs << "\n";
-    std::cout << "Fit start: "  << patient.data.fitstart << "\n";
-    std::cout << "Fit end: "    << patient.data.fitend << "\n";
-    std::cout << "Avg period: " << patient.data.avg_period_of_obs << "\n";
-    std::cout << "Likelihood: " << patient.likelihood(false) << "\n";
-    std::cout << "Pulse count: " << patient.get_pulsecount() << "\n\n";
-
-    arma::vec partial_likelihood = patient.get_partial_likelihood(false);
-    std::cout << "Partial_likelihood length: " << partial_likelihood.n_elem << "\n"; 
-    //std::cout << "First element: " << partial_likelihood[0] << "\n";
-    std::cout << "Partial_likelihood: ";
-    for(auto like : partial_likelihood) { std::cout << like << " "; }
-    std::cout << "\n\n";
-    
-    std::cout << "Population Level:\n";
-    std::cout << "Mass P2P sd: " << population->patPriors.mass_p2p_sd << "\n";
-    std::cout << "Width P2P sd: " << population->patPriors.width_p2p_sd << "\n";
-    std::cout << "Width mean: " << population->patPriors.width_mean << "\n";
-    std::cout << "Mass mean: " << population->patPriors.mass_mean << "\n";
-    std::cout << "Baseline mean: " << population->patPriors.baseline_mean << "\n";
-    std::cout << "Halflife mean: " << population->patPriors.halflife_mean << "\n";
-    std::cout << "Width S2S sd: " << population->patPriors.width_s2s_sd << "\n";
-    std::cout << "Mass S2S sd: " << population->patPriors.mass_s2s_sd << "\n";
-    std::cout << "Baseline S2S sd: " << population->patPriors.baseline_sd << "\n";
-    std::cout << "Halflife S2S sd: " << population->patPriors.halflife_sd << "\n\n";
-
-    std::cout << "Subject Level\n";
-    std::cout << "Mass mean: " << patient.estimates.mass_mean << "\n";
-    std::cout << "Width mean: " << patient.estimates.width_mean << "\n";
-    std::cout << "Error: " << patient.estimates.errorsq << "\n\n";
-
-    std::cout << "Pulse Level\n";
-    std::cout << "Pulse times: ";
-    for(auto pulse : patient.pulses) { std::cout << pulse.time << " "; }
-    std::cout << "\nPulse masses: ";
-    for(auto pulse : patient.pulses) { std::cout << pulse.mass << " "; }
-    std::cout << "\nPulse widths: ";
-    for(auto pulse : patient.pulses) { std::cout << pulse.width << " "; }
-    std::cout << "\n\n";
-
-    std::cout << "SSQ: " << patient.get_sumerrorsquared(false) << "\n\n";
-    j++;
-
-  }*/
 
   delete draw_locations;
   

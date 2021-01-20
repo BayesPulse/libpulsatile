@@ -39,8 +39,8 @@ class SS_DrawError
     }
 
     void sample(Population *population) {
-      double alpha = population->patPriors.error_alpha;
-      double beta = population->patPriors.error_beta;
+      double alpha = population->priors.error_alpha;
+      double beta = population->priors.error_beta;
       int N;
       double ssq;
 

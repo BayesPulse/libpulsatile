@@ -45,11 +45,11 @@ struct PatientEstimates {
   // Always use these functions to get these values.  removed them as separate
   // member variables to ensure the result is always up-to-date
   double get_decay() { 
-    if (baseline_halflife.n_elem == 2) {
+    //if (baseline_halflife.n_elem == 2) {
       return log(2) / baseline_halflife(1);
-    } else {
-      return log(2) / halflife;
-    }
+    //} else {
+    //  return log(2) / halflife;
+    //}
   }
   double get_logerrorsq() { return log(errorsq); }
 
@@ -65,7 +65,7 @@ struct PatientEstimates {
                    double sv_mass_sd,
                    double sv_width_sd,
                    bool notused){
-    baseline_halflife = {0};
+    baseline_halflife = {sv_baseline, sv_halflife};
     baseline = sv_baseline;
     halflife = sv_halflife;
     errorsq = sv_error_var;
@@ -73,6 +73,14 @@ struct PatientEstimates {
     width_mean  = sv_width_mean;
     mass_sd = sv_mass_sd;
     width_sd = sv_width_sd;
+  }
+
+  // Coordinates vector and double BL/HL
+  //   Vector used for subject level draw
+  //   doubles used for population draws
+  void matchBLHL() {
+    baseline = baseline_halflife(0);
+    halflife = baseline_halflife(1);
   }
 
   //

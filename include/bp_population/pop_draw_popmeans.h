@@ -41,31 +41,31 @@ class Pop_DrawPopMeans :
         if (for_width) {
           prior_mean_     = &PopulationPriors::width_mean;
           prior_variance_ = &PopulationPriors::width_variance;
-          est_mean_       = &PatientPriors::width_mean;
-          est_sd_         = &PatientPriors::width_s2s_sd;
+          est_mean_       = &PopulationEstimates::width_mean;
+          est_sd_         = &PopulationEstimates::width_s2s_sd;
           randomeffect_   = &PatientEstimates::width_mean;
           parameter_name  = "Pop Mean width";
         } else if (for_mass) {
           prior_mean_     = &PopulationPriors::mass_mean;
           prior_variance_ = &PopulationPriors::mass_variance;
-          est_mean_       = &PatientPriors::mass_mean;
-          est_sd_         = &PatientPriors::mass_s2s_sd;
+          est_mean_       = &PopulationEstimates::mass_mean;
+          est_sd_         = &PopulationEstimates::mass_s2s_sd;
           randomeffect_   = &PatientEstimates::mass_mean;
           parameter_name  = "Pop Mean mass";
         } else if (for_baseline) {
           prior_mean_     = &PopulationPriors::baseline_mean;
           prior_variance_ = &PopulationPriors::baseline_variance;
-          est_mean_       = &PatientPriors::baseline_mean;
-          est_sd_         = &PatientPriors::baseline_sd;
-          randomeffect_    = &PatientEstimates::baseline;
+          est_mean_       = &PopulationEstimates::baseline_mean;
+          est_sd_         = &PopulationEstimates::baseline_sd;
+          randomeffect_   = &PatientEstimates::baseline;
           //randomeffect_   = &PatientEstimates::baseline_halflife.colptr(0);  //need help to check that this pulls the first value of this vector
           parameter_name  = "Pop Mean baseline";
         } else {
           prior_mean_     = &PopulationPriors::halflife_mean;
           prior_variance_ = &PopulationPriors::halflife_variance;
-          est_mean_       = &PatientPriors::halflife_mean;
-          est_sd_         = &PatientPriors::halflife_sd;
-          randomeffect_    = &PatientEstimates::halflife;
+          est_mean_       = &PopulationEstimates::halflife_mean;
+          est_sd_         = &PopulationEstimates::halflife_sd;
+          randomeffect_   = &PatientEstimates::halflife;
           //randomeffect_   = &PatientEstimates::baseline_halflife.memptr(1);  //need help to check that this pulls the 2nd value of this vector
           parameter_name  = "Pop Mean halflife";
         }
@@ -75,8 +75,8 @@ class Pop_DrawPopMeans :
 
     double PopulationPriors::*prior_mean_;
     double PopulationPriors::*prior_variance_;
-    double PatientPriors::*est_mean_;
-    double PatientPriors::*est_sd_;
+    double PopulationEstimates::*est_mean_;
+    double PopulationEstimates::*est_sd_;
     double PatientEstimates::*randomeffect_; //patient specific mean mass, mean width, baseline, or halflife
    
     std::string parameter_name;
@@ -93,8 +93,8 @@ class Pop_DrawPopMeans :
       double oldint               = 0.0 ;
       double normalizing_ratio    = 0.0 ;
       double prop_ratio           = 0.0 ;
-      PopulationPriors *priors    = &population->popPriors;  //need help here?  This isn't in patient so I put in population which would have all patients and fixed prior info.
-      PatientPriors *est          = &population->patPriors;
+      PopulationPriors *priors    = &population->priors;  //need help here?  This isn't in patient so I put in population which would have all patients and fixed prior info.
+      PopulationEstimates *est    = &population->estimates;
       double prior_mean           = (*priors).*prior_mean_;  //N: why mass, can we remove, M: removed
       double prior_var            = (*priors).*prior_variance_;  
       double current              = (*est).*est_mean_;
@@ -132,7 +132,7 @@ class Pop_DrawPopMeans :
       normalizing_ratio = oldint - newint;
       
       //Rcpp::Rcout << "Prop ratio: " << prop_ratio << " Norm ratio: " << normalizing_ratio
-      //            << "\n";
+      //            << "\n\n";
 
       return prior_ratio + prop_ratio + normalizing_ratio;
 

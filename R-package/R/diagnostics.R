@@ -65,7 +65,7 @@ bp_trace.pop_pulse_fit <- function(fit, patient = NULL) {
     dat <- dplyr::bind_rows(dat, patDat)
     
     nCol <- 5
-    nRow <- 3
+    nRow <- 4
   } else {
     nCol <- 4
     nRow <- 3

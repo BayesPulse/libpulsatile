@@ -39,26 +39,26 @@ class Pop_DrawS2S_SD :
 
         // Choose which set of parameters to use: width or mass
         if (for_width) {
-          est_mean_       = &PatientPriors::width_mean;
-          est_sd_         = &PatientPriors::width_s2s_sd;
+          est_mean_       = &PopulationEstimates::width_mean;
+          est_sd_         = &PopulationEstimates::width_s2s_sd;
           randomeffect_   = &PatientEstimates::width_mean;
           sd_param_       = &PopulationPriors::width_s2s_sd_param;
           parameter_name  = "SD of mean pulse widths";
         } else if (for_mass) {
-          est_mean_       = &PatientPriors::mass_mean;
-          est_sd_         = &PatientPriors::mass_s2s_sd;
+          est_mean_       = &PopulationEstimates::mass_mean;
+          est_sd_         = &PopulationEstimates::mass_s2s_sd;
           randomeffect_   = &PatientEstimates::mass_mean;
           sd_param_       = &PopulationPriors::mass_s2s_sd_param;
           parameter_name  = "SD of mean pulse masses";
         } else if (for_baseline) {
-          est_mean_       = &PatientPriors::baseline_mean;
-          est_sd_         = &PatientPriors::baseline_sd;
+          est_mean_       = &PopulationEstimates::baseline_mean;
+          est_sd_         = &PopulationEstimates::baseline_sd;
           randomeffect_   = &PatientEstimates::baseline;
           sd_param_       = &PopulationPriors::baseline_sd_param;
           parameter_name  = "SD of baselines";
         } else {
-          est_mean_       = &PatientPriors::halflife_mean;
-          est_sd_         = &PatientPriors::halflife_sd;
+          est_mean_       = &PopulationEstimates::halflife_mean;
+          est_sd_         = &PopulationEstimates::halflife_sd;
           randomeffect_   = &PatientEstimates::halflife;
           sd_param_       = &PopulationPriors::halflife_sd_param;
           parameter_name  = "SD of halflives";
@@ -67,8 +67,8 @@ class Pop_DrawS2S_SD :
 
   private:
 
-    double PatientPriors::*est_mean_;
-    double PatientPriors::*est_sd_;
+    double PopulationEstimates::*est_mean_;
+    double PopulationEstimates::*est_sd_;
     double PatientEstimates::*randomeffect_; //pulse specific mass or width
     
     double PopulationPriors::*sd_param_; //pulse specific mass or width
@@ -118,8 +118,8 @@ double Pop_DrawS2S_SD::posterior_function(Population *population,
   double second_part       = 0.0;
   double third_part        = 0.0;
   double fourth_part       = 0.0;
-  PatientPriors *est       = &population->patPriors;  //Assumes there is a population structure with an estimates component, I think.
-  PopulationPriors *priors = &population->popPriors;
+  PopulationEstimates *est       = &population->estimates;  //Assumes there is a population structure with an estimates component, I think.
+  PopulationPriors *priors = &population->priors;
   double pop_mean          = (*est).*est_mean_;
   double pop_sd            = (*est).*est_sd_;
   double pop_sd_param      = (*priors).*sd_param_;

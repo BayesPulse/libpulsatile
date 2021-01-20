@@ -47,10 +47,18 @@ fit_pop_pulse <- function(data,
                           test_pop_means_halflife = FALSE,
                           test_fixeff_mass = FALSE,
                           test_fixeff_width = FALSE,
+                          test_blhl = FALSE,
                           test_error = FALSE,
                           test_locations = FALSE,
                           test_masses = FALSE,
-                          test_widths = FALSE
+                          test_widths = FALSE,
+                          test_tvarscale_mass = FALSE,
+                          test_tvarscale_width = FALSE,
+                          testMassVec,
+                          testWidthVec,
+                          testMKappaVec,
+                          testWKappaVec,
+                          testLocVec
                           ) {
   
   #if(num_patients != length(concs)) stop("Number of patients and concentration columns unequal")
@@ -112,10 +120,19 @@ fit_pop_pulse <- function(data,
                      test_pop_means_halflife,
                      test_fixeff_mass,
                      test_fixeff_width,
+                     test_blhl,
                      test_error,
                      test_locations,
                      test_masses,
-                     test_widths)
+                     test_widths,
+                     test_tvarscale_mass,
+                     test_tvarscale_width,
+                     testMassVec,
+                     testWidthVec,
+                     testMKappaVec,
+                     testWKappaVec,
+                     testLocVec)
+
 
 
   population_chain <- as.data.frame(fit$pop_chain)

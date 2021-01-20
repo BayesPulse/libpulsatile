@@ -40,14 +40,14 @@ class Pop_DrawSDRandomEffects :
         // Choose which set of parameters to use: width or mass
         if (for_width) {
           est_mean_       = &PatientEstimates::width_mean;
-          est_sd_         = &PatientPriors::width_p2p_sd;
+          est_sd_         = &PopulationEstimates::width_p2p_sd;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
           sd_param_       = &PopulationPriors::width_p2p_sd_param;
           parameter_name  = "SD of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
-          est_sd_         = &PatientPriors::mass_p2p_sd;
+          est_sd_         = &PopulationEstimates::mass_p2p_sd;
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
           sd_param_       = &PopulationPriors::mass_p2p_sd_param;
@@ -59,7 +59,7 @@ class Pop_DrawSDRandomEffects :
   private:
 
     double PatientEstimates::*est_mean_;
-    double PatientPriors::*est_sd_;
+    double PopulationEstimates::*est_sd_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
@@ -114,10 +114,10 @@ double Pop_DrawSDRandomEffects::posterior_function(Population *population,
   double third_part  = 0.0;
   double fourth_part = 0.0;
   //PatientEstimates *est  = &patient->estimates;
-  PatientPriors *patPriors = &population->patPriors;
-  PopulationPriors *popPriors = &population->popPriors;
+  PopulationEstimates *popEst = &population->estimates;
+  PopulationPriors *popPriors = &population->priors;
   //double patient_mean    = (*est).*est_mean_;
-  double patient_sd      = (*patPriors).*est_sd_;
+  double patient_sd      = (*popEst).*est_sd_;
   double patient_sd_param = (*popPriors).*sd_param_;
 
   // Calculate pulse-specific portion of acceptance ratio

@@ -36,7 +36,7 @@ class PopChains {
       num_patients = in_num_patients;
 
       for (int i = 0; i < num_patients; i++) {
-        patient_chains.push_back(arma::mat(num_outputs, 6,
+        patient_chains.push_back(arma::mat(num_outputs, 8,
                                            arma::fill::zeros));
       }
 
@@ -97,17 +97,17 @@ void PopChains::save_sample(Population * pop, int iter) {
     int pat_iter = 0;
 
     // Fill population chain w/ current population-level estimates
-    pop_chain(output_index, 0) = (double)r_iter;
-    pop_chain(output_index, 1) = pop->patPriors.mass_p2p_sd;
-    pop_chain(output_index, 2) = pop->patPriors.width_p2p_sd;
-    pop_chain(output_index, 3) = pop->patPriors.width_mean;
-    pop_chain(output_index, 4) = pop->patPriors.mass_mean;
-    pop_chain(output_index, 5) = pop->patPriors.baseline_mean;
-    pop_chain(output_index, 6) = pop->patPriors.halflife_mean;
-    pop_chain(output_index, 7) = pop->patPriors.width_s2s_sd;
-    pop_chain(output_index, 8) = pop->patPriors.mass_s2s_sd;
-    pop_chain(output_index, 9) = pop->patPriors.baseline_sd;
-    pop_chain(output_index, 10) = pop->patPriors.halflife_sd;
+    pop_chain(output_index, 0)  = (double)r_iter;
+    pop_chain(output_index, 1)  = pop->estimates.mass_p2p_sd;
+    pop_chain(output_index, 2)  = pop->estimates.width_p2p_sd;
+    pop_chain(output_index, 3)  = pop->estimates.width_mean;
+    pop_chain(output_index, 4)  = pop->estimates.mass_mean;
+    pop_chain(output_index, 5)  = pop->estimates.baseline_mean;
+    pop_chain(output_index, 6)  = pop->estimates.halflife_mean;
+    pop_chain(output_index, 7)  = pop->estimates.width_s2s_sd;
+    pop_chain(output_index, 8)  = pop->estimates.mass_s2s_sd;
+    pop_chain(output_index, 9)  = pop->estimates.baseline_sd;
+    pop_chain(output_index, 10) = pop->estimates.halflife_sd;
 
     for(auto pat : pop->patients) {
 
@@ -118,8 +118,10 @@ void PopChains::save_sample(Population * pop, int iter) {
       patient_chains[pat_iter](output_index, 1) = pulsecount;
       patient_chains[pat_iter](output_index, 2) = pat.estimates.mass_mean;
       patient_chains[pat_iter](output_index, 3) = pat.estimates.width_mean;
-      patient_chains[pat_iter](output_index, 4) = pat.estimates.errorsq;
-      patient_chains[pat_iter](output_index, 5) = pat.likelihood(false);
+      patient_chains[pat_iter](output_index, 4) = pat.estimates.baseline;
+      patient_chains[pat_iter](output_index, 5) = pat.estimates.halflife;
+      patient_chains[pat_iter](output_index, 6) = pat.estimates.errorsq;
+      patient_chains[pat_iter](output_index, 7) = pat.likelihood(false);
 
       // Create a matrix of current pulse-level estimates and add matrix to the
       //   vector chain
@@ -205,36 +207,68 @@ void PopChains::print_diagnostic_output(Population * pop, int iter) {
   int pat_iter = 0;
 
   Rcpp::Rcout              << "\n\n\n"                         <<
-    "Population Level ---------------------------------------------------"     
+    "Population Level ---------------------------------------------------"
+                           << "\n" <<
+    "Priors -------------------------------------------------------------"
+                           << "\n" <<
+    "Mass mean = "         << pop->priors.mass_mean            <<
+    " Mass Var = "         << pop->priors.mass_variance        <<
+    " Mass S2S sd = "      << pop->priors.mass_s2s_sd_param    <<
+    " Mass P2P sd = "      << pop->priors.mass_p2p_sd_param    << "\n" <<
+    "Width mean = "        << pop->priors.width_mean           <<
+    " Width var = "        << pop->priors.width_variance       <<
+    " Width s2s sd = "     << pop->priors.width_s2s_sd_param   <<
+    " Width p2p sd = "     << pop->priors.width_p2p_sd_param   << "\n" <<
+    "Halflife mean = "     << pop->priors.halflife_mean        <<
+    " Halfife var = "      << pop->priors.halflife_variance    <<
+    " Halflife sd = "      << pop->priors.halflife_sd_param    << "\n" <<
+    "Estimates ----------------------------------------------------------"
                            << "\n" <<
     "Iteration = "         << iter                             << "\n" <<
-    "Mass mean = "         << pop->patPriors.mass_mean         <<
-    " Mass S2S sd = "      << pop->patPriors.mass_s2s_sd       <<
-    " Mass P2P sd = "      << pop->patPriors.mass_p2p_sd       << "\n" <<
-    "Width mean = "        << pop->patPriors.width_mean        <<
-    " Width S2S sd = "     << pop->patPriors.width_s2s_sd      <<
-    " Width P2P sd = "     << pop->patPriors.width_p2p_sd      << "\n" <<
-    "Baseline mean = "     << pop->patPriors.baseline_mean     <<
-    " Baseline S2S sd = "  << pop->patPriors.baseline_sd       << "\n" <<
-    "Halflife mean = "     << pop->patPriors.halflife_mean     <<
-    " Halflife S2S sd = "  << pop->patPriors.halflife_sd       << "\n\n";
+    "Mass mean = "         << pop->estimates.mass_mean         <<
+    " Mass S2S sd = "      << pop->estimates.mass_s2s_sd       <<
+    " Mass P2P sd = "      << pop->estimates.mass_p2p_sd       << "\n" <<
+    "Width mean = "        << pop->estimates.width_mean        <<
+    " Width S2S sd = "     << pop->estimates.width_s2s_sd      <<
+    " Width P2P sd = "     << pop->estimates.width_p2p_sd      << "\n" <<
+    "Baseline mean = "     << pop->estimates.baseline_mean     <<
+    " Baseline S2S sd = "  << pop->estimates.baseline_sd       << "\n" <<
+    "Halflife mean = "     << pop->estimates.halflife_mean     <<
+    " Halflife S2S sd = "  << pop->estimates.halflife_sd       << "\n";
 
   for(auto pat : pop->patients) {
 
-    Rcpp::Rcout            <<
-      "Patient = "         << pat_iter                       <<
-      " Likelihood = "     << pat.likelihood(false)          << "\n" <<
-      "Pulse count = "     << pat.get_pulsecount()           <<
-      " Error variance = " << pat.estimates.errorsq          << "\n" <<
-      "Mass mean = "       << pat.estimates.mass_mean        <<
-      " Width mean = "     << pat.estimates.width_mean       << "\n" <<
-      "Priors ---------\n" <<
-      "Mass mean = "       << pat.priors.mass_mean           <<
-      " Width mean = "     << pat.priors.width_mean          << "\n" <<
-      "Mass S2S Var = "    << pat.priors.mass_variance       <<
-      " Width S2S Var = "  << pat.priors.width_variance      << "\n" <<
-      "Mass P2P SD = "     << pat.estimates.mass_sd          << 
-      " Width P2P SD = "   << pat.estimates.width_sd         << "\n";
+    Rcpp::Rcout                <<
+      "Patient "               << pat_iter                     <<
+                " ---------------------------------------------------------"
+                               << "\n" <<
+      "Priors ------------------------------------------------------------"
+                               << "\n" <<
+      "Mass mean = "           << pat.priors.mass_mean         <<
+      " Mass variance = "      << pat.priors.mass_variance     << "\n" <<
+      "Width mean = "          << pat.priors.width_mean        <<
+      " Width variance = "     << pat.priors.width_variance    << "\n" <<
+      "Baseline mean = "       << pat.priors.baseline_mean     <<
+      " Baseline variance = "  << pat.priors.baseline_variance << "\n" <<
+      "Halflife mean = "       << pat.priors.halflife_mean     <<
+      " Halflife variance = "  << pat.priors.halflife_variance << "\n" <<
+      "Pulse count = "         << pat.priors.pulse_count       <<
+      " Strauss Rep = "        << pat.priors.strauss_repulsion <<
+      " Range = "              << pat.priors.strauss_repulsion_range <<
+      "\n"                     <<
+      "Estimates ---------------------------------------------------------"
+                           << "\n" <<
+      "Likelihood = "      << pat.likelihood(false)              <<
+      " Pulse count = "    << pat.get_pulsecount()               << "\n" <<
+      "Mass mean = "       << pat.estimates.mass_mean            <<
+      " Mass P2P SD = "    << pat.estimates.mass_sd              << "\n" <<
+      "Width mean = "      << pat.estimates.width_mean           <<
+      " Width P2P SD = "   << pat.estimates.width_sd             << "\n" <<
+      "Baseline = "        << pat.estimates.baseline             <<
+      " BL Vec = "         << pat.estimates.baseline_halflife(0) << "\n" <<
+      "Halflife = "        << pat.estimates.halflife             <<
+      " HL Vec = "         << pat.estimates.baseline_halflife(1) << "\n" <<
+      "Error variance = "  << pat.estimates.errorsq              << "\n";
 
     Rcpp::Rcout << "Pulse times: ";
     for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.time << " "; }
@@ -305,6 +339,8 @@ NumericMatrix PopChains::addattribs_patient_chain(arma::mat in) {
                                           "num_pulses",
                                           "mass_mean",
                                           "width_mean",
+                                          "baseline",
+                                          "halflife",
                                           "model_error",
                                           "likelihood");
 
