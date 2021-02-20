@@ -146,7 +146,7 @@ double Pop_DrawSDRandomEffects::posterior_function(Population *population,
         second_part += 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
     
         // 4th part of acceptance ratio: Ratio of priors
-        fourth_part = log(patient_sd_param + patient_sd * patient_sd) - log(patient_sd_param + proposal * proposal);
+        fourth_part = log(patient_sd_param * patient_sd_param + patient_sd * patient_sd) - log(patient_sd_param * patient_sd_param + proposal * proposal);
     }
 
   // Compute and return log rho

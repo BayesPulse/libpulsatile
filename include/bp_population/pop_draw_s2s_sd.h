@@ -146,7 +146,7 @@ double Pop_DrawS2S_SD::posterior_function(Population *population,
   second_part = 0.5 * ((1 / (pop_sd * pop_sd)) - (1 / (proposal * proposal)));
     
   // 4th part of acceptance ratio: Ratio of priors
-  fourth_part = log(pop_sd_param + pop_sd * pop_sd) - log(pop_sd_param + proposal * proposal);
+  fourth_part = log(pop_sd_param * pop_sd_param + pop_sd * pop_sd) - log(pop_sd_param * pop_sd_param + proposal * proposal);
 
   // Compute and return log rho
   return old_int - new_int + first_part + second_part * third_part + fourth_part;
