@@ -60,7 +60,6 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   // Set to print every nth iteration for verbose screen output  
   int verbose_iter = 5000;
 
-
   // Check for valid input
   if ( !inpriors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
   if ( !proposalvars.inherits("bp_proposalvariance") ) stop("proposalvars argument must be a bp_proposalvariance object");
@@ -74,7 +73,31 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   double biv_target  = bivariate_pv_target_ratio;
   double univ_target = univariate_pv_target_ratio;
   std::string loc_prior = Rcpp::as<std::string>(location_prior);
-  
+
+  // Test block for testing trunc_exp
+  //arma::vec test_vector(3);
+  //test_vector.fill(pow(10, 2));
+  //Rcpp::Rcout << "10^2" << trunc_exp(test_vector);
+  //Rcpp::Rcout << "10^2" << exp(test_vector);
+  //test_vector.fill(pow(10, 4));
+  //Rcpp::Rcout << "10^4" << trunc_exp(test_vector);
+  //Rcpp::Rcout << "10^4" << exp(test_vector);
+  //test_vector.fill(pow(10, 8));
+  //Rcpp::Rcout << "10^8" << trunc_exp(test_vector);
+  //Rcpp::Rcout << "10^8" << exp(test_vector);
+  //Rcpp::Rcout << "Test equation: "
+  //            << (test_vector * 0) % exp(test_vector) << "\n"
+  //            << (test_vector * 0) % trunc_exp(test_vector) << "\n";
+  //Rcpp::Rcout << "Test equation 2: "
+  //            << (test_vector * 1.27e-254) % trunc_exp(test_vector) << "\n";
+  //
+  //arma::vec test_vec2 = (test_vector * 0) % exp(test_vector);
+  //arma::vec test_vec3 = (test_vector * 0) % trunc_exp(test_vector);
+
+  //Rcpp::Rcout << "Sums: " << sum(test_vec2) << " " << sum(test_vec3) << "\n";
+
+  //stop("test");
+
 
   Rcpp::Rcout << "Location prior is: " << loc_prior << "\n\n";
   

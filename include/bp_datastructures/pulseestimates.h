@@ -121,12 +121,22 @@ class PulseEstimates {
         //x = arma::normpdf(x); // doesn't give same results
       }
 
+      //Rcpp::Rcout << "New Iteration --------------------------\n"
+      //            << "z = " << z << "; y = " <<  y << "; w = " << w
+      //            << "\nDecay rate: " << decay_rate
+      //            << "\ntime: " << time << "\n"
+      //            << "Sum X: " << sum(x) << "\n"
+      //            << "mass: " << mass << "\n"
+      //            << "width: " << width << "\n";
+
       // Finish calculating mean_contrib w/ vectorized ops
       //    mass * x is a vector, as is exp(), so use element-wise
       //    multiplication via %
-      mean_contribution = (mass * x) % exp(y - data_time * decay_rate);
+      mean_contribution = (mass * x) % trunc_exp(y - data_time * decay_rate);
+      //Rcpp::Rcout << "Sum(mean_contribution) 1 = " << sum(mean_contribution) << "\n";
       // Truncate <0 = 0
       mean_contribution.for_each( [](arma::vec::elem_type& val) { val = std::max(val, 0.); } );
+      //Rcpp::Rcout << "Sum(mean_contribution) 2 = " << sum(mean_contribution) << "\n\n";
 
     }
 

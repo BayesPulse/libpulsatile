@@ -131,12 +131,12 @@ class BirthDeathProcess
           total_death_rate = 0; 
         }
      
-        for (int i = 1; i < pulse_count; i++) {
-          
-          if (isnan(death_rates(i)) || isinf(death_rates(i))) {
-            std::cout << "Death Rate: " << death_rates(i) << " ";
-          }
-        }
+        //for (int i = 1; i < pulse_count; i++) {
+        //  
+        //  if (isnan(death_rates(i)) || isinf(death_rates(i))) {
+        //    std::cout << "Death Rate: " << death_rates(i) << " ";
+        //  }
+        //}
 
         
         // 5. Update virtual time (how long to run BD step) - Draw from exp(B+D) and add to current S
@@ -184,20 +184,41 @@ class BirthDeathProcess
           // Choose and remove a pulse
           remove_pulse(patient, death_rates, pulse_count);
         }
-       
-        // Only print if value is NaN or Inf 
-        if (isnan(birth_rate) || isinf(birth_rate)) {
-          std::cout << "Birth Rate: " << birth_rate << "\n";
-        }
-        if (isnan(probability_of_birth) || isinf(probability_of_birth)) {
-          std::cout << "Probability of Birth: " << probability_of_birth << "\n";
-        }
+
+        // Print patient info for debugging
+        //Rcpp::Rcout                <<
+        //  "Estimates ---------------------------------------------------------"
+        //                       << "\n" <<
+        //  "Likelihood = "      << patient->likelihood(false)              <<
+        //  " Pulse count = "    << patient->get_pulsecount()               << "\n" <<
+        //  "Mass mean = "       << patient->estimates.mass_mean            <<
+        //  " Mass P2P SD = "    << patient->estimates.mass_sd              << "\n" <<
+        //  "Width mean = "      << patient->estimates.width_mean           <<
+        //  " Width P2P SD = "   << patient->estimates.width_sd             << "\n" <<
+        //  "Baseline = "        << patient->estimates.baseline             <<
+        //  " BL Vec = "         << patient->estimates.baseline_halflife(0) << "\n" <<
+        //  "Halflife = "        << patient->estimates.halflife             <<
+        //  " HL Vec = "         << patient->estimates.baseline_halflife(1) << "\n" <<
+        //  "Error variance = "  << patient->estimates.errorsq              << "\n";
+        //
+        //// Print BD info for debugging
         //Rcpp::Rcout << "Birth Rate: " << birth_rate
         //            << " Death rate size: " << death_rates.size() << "\n"
+        //            << "Total Birth Rate: " << total_birth_rate
+        //            << " Total Death Rate: " << total_death_rate << "\n"
+        //            << "Strauss_repulsion: " << patient->priors.strauss_repulsion << "\n"
         //            << "Death Rate: ";
         //for(auto dr : death_rates) { Rcpp::Rcout << dr << " "; } 
+        //Rcpp::Rcout << "\nPartial Lklhd: ";
+        //for(auto like : partial_likelihood) { Rcpp::Rcout << like << " "; }
         //Rcpp::Rcout << "\nProbability of Birth: " << probability_of_birth << "\n"
-        //            << "Pulse count: " << patient->get_pulsecount() << "\n\n";
+        //            << "Pulse count: " << patient->get_pulsecount() << "\n"
+        //            << "BD Iter: " << aaa << "\n\n";
+
+        if (isnan(birth_rate)) stop("NaN birth_rate");
+        if (isinf(birth_rate)) stop("Inf birth_rate");
+        if (isnan(probability_of_birth)) stop("NaN Prop_of_birth");
+        if (isinf(probability_of_birth)) stop("Inf Prob_of_birth");
 
       } while (true);
 
