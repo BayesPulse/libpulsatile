@@ -98,14 +98,15 @@ class SS_DrawTVarScale :
 
       prior_ratio  = log(new_gamma) - log(old_gamma);
 
-      stdold       = (pulse_randomeffect) / (patient_sd / sqrt(curr_scale));
-      stdnew       = (pulse_randomeffect) / (patient_sd / sqrt(proposal));
-      re_old       = (pulse_randomeffect - patient_mean) * 0.5 * re_old * curr_scale;
-      re_new       = (pulse_randomeffect - patient_mean) * 0.5 * re_new * proposal;
-      re_ratio     = (re_old - re_new) / (patient_sd * patient_sd);
+     // compute the normalization from the truncated t-distribution prior
+      stdold       = (patient_mean / (patient_sd / sqrt(curr_scale));
+      stdnew       = (patient_mean / (patient_sd / sqrt(proposal));
+      re_old       = (pulse_randomeffect - patient_mean) * (pulse_randomeffect - patient_mean) * 0.5 * curr_scale;
+      re_new       = (pulse_randomeffect - patient_mean) * (pulse_randomeffect - patient_mean)* 0.5 * proposal;
+      re_ratio     = (re_old - re_new)/(patient_sd * patient_sd);
       re_ratio    += Rf_pnorm5(stdold, 0, 1, 1.0, 1.0) -  // second 1.0 does the log xform for us 
                      Rf_pnorm5(stdnew, 0, 1, 1.0, 1.0) -  // first 1.0 says to use lower tail      
-                     0.5 * log(curr_scale) + 0.5 * log(proposal); // the 1/2pi term in normal distirbution
+                    log(curr_scale) + log(proposal); // the 1/2pi term in normal distirbution
 
       // Compute and acceptance ratio
       return prior_ratio + re_ratio;
