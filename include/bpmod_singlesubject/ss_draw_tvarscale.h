@@ -99,8 +99,8 @@ class SS_DrawTVarScale :
       prior_ratio  = log(new_gamma) - log(old_gamma);
 
      // compute the normalization from the truncated t-distribution prior
-      stdold       = (patient_mean / (patient_sd / sqrt(curr_scale));
-      stdnew       = (patient_mean / (patient_sd / sqrt(proposal));
+      stdold       = (patient_mean / (patient_sd / sqrt(curr_scale)));
+      stdnew       = (patient_mean / (patient_sd / sqrt(proposal)));
       re_old       = (pulse_randomeffect - patient_mean) * (pulse_randomeffect - patient_mean) * 0.5 * curr_scale;
       re_new       = (pulse_randomeffect - patient_mean) * (pulse_randomeffect - patient_mean)* 0.5 * proposal;
       re_ratio     = (re_old - re_new)/(patient_sd * patient_sd);
