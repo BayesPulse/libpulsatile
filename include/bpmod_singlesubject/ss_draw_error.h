@@ -49,12 +49,17 @@ class SS_DrawError
       for(auto &patient : population->patients) {
         N = patient.data.number_of_obs;
         ssq = patient.get_sumerrorsquared(false);
+        //double test  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
         patient.estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
 
-       // Rcpp::Rcout << "N: " << N << " SSQ: " << ssq
-       //             << "\npatErrorSq: " << patient.estimates.errorsq << "\n\n";
+        //Rcpp::Rcout << "N: " << N << " SSQ: " << ssq << " Test: " << test
+        //            << "\npatErrorSq: " << patient.estimates.errorsq << "\n\n";
+
+        if(isnan(ssq)) stop("NaN SSQ in draw_error");
+        if(isinf(ssq)) stop("Inf SSQ in draw_error");
         
       }
+
     }
 
 };

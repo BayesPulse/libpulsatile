@@ -87,7 +87,7 @@ struct PopulationPriors {
     halflife_sd_param  = prior_halflife_sd_param;
 
     error_alpha        = prior_error_alpha;
-    error_beta         = prior_error_beta;
+    error_beta         = 1 / prior_error_beta;
 
   }
 };

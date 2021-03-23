@@ -560,6 +560,12 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
     if (test_error) draw_error.sample(population);
 
+
+    //for(auto pat : population->patients) {
+    //    Rcpp::Rcout << "Patient errorsq: " << pat.estimates.errorsq << "\n";
+    //}
+    //Rcpp::Rcout << "\n";
+
     chains.save_sample(population, iteration);
 
   }
