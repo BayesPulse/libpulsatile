@@ -14,7 +14,24 @@ fit_pulse(
   thin = 50,
   burnin = as.integer(0.1 * iters),
   use_tibble = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  test_birthdeath = TRUE,
+  test_fixeff_mass = TRUE,
+  test_fixeff_width = TRUE,
+  test_sd_mass = TRUE,
+  test_sd_width = FALSE,
+  test_blhl = TRUE,
+  test_error = TRUE,
+  test_locations = TRUE,
+  test_masses = TRUE,
+  test_widths = TRUE,
+  test_tvarscale_mass = TRUE,
+  test_tvarscale_width = TRUE,
+  testMassVec,
+  testWidthVec,
+  testMKappaVec,
+  testWKappaVec,
+  testLocVec
 )
 }
 \arguments{

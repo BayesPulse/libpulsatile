@@ -28,10 +28,18 @@ fit_pop_pulse(
   test_pop_means_halflife = FALSE,
   test_fixeff_mass = FALSE,
   test_fixeff_width = FALSE,
+  test_blhl = FALSE,
   test_error = FALSE,
   test_locations = FALSE,
   test_masses = FALSE,
-  test_widths = FALSE
+  test_widths = FALSE,
+  test_tvarscale_mass = FALSE,
+  test_tvarscale_width = FALSE,
+  testMassVec,
+  testWidthVec,
+  testMKappaVec,
+  testWKappaVec,
+  testLocVec
 )
 }
 \arguments{

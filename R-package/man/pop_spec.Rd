@@ -19,6 +19,8 @@ pop_spec(
   prior_halflife_mean,
   prior_halflife_var,
   prior_halflife_s2s_sd_var_max,
+  prior_error_alpha,
+  prior_error_beta,
   sv_mass_mean,
   sv_mass_p2p_sd_var,
   sv_mass_s2s_sd_var,
@@ -30,8 +32,6 @@ pop_spec(
   sv_halflife_mean,
   sv_halflife_s2s_sd_var,
   sv_error_var,
-  sv_error_alpha,
-  sv_error_beta,
   sv_mean_pulse_count,
   sv_strauss_repulsion,
   sv_strauss_repulsion_range,
@@ -47,7 +47,9 @@ pop_spec(
   pv_sub_baseline,
   pv_pop_halflife_mean,
   pv_sub_halflife,
-  pv_pulse_location
+  pv_pulse_location,
+  pv_sdscale_pulse_mass,
+  pv_sdscale_pulse_width
 )
 }
 \arguments{
