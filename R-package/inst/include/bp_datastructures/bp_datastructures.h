@@ -7,6 +7,7 @@
 #include <bp_datastructures/patientestimates.h>
 #include <bp_datastructures/patientpriors.h>
 #include <bp_datastructures/population.h>
+#include <bp_datastructures/populationestimates.h>
 #include <bp_datastructures/pulseestimates.h>
 #include <bp_datastructures/utils.h>
 

@@ -102,12 +102,6 @@ class SS_DrawLocationsStrauss : public SS_DrawLocations
 
       }
 
-      //Rcpp::Rcout << "cLikelihood: " << curr_likelihood << " Gamma: " << gamma
-      //            << "\nsumSRProp: " << sum_s_r_proposal
-      //            << " sumSRCurrent: " << sum_s_r_current
-      //            << "\nPrior Ratio: " << prior_ratio
-      //            << " cTime: " << current_time << "\n";
-
       return acceptance_ratio;
 
     }

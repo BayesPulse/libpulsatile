@@ -88,6 +88,14 @@ class SS_DrawBaselineHalflife :
       // Reset estimates to current value before exiting (decision made in sample())
       patient->estimates.baseline_halflife = current;
 
+      //Debug output
+      //Rcpp::Rcout << "Prior BL mean: " << prior_baseline_mean
+      //            << " Prior BL var: " << prior_baseline_variance << "\n"
+      //            << "Prior HL mean: " << prior_halflife_mean
+      //            << " Prior HL var: " << prior_halflife_variance << "\n"
+      //            << "Current: " << current(0) << " " << current(1) << "\n"
+      //            << "Acc ratio: " << acceptance_ratio << "\n\n";
+
       return acceptance_ratio;
 
     }

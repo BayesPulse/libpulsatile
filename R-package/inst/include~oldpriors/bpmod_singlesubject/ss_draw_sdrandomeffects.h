@@ -136,7 +136,7 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   second_part = 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
     
   // 4th part of acceptance ratio: Ratio of priors
-    fourth_part = log(patient_sd_param * patient_sd_param + patient_sd * patient_sd) - log(patient_sd_param * patient_sd_param + proposal * proposal);
+    fourth_part = log(patient_sd_param + patient_sd * patient_sd) - log(patient_sd_param + proposal * proposal);
 
   // Compute and return log rho
   return old_int - new_int + first_part + second_part * third_part + fourth_part;

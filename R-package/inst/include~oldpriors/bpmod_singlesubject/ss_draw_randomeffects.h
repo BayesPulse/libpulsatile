@@ -116,12 +116,6 @@ class SS_DrawRandomEffects :
         // Calculate likelihood assuming proposed mass/width 
         plikelihood          = patient->likelihood(false);
 
-        //Rcpp::Rcout << "Patient mean: " << patient_mean << " Patient_sd: " << patient_sd << "\n"
-        //            << "Current RE: " << current_randomeffect << " New RE: " << proposal
-        //            << "\nPrior ratio: " << prior_ratio
-        //            << "\npLikelihood: " << plikelihood << " currLikelihood: " << curr_likelihood
-        //            << "\n";
-
         // Reset pulse->time to current (sample() chooses whether to keep)
         //   and get_mean_contribution() will recalc that when requested.
         (*pulse).*randomeffect_ = current_randomeffect;

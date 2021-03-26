@@ -82,12 +82,6 @@ struct Patient {
     , estimates(in_parms) 
     , priors() {
       // priors member obj not used
-
-    PulseEstimates firstpulse(in_data.fitstart,
-                              1, 1, 1, 1,
-                              in_parms.get_decay(), 
-                              in_data.concentration);
-    pulses.push_back(firstpulse);
   }
 
 
@@ -154,23 +148,9 @@ struct Patient {
     // Calculate likelihood
     diffs = conc - mean_concentration(response_hormone, pulse_excluded);
     diffs = arma::square(diffs);
-
-    //Rcpp::Rcout << "Diffs: ";
-    //for(auto diff : diffs) { Rcpp::Rcout << diff << " "; }
-    //Rcpp::Rcout << "\n";
-    //Rcpp::Rcout << "Mean conc: " << mean_concentration(response_hormone, pulse_excluded);
-
     like  = arma::accu(diffs);
-    //Rcpp::Rcout << "\nLike 1: " << like;
-
     like /= (-2.0 * estimates.errorsq);
-    //Rcpp::Rcout << "\nLike 2: " << like
-    //            << "\nErrorsq: " << estimates.errorsq;
-
     like += -0.5 * conc.n_elem * (1.8378771 + estimates.get_logerrorsq());
-    //Rcpp::Rcout << "\nLike 3: " << like
-    //            << "\nLogErrorSq: " << estimates.get_logerrorsq()
-    //            << "\n\n";
 
     return like;
 
@@ -234,14 +214,8 @@ struct Patient {
     }
 
     // Add the baseline contribution and log
-    if (estimates.baseline_halflife.n_elem == 2) {
-      mean_conc += estimates.baseline_halflife(0);
-    } else {
-      mean_conc += estimates.baseline;
-    }
-    //Rcpp::Rcout << "Sum(mean_conc) = " << sum(mean_conc) << "\n";
+    mean_conc += estimates.baseline_halflife(0);
     mean_conc = log(mean_conc);
-    //Rcpp::Rcout << "Sum(log(mean_conc)) = " << sum(mean_conc) << "\n\n";
 
     return mean_conc;
 

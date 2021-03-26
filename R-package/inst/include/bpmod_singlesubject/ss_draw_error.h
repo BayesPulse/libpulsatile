@@ -7,6 +7,7 @@
 #endif
 #include <math.h>
 #include <bp_datastructures/patient.h>
+#include <bp_datastructures/population.h>
 
 //
 // SS_DrawError
@@ -35,6 +36,30 @@ class SS_DrawError
       //patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, beta + (0.5 * ssq));
       patient->estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
       //parms->sigma  = 1 / Rf_rgamma(priors->err_alpha + N / 2, 1 / (1 / priors->err_beta + 0.5 * ssq));
+    }
+
+    void sample(Population *population) {
+      double alpha = population->priors.error_alpha;
+      double beta = population->priors.error_beta;
+      int N;
+      double ssq;
+
+      //Rcpp::Rcout << "Alpha: " << alpha << " Beta: " << beta << " -------------\n";
+
+      for(auto &patient : population->patients) {
+        N = patient.data.number_of_obs;
+        ssq = patient.get_sumerrorsquared(false);
+        //double test  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
+        patient.estimates.errorsq  = 1 / Rf_rgamma(alpha + N / 2, 1 / (1 / beta + 0.5 * ssq));
+
+        //Rcpp::Rcout << "N: " << N << " SSQ: " << ssq << " Test: " << test
+        //            << "\npatErrorSq: " << patient.estimates.errorsq << "\n\n";
+
+        if(isnan(ssq)) stop("NaN SSQ in draw_error");
+        if(isinf(ssq)) stop("Inf SSQ in draw_error");
+        
+      }
+
     }
 
 };
