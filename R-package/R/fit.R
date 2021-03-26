@@ -61,11 +61,11 @@ fit_pulse <- function(data,
                       test_widths = TRUE,
                       test_tvarscale_mass = TRUE,
                       test_tvarscale_width = TRUE,
-                      testMassVec,
-                      testWidthVec,
-                      testMKappaVec,
-                      testWKappaVec,
-                      testLocVec
+                      testMassVec = NULL,
+                      testWidthVec = NULL,
+                      testMKappaVec = NULL,
+                      testWKappaVec = NULL,
+                      testLocVec = NULL
                       ) {
 
   
@@ -78,6 +78,34 @@ fit_pulse <- function(data,
   stopifnot(is.numeric(indata[[time]]), is.numeric(indata[[conc]]),
             is.logical(use_tibble), is.logical(verbose))
   if (burnin >= iters) stop("burnin >= iters")
+  
+  # Check that necessary combination of test arguments are used
+  #   To be removed in final version
+  if (is.null(testMassVec) & !test_masses) {
+    stop("Must include testMassVec if test_masses is FALSE")
+  } else if (is.null(testMassVec)) {
+    testMassVec <- 1:10
+  }
+  if (is.null(testWidthVec) & !test_widths) {
+    stop("Must include testWidthVec if test_widths is FALSE")
+  } else if (is.null(testWidthVec)) {
+    testWidthVec <- 1:10
+  }
+  if (is.null(testMKappaVec) & !test_tvarscale_mass) {
+    stop("Must include testMKappaVec if test_tvarscale_mass is FALSE")
+  } else if (is.null(testMKappaVec)) {
+    testMKappaVec <- 1:10
+  }
+  if (is.null(testWKappaVec) & !test_tvarscale_width) {
+    stop("Must include testWKappaVec if test_tvarscale_width is FALSE")
+  } else if (is.null(testWKappaVec)) {
+    testWKappaVec <- 1:10
+  }
+  if (is.null(testLocVec) & !test_locations) {
+    stop("Must include testLocVec if test_locations is FALSE")
+  } else if (is.null(testLocVec)) {
+    testLocVec <- 1:10
+  }
 
   #---------------------------------------
   # TODO: Temporary work-arounds  (What todo for a non-temp work around??)
