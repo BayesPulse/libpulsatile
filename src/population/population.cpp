@@ -398,10 +398,10 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
       Rcpp::RNGScope rng_scope;
       position = (!test_locations) ? testLocVec(l) : Rf_runif(patient->data.fitstart, patient->data.fitend);
-      //new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : Rf_rgamma(2, 0.5);
-      new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : 10;
-      //new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : Rf_rgamma(2, 0.5);
-      new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : 10;
+      new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : Rf_rgamma(2, 0.5);
+      //new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : 10;
+      new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : Rf_rgamma(2, 0.5);
+      //new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : 10;
   
       if(!test_masses) {
         new_mass = testMassVec(l);
@@ -437,10 +437,10 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
         Rcpp::RNGScope rng_scope;
         position = (!test_locations) ? testLocVec(l) : Rf_runif(patient->data.fitstart, patient->data.fitend);
-        //new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : Rf_rgamma(2, 0.5);
-        new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : 10;
-        //new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : Rf_rgamma(2, 0.5);
-        new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : 10;
+        new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : Rf_rgamma(2, 0.5);
+        //new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : 10;
+        new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : Rf_rgamma(2, 0.5);
+        //new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : 10;
 
         if(!test_masses) {
           new_mass = testMassVec(l);

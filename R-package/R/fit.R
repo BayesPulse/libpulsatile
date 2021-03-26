@@ -48,7 +48,24 @@ fit_pulse <- function(data,
                       thin       = 50,
                       burnin     = as.integer(0.1 * iters),
                       use_tibble = TRUE,
-                      verbose    = FALSE
+                      verbose    = FALSE,
+                      test_birthdeath = TRUE,
+                      test_fixeff_mass = TRUE,
+                      est_fixeff_width = TRUE,
+                      test_sd_mass = TRUE,
+                      test_sd_width = FALSE,
+                      test_blhl = TRUE,
+                      test_error = TRUE,
+                      test_locations = TRUE,
+                      test_masses = TRUE,
+                      test_widths = TRUE,
+                      test_tvarscale_mass = TRUE,
+                      test_tvarscale_width = TRUE,
+                      testMassVec,
+                      testWidthVec,
+                      testMKappaVec,
+                      testWKappaVec,
+                      testLocVec
                       ) {
 
   
@@ -100,7 +117,24 @@ fit_pulse <- function(data,
                         startingvalues,
                         iters, thin, burnin, verbose,
                         pv_adjust_iter, pv_adjust_max_iter,
-                        bivariate_pv_target_ratio, univariate_pv_target_ratio)
+                        bivariate_pv_target_ratio, univariate_pv_target_ratio,
+                        test_birthdeath,
+                        test_fixeff_mass,
+                        est_fixeff_width,
+                        test_sd_mass,
+                        test_sd_width,
+                        test_blhl,
+                        test_error,
+                        test_locations,
+                        test_masses,
+                        test_widths,
+                        test_tvarscale_mass,
+                        test_tvarscale_width,
+                        testMassVec,
+                        testWidthVec,
+                        testMKappaVec,
+                        testWKappaVec,
+                        testLocVec)
 
   patient_chain <- as.data.frame(fit$patient_chain)
   pulse_chain   <- as.data.frame(do.call(rbind, fit$pulse_chains))

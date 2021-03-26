@@ -34,7 +34,24 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                           int pv_adjust_iter,
                           int pv_adjust_max_iter,
                           double bivariate_pv_target_ratio,
-                          double univariate_pv_target_ratio)
+                          double univariate_pv_target_ratio,
+                          bool test_birthdeath,
+                          bool test_fixeff_mass,
+                          bool test_fixeff_width,
+                          bool test_sd_mass,
+                          bool test_sd_width,
+                          bool test_blhl,
+                          bool test_error,
+                          bool test_locations,
+                          bool test_masses,
+                          bool test_widths,
+                          bool test_tvarscale_mass,
+                          bool test_tvarscale_width,
+                          Rcpp::NumericVector testMassVec,
+                          Rcpp::NumericVector testWidthVec,
+                          Rcpp::NumericVector testMKappaVec,
+                          Rcpp::NumericVector testWKappaVec,
+                          Rcpp::NumericVector testLocVec)
 {
 
   // every nth iteration for printing verbose screen output
@@ -106,6 +123,8 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   //Rcpp::Rcout << "initial likelihood is: " << like << std::endl;
   //Rcpp::Rcout << "Mean conc:\n" << patient->mean_concentration(false) << std::endl;
   //std::cout << "pulse count is: " << patient->get_pulsecount() << std::endl;
+  
+  
 
   //----------------------------------------
   // Create sampler objects
@@ -173,6 +192,115 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
   Rcpp::Rcout << "burnin = " << burnin << std::endl;
   Chains chains(mcmc_iterations, thin, burnin, false, verbose, verbose_iter);
 
+  //---------------------------------------
+  // Manually fix values for testing
+  //---------------------------------------
+
+
+  //---------------------------------------
+  // Add pulses (for testing)
+  //---------------------------------------
+  double position, new_mass, new_width, new_tvarscale_mass, new_tvarscale_width,
+         new_t_sd_mass, new_t_sd_width;
+  int l = 0;
+
+  if (!test_birthdeath) {
+
+    int num_pulses = inpriors["pulse_count"];
+
+    // Create first pulse (can't do it in loop because first pulse is initialized differently)
+
+    Rcpp::RNGScope rng_scope;
+    position = (!test_locations) ? testLocVec(l) : Rf_runif(patient->data.fitstart, patient->data.fitend);
+    new_tvarscale_mass = (!test_locations) ? testMKappaVec(l) : Rf_rgamma(2, 0.5);
+    new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : Rf_rgamma(2, 0.5);
+
+
+    if(!test_masses) {
+      new_mass = testMassVec(l);
+    } else {
+      new_t_sd_mass = patient->estimates.mass_sd / sqrt(new_tvarscale_mass);
+      new_mass = -1.0;
+      while (new_mass < 0) {
+        //new_mass = Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass);
+        new_mass = Rf_rnorm(10, .1);
+      }
+    }
+
+    if(!test_widths) {
+      new_width = testWidthVec(l);
+    } else {
+      new_t_sd_width = patient->estimates.width_sd / sqrt(new_tvarscale_width);
+      new_width = -1.0;
+      while (new_width < 0) {
+        //new_width = Rf_rnorm(patient->estimates.width_mean, new_t_sd_width);
+        new_width = Rf_rnorm(70, 1);
+      }
+    }
+    
+    PulseEstimates new_pulse(position, new_mass, new_width, new_tvarscale_mass,
+                             new_tvarscale_width, patient->estimates.get_decay(),
+                             patient->data.time);
+    patient->pulses.front() = new_pulse;
+    l++;
+    
+    // Create remaining pulses in loop
+    for (int k = 0; k < num_pulses - 1; k++) {
+      
+        Rcpp::RNGScope rng_scope;
+        position = (!test_locations) ? testLocVec(l) : Rf_runif(patient->data.fitstart, patient->data.fitend);
+        new_tvarscale_mass = (!test_tvarscale_mass) ? testMKappaVec(l) : Rf_rgamma(2, 0.5);
+        new_tvarscale_width = (!test_tvarscale_width) ? testWKappaVec(l) : Rf_rgamma(2, 0.5);
+
+        if(!test_masses) {
+          new_mass = testMassVec(l);
+        } else {
+          new_t_sd_mass = patient->estimates.mass_sd / sqrt(new_tvarscale_mass);
+          new_mass = -1.0;
+          while (new_mass < 0) {
+            //new_mass = Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass);
+            new_mass = Rf_rnorm(10, .1);
+          }
+        }
+
+        if(!test_widths) {
+          new_width = testWidthVec(l);
+        } else {
+          new_t_sd_width = patient->estimates.width_sd / sqrt(new_tvarscale_width);
+          new_width = -1.0;
+          while (new_width < 0) {
+            //new_width = Rf_rnorm(patient->estimates.width_mean, new_t_sd_width);
+            new_width = Rf_rnorm(70, 1);
+          }
+        }
+        
+        PulseEstimates new_pulse(position, new_mass, new_width, new_tvarscale_mass,
+                                 new_tvarscale_width, patient->estimates.get_decay(),
+                                 patient->data.time);
+
+        patient->pulses.push_back(new_pulse);
+
+        l++;
+
+  }
+
+  Rcpp::Rcout << "Pulses Added Manually\n";
+
+  Rcpp::Rcout << "Details:\n";
+  l = 1;
+  for(auto pulse : patient->pulses) {
+    Rcpp::Rcout << std::setprecision(3) << l << ": "
+                << pulse.mass << " "
+                << pulse.width << " "
+                << pulse.time << " "
+                << pulse.tvarscale_mass << " "
+                << pulse.tvarscale_width << " " << "\n";
+    l++;
+  }
+
+  Rcpp::Rcout << "\n";
+  }
+
   //----------------------------------------
   // Sample MMH objects
   //----------------------------------------
@@ -181,18 +309,18 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     checkUserInterrupt();
     chains.print_diagnostic_output(patient, iteration);
 
-    birth_death.sample(patient, false, iteration);
-    draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
-    draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
-    draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
-    //draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
-    draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
-    draw_locations->sample_pulses(patient, iteration);
-    draw_masses.sample_pulses(patient, iteration);
-    draw_widths.sample_pulses(patient, iteration);
-    draw_tvarscale_mass.sample_pulses(patient, iteration);
-    draw_tvarscale_width.sample_pulses(patient, iteration);
-    draw_error.sample(patient);
+    if (test_birthdeath) birth_death.sample(patient, false, iteration);
+    if (test_fixeff_mass) draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
+    if (test_fixeff_width) draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
+    if (test_sd_mass) draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
+    if (test_sd_width) draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
+    if (test_blhl) draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
+    if (test_locations) draw_locations->sample_pulses(patient, iteration);
+    if (test_masses) draw_masses.sample_pulses(patient, iteration);
+    if (test_widths) draw_widths.sample_pulses(patient, iteration);
+    if (test_tvarscale_mass) draw_tvarscale_mass.sample_pulses(patient, iteration);
+    if (test_tvarscale_width) draw_tvarscale_width.sample_pulses(patient, iteration);
+    if (test_error) draw_error.sample(patient);
     chains.save_sample(patient, iteration);
 
     //arma::vec locations(patient->get_pulsecount());
