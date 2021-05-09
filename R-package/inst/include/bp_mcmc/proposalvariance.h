@@ -141,13 +141,13 @@ class ProposalVariance2p {
 
       if (iter < (max_iter + 1) && iter % adjust_iter == 0 && iter > 0 &&
           getiter_since_reset() > (adjust_iter - 1)) {
-        adjustpv(-0.90); 
+        adjustpv(-0.90);
       }
 
     }
 
 
-    void adjustpv(double corr = -0.90) {
+    void adjustpv(double corr = -0.5) {
 
       // identity matrix
       arma::mat mydiag(2, 2, arma::fill::eye);
@@ -195,7 +195,7 @@ class ProposalVariance2p {
 
     void initialize_proposals(arma::vec initial_pv) {
       arma::mat this_pv = arma::diagmat(initial_pv);
-      set_proposals(this_pv, -0.90);
+      set_proposals(this_pv, -0.5);
     }
 
     void set_proposals(arma::mat this_pv, double corr) {
