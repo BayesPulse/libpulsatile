@@ -54,11 +54,11 @@ fit_pop_pulse <- function(data,
                           test_widths = TRUE,
                           test_tvarscale_mass = TRUE,
                           test_tvarscale_width = TRUE,
-                          testMassVec = NULL,
-                          testWidthVec = NULL,
-                          testMKappaVec = NULL,
-                          testWKappaVec = NULL,
-                          testLocVec = NULL
+                          testMassVec = numeric(),
+                          testWidthVec = numeric(),
+                          testMKappaVec = numeric(),
+                          testWKappaVec = numeric(),
+                          testLocVec = numeric()
                           ) {
   
   #if(num_patients != length(concs)) stop("Number of patients and concentration columns unequal")
