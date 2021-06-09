@@ -7,7 +7,6 @@
 fit_pop_pulse(
   data,
   time,
-  num_patients,
   location_prior = "strauss",
   spec,
   iters = 250000,
@@ -15,39 +14,29 @@ fit_pop_pulse(
   burnin = as.integer(0.1 * iters),
   use_tibble = TRUE,
   verbose = FALSE,
-  test_birthdeath = FALSE,
-  test_sd_masses = FALSE,
-  test_sd_width = FALSE,
-  test_s2s_sd_width = FALSE,
-  test_s2s_sd_mass = FALSE,
-  test_s2s_sd_baseline = FALSE,
-  test_s2s_sd_halflife = FALSE,
-  test_pop_means_width = FALSE,
-  test_pop_means_mass = FALSE,
-  test_pop_means_baseline = FALSE,
-  test_pop_means_halflife = FALSE,
-  test_fixeff_mass = FALSE,
-  test_fixeff_width = FALSE,
-  test_blhl = FALSE,
-  test_error = FALSE,
-  test_locations = FALSE,
-  test_masses = FALSE,
-  test_widths = FALSE,
-  test_tvarscale_mass = FALSE,
-  test_tvarscale_width = FALSE,
-  testMassVec,
-  testWidthVec,
-  testMKappaVec,
-  testWKappaVec,
-  testLocVec
+  verbose_patient = FALSE,
+  verbose_iter = 5000,
+  fix_params = NULL,
+  pat_mass_means = numeric(),
+  pat_width_means = numeric(),
+  pat_baselines = numeric(),
+  pat_halflives = numeric(),
+  pulse_counts = numeric(),
+  pulse_masses = numeric(),
+  pulse_widths = numeric(),
+  pulse_mass_sdscales = numeric(),
+  pulse_width_sdscales = numeric(),
+  pulse_locations = numeric()
 )
 }
 \arguments{
-\item{data}{Placeholder}
+\item{data}{Numeric matrix specifying pulsatile hormone concentration for each
+patient in population at each time of observation, with each patient as a 
+column and each row as an observation time. No additional columns should be
+present.}
 
-\item{time}{A string. Name of the time variable in \code{data}}
-
-\item{num_patients}{Number of patients in the analysis}
+\item{time}{Numeric vector for observation times. Must be the same length as
+the number of rows in \code{data}}
 
 \item{spec}{An object of class \code{spec}, created by
 \code{pulse_spec()}, specifying the priors, starting values, and proposal
@@ -65,8 +54,76 @@ samples). Applied prior to thinning.}
 package.  Mostly used for the print.tbl_df method, which limits the rows and
 columns printed to those which fit in the console.}
 
-\item{verbose}{Prints diagnostics and estimates every 5000th iteration.
-Default is \code{FALSE}.}
+\item{verbose}{Prints diagnostics and estimates at iterations determined by
+'verbose_iters' argument. Default is \code{FALSE}.}
+
+\item{verbose_patient}{Expands diagnostic output to include patient level
+parameters. Default is \code{FALSE}.}
+
+\item{fix_params}{Character vector enabling parameters to fixed (not 
+estimated). Vector may include options:
+"pop_mass_mean", "pop_width_mean", "pop_baseline_mean",
+"pop_halflife_mean", "mass_s2s_sd", "width_s2s_sd", "baseline_s2s_sd",
+"halflife_s2s_sd", "mass_p2p_sd", "width_p2p_sd", "pat_mass_mean",
+"pat_width_mean", "pat_bl_hl", "pat_error", "pulse_count", "pulse_location",
+"pulse_mass", "pulse_width", "pulse_mass_sdscale", "pulse_width_sdscale", 
+or may be left empty to estimate all parameters. For population level 
+parameters, values are fixed at the starting values specified by
+\code{pop_spec()}. For patient and pulse parameters, vectors must be
+provided using the function arguments below to specify their fixed values.}
+
+\item{pat_mass_means}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for patient mass means. Must
+be the same length as the number of patients being analyzed (the number
+of columns passed to \code{data}).}
+
+\item{pat_width_means}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for patient width means. Must
+be the same length as the number of patients being analyzed (the number
+of columns passed to \code{data}).}
+
+\item{pat_baselines}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for patient baseline means. Must
+be the same length as the number of patients being analyzed (the number
+of columns passed to \code{data}).}
+
+\item{pat_halflives}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for patient halflife means. Must
+be the same length as the number of patients being analyzed (the number
+of columns passed to \code{data}).}
+
+\item{pulse_counts}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for patient pulse numbers. Must
+be the same length as the number of patients being analyzed (the number
+of columns passed to \code{data}).}
+
+\item{pulse_masses}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse masses. 
+If used, \code{pulse_count} must also be fixed, and the length of the 
+vector must equal the sum of \code{pulse_counts}.}
+
+\item{pulse_widths}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse widths. If
+used, \code{pulse_count} must also be fixed, and length of the vector 
+must equal the sum of \code{pulse_counts}.}
+
+\item{pulse_mass_sdscales}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse mass standard
+deviation scales. If used, \code{pulse_count} must also be fixed, and 
+length of the vector must equal the sum of \code{pulse_counts}.}
+
+\item{pulse_width_sdscales}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse width standard
+deviation scales. If used, \code{pulse_count} must also be fixed, and 
+length of the vector must equal the sum of \code{pulse_counts}.}
+
+\item{pulse_locations}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse locations. 
+If used, \code{pulse_count} must also be fixed, and 
+length of the vector must equal the sum of \code{pulse_counts}.}
+
+\item{verbose_iters}{Integer that sets diagnostic output to printout at the
+given interval if 'verbose' is \code{TRUE}. Default is 5000.}
 }
 \description{
 fit_pop_pulse

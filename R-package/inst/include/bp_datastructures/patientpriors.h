@@ -138,9 +138,9 @@ struct PatientPriors {
                 double sv_width_s2s_sd,
                 double sv_baseline_sd,
                 double sv_halflife_sd,
-                int    sv_pulse_count,
-                double sv_strauss_repulsion,
-                double sv_strauss_repulsion_range) {
+                int    prior_pulse_count,
+                double prior_strauss_repulsion,
+                double prior_strauss_repulsion_range) {
     mass_mean         = sv_mass_mean;
     width_mean        = sv_width_mean;
     baseline_mean     = sv_baseline_mean;
@@ -154,9 +154,9 @@ struct PatientPriors {
     //mass_sd_param     = mass_p2p_sd;
     //width_sd_param    = width_p2p_sd;
     
-    pulse_count       = sv_pulse_count;
-    strauss_repulsion = sv_strauss_repulsion;
-    strauss_repulsion_range = sv_strauss_repulsion_range;
+    pulse_count       = prior_pulse_count;
+    strauss_repulsion = prior_strauss_repulsion;
+    strauss_repulsion_range = prior_strauss_repulsion_range;
     num_orderstat     = pu.orderstat_default();
   }
 

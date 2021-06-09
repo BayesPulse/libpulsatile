@@ -27,11 +27,11 @@ fit_pulse(
   test_widths = TRUE,
   test_tvarscale_mass = TRUE,
   test_tvarscale_width = TRUE,
-  testMassVec,
-  testWidthVec,
-  testMKappaVec,
-  testWKappaVec,
-  testLocVec
+  testMassVec = NULL,
+  testWidthVec = NULL,
+  testMKappaVec = NULL,
+  testWKappaVec = NULL,
+  testLocVec = NULL
 )
 }
 \arguments{

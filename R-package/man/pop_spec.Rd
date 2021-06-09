@@ -5,57 +5,149 @@
 \title{pop_spec}
 \usage{
 pop_spec(
-  prior_mass_mean,
-  prior_mass_var,
-  prior_mass_p2p_sd_var_max,
-  prior_mass_s2s_sd_var_max,
-  prior_width_mean,
-  prior_width_var,
-  prior_width_p2p_sd_var_max,
-  prior_width_s2s_sd_var_max,
-  prior_baseline_mean,
-  prior_baseline_var,
-  prior_baseline_s2s_sd_var_max,
-  prior_halflife_mean,
-  prior_halflife_var,
-  prior_halflife_s2s_sd_var_max,
-  prior_error_alpha,
-  prior_error_beta,
-  sv_mass_mean,
-  sv_mass_p2p_sd_var,
-  sv_mass_s2s_sd_var,
-  sv_width_mean,
-  sv_width_p2p_sd_var,
-  sv_width_s2s_sd_var,
-  sv_baseline_mean,
-  sv_baseline_s2s_sd_var,
-  sv_halflife_mean,
-  sv_halflife_s2s_sd_var,
-  sv_error_var,
-  sv_mean_pulse_count,
-  sv_strauss_repulsion,
-  sv_strauss_repulsion_range,
-  pv_sub_mass_mean,
-  pv_pop_mass_mean,
-  pv_ind_mass,
-  pv_sub_mass,
-  pv_sub_width_mean,
-  pv_pop_width_mean,
-  pv_ind_width,
-  pv_sub_width,
-  pv_pop_baseline_mean,
-  pv_sub_baseline,
-  pv_pop_halflife_mean,
-  pv_sub_halflife,
-  pv_pulse_location,
-  pv_sdscale_pulse_mass,
-  pv_sdscale_pulse_width
+  prior_mass_mean = 3.5,
+  prior_mass_var = 100,
+  prior_mass_s2s_sd = 1,
+  prior_mass_p2p_sd = 1,
+  prior_width_mean = 25,
+  prior_width_var = 1000,
+  prior_width_s2s_sd = 1,
+  prior_width_p2p_sd = 1,
+  prior_baseline_mean = 3,
+  prior_baseline_var = 100,
+  prior_baseline_s2s_sd = 1,
+  prior_halflife_mean = 45,
+  prior_halflife_var = 1000,
+  prior_halflife_s2s_sd = 1,
+  prior_error_alpha = 1e-04,
+  prior_error_beta = 1e-04,
+  prior_mean_pulse_count = 8,
+  prior_strauss_repulsion = 0,
+  prior_strauss_repulsion_range = 40,
+  sv_mass_mean = 3.5,
+  sv_mass_s2s_sd = 0.5,
+  sv_mass_p2p_sd = 0.5,
+  sv_width_mean = 25,
+  sv_width_s2s_sd = 5,
+  sv_width_p2p_sd = 5,
+  sv_baseline_mean = 3,
+  sv_baseline_s2s_sd = 0.5,
+  sv_halflife_mean = 45,
+  sv_halflife_s2s_sd = 5,
+  sv_error_var = 0.015,
+  pv_pat_mass_mean = 0.5,
+  pv_pop_mass_mean = 0.5,
+  pv_ind_mass_sd = 1,
+  pv_pat_mass_sd = 1,
+  pv_pat_width_mean = 21,
+  pv_pop_width_mean = 21,
+  pv_ind_width_sd = 50,
+  pv_pat_width_sd = 25,
+  pv_pop_baseline_mean = 0.015,
+  pv_pat_baseline = 0.015,
+  pv_pat_baseline_sd = 1,
+  pv_pop_halflife_mean = 25,
+  pv_pat_halflife = 25,
+  pv_pat_halflife_sd = 1,
+  pv_pulse_location = 40,
+  pv_sdscale_pulse_mass = 4,
+  pv_sdscale_pulse_width = 4
 )
 }
 \arguments{
-\item{prior_mass_mean}{Placeholder}
+\item{prior_mass_mean}{Mean of the Gaussian prior on population mean pulse mass}
 
-\item{prior_mass_variance}{Placeholder}
+\item{prior_mass_var}{Variance of the Gaussian prior on population mean pulse mass}
+
+\item{prior_mass_s2s_sd}{Scale of the Half-Cauchy prior on the standard deviation of patient mean pulse mass}
+
+\item{prior_mass_p2p_sd}{Scale of the Half-Cauchy prior on the standard deviation of pulse-to-pulse variation of masses for a patient}
+
+\item{prior_width_mean}{Mean of the Gaussian prior on population mean pulse width}
+
+\item{prior_width_var}{Variance of the Gaussian prior on population mean pulse width}
+
+\item{prior_width_s2s_sd}{Scale of the Half-Cauchy prior on the standard deviation of patient mean pulse width}
+
+\item{prior_width_p2p_sd}{Scale of the Half-Cauchy prior on the standard deviation of pulse-to-pulse variation of widths for a patient}
+
+\item{prior_baseline_mean}{Mean of the Gaussian prior on population mean baseline}
+
+\item{prior_baseline_var}{Variance of the Gaussian prior on population mean baseline}
+
+\item{prior_baseline_s2s_sd}{Scale of the Half-Cauchy prior on the standard deviation of patient baselines}
+
+\item{prior_halflife_mean}{Mean of the Gaussian prior on population mean half-life}
+
+\item{prior_halflife_var}{Variance of the Gaussian prior on population mean half-life}
+
+\item{prior_halflife_s2s_sd}{Scale of the Half-Cauchy prior on the standard deviation of patient half-lives}
+
+\item{prior_error_alpha}{Shape parameter of Gamma prior on patient error variance}
+
+\item{prior_error_beta}{Scale parameter of Gamma prior on patient error variance}
+
+\item{prior_mean_pulse_count}{Rate parameter for Strauss prior on pulse count}
+
+\item{prior_strauss_repulsion}{Repulsion parameter for Strauss prior on pulse count}
+
+\item{prior_strauss_repulsion_range}{Rate parameter for Strauss prior on pulse count}
+
+\item{sv_mass_mean}{Starting value for population mean pulse mass}
+
+\item{sv_mass_s2s_sd}{Starting value for standard deviation of patient mean pulse mass}
+
+\item{sv_mass_p2p_sd}{Starting value for standard deviation of pulse-to-pulse variation of masses}
+
+\item{sv_width_mean}{Starting value for population mean pulse width}
+
+\item{sv_width_s2s_sd}{Starting value for standard deviation of patient mean pulse width}
+
+\item{sv_width_p2p_sd}{Starting value for standard deviation of pulse-to-pulse variation of widths}
+
+\item{sv_baseline_mean}{Starting value for population mean baseline}
+
+\item{sv_baseline_s2s_sd}{Starting value for standard deviation of patient mean baseline}
+
+\item{sv_halflife_mean}{Starting value for population mean half-life}
+
+\item{sv_halflife_s2s_sd}{Starting value for standard deviation of patient mean half-life}
+
+\item{sv_error_var}{Starting value for patient error variance}
+
+\item{pv_pat_mass_mean}{Proposal variance for patient mean pulse mass}
+
+\item{pv_pop_mass_mean}{Proposal variance for population mean pulse mass}
+
+\item{pv_ind_mass_sd}{Proposal variance for mass pulse-to-pulse standard deviation}
+
+\item{pv_pat_mass_sd}{Proposal variance for standard deviation of patient mean pulse mass}
+
+\item{pv_pat_width_mean}{Proposal variance for patient mean pulse width}
+
+\item{pv_pop_width_mean}{Proposal variance for population mean pulse width}
+
+\item{pv_ind_width_sd}{Proposal variance for width pulse-to-pulse standard deviation}
+
+\item{pv_pat_width_sd}{Proposal variance for standard deviation of patient mean pulse width}
+
+\item{pv_pop_baseline_mean}{Proposal variance for population mean baseline}
+
+\item{pv_pat_baseline}{Proposal variance for patient baselines}
+
+\item{pv_pat_baseline_sd}{Proposal variance for standard deviation of patient baseline}
+
+\item{pv_pop_halflife_mean}{Proposal variance for population mean half-life}
+
+\item{pv_pat_halflife}{Proposal variance for standard deviation of patient half-life}
+
+\item{pv_pat_halflife_sd}{Proposal variance for standard deviation of patient half-life}
+
+\item{pv_pulse_location}{Proposal variance for pulse locations}
+
+\item{pv_sdscale_pulse_mass}{Proposal variance for individual pulse mass distribution standard deviation scale}
+
+\item{pv_sdscale_pulse_width}{Proposal variance for individual pulse width distribution standard deviation scale}
 }
 \description{
 pop_spec
