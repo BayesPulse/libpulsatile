@@ -27,7 +27,7 @@
 #'   parameters. Default is \code{FALSE}.
 #' @param verbose_iters Integer that sets diagnostic output to printout at the
 #'   given interval if 'verbose' is \code{TRUE}. Default is 5000.
-#' @param fix_params Character vector enabling parameters to fixed (not 
+#' @param fix_params Character vector enabling parameters to fixed (i.e. not 
 #'   estimated). Vector may include options:
 #'   "pop_mass_mean", "pop_width_mean", "pop_baseline_mean",
 #'   "pop_halflife_mean", "mass_s2s_sd", "width_s2s_sd", "baseline_s2s_sd",
@@ -66,11 +66,11 @@
 #'   \code{fix_params} to choose fixed values for individual pulse widths. If
 #'   used, \code{pulse_count} must also be fixed, and length of the vector 
 #'   must equal the sum of \code{pulse_counts}.
-#' @param pulse_mass_sdscales Numeric vector used in conjunction with 
+#' @param pulse_mass_sdscale Numeric vector used in conjunction with 
 #'   \code{fix_params} to choose fixed values for individual pulse mass standard
 #'   deviation scales. If used, \code{pulse_count} must also be fixed, and 
 #'   length of the vector must equal the sum of \code{pulse_counts}.
-#' @param pulse_width_sdscales Numeric vector used in conjunction with 
+#' @param pulse_width_sdscale Numeric vector used in conjunction with 
 #'   \code{fix_params} to choose fixed values for individual pulse width standard
 #'   deviation scales. If used, \code{pulse_count} must also be fixed, and 
 #'   length of the vector must equal the sum of \code{pulse_counts}.
@@ -108,9 +108,10 @@ fit_pop_pulse <- function(data,
   param_list <- c("pop_mass_mean", "pop_width_mean", "pop_baseline_mean", 
                   "pop_halflife_mean", "mass_s2s_sd", "width_s2s_sd", 
                   "baseline_s2s_sd","halflife_s2s_sd", "mass_p2p_sd", 
-                  "width_p2p_sd", "pat_mass_mean", "pat_width_mean", "pat_bl_hl", 
-                  "pat_error", "pulse_count", "pulse_location", "pulse_mass", 
-                  "pulse_width", "pulse_mass_sdscale", "pulse_width_sdscale")
+                  "width_p2p_sd", "pat_mass_mean", "pat_width_mean", 
+                  "pat_bl_hl", "pat_error", "pulse_count", "pulse_location", 
+                  "pulse_mass", "pulse_width", "pulse_mass_sdscale", 
+                  "pulse_width_sdscale")
   if(!all(fix_params %in% param_list)) {stop("Invalid 'fix_params' element(s)")}
   fix_params <- as.list(param_list %in% fix_params)
   names(fix_params) <- param_list
@@ -167,24 +168,6 @@ fit_pop_pulse <- function(data,
   patient_chains <- lapply(fit$patient_chains, as.data.frame);
   pulse_chains <- lapply(fit$pulse_chains, 
                         FUN = function(x){as.data.frame(do.call(rbind, x))})
-  
-  # patient_chains <- as.data.frame(fit$patient_chains)
-  # pulse_chains <- as.data.frame(do.call(rbind, fit$pulse_chains))
-  # pulse_chains <- fit$pulse_chains
-
-
-  # Convert doubles to ints -- not strictly necessary -- consider.
-  # pulse_chain$iteration        <- as.integer(pulse_chain$iteration)
-  # pulse_chain$total_num_pulses <- as.integer(pulse_chain$total_num_pulses)
-  # pulse_chain$pulse_num        <- as.integer(pulse_chain$pulse_num)
-  # patient_chain$iteration       <- as.integer(patient_chain$iteration)
-  # patient_chain$num_pulses      <- as.integer(patient_chain$num_pulses)
-
-  # if (use_tibble) {
-  #  patient_chain <- tibble::as_data_frame(patient_chain)
-  #  pulse_chain  <- tibble::as_data_frame(pulse_chain)
-  # }
-  # temp return line
 
   rtn_obj <-
     structure(list("model"            = "population",

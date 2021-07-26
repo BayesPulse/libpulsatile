@@ -101,7 +101,9 @@ pop_spec <- function(prior_mass_mean = 3.5,
                      pv_pat_halflife_sd = 1,
                      pv_pulse_location = 40,
                      pv_sdscale_pulse_mass = 4,
-                     pv_sdscale_pulse_width = 4
+                     pv_sdscale_pulse_width = 4,
+                     pv_ind_pulse_mass = 1,
+                     pv_ind_pulse_width = 50
 ) {
   
   pop_ps_obj <- 
@@ -141,6 +143,8 @@ pop_spec <- function(prior_mass_mean = 3.5,
                                      pat_halflife        = pv_pat_halflife,
                                      pat_halflife_sd     = pv_pat_halflife_sd,
                                      pulse_location      = pv_pulse_location,
+                                     ind_pulse_mass      = pv_ind_pulse_mass,
+                                     ind_pulse_width     = pv_ind_pulse_width,
                                      sdscale_pulse_mass  =
                                        pv_sdscale_pulse_mass,
                                      sdscale_pulse_width =

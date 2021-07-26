@@ -15,23 +15,13 @@ fit_pulse(
   burnin = as.integer(0.1 * iters),
   use_tibble = TRUE,
   verbose = FALSE,
-  test_birthdeath = TRUE,
-  test_fixeff_mass = TRUE,
-  test_fixeff_width = TRUE,
-  test_sd_mass = TRUE,
-  test_sd_width = FALSE,
-  test_blhl = TRUE,
-  test_error = TRUE,
-  test_locations = TRUE,
-  test_masses = TRUE,
-  test_widths = TRUE,
-  test_tvarscale_mass = TRUE,
-  test_tvarscale_width = TRUE,
-  testMassVec = NULL,
-  testWidthVec = NULL,
-  testMKappaVec = NULL,
-  testWKappaVec = NULL,
-  testLocVec = NULL
+  verbose_iter = 5000,
+  fix_params = NULL,
+  pulse_masses = numeric(),
+  pulse_widths = numeric(),
+  pulse_mass_sdscales = numeric(),
+  pulse_width_sdscales = numeric(),
+  pulse_locations = numeric()
 )
 }
 \arguments{
@@ -63,6 +53,45 @@ columns printed to those which fit in the console.}
 
 \item{verbose}{Prints diagnostics and estimates every 5000th iteration.
 Default is \code{FALSE}.}
+
+\item{fix_params}{Character vector enabling parameters to fixed (i.e. not 
+estimated). Vector may include options:
+"pulse_count", "mass_mean", "width_mean", "mass_sd", 
+"width_sd", "bl_hl", "pulse_location", "error_var",
+"pulse_mass", "pulse_width", "pulse_mass_sdscale", 
+"pulse_width_sdscale" 
+or may be left empty to estimate all parameters. For patient level 
+parameters, values are fixed at the starting values specified by
+\code{pulse_spec()}. For pulse level parameters, vectors must be
+provided using the function arguments below to specify their fixed values.}
+
+\item{pulse_masses}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse masses. 
+If used, \code{pulse_count} must also be fixed, and the length of the 
+vector must equal the sum of \code{pulse_counts}.}
+
+\item{pulse_widths}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse widths. If
+used, \code{pulse_count} must also be fixed, and length of the vector 
+must equal the sum of \code{prior_mean_pulse_count}.}
+
+\item{pulse_locations}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse locations. 
+If used, \code{pulse_count} must also be fixed, and 
+length of the vector must equal the sum of \code{prior_mean_pulse_count}.}
+
+\item{verbose_iters}{Integer that sets diagnostic output to printout at the
+given interval if 'verbose' is \code{TRUE}. Default is 5000.}
+
+\item{pulse_mass_sdscale}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse mass standard
+deviation scales. If used, \code{pulse_count} must also be fixed, and 
+length of the vector must equal the sum of \code{prior_mean_pulse_count}.}
+
+\item{pulse_width_sdscale}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse width standard
+deviation scales. If used, \code{pulse_count} must also be fixed, and 
+length of the vector must equal the sum of \code{prior_mean_pulse_count}.}
 }
 \description{
 Primary function for fitting deconvolution model for time series of pulsatile

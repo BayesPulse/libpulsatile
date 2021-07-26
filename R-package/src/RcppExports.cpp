@@ -44,8 +44,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // singlesubject_
-Rcpp::List singlesubject_(Rcpp::NumericVector concentration, Rcpp::NumericVector time, Rcpp::CharacterVector location_prior, Rcpp::List inpriors, Rcpp::List proposalvars, Rcpp::List startingvals, int mcmc_iterations, int thin, int burnin, bool verbose, int pv_adjust_iter, int pv_adjust_max_iter, double bivariate_pv_target_ratio, double univariate_pv_target_ratio, bool test_birthdeath, bool test_fixeff_mass, bool test_fixeff_width, bool test_sd_mass, bool test_sd_width, bool test_blhl, bool test_error, bool test_locations, bool test_masses, bool test_widths, bool test_tvarscale_mass, bool test_tvarscale_width, Rcpp::NumericVector testMassVec, Rcpp::NumericVector testWidthVec, Rcpp::NumericVector testMKappaVec, Rcpp::NumericVector testWKappaVec, Rcpp::NumericVector testLocVec);
-RcppExport SEXP _bayespulse_singlesubject_(SEXP concentrationSEXP, SEXP timeSEXP, SEXP location_priorSEXP, SEXP inpriorsSEXP, SEXP proposalvarsSEXP, SEXP startingvalsSEXP, SEXP mcmc_iterationsSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP verboseSEXP, SEXP pv_adjust_iterSEXP, SEXP pv_adjust_max_iterSEXP, SEXP bivariate_pv_target_ratioSEXP, SEXP univariate_pv_target_ratioSEXP, SEXP test_birthdeathSEXP, SEXP test_fixeff_massSEXP, SEXP test_fixeff_widthSEXP, SEXP test_sd_massSEXP, SEXP test_sd_widthSEXP, SEXP test_blhlSEXP, SEXP test_errorSEXP, SEXP test_locationsSEXP, SEXP test_massesSEXP, SEXP test_widthsSEXP, SEXP test_tvarscale_massSEXP, SEXP test_tvarscale_widthSEXP, SEXP testMassVecSEXP, SEXP testWidthVecSEXP, SEXP testMKappaVecSEXP, SEXP testWKappaVecSEXP, SEXP testLocVecSEXP) {
+Rcpp::List singlesubject_(Rcpp::NumericVector concentration, Rcpp::NumericVector time, Rcpp::CharacterVector location_prior, Rcpp::List inpriors, Rcpp::List proposalvars, Rcpp::List startingvals, int mcmc_iterations, int thin, int burnin, bool verbose, int verbose_iter, int pv_adjust_iter, int pv_adjust_max_iter, double bivariate_pv_target_ratio, double univariate_pv_target_ratio, Rcpp::List fix_params, Rcpp::NumericVector masses_vec, Rcpp::NumericVector width_vec, Rcpp::NumericVector mass_tvarscale_vec, Rcpp::NumericVector width_tvarscale_vec, Rcpp::NumericVector location_vec);
+RcppExport SEXP _bayespulse_singlesubject_(SEXP concentrationSEXP, SEXP timeSEXP, SEXP location_priorSEXP, SEXP inpriorsSEXP, SEXP proposalvarsSEXP, SEXP startingvalsSEXP, SEXP mcmc_iterationsSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP verboseSEXP, SEXP verbose_iterSEXP, SEXP pv_adjust_iterSEXP, SEXP pv_adjust_max_iterSEXP, SEXP bivariate_pv_target_ratioSEXP, SEXP univariate_pv_target_ratioSEXP, SEXP fix_paramsSEXP, SEXP masses_vecSEXP, SEXP width_vecSEXP, SEXP mass_tvarscale_vecSEXP, SEXP width_tvarscale_vecSEXP, SEXP location_vecSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -59,28 +59,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< int >::type verbose_iter(verbose_iterSEXP);
     Rcpp::traits::input_parameter< int >::type pv_adjust_iter(pv_adjust_iterSEXP);
     Rcpp::traits::input_parameter< int >::type pv_adjust_max_iter(pv_adjust_max_iterSEXP);
     Rcpp::traits::input_parameter< double >::type bivariate_pv_target_ratio(bivariate_pv_target_ratioSEXP);
     Rcpp::traits::input_parameter< double >::type univariate_pv_target_ratio(univariate_pv_target_ratioSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_birthdeath(test_birthdeathSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_fixeff_mass(test_fixeff_massSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_fixeff_width(test_fixeff_widthSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_sd_mass(test_sd_massSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_sd_width(test_sd_widthSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_blhl(test_blhlSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_error(test_errorSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_locations(test_locationsSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_masses(test_massesSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_widths(test_widthsSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_tvarscale_mass(test_tvarscale_massSEXP);
-    Rcpp::traits::input_parameter< bool >::type test_tvarscale_width(test_tvarscale_widthSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type testMassVec(testMassVecSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type testWidthVec(testWidthVecSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type testMKappaVec(testMKappaVecSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type testWKappaVec(testWKappaVecSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type testLocVec(testLocVecSEXP);
-    rcpp_result_gen = Rcpp::wrap(singlesubject_(concentration, time, location_prior, inpriors, proposalvars, startingvals, mcmc_iterations, thin, burnin, verbose, pv_adjust_iter, pv_adjust_max_iter, bivariate_pv_target_ratio, univariate_pv_target_ratio, test_birthdeath, test_fixeff_mass, test_fixeff_width, test_sd_mass, test_sd_width, test_blhl, test_error, test_locations, test_masses, test_widths, test_tvarscale_mass, test_tvarscale_width, testMassVec, testWidthVec, testMKappaVec, testWKappaVec, testLocVec));
+    Rcpp::traits::input_parameter< Rcpp::List >::type fix_params(fix_paramsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type masses_vec(masses_vecSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type width_vec(width_vecSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mass_tvarscale_vec(mass_tvarscale_vecSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type width_tvarscale_vec(width_tvarscale_vecSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type location_vec(location_vecSEXP);
+    rcpp_result_gen = Rcpp::wrap(singlesubject_(concentration, time, location_prior, inpriors, proposalvars, startingvals, mcmc_iterations, thin, burnin, verbose, verbose_iter, pv_adjust_iter, pv_adjust_max_iter, bivariate_pv_target_ratio, univariate_pv_target_ratio, fix_params, masses_vec, width_vec, mass_tvarscale_vec, width_tvarscale_vec, location_vec));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -89,7 +79,7 @@ RcppExport SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_bayespulse_population_", (DL_FUNC) &_bayespulse_population_, 27},
-    {"_bayespulse_singlesubject_", (DL_FUNC) &_bayespulse_singlesubject_, 31},
+    {"_bayespulse_singlesubject_", (DL_FUNC) &_bayespulse_singlesubject_, 21},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 0},
     {NULL, NULL, 0}
 };

@@ -1,13 +1,7 @@
-
-#-------------------------------------------------------------------------------
-# Functions for creating a pulse model specification
-#-------------------------------------------------------------------------------
-
 #' pulse_spec
 #'
 #' Generates a pulse_spec object -- the specification object required for
 #' fitting a fit_pulse model.
-#'   
 #' 
 #' @param location_prior_type Takes on two values: "order-statistic" and
 #' "strauss". "order-statistic" uses every third order statistic of a Uniform
@@ -16,39 +10,39 @@
 #' "strauss" uses the Strauss interacting point-process as a prior and requires
 #' specification of "prior_mean_pulse_count", "prior_location_gamma", and
 #' "prior_location_range".
-#' @param prior_mass_mean mass mean hyperparm
-#' @param prior_mass_var mass variance hyperparm
-#' @param prior_width_mean width mean hyperparm (on variance scale)
-#' @param prior_width_var width variance hyperparm (on variance scale)
-#' @param prior_baseline_mean mean of prior on baseline
-#' @param prior_baseline_var variance of prior on baseline
-#' @param prior_halflife_mean mean of prior on half-life
-#' @param prior_halflife_var variance of prior on half-life
-#' @param prior_error_alpha Gamma shape parameter
-#' @param prior_error_beta Gamma rate parameter
-#' @param prior_location_gamma placeholder
-#' @param prior_location_range placeholder
-#' @param prior_sd_mass placeholder
-#' @param prior_sd_width placeholder
-#' @param prior_mean_pulse_count placeholder
-#' @param sv_mass_mean placeholder
-#' @param sv_width_mean placeholder
-#' @param sv_baseline_mean placeholder
-#' @param sv_halflife_mean placeholder
-#' @param sv_error_var placeholder
-#' @param sv_mass_sd placeholder
-#' @param sv_width_sd placeholder
-#' @param pv_baseline placeholder
-#' @param pv_halflife placeholder
-#' @param pv_mean_pulse_mass placeholder
-#' @param pv_mean_pulse_width placeholder
-#' @param pv_indiv_pulse_mass placeholder
-#' @param pv_indiv_pulse_width placeholder
-#' @param pv_sd_pulse_mass placeholder
-#' @param pv_sd_pulse_width Proposal variance of the SD of the pulse widths (pulse widths are on variance scale)
-#' @param pv_sdscale_pulse_mass placeholder
-#' @param pv_sdscale_pulse_width placeholder
-#' @param pv_pulse_location placeholder
+#' @param prior_mass_mean Mean of Gaussian prior on patient mean pulse mass
+#' @param prior_mass_var Variance of the Gaussian prior on population mean pulse mass
+#' @param prior_mass_sd Scale of the Half-Cauchy prior on the standard deviation of patient mean pulse mass
+#' @param prior_width_mean Mean of Gaussian prior on patient mean pulse width
+#' @param prior_width_var Variance of the Gaussian prior on population mean pulse width
+#' @param prior_width_sd Scale of the Half-Cauchy prior on the standard deviation of patient mean pulse width
+#' @param prior_baseline_mean Mean of Gaussian prior on patient baseline concentration
+#' @param prior_baseline_var Variance of the Gaussian prior on baseline concentration
+#' @param prior_halflife_mean Mean of Gaussian prior on patient mean elimination half-life
+#' @param prior_halflife_var Variance of the Gaussian prior on population mean elimination half-life
+#' @param prior_error_alpha Shape parameter of Gamma prior on patient error variance
+#' @param prior_error_beta Scale parameter of Gamma prior on patient error variance
+#' @param prior_location_gamma Repulsion parameter for Strauss prior on pulse count
+#' @param prior_location_range Rate parameter for Strauss prior on pulse count
+#' @param prior_mean_pulse_count Rate parameter for Strauss prior on pulse count
+#' @param sv_mass_mean Starting value for patient mean pulse mass
+#' @param sv_mass_sd Starting value for standard deviation of pulse-to-pulse variation of masses
+#' @param sv_width_mean Starting value for patient mean pulse width
+#' @param sv_width_sd Starting value for standard deviation of pulse-to-pulse variation of widths
+#' @param sv_baseline_mean Starting value for patient mean baseline
+#' @param sv_halflife_mean Starting value for patient mean half-life
+#' @param sv_error_var Starting value for patient error variance
+#' @param pv_pat_baseline Proposal variance for patient baseline concentration
+#' @param pv_pat_halflife Proposal variance for patient elimination half-life
+#' @param pv_pat_mass_mean Proposal variance for patient mean pulse mass
+#' @param pv_pat_width_mean Proposal variance for patient mean pulse width
+#' @param pv_ind_pulse_mass Proposal variance for individual pulse masses
+#' @param pv_ind_pulse_width Proposal variance for individual pulse widths
+#' @param pv_sd_pulse_mass Proposal variance for individual pulse mass standard deviation
+#' @param pv_sd_pulse_width Proposal variance for individual pulse width standard deviation
+#' @param pv_sdscale_pulse_mass Proposal variance for individual pulse mass distribution standard deviation scale
+#' @param pv_sdscale_pulse_width Proposal variance for individual pulse width distribution standard deviation scale
+#' @param pv_pulse_location Proposal variance for individual pulse locations
 #' @export
 #' @keywords pulse simulation
 pulse_spec <-
@@ -65,8 +59,8 @@ pulse_spec <-
            prior_error_beta       = 0.0001,
            prior_location_gamma   = 0,
            prior_location_range   = 40,
-           prior_sd_mass      = 1,
-           prior_sd_width     = 1,
+           prior_mass_sd          = 1,
+           prior_width_sd         = 1,
            prior_mean_pulse_count = 8,
            sv_mass_mean           = 3.5,
            sv_width_mean          = 25,
@@ -75,12 +69,12 @@ pulse_spec <-
            sv_error_var           = 0.015,
            sv_mass_sd             = 0.5,
            sv_width_sd            = 5,
-           pv_baseline            = 0.015,
-           pv_halflife            = 25,
-           pv_mean_pulse_mass     = 0.5,
-           pv_mean_pulse_width    = 21,
-           pv_indiv_pulse_mass    = 1,
-           pv_indiv_pulse_width   = 50,
+           pv_pat_baseline        = 0.015,
+           pv_pat_halflife        = 25,
+           pv_pat_mass_mean       = 0.5,
+           pv_pat_width_mean      = 21,
+           pv_ind_pulse_mass      = 1,
+           pv_ind_pulse_width     = 50,
            pv_sd_pulse_mass       = 0.25,
            pv_sd_pulse_width      = 10,
            pv_sdscale_pulse_mass  = 4,
@@ -132,22 +126,22 @@ pulse_spec <-
                            mass_variance           = prior_mass_var,
                            width_mean              = prior_width_mean,
                            width_variance          = prior_width_var,
-                           mass_sd_param           = prior_sd_mass,
-                           width_sd_param          = prior_sd_width,
+                           mass_sd_param           = prior_mass_sd,
+                           width_sd_param          = prior_width_sd,
                            error_alpha             = prior_error_alpha,
                            error_beta              = prior_error_beta,
                            pulse_count             = prior_mean_pulse_count,
                            strauss_repulsion       = prior_location_gamma,
                            strauss_repulsion_range = prior_location_range),
-             proposal_variances = list(mass_mean   = pv_mean_pulse_mass,
-                                       width_mean  = pv_mean_pulse_width,
+             proposal_variances = list(mass_mean   = pv_pat_mass_mean,
+                                       width_mean  = pv_pat_width_mean,
                                        mass_sd     = pv_sd_pulse_mass,
                                        width_sd    = pv_sd_pulse_width,
-                                       baseline    = pv_baseline,
-                                       halflife    = pv_halflife,
+                                       baseline    = pv_pat_baseline,
+                                       halflife    = pv_pat_halflife,
                                        location    = pv_pulse_location,
-                                       pulse_mass  = pv_indiv_pulse_mass,
-                                       pulse_width = pv_indiv_pulse_width,
+                                       pulse_mass  = pv_ind_pulse_mass,
+                                       pulse_width = pv_ind_pulse_width,
                                        sdscale_pulse_mass  = pv_sdscale_pulse_mass ,
                                        sdscale_pulse_width = pv_sdscale_pulse_width),
              starting_values = list(baseline       = sv_baseline_mean,

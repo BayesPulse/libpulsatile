@@ -63,8 +63,6 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   double univ_target = univariate_pv_target_ratio;
   std::string loc_prior = Rcpp::as<std::string>(location_prior);
 
-  Rcpp::Rcout << "Location prior is: " << loc_prior << "\n";
-  
   // Create population priors and estimates objects
   PopulationPriors popPriors(inpriors["mass_mean"],
                              inpriors["mass_var"],                
@@ -93,8 +91,6 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
                                    startingvals["baseline_s2s_sd"],
                                    startingvals["halflife_mean"],
                                    startingvals["halflife_s2s_sd"]);
-
-  Rcpp::Rcout << "Population priors and estimates created\n";
 
   PatientPriors patientPriors(startingvals["mass_mean"],
                               startingvals["width_mean"],
@@ -201,9 +197,9 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
     Rcpp::stop("Order statistic prior is not yet implemented in the birth death process");
   }
 
-  SS_DrawRandomEffects draw_masses(proposalvars["pat_mass_mean"], adj_iter, adj_max, univ_target,
+  SS_DrawRandomEffects draw_masses(proposalvars["ind_pulse_mass"], adj_iter, adj_max, univ_target,
                                    false, verbose, verbose_iter);
-  SS_DrawRandomEffects draw_widths(proposalvars["pat_width_mean"], adj_iter, adj_max, univ_target,
+  SS_DrawRandomEffects draw_widths(proposalvars["ind_pulse_width"], adj_iter, adj_max, univ_target,
                                    true, verbose, verbose_iter);
   SS_DrawTVarScale draw_tvarscale_mass(proposalvars["sdscale_pulse_mass"],
                                        adj_iter, adj_max, univ_target, false,
@@ -221,6 +217,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
 
   for(int iteration = 0; iteration < mcmc_iterations; iteration++) {
 
+    checkUserInterrupt(); 
     chains.print_diagnostic_output(population, iteration, verbose_patient);
 
     if (!fix_params["mass_p2p_sd"]) {

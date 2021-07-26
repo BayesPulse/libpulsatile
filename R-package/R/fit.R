@@ -28,6 +28,38 @@
 #'   columns printed to those which fit in the console.
 #' @param verbose Prints diagnostics and estimates every 5000th iteration.
 #'   Default is \code{FALSE}.
+#' @param verbose_iters Integer that sets diagnostic output to printout at the
+#'   given interval if 'verbose' is \code{TRUE}. Default is 5000.
+#' @param fix_params Character vector enabling parameters to fixed (i.e. not 
+#'   estimated). Vector may include options:
+#'   "pulse_count", "mass_mean", "width_mean", "mass_sd", 
+#'   "width_sd", "bl_hl", "pulse_location", "error_var",
+#'   "pulse_mass", "pulse_width", "pulse_mass_sdscale", 
+#'   "pulse_width_sdscale" 
+#'   or may be left empty to estimate all parameters. For patient level 
+#'   parameters, values are fixed at the starting values specified by
+#'   \code{pulse_spec()}. For pulse level parameters, vectors must be
+#'   provided using the function arguments below to specify their fixed values.
+#' @param pulse_masses Numeric vector used in conjunction with 
+#'   \code{fix_params} to choose fixed values for individual pulse masses. 
+#'   If used, \code{pulse_count} must also be fixed, and the length of the 
+#'   vector must equal the sum of \code{pulse_counts}.
+#' @param pulse_widths Numeric vector used in conjunction with 
+#'   \code{fix_params} to choose fixed values for individual pulse widths. If
+#'   used, \code{pulse_count} must also be fixed, and length of the vector 
+#'   must equal the sum of \code{prior_mean_pulse_count}.
+#' @param pulse_mass_sdscale Numeric vector used in conjunction with 
+#'   \code{fix_params} to choose fixed values for individual pulse mass standard
+#'   deviation scales. If used, \code{pulse_count} must also be fixed, and 
+#'   length of the vector must equal the sum of \code{prior_mean_pulse_count}.
+#' @param pulse_width_sdscale Numeric vector used in conjunction with 
+#'   \code{fix_params} to choose fixed values for individual pulse width standard
+#'   deviation scales. If used, \code{pulse_count} must also be fixed, and 
+#'   length of the vector must equal the sum of \code{prior_mean_pulse_count}.
+#' @param pulse_locations Numeric vector used in conjunction with 
+#'   \code{fix_params} to choose fixed values for individual pulse locations. 
+#'   If used, \code{pulse_count} must also be fixed, and 
+#'   length of the vector must equal the sum of \code{prior_mean_pulse_count}.
 #' @importFrom tibble as_data_frame
 #' @keywords pulse fit
 #' @examples
@@ -49,63 +81,36 @@ fit_pulse <- function(data,
                       burnin     = as.integer(0.1 * iters),
                       use_tibble = TRUE,
                       verbose    = FALSE,
-                      test_birthdeath = TRUE,
-                      test_fixeff_mass = TRUE,
-                      test_fixeff_width = TRUE,
-                      test_sd_mass = TRUE,
-                      test_sd_width = FALSE,
-                      test_blhl = TRUE,
-                      test_error = TRUE,
-                      test_locations = TRUE,
-                      test_masses = TRUE,
-                      test_widths = TRUE,
-                      test_tvarscale_mass = TRUE,
-                      test_tvarscale_width = TRUE,
-                      testMassVec = NULL,
-                      testWidthVec = NULL,
-                      testMKappaVec = NULL,
-                      testWKappaVec = NULL,
-                      testLocVec = NULL
-                      ) {
-
+                      verbose_iter = 5000,
+                      fix_params = NULL,
+                      pulse_masses = numeric(),
+                      pulse_widths = numeric(),
+                      pulse_mass_sdscales = numeric(),
+                      pulse_width_sdscales = numeric(),
+                      pulse_locations = numeric()) {
   
   if (all(class(data) == "pulse_sim")) {
     indata <- data$data
   } else {
     indata <- data.frame("time" = data[[time]], "concentration" = data[[conc]])
   }
-
   stopifnot(is.numeric(indata[[time]]), is.numeric(indata[[conc]]),
             is.logical(use_tibble), is.logical(verbose))
-  if (burnin >= iters) stop("burnin >= iters")
   
-  # Check that necessary combination of test arguments are used
-  #   To be removed in final version
-  if (is.null(testMassVec) & !test_masses) {
-    stop("Must include testMassVec if test_masses is FALSE")
-  } else if (is.null(testMassVec)) {
-    testMassVec <- 1:10
-  }
-  if (is.null(testWidthVec) & !test_widths) {
-    stop("Must include testWidthVec if test_widths is FALSE")
-  } else if (is.null(testWidthVec)) {
-    testWidthVec <- 1:10
-  }
-  if (is.null(testMKappaVec) & !test_tvarscale_mass) {
-    stop("Must include testMKappaVec if test_tvarscale_mass is FALSE")
-  } else if (is.null(testMKappaVec)) {
-    testMKappaVec <- 1:10
-  }
-  if (is.null(testWKappaVec) & !test_tvarscale_width) {
-    stop("Must include testWKappaVec if test_tvarscale_width is FALSE")
-  } else if (is.null(testWKappaVec)) {
-    testWKappaVec <- 1:10
-  }
-  if (is.null(testLocVec) & !test_locations) {
-    stop("Must include testLocVec if test_locations is FALSE")
-  } else if (is.null(testLocVec)) {
-    testLocVec <- 1:10
-  }
+  # Prepare named list that is used to fix parameters
+  param_list <- c("pulse_count", "mass_mean", "width_mean", "mass_sd", 
+                  "width_sd", "bl_hl", "pulse_location", "error_var",
+                  "pulse_mass", "pulse_width", "pulse_mass_sdscale", 
+                  "pulse_width_sdscale")
+  if(!all(fix_params %in% param_list)) {stop("Invalid 'fix_params' element(s)")}
+  fix_params <- as.list(param_list %in% fix_params)
+  names(fix_params) <- param_list
+  
+  param_validation(data, time, conc, subject_id, spec, iters, thin,
+                   burnin, use_tibble, verbose, verbose_iter,
+                   fix_params,pulse_masses, pulse_widths,
+                   pulse_mass_sdscales, pulse_width_sdscales,
+                   pulse_locations)
 
   #---------------------------------------
   # TODO: Temporary work-arounds  (What todo for a non-temp work around??)
@@ -143,26 +148,15 @@ fit_pulse <- function(data,
                         priors,
                         proposalvariances,
                         startingvalues,
-                        iters, thin, burnin, verbose,
+                        iters, thin, burnin, verbose, verbose_iter,
                         pv_adjust_iter, pv_adjust_max_iter,
                         bivariate_pv_target_ratio, univariate_pv_target_ratio,
-                        test_birthdeath,
-                        test_fixeff_mass,
-                        test_fixeff_width,
-                        test_sd_mass,
-                        test_sd_width,
-                        test_blhl,
-                        test_error,
-                        test_locations,
-                        test_masses,
-                        test_widths,
-                        test_tvarscale_mass,
-                        test_tvarscale_width,
-                        testMassVec,
-                        testWidthVec,
-                        testMKappaVec,
-                        testWKappaVec,
-                        testLocVec)
+                        fix_params, 
+                        pulse_masses,
+                        pulse_widths,
+                        pulse_mass_sdscales,
+                        pulse_width_sdscales,
+                        pulse_locations)
 
   patient_chain <- as.data.frame(fit$patient_chain)
   pulse_chain   <- as.data.frame(do.call(rbind, fit$pulse_chains))
@@ -195,4 +189,50 @@ fit_pulse <- function(data,
 
   return(rtn_obj)
 
+}
+
+param_validation <- function(data, time, conc, subject_id, spec, iters, thin,
+                             burnin, use_tibble, verbose, verbose_iter,
+                             fix_params,pulse_masses, pulse_widths,
+                             pulse_mass_sdscales, pulse_width_sdscales,
+                             pulse_locations) {
+  
+  if (burnin >= iters) stop("burnin >= iters")
+  
+  if(fix_params[["pulse_location"]] & (length(pulse_locations) == 0)) {
+    stop("pulse_locations vector must be provided if pulse_location is fixed")
+  }
+  if(fix_params[["pulse_mass"]] & (length(pulse_masses) == 0)) {
+    stop("pulse_masses vector must be provided if pulse_mass is fixed")
+  }
+  if(fix_params[["pulse_width"]] & (length(pulse_widths) == 0)) {
+    stop("pulse_widths vector must be provided if pulse_width is fixed")
+  }
+  if(fix_params[["pulse_mass_sdscale"]] & (length(pulse_mass_sdscales) == 0)) {
+    stop("pulse_mass_sdscales vector must be provided if pulse_mass_sdscale is fixed")
+  }
+  if(fix_params[["pulse_width_sdscale"]] & (length(pulse_width_sdscales) == 0)) {
+    stop("pulse_width_sdscales vector must be provided if pulse_width_sdscale is fixed")
+  }
+  
+  if(fix_params[["pulse_location"]] & 
+     (length(pulse_locations) != spec$priors$pulse_count)) {
+    stop("length(pulse_locations) != prior_mean_pulse_count")
+  }
+  if(fix_params[["pulse_mass"]] & 
+     (length(pulse_masses) != spec$priors$pulse_count)) {
+    stop("length(pulse_masses) != prior_mean_pulse_count")
+  }
+  if(fix_params[["pulse_width"]] & 
+     (length(pulse_widths) != spec$priors$pulse_count)) {
+    stop("length(pulse_widths) != prior_mean_pulse_count")
+  }
+  if(fix_params[["pulse_mass_sdscale"]] & 
+     (length(pulse_mass_sdscales) != spec$priors$pulse_count)) {
+    stop("length(pulse_mass_sdscales) != prior_mean_pulse_count")
+  }
+  if(fix_params[["pulse_width_sdscale"]] & 
+     (length(pulse_width_sdscales) != spec$priors$pulse_count)) {
+    stop("length(pulse_width_sdscales) != prior_mean_pulse_count")
+  }
 }

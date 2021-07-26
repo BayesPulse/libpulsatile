@@ -51,7 +51,9 @@ pop_spec(
   pv_pat_halflife_sd = 1,
   pv_pulse_location = 40,
   pv_sdscale_pulse_mass = 4,
-  pv_sdscale_pulse_width = 4
+  pv_sdscale_pulse_width = 4,
+  pv_ind_pulse_mass = 1,
+  pv_ind_pulse_width = 50
 )
 }
 \arguments{
