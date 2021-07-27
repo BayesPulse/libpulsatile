@@ -165,9 +165,12 @@ fit_pop_pulse <- function(data,
                      pulse_mass_sdscales, pulse_width_sdscales, pulse_locations)
 
   population_chain <- as.data.frame(fit$pop_chain)
-  patient_chains <- lapply(fit$patient_chains, as.data.frame);
+  patient_chains <- lapply(fit$patient_chains, as.data.frame)
   pulse_chains <- lapply(fit$pulse_chains, 
                         FUN = function(x){as.data.frame(do.call(rbind, x))})
+  
+  names(patient_chains) <- colnames(data)
+  names(pulse_chains) <- colnames(data)
 
   rtn_obj <-
     structure(list("model"            = "population",
@@ -175,7 +178,7 @@ fit_pop_pulse <- function(data,
                    "population_chain" = population_chain,
                    "patient_chain"    = patient_chains,
                    "pulse_chain"      = pulse_chains,
-                   "data"             = data,
+                   "data"             = as.data.frame(cbind(time, data)),
                    "time_range"       = fit$time_range,
                    "options"          = list(#"time"       = time,
                                              #"conc"       = conc,

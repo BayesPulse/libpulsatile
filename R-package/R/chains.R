@@ -31,19 +31,10 @@ chains <- function(fit) {
       how to access them, and/or some summary stats.\n")
 }
 
-#' @rdname chains
-#' @export
-population_chain <- function(fit) UseMethod("population_chain")
-
 #' @export
 population_chain.pop_pulse_fit <- function(fit) {
   fit$population_chain
 }
-
-
-#' @rdname chains
-#' @export
-pulse_chain <- function(fit, ...) UseMethod("pulse_chain")
 
 #' @export
 pulse_chain.pulse_fit <- function(fit) {
@@ -54,10 +45,6 @@ pulse_chain.pulse_fit <- function(fit) {
 pulse_chain.pop_pulse_fit <- function(fit, patient) {
   fit$pulse_chain[[patient]]
 }
-
-#' @rdname chains
-#' @export
-patient_chain <- function(fit, ...) UseMethod("patient_chain")
 
 #' @export
 patient_chain.pulse_fit <- function(fit) {

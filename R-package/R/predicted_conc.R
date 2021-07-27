@@ -42,8 +42,6 @@
 #' @export
 predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
 
-  stopifnot(class(object) == "pulse_fit")
-
   if (class(object$data) == "pulse_sim") {
     data <- object$data$data
   } else {
@@ -57,7 +55,7 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
   onechain <- full_join(pulse_chain(object), patient_chain(object), 
                         by = c("iteration", "total_num_pulses" = "num_pulses"))
 
-  # Only plot within range of data -- saw some werid behavior using full
+  # Only plot within range of data -- saw some weird behavior using full
   # fitstart/fitend
   #   fitstart <- object$time_range[1]
   #   fitend   <- object$time_range[2]
@@ -68,7 +66,7 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
   fitend <- sym(as.character(fitend))
 
   onechain <- onechain %>% 
-    mutate(time = list(time)) %>% unnest %>%
+    mutate(time = list(time)) %>% unnest(cols = c(time)) %>%
     mutate(mean_contrib = calc_mean_contrib(time, .data$location,
                                             .data$halflife, .data$mass,
                                             .data$width)) 
@@ -77,13 +75,21 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
     select(.data$iteration, .data$pulse_num, .data$baseline, .data$model_error,
            .data$time, .data$mean_contrib) 
 
-  wide <- onechain %>% spread(key = .data$time, value = .data$mean_contrib)
+  # wide <- onechain %>% spread(key = .data$time, value = .data$mean_contrib)
+  wide <- onechain %>% 
+    pivot_wider(names_from = .data$time, values_from = .data$mean_contrib)
+  
+  # long <- wide %>% 
+  #   group_by(.data$iteration, .data$baseline, .data$model_error) %>%
+  #   summarise_at(vars(UQ(fitstart):UQ(fitend)), funs(sum)) %>% 
+  #   mutate_at(vars(UQ(fitstart):UQ(fitend)), 
+  #             funs(add_baseline_error), baseline = quote(baseline), model_error = quote(model_error))
   long <- wide %>% 
     group_by(.data$iteration, .data$baseline, .data$model_error) %>%
-    summarise_at(vars(UQ(fitstart):UQ(fitend)), funs(sum)) %>% 
+    summarise_at(vars(UQ(fitstart):UQ(fitend)), sum) %>% 
     mutate_at(vars(UQ(fitstart):UQ(fitend)), 
-              funs(add_baseline_error), baseline = quote(baseline), model_error = quote(model_error))
-
+              add_baseline_error, baseline = quote(baseline), model_error = quote(model_error))
+  
   long <- 
     long %>% 
     gather(key = "time", value = "concentration", UQ(fitstart):UQ(fitend)) %>%
@@ -102,8 +108,72 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
 
 }
 
-
-
+#' @export
+predict.pop_pulse_fit <- function(object, cred_interval = 0.8, ...) {
+  
+  data <- fit$data
+  
+  diff_from_bound <- (1 - cred_interval) / 2
+  lwr             <- diff_from_bound
+  upr             <- 1 - diff_from_bound
+  
+  num_patients <- length(object$patient_chain)
+  rtn <- vector(mode = "list", length = num_patients)
+  
+  fitstart <- min(data$time)
+  fitend   <- max(data$time)
+  time     <- seq(fitstart, fitend, by = 10) # TODO: change 10 to whatever the sampling interval is
+  fitstart <- sym(as.character(fitstart))
+  fitend <- sym(as.character(fitend))
+  
+  for (i in 1:num_patients) {
+    onechain <- full_join(pulse_chain(object, i), patient_chain(object,i ),
+                          by = c("iteration", 
+                                 "total_num_pulses" = "num_pulses"))
+    
+    
+    onechain <- onechain %>% 
+      mutate(time = list(time)) %>% unnest(cols = c(time)) %>%
+      mutate(mean_contrib = calc_mean_contrib(time, .data$location,
+                                              .data$halflife, .data$mass,
+                                              .data$width)) 
+    onechain <- 
+      onechain %>%
+      select(.data$iteration, .data$pulse_num, .data$baseline, .data$model_error,
+             .data$time, .data$mean_contrib) 
+    
+    wide <- onechain %>% 
+      pivot_wider(names_from = .data$time, values_from = .data$mean_contrib)
+    
+    long <- wide %>% 
+      group_by(.data$iteration, .data$baseline, .data$model_error) %>%
+      summarise_at(vars(UQ(fitstart):UQ(fitend)), sum) %>% 
+      mutate_at(vars(UQ(fitstart):UQ(fitend)), 
+                add_baseline_error, baseline = quote(baseline), 
+                model_error = quote(model_error))
+    
+    long <- 
+      long %>% 
+      gather(key = "time", value = "concentration", UQ(fitstart):UQ(fitend)) %>%
+      mutate(time = as.numeric(.data$time))
+    
+    rtn[[i]] <- long %>% 
+      ungroup %>% 
+      arrange(.data$iteration, .data$time) %>% 
+      select(-.data$baseline, -.data$model_error) %>%
+      group_by(time) %>%
+      summarise(mean.conc = mean(.data$concentration),
+                med.conc  = median(.data$concentration),
+                upper = quantile(.data$concentration, upr),
+                lower = quantile(.data$concentration, lwr))
+  
+  }
+  
+  names(rtn) <- names(object$patient_chain)
+  
+  return(rtn)
+  
+}
 
 #' Creates the integral in the deconvolution part of the model
 #'
@@ -113,7 +183,6 @@ erf <- function(time){
   y <- 2 * pnorm(time * sqrt(2), 0, 1) - 1
   y
 }
-
 
 #' Creates the expected hormone concentration for a particular pulse in a
 #' particular iteration
@@ -149,10 +218,6 @@ add_baseline_error <- function(x, baseline, model_error) {
   x + baseline + rnorm(1, 0, sqrt(model_error))
 }
 
-
-
-
-
 ### TODO: so far haven't added eta/tvarscale_ to the prediction functions --
 ### Don't think you should, this only comes into play in the random draw of the
 ### SD?
@@ -186,14 +251,13 @@ add_baseline_error <- function(x, baseline, model_error) {
 #' bp_predicted(this_fit, fit_predicted)
 #'
 #' @export
-bp_predicted <- function(fit, predicted) {
+bp_predicted.pulse_fit <- function(fit, predicted) {
   
   if (class(fit$data) == "pulse_sim") {
     data <- fit$data$data
   } else {
     data <- fit$data
   }
-
 
   ggplot(data) +
     aes_string(x = "time", y = "concentration") +
@@ -207,5 +271,34 @@ bp_predicted <- function(fit, predicted) {
 
 }
 
-
+#' Plot predicted concentration, credible interval, and observed data
+#'
+#'
+#' @param fit a pop_fit_pulse object
+#' @param predicted result of predict.pulse_fit(fit)
+#' @export
+bp_predicted.pop_pulse_fit <- function(fit, predicted) {
+  
+  observed_concs <- fit$data %>% 
+    pivot_longer(!time, names_to = "patient", values_to = "observed")
+  predicted_concs <- predicted %>% bind_rows(.id = "patient")
+  
+  concentrations <- full_join(observed_concs, predicted_concs, 
+                              by = c("time", "patient"))
+  
+  plt <-
+    ggplot(concentrations) +
+    aes_string(x = "time", y = "observed") +
+    geom_path() +
+    geom_point() +
+    geom_path(aes_string(y = "mean.conc"), color = "red") +
+    geom_path(aes_string(y = "upper"), color = "red", linetype = "dashed") +
+    geom_path(aes_string(y = "lower"), color = "red", linetype = "dashed") +
+    xlab("Time (minutes)") +
+    ylab("Concentration (ng/mL)") +
+    facet_wrap( ~ patient, scales = "free")
+  
+  return(plt)
+  
+}
 

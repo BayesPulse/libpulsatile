@@ -1,4 +1,3 @@
-
 #' Simulate pulsatile hormone data
 #' 
 #' @description 
@@ -177,10 +176,6 @@ simulate_pulse <- function(num_obs           = 144,
 
 }
 
-
-
-
-
 #' Plot a simulated pulsatile hormone time series.
 #' 
 #' @description \code{\link{plot.pulse_sim}} plots the time-series component of
@@ -203,9 +198,6 @@ plot.pulse_sim <- function(x, ...) {
     ggplot2::geom_path()
 
 }
-
-
-
 
 # #' Summarizing simulated pulsatile hormone time series.
 # #' 

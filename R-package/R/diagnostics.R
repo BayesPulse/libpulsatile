@@ -27,15 +27,6 @@
 bp_trace.pulse_fit <- function(fit) {
 
   stopifnot(class(fit) == "pulse_fit")
-
-  # dat <- patient_chain(fit)
-  # dat <- tidyr::gather_(dat, key = "key", value = "value",
-  #                       dplyr::select_vars_(names(dat), names(dat),
-  #                                           exclude = "iteration"))
-  # ggplot2::ggplot(dat) +
-  # ggplot2::aes_string(x = "iteration", y = "value") +
-  # ggplot2::geom_path(size = 0.15) +
-  # ggplot2::facet_wrap( ~ key, ncol = 2, nrow = 4, scales = "free")
   
   dat <- patient_chain(fit)
   dat <- tidyr::pivot_longer(dat, !iteration, names_to = "parameter",
@@ -77,21 +68,13 @@ bp_trace.pop_pulse_fit <- function(fit, patient = NULL) {
     facet_wrap(~ parameter, ncol = nCol, nrow = nRow, scales = "free")
 }
 
-#' Creates chain trace plots
-#' @export
-bp_trace <- function(fit, ...) UseMethod("bp_trace")
+
 
 #' @rdname bp_trace
 #' @export
-bp_posteriors <- function(fit, type = c("histogram", "density")) {
+bp_posteriors.pulse_fit <- function(fit, type = c("histogram", "density")) {
 
-  stopifnot(class(fit) == "pulse_fit")
-
-  # dat <- patient_chain(fit) 
-  # dat <- tidyr::gather_(dat, key = "key", value = "value", 
-  #                       dplyr::select_vars_(names(dat), names(dat),
-  #                                           exclude = "iteration"))
-  
+  type <- match.arg(type)
   dat <- patient_chain(fit)
   dat <- tidyr::pivot_longer(dat, !iteration, names_to = "parameter",
                                 values_to = "value")
@@ -114,14 +97,74 @@ bp_posteriors <- function(fit, type = c("histogram", "density")) {
 
 }
 
-#' @rdname bp_trace
 #' @export
-bp_location_posterior <- function(fit) {
+bp_posteriors.pop_pulse_fit <- function(fit, type = c("histogram", "density"), 
+                                        patient = NULL) {
+  
+  type <- match.arg(type)
+  dat <- population_chain(fit)
+  colnames(dat)[2:11] <- paste0("pop_", colnames(dat)[2:11])
+  dat <- tidyr::pivot_longer(dat, !iteration, names_to = "parameter",
+                             values_to = "value")
+  
+  if (!is.null(patient)) {
+    patDat <- patient_chain(fit, patient)
+    colnames(patDat)[2:6] <- paste0("pat_", colnames(patDat)[2:6])
+    patDat <- tidyr::pivot_longer(patDat, !iteration, names_to = "parameter",
+                                  values_to = "value")
+    
+    dat <- dplyr::bind_rows(dat, patDat)
+    
+    nCol <- 5
+    nRow <- 4
+  } else {
+    nCol <- 4
+    nRow <- 3
+  }
+  
+  if (type == "histogram") {
+    plt <- 
+      ggplot2::ggplot(dat) +
+      ggplot2::aes_string(x = "value", y = "..density..") +
+      ggplot2::geom_histogram(size = 0.15) + #aes(y = ..density..), size = 0.15) +
+      ggplot2::facet_wrap( ~ parameter, ncol = nCol, nrow = nRow, scales = "free")
+  } else if (type == "density") {
+    plt <-
+      ggplot2::ggplot(dat) +
+      ggplot2::aes_string(x = "value") +
+      ggplot2::geom_density(alpha = .2) +
+      ggplot2::facet_wrap( ~ parameter, ncol = nCol, nrow = nRow, scales = "free")
+  }
+  
+  return(plt)
+}
 
-  stopifnot(class(fit) == "pulse_fit")
+#' @export
+bp_location_posterior.pulse_fit <- function(fit) {
   ggplot2::ggplot(pulse_chain(fit)) +
     ggplot2::aes_string(x = "location") +
     ggplot2::geom_histogram(binwidth = 5)
 
 }
+
+#' @export
+bp_location_posterior.pop_pulse_fit <- function(fit, patient = NULL) {
+  if(!is.null(patient)) {
+    rtn <- ggplot2::ggplot(pulse_chain(fit, patient)) +
+      ggplot2::aes_string(x = "location") +
+      ggplot2::geom_histogram(binwidth = 5)
+  } else {
+    location_data <- fit$pulse_chain %>%
+      bind_rows(.id = "patient")
+    
+    rtn <- ggplot(location_data) +
+      aes_string(x = "location") +
+      geom_histogram(binwidth = 5) +
+      facet_wrap(~ patient)
+  }
+  
+  return(rtn)
+  
+}
+
 
