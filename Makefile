@@ -63,13 +63,11 @@ INC := -I include -I include/testing $(CPPFLAGS) $(CXXFLAGS) -std=c++11
 #	-I include/mcmc  \
 
 # Population test
-POPSRCDIR := src/population
-POPBUILDDIR := build
-POPTARGET := poppulsatile 
-POPSOURCES := $(shell find $(POPSRCDIR) -type f -name *.$(SRCEXT))
-POPOBJECTS := $(patsubst $(POPSRCDIR)/%,$(POPBUILDDIR)/%,$(POPSOURCES:.$(SRCEXT)=.o))
-
-
+# POPSRCDIR := src/population
+# POPBUILDDIR := build
+# POPTARGET := poppulsatile 
+# POPSOURCES := $(shell find $(POPSRCDIR) -type f -name *.$(SRCEXT))
+# POPOBJECTS := $(patsubst $(POPSRCDIR)/%,$(POPBUILDDIR)/%,$(POPSOURCES:.$(SRCEXT)=.o))
 
 TESTSRCDIR := tests
 TESTBUILDDIR := buildtests
@@ -101,14 +99,14 @@ $(TESTBUILDDIR)/%.o: $(TESTSRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(TESTBUILDDIR)
 	$(CXX) $(CFLAGS) $(INC) -c -o $@ $<
 
-$(TARGETDIR)/$(POPTARGET): $(POPOBJECTS)
-	@echo " Linking population..."
-	@mkdir -p $(TARGETDIR)
-	$(CXX) $^ -o $(TARGETDIR)/$(POPTARGET) $(LIB)
-
-$(POPBUILDDIR)/%.o: $(POPSRCDIR)/%.$(SRCEXT)
-	@mkdir -p $(POPBUILDDIR)
-	$(CXX)  $(CFLAGS) $(INC) -c -o $@ $<
+# $(TARGETDIR)/$(POPTARGET): $(POPOBJECTS)
+# 	@echo " Linking population..."
+# 	@mkdir -p $(TARGETDIR)
+# 	$(CXX) $^ -o $(TARGETDIR)/$(POPTARGET) $(LIB)
+# 
+# $(POPBUILDDIR)/%.o: $(POPSRCDIR)/%.$(SRCEXT)
+# 	@mkdir -p $(POPBUILDDIR)
+# 	$(CXX)  $(CFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";

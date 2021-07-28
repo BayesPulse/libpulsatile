@@ -208,24 +208,24 @@ void PopChains::print_diagnostic_output(Population * pop, int iter, bool verbose
     int pat_iter = 0;
 
     Rcpp::Rcout              << "\n"                             <<
-      "Population Level ---------------------------------------------------"
-                             << "\n" <<
-      "Priors -------------------------------------------------------------"
-                             << "\n" <<
-      "Mass mean = "         << pop->priors.mass_mean            <<
-      " Mass Var = "         << pop->priors.mass_variance        <<
-      " Mass S2S sd = "      << pop->priors.mass_s2s_sd_param    <<
-      " Mass P2P sd = "      << pop->priors.mass_p2p_sd_param    << "\n" <<
-      "Width mean = "        << pop->priors.width_mean           <<
-      " Width var = "        << pop->priors.width_variance       <<
-      " Width s2s sd = "     << pop->priors.width_s2s_sd_param   <<
-      " Width p2p sd = "     << pop->priors.width_p2p_sd_param   << "\n" <<
-      "Halflife mean = "     << pop->priors.halflife_mean        <<
-      " Halfife var = "      << pop->priors.halflife_variance    <<
-      " Halflife sd = "      << pop->priors.halflife_sd_param    << "\n" <<
-      "Estimates ----------------------------------------------------------"
-                             << "\n" <<
       "Iteration = "         << iter                             << "\n" <<
+      "Population Level Estimates -------------------------------------------"
+      //                       << "\n" <<
+      //"Priors -------------------------------------------------------------"
+      //                       << "\n" <<
+      //"Mass mean = "         << pop->priors.mass_mean            <<
+      //" Mass Var = "         << pop->priors.mass_variance        <<
+      //" Mass S2S sd = "      << pop->priors.mass_s2s_sd_param    <<
+      //" Mass P2P sd = "      << pop->priors.mass_p2p_sd_param    << "\n" <<
+      //"Width mean = "        << pop->priors.width_mean           <<
+      //" Width var = "        << pop->priors.width_variance       <<
+      //" Width s2s sd = "     << pop->priors.width_s2s_sd_param   <<
+      //" Width p2p sd = "     << pop->priors.width_p2p_sd_param   << "\n" <<
+      //"Halflife mean = "     << pop->priors.halflife_mean        <<
+      //" Halfife var = "      << pop->priors.halflife_variance    <<
+      //" Halflife sd = "      << pop->priors.halflife_sd_param    << "\n" <<
+      //"Estimates ----------------------------------------------------------"
+                             << "\n" <<
       "Mass mean = "         << pop->estimates.mass_mean         <<
       " Mass S2S sd = "      << pop->estimates.mass_s2s_sd       <<
       " Mass P2P sd = "      << pop->estimates.mass_p2p_sd       << "\n" <<
@@ -242,24 +242,24 @@ void PopChains::print_diagnostic_output(Population * pop, int iter, bool verbose
 
         Rcpp::Rcout                <<
           "Patient "               << pat_iter                     <<
-                    " ---------------------------------------------------------"
+                    " Estimates ----------------------------------------------"
                                    << "\n" <<
-          "Priors ------------------------------------------------------------"
-                                   << "\n" <<
-          "Mass mean = "           << pat.priors.mass_mean         <<
-          " Mass variance = "      << pat.priors.mass_variance     << "\n" <<
-          "Width mean = "          << pat.priors.width_mean        <<
-          " Width variance = "     << pat.priors.width_variance    << "\n" <<
-          "Baseline mean = "       << pat.priors.baseline_mean     <<
-          " Baseline variance = "  << pat.priors.baseline_variance << "\n" <<
-          "Halflife mean = "       << pat.priors.halflife_mean     <<
-          " Halflife variance = "  << pat.priors.halflife_variance << "\n" <<
-          "Pulse count = "         << pat.priors.pulse_count       <<
-          " Strauss Rep = "        << pat.priors.strauss_repulsion <<
-          " Range = "              << pat.priors.strauss_repulsion_range <<
-          "\n"                     <<
-          "Estimates ---------------------------------------------------------"
-                               << "\n" <<
+          //"Priors ------------------------------------------------------------"
+          //                         << "\n" <<
+          //"Mass mean = "           << pat.priors.mass_mean         <<
+          //" Mass variance = "      << pat.priors.mass_variance     << "\n" <<
+          //"Width mean = "          << pat.priors.width_mean        <<
+          //" Width variance = "     << pat.priors.width_variance    << "\n" <<
+          //"Baseline mean = "       << pat.priors.baseline_mean     <<
+          //" Baseline variance = "  << pat.priors.baseline_variance << "\n" <<
+          //"Halflife mean = "       << pat.priors.halflife_mean     <<
+          //" Halflife variance = "  << pat.priors.halflife_variance << "\n" <<
+          //"Pulse count = "         << pat.priors.pulse_count       <<
+          //" Strauss Rep = "        << pat.priors.strauss_repulsion <<
+          //" Range = "              << pat.priors.strauss_repulsion_range <<
+          //"\n"                     <<
+          //"Estimates ---------------------------------------------------------"
+          //                     << "\n" <<
           "Likelihood = "      << pat.likelihood(false)              <<
           " Pulse count = "    << pat.get_pulsecount()               << "\n" <<
           "Mass mean = "       << pat.estimates.mass_mean            <<
@@ -270,31 +270,27 @@ void PopChains::print_diagnostic_output(Population * pop, int iter, bool verbose
           " BL Vec = "         << pat.estimates.baseline_halflife(0) << "\n" <<
           "Halflife = "        << pat.estimates.halflife             <<
           " HL Vec = "         << pat.estimates.baseline_halflife(1) << "\n" <<
-          "Error variance = "  << pat.estimates.errorsq              << "\n";
+          "Error variance = "  << pat.estimates.errorsq              << "\n\n";
 
-        Rcpp::Rcout << "Pulse times: ";
-        for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.time << " "; }
-        Rcpp::Rcout << "\nPulse masses: ";
-        for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.mass << " "; }
-        Rcpp::Rcout << "\nPulse eta_mass: ";
-        for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.tvarscale_mass << " "; }
-        Rcpp::Rcout << "\nPulse widths: ";
-        for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.width << " "; }
-        Rcpp::Rcout << "\nPulse eta_width: ";
-        for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.tvarscale_width << " "; }
-        Rcpp::Rcout << "\n\n";
+        //Rcpp::Rcout << "Pulse times: ";
+        //for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.time << " "; }
+        //Rcpp::Rcout << "\nPulse masses: ";
+        //for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.mass << " "; }
+        //Rcpp::Rcout << "\nPulse eta_mass: ";
+        //for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.tvarscale_mass << " "; }
+        //Rcpp::Rcout << "\nPulse widths: ";
+        //for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.width << " "; }
+        //Rcpp::Rcout << "\nPulse eta_width: ";
+        //for(auto pulse : pat.pulses) { Rcpp::Rcout << pulse.tvarscale_width << " "; }
+        //Rcpp::Rcout << "\n\n";
 
-            //" Current pulse-specific parms: " << "\n" << 
-            //"Pulse No. Time  Mass  Width\n" << pulse_chains.back() <<
+        //" Current pulse-specific parms: " << "\n" << 
+        //"Pulse No. Time  Mass  Width\n" << pulse_chains.back() <<
 
-            pat_iter++;
+        pat_iter++;
       }
-
     }
-
   }
-
-
 };
 
 
@@ -307,9 +303,6 @@ NumericMatrix PopChains::addattribs_pop_chain(arma::mat in) {
 
   // Convert arma obj to Rcpp
   NumericMatrix out = as<NumericMatrix>(wrap(in));
-
-  //Rcout << "Hello world, I'm addattribs_pop_chain()" << std::endl;
-
   colnames(out) = CharacterVector::create("iteration",
                                           "mass_p2p_sd",
                                           "width_p2p_sd",
@@ -334,12 +327,7 @@ NumericMatrix PopChains::addattribs_patient_chain(arma::mat in) {
   // Convert arma obj to Rcpp
   NumericMatrix out = as<NumericMatrix>(wrap(in));
 
-  //Rcout << "Hello world, I'm addattribs_patient_chain()" << std::endl;
   // Add R attributes
-  //CharacterVector classes = CharacterVector::create("patient_chain");
-  //Rcout << "classes = " << classes << std::endl;
-  //out.attr("class") = classes;
-
   colnames(out) = CharacterVector::create("iteration",
                                           "num_pulses",
                                           "mass_mean",
@@ -350,7 +338,6 @@ NumericMatrix PopChains::addattribs_patient_chain(arma::mat in) {
                                           "likelihood");
 
   return out;
-
 }
 
 // Member Function: Function for adding attributes to one_set_of_pulses
