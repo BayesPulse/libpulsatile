@@ -22,6 +22,7 @@ Suggests:
   magrittr,
   RcppArmadillo,
   testthat,
+  xml2
 LinkingTo:
   Rcpp,
   RcppArmadillo,
