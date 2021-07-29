@@ -29,7 +29,7 @@ bp_trace.pulse_fit <- function(fit) {
   stopifnot(class(fit) == "pulse_fit")
   
   dat <- patient_chain(fit)
-  dat <- tidyr::pivot_longer(dat, !iteration, names_to = "parameter",
+  dat <- tidyr::pivot_longer(dat, !.data$iteration, names_to = "parameter",
                              values_to = "value")
   ggplot(dat) +
     aes_string(x = "iteration", y = "value") +
@@ -44,13 +44,13 @@ bp_trace.pop_pulse_fit <- function(fit, patient = NULL) {
   
   dat <- population_chain(fit)
   colnames(dat)[2:11] <- paste0("pop_", colnames(dat)[2:11])
-  dat <- tidyr::pivot_longer(dat, !iteration, names_to = "parameter",
+  dat <- tidyr::pivot_longer(dat, !.data$iteration, names_to = "parameter",
                                 values_to = "value")
   
   if (!is.null(patient)) {
     patDat <- patient_chain(fit, patient)
     colnames(patDat)[2:6] <- paste0("pat_", colnames(patDat)[2:6])
-    patDat <- tidyr::pivot_longer(patDat, !iteration, names_to = "parameter",
+    patDat <- tidyr::pivot_longer(patDat, !.data$iteration, names_to = "parameter",
                                values_to = "value")
     
     dat <- dplyr::bind_rows(dat, patDat)
@@ -76,7 +76,7 @@ bp_posteriors.pulse_fit <- function(fit, type = c("histogram", "density")) {
 
   type <- match.arg(type)
   dat <- patient_chain(fit)
-  dat <- tidyr::pivot_longer(dat, !iteration, names_to = "parameter",
+  dat <- tidyr::pivot_longer(dat, !.data$iteration, names_to = "parameter",
                                 values_to = "value")
 
   if (type == "histogram") {
@@ -104,13 +104,13 @@ bp_posteriors.pop_pulse_fit <- function(fit, type = c("histogram", "density"),
   type <- match.arg(type)
   dat <- population_chain(fit)
   colnames(dat)[2:11] <- paste0("pop_", colnames(dat)[2:11])
-  dat <- tidyr::pivot_longer(dat, !iteration, names_to = "parameter",
+  dat <- tidyr::pivot_longer(dat, !.data$iteration, names_to = "parameter",
                              values_to = "value")
   
   if (!is.null(patient)) {
     patDat <- patient_chain(fit, patient)
     colnames(patDat)[2:6] <- paste0("pat_", colnames(patDat)[2:6])
-    patDat <- tidyr::pivot_longer(patDat, !iteration, names_to = "parameter",
+    patDat <- tidyr::pivot_longer(patDat, !.data$iteration, names_to = "parameter",
                                   values_to = "value")
     
     dat <- dplyr::bind_rows(dat, patDat)

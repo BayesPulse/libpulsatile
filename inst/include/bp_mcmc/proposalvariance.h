@@ -195,7 +195,7 @@ class ProposalVariance2p {
 
     void initialize_proposals(arma::vec initial_pv) {
       arma::mat this_pv = arma::diagmat(initial_pv);
-      set_proposals(this_pv, -0.5);
+      set_proposals(this_pv, -0.9);
     }
 
     void set_proposals(arma::mat this_pv, double corr) {

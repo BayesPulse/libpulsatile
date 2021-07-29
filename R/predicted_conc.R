@@ -10,6 +10,7 @@
 #' @importFrom tidyr gather
 #' @importFrom tidyr spread
 #' @importFrom tidyr unnest
+#' @importFrom tidyr pivot_wider
 #' @importFrom dplyr select
 #' @importFrom rlang sym
 #' @importFrom rlang UQ
@@ -111,7 +112,7 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
 #' @export
 predict.pop_pulse_fit <- function(object, cred_interval = 0.8, ...) {
   
-  data <- fit$data
+  data <- object$data
   
   diff_from_bound <- (1 - cred_interval) / 2
   lwr             <- diff_from_bound
@@ -280,7 +281,7 @@ bp_predicted.pulse_fit <- function(fit, predicted) {
 bp_predicted.pop_pulse_fit <- function(fit, predicted) {
   
   observed_concs <- fit$data %>% 
-    pivot_longer(!time, names_to = "patient", values_to = "observed")
+    pivot_longer(!.data$time, names_to = "patient", values_to = "observed")
   predicted_concs <- predicted %>% bind_rows(.id = "patient")
   
   concentrations <- full_join(observed_concs, predicted_concs, 

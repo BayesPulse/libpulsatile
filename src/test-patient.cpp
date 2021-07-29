@@ -4,7 +4,7 @@
 #include <RInside.h>
 #endif
 #include <bpmod_singlesubject/bpmod_singlesubject.h>
-#include <testing/catch.h>
+// #include <testing/catch.h>
 
 context("Patient - Single Patient Constructor") {
   

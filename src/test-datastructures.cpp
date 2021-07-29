@@ -9,7 +9,7 @@
 #include <bp_datastructures/pulseestimates.h>
 #include <bp_mcmc/utils.h>
 #include <bp_mcmc/proposalvariance.h>
-#include <testing/catch.h>
+// #include <testing/catch.h>
 
 context("PatientPriors - Single Patient Constructor" ) {
   

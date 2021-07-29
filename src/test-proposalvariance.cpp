@@ -6,7 +6,7 @@
 #include <bp_mcmc/counter.h>
 #include <bp_mcmc/proposalvariance.h>
 #include <bp_mcmc/mh.h>
-#include <testing/catch.h>
+// #include <testing/catch.h>
 
 //
 // Test the Counter class

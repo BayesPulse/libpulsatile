@@ -1,7 +1,10 @@
+#' @importFrom dplyr summarise_all
+#' 
+#' 
 #' @export
 summary.pulse_fit <- function(fit, quantiles = c(.1, .2, .5, .8, .9)) {
   pat_params <- fit$patient_chain %>%
-    select(-c(iteration)) %>%
+    select(-c(.data$iteration)) %>%
     summarise_all(quantile, quantiles)
   
   cat("Patient parameters\n")
@@ -23,11 +26,11 @@ summary.pop_pulse_fit <- function(fit, quantiles = c(.1, .2, .5, .8, .9),
                                   patient = 1) {
   # if(!is.null(patient)) {
   pop_params <- fit$population_chain %>%
-    select(-c(iteration)) %>%
+    select(-c(.data$iteration)) %>%
     summarise_all(quantile, quantiles)
     
   pat_params <- fit$patient_chain[[patient]] %>%
-    select(-c(iteration, likelihood)) %>%
+    select(-c(.data$iteration, .data$likelihood)) %>%
     summarise_all(quantile, quantiles)
   
   cat("Population parameters\n")
@@ -56,7 +59,7 @@ summary.pop_pulse_fit <- function(fit, quantiles = c(.1, .2, .5, .8, .9),
   cat("model_error:  ", paste(format(round(pat_params$model_error, 3), nsmall = 3), " "), "\n")
   cat("num_pulses:   ", paste(format(round(pat_params$num_pulses, 2), nsmall = 2), " "), "\n")
   
-  invisible(list("pop_params" = pop_params,
-              "pat_params" = pat_params))
+  invisible(list("pop_quantiles" = pop_params,
+              "pat_quantiles" = pat_params))
 }
 

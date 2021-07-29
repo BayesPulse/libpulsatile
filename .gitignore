@@ -10,14 +10,11 @@ inst/doc
 bin/
 build/
 tags
-R-package/src/singlesubject.cpp
-R-package/src/tests
 .DS_Store
-<<<<<<< HEAD
-
-=======
 .clang_complete
 .document.Rout
 *.Rcheck
 *.tar.gz
->>>>>>> newpriors
+src/*.o
+src/*.so
+src/*.dll

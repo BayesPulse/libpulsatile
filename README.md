@@ -1,11 +1,18 @@
-# libpulsatile
+# bayespulse
 
 [![Build Status](https://travis-ci.org/BayesPulse/libpulsatile.svg?branch=master)](https://travis-ci.org/BayesPulse/libpulsatile)
 [![codecov](https://codecov.io/gh/BayesPulse/libpulsatile/branch/master/graph/badge.svg)](https://codecov.io/gh/BayesPulse/libpulsatile)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version-ago/BayesPulse)](https://cran.r-project.org/package=BayesPulse) 
 [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/BayesPulse)](https://cran.r-project.org/package=BayesPulse)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)<Paste>
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)\
+
+An R package for analyzing time series of hormone concentrations using Bayesian
+deconvolution analysis.
+
+If you're seeing this please ignore everything below. It will change soon.
+
+---
 
 The development repository for the C++ backend to the unified Bayesian pulsatile
 hormone modeling algorithm used in the bayespulse R package.
