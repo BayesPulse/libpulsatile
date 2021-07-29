@@ -1,10 +1,10 @@
 #' @export
 summary.pulse_fit <- function(fit, quantiles = c(.1, .2, .5, .8, .9)) {
-  pat_params <- fit$patient_chain[[patient]] %>%
-    select(-c(iteration, likelihood)) %>%
+  pat_params <- fit$patient_chain %>%
+    select(-c(iteration)) %>%
     summarise_all(quantile, quantiles)
   
-  cat("Patient", names(fit$patient_chain)[patient], "parameters\n")
+  cat("Patient parameters\n")
   cat("               ")
   cat(paste0(quantiles*100, "%    "))
   cat("\n")
