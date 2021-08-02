@@ -6,7 +6,7 @@
 \usage{
 fit_pop_pulse(
   data,
-  time,
+  times,
   location_prior = "strauss",
   spec,
   iters = 250000,
@@ -34,9 +34,6 @@ fit_pop_pulse(
 patient in population at each time of observation, with each patient as a 
 column and each row as an observation time. No additional columns should be
 present.}
-
-\item{time}{Numeric vector for observation times. Must be the same length as
-the number of rows in \code{data}}
 
 \item{spec}{An object of class \code{spec}, created by
 \code{pulse_spec()}, specifying the priors, starting values, and proposal
@@ -111,6 +108,9 @@ must equal the sum of \code{pulse_counts}.}
 \code{fix_params} to choose fixed values for individual pulse locations. 
 If used, \code{pulse_count} must also be fixed, and 
 length of the vector must equal the sum of \code{pulse_counts}.}
+
+\item{time}{Numeric vector for observation times. Must be the same length as
+the number of rows in \code{data}}
 
 \item{verbose_iters}{Integer that sets diagnostic output to printout at the
 given interval if 'verbose' is \code{TRUE}. Default is 5000.}

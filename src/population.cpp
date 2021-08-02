@@ -17,8 +17,8 @@ using namespace Rcpp;
 //
 
 // [[Rcpp::export]]
-Rcpp::List population_(Rcpp::NumericMatrix concentrations,
-                       Rcpp::NumericVector time,
+Rcpp::List population_(Rcpp::List concentrations,
+                       Rcpp::List times,
                        Rcpp::CharacterVector location_prior,
                        Rcpp::List inpriors,
                        Rcpp::List proposalvars,
@@ -53,7 +53,7 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   if ( !inpriors.inherits("bp_priors") ) stop("priors argument must be a bp_priors object");
   if ( !proposalvars.inherits("bp_proposalvariance") ) stop("proposalvars argument must be a bp_proposalvariance object");
   if ( !startingvals.inherits("bp_startingvals") ) stop("startingvals argument must be a bp_startingvals object");
-  if ( concentrations.nrow() != time.size() ) stop("Time and concentration vectors must be the same size");
+  //if ( concentrations.nrow() != time.size() ) stop("Time and concentration vectors must be the same size");
   if ( location_prior.size() != 1 ) stop("Location prior vector must be length 1");
   
   // Cleanup variable names 
@@ -117,14 +117,18 @@ Rcpp::List population_(Rcpp::NumericMatrix concentrations,
   Rcpp::Rcout << "Patient priors and estimates created\n";
 
   // Get number of patients (should this be a function arg?)
-  int numPats = concentrations.ncol();
+  int numPats = concentrations.length();
   
   // Create vector of patients
   std::vector<Patient> pats;
 
   // Fill vector of patients
   for(int i = 0; i < numPats; i++) {
-    PatientData tempdata(time, concentrations.column(i));
+    // Do some param validation while we're looping
+    //if ( times[i].length() != concentrations[i].length() ) { 
+    //  stop("Lengths of times and concentrations must match for respective patients");
+    //}
+    PatientData tempdata(times[i], concentrations[i]);
     Patient temppatient(tempdata, patientPriors, patEstimates);
     pats.push_back(temppatient);
   }

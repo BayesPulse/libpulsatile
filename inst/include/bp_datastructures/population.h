@@ -202,8 +202,8 @@ struct Population {
     }
   };
 
-  // This function fixes parameter estimates for parameters the user
-  //   chooses not to estimate 
+// This function fixes parameter estimates for parameters the user
+//   chooses not to estimate 
 void fix_estimates(Rcpp::List fix_params,
                      Rcpp::NumericVector pat_mass_mean_vec,
                      Rcpp::NumericVector pat_width_mean_vec,

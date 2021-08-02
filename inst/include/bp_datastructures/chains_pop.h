@@ -185,9 +185,17 @@ List PopChains::output(Population * pop) {
   //NumericMatrix patient_chain_r = addattribs_patient_chain(patient_chains[2]);
   //List pulse_chain_r            = addattribs_pulse_chain(pulse_chains[1]);
 
-  NumericVector fitrange(2); 
-  fitrange(0) = pop->patients[1].data.fitstart;
-  fitrange(1) = pop->patients[1].data.fitend;
+  NumericVector fitrange(2);
+  int min = pop->patients[1].data.fitstart;
+  int max = pop->patients[1].data.fitend;
+
+  for(auto pat : pop->patients) {
+    if (pat.data.fitstart < min) { min = pat.data.fitstart; }
+    if (pat.data.fitend > max) { max = pat.data.fitend; }
+  }
+
+  fitrange(0) = min;
+  fitrange(1) = max;
 
   // Create list object combining all chains & other output
   List out = List::create(Named("pop_chain") = pop_chain_r,

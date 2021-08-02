@@ -81,7 +81,7 @@
 #'   
 #' @export
 fit_pop_pulse <- function(data,
-                          time,
+                          times,
                           location_prior = "strauss",
                           spec,
                           iters = 250000,
@@ -155,7 +155,7 @@ fit_pop_pulse <- function(data,
   }
   
   # Call RCPP population function
-  fit <- population_(data, time, location_prior, priors, proposalvariances,
+  fit <- population_(data, times, location_prior, priors, proposalvariances,
                      startingvalues, iters, thin, burnin, verbose,
                      verbose_patient, verbose_iter, pv_adjust_iter, 
                      pv_adjust_max_iter, bivariate_pv_target_ratio, 
@@ -168,9 +168,15 @@ fit_pop_pulse <- function(data,
   patient_chains <- lapply(fit$patient_chains, as.data.frame)
   pulse_chains <- lapply(fit$pulse_chains, 
                         FUN = function(x){as.data.frame(do.call(rbind, x))})
+  returnData <- vector(mode = "list", length = length(data))
+  for(i in 1:length(data)) {
+    returnData[[i]] <- data.frame("data" = data[i], "time" = times[i])
+    colnames(returnData[[i]]) <- c("data", "time")
+  }
   
-  names(patient_chains) <- colnames(data)
-  names(pulse_chains) <- colnames(data)
+  names(patient_chains) <- names(data)
+  names(pulse_chains) <- names(data)
+  names(returnData) <- names(data)
 
   rtn_obj <-
     structure(list("model"            = "population",
@@ -178,7 +184,7 @@ fit_pop_pulse <- function(data,
                    "population_chain" = population_chain,
                    "patient_chain"    = patient_chains,
                    "pulse_chain"      = pulse_chains,
-                   "data"             = as.data.frame(cbind(time, data)),
+                   "data"             = returnData,
                    "time_range"       = fit$time_range,
                    "options"          = list(#"time"       = time,
                                              #"conc"       = conc,
@@ -232,19 +238,19 @@ pop_param_validation <- function(data, time, location_prior, spec, iters, thin,
   }
   
   if(fix_params[["pat_mass_mean"]] & 
-     (length(pat_mass_means) != ncol(data))) {
+     (length(pat_mass_means) != length(data))) {
     stop("length(pat_mass_means) != ncol(data)")
   }
   if(fix_params[["pat_width_mean"]] & 
-     (length(pat_width_means) != ncol(data))) {
+     (length(pat_width_means) != length(data))) {
     stop("length(pat_width_means) != ncol(data)")
   }
   if(fix_params[["pat_bl_hl"]] & 
-     (length(pat_baselines) != ncol(data))) {
+     (length(pat_baselines) != length(data))) {
     stop("length(pat_baselines) != ncol(data)")
   }
   if(fix_params[["pat_bl_hl"]] & 
-     (length(pat_halflives) != ncol(data))) {
+     (length(pat_halflives) != length(data))) {
     stop("length(pat_halflives) != ncol(data)")
   }
   

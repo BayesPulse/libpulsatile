@@ -121,13 +121,15 @@ predict.pop_pulse_fit <- function(object, cred_interval = 0.8, ...) {
   num_patients <- length(object$patient_chain)
   rtn <- vector(mode = "list", length = num_patients)
   
-  fitstart <- min(data$time)
-  fitend   <- max(data$time)
-  time     <- seq(fitstart, fitend, by = 10) # TODO: change 10 to whatever the sampling interval is
-  fitstart <- sym(as.character(fitstart))
-  fitend <- sym(as.character(fitend))
   
   for (i in 1:num_patients) {
+    
+    fitstart <- min(data[[i]]$time)
+    fitend   <- max(data[[i]]$time)
+    time     <- seq(fitstart, fitend, by = 10) # TODO: change 10 to whatever the sampling interval is
+    fitstart <- sym(as.character(fitstart))
+    fitend <- sym(as.character(fitend))
+    
     onechain <- full_join(pulse_chain(object, i), patient_chain(object,i ),
                           by = c("iteration", 
                                  "total_num_pulses" = "num_pulses"))
@@ -274,22 +276,19 @@ bp_predicted.pulse_fit <- function(fit, predicted) {
 
 #' Plot predicted concentration, credible interval, and observed data
 #'
-#'
 #' @param fit a pop_fit_pulse object
 #' @param predicted result of predict.pulse_fit(fit)
 #' @export
 bp_predicted.pop_pulse_fit <- function(fit, predicted) {
   
-  observed_concs <- fit$data %>% 
-    pivot_longer(!.data$time, names_to = "patient", values_to = "observed")
+  observed_concs <- fit$data %>% bind_rows(.id = "patient")
   predicted_concs <- predicted %>% bind_rows(.id = "patient")
-  
   concentrations <- full_join(observed_concs, predicted_concs, 
                               by = c("time", "patient"))
   
   plt <-
     ggplot(concentrations) +
-    aes_string(x = "time", y = "observed") +
+    aes_string(x = "time", y = "data") +
     geom_path() +
     geom_point() +
     geom_path(aes_string(y = "mean.conc"), color = "red") +
