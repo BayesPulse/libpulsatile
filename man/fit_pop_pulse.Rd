@@ -6,7 +6,8 @@
 \usage{
 fit_pop_pulse(
   data,
-  times,
+  time = "time",
+  conc = "concentration",
   location_prior = "strauss",
   spec,
   iters = 250000,
@@ -30,10 +31,20 @@ fit_pop_pulse(
 )
 }
 \arguments{
-\item{data}{Numeric matrix specifying pulsatile hormone concentration for each
-patient in population at each time of observation, with each patient as a 
-column and each row as an observation time. No additional columns should be
-present.}
+\item{data}{List of \code{data.frame}'s specifying pulsatile hormone 
+concentration for each patient in population at each observation time.
+Each patient's observed data should be represented by a list item, with
+each item being a \code{data.frame} with one column for observed 
+concentrations and one column for observation times (other columns may be
+present but will be ignored). All concentration columns must have the same
+name (to be specified with \code{conc} argument) and all time columns must
+have the same name (specified with \code{time} argument). The list may be a
+named list with names indicating patient ID.}
+
+\item{time}{A string. Name of the time columns in \code{data}.}
+
+\item{conc}{A string. Name of the hormone concentration columns in
+\code{data}.}
 
 \item{spec}{An object of class \code{spec}, created by
 \code{pulse_spec()}, specifying the priors, starting values, and proposal
@@ -108,9 +119,6 @@ must equal the sum of \code{pulse_counts}.}
 \code{fix_params} to choose fixed values for individual pulse locations. 
 If used, \code{pulse_count} must also be fixed, and 
 length of the vector must equal the sum of \code{pulse_counts}.}
-
-\item{time}{Numeric vector for observation times. Must be the same length as
-the number of rows in \code{data}}
 
 \item{verbose_iters}{Integer that sets diagnostic output to printout at the
 given interval if 'verbose' is \code{TRUE}. Default is 5000.}

@@ -296,7 +296,7 @@ bp_predicted.pop_pulse_fit <- function(fit, predicted) {
     geom_path(aes_string(y = "lower"), color = "red", linetype = "dashed") +
     xlab("Time (minutes)") +
     ylab("Concentration (ng/mL)") +
-    facet_wrap( ~ patient, scales = "free")
+    facet_wrap( ~ patient)
   
   return(plt)
   

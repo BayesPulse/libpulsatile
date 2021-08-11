@@ -4,12 +4,18 @@
 
 #' fit_pop_pulse
 #' 
-#' @param data Numeric matrix specifying pulsatile hormone concentration for each
-#'   patient in population at each time of observation, with each patient as a 
-#'   column and each row as an observation time. No additional columns should be
-#'   present.
-#' @param time Numeric vector for observation times. Must be the same length as
-#'   the number of rows in \code{data}
+#' @param data List of \code{data.frame}'s specifying pulsatile hormone 
+#'   concentration for each patient in population at each observation time.
+#'   Each patient's observed data should be represented by a list item, with
+#'   each item being a \code{data.frame} with one column for observed 
+#'   concentrations and one column for observation times (other columns may be
+#'   present but will be ignored). All concentration columns must have the same
+#'   name (to be specified with \code{conc} argument) and all time columns must
+#'   have the same name (specified with \code{time} argument). The list may be a
+#'   named list with names indicating patient ID.
+#' @param time A string. Name of the time columns in \code{data}.
+#' @param conc A string. Name of the hormone concentration columns in
+#'   \code{data}.
 #' @param spec An object of class \code{spec}, created by
 #'   \code{pulse_spec()}, specifying the priors, starting values, and proposal
 #'   variances to use.
@@ -81,7 +87,8 @@
 #'   
 #' @export
 fit_pop_pulse <- function(data,
-                          times,
+                          time = "time",
+                          conc = "concentration",
                           location_prior = "strauss",
                           spec,
                           iters = 250000,
@@ -104,6 +111,22 @@ fit_pop_pulse <- function(data,
                           pulse_locations = numeric()
                           ) {
   
+  # if (all(class(data) == "pulse_sim")) {
+  #   indata <- data$data
+  # } else {
+  #   indata <- data.frame("time" = data[[time]], "concentration" = data[[conc]])
+  # }
+  # stopifnot(is.numeric(indata[[time]]), is.numeric(indata[[conc]]),
+  #           is.logical(use_tibble), is.logical(verbose))
+  
+  numPats <- length(data)
+  times <- vector(mode = "list", length = numPats)
+  concs <- vector(mode = "list", length = numPats)
+  for (i in 1:numPats) {
+    times[i] <- data[[i]][time]
+    concs[i] <- data[[i]][conc]
+  }
+  
   # Prepare named list that is used to fix parameters
   param_list <- c("pop_mass_mean", "pop_width_mean", "pop_baseline_mean", 
                   "pop_halflife_mean", "mass_s2s_sd", "width_s2s_sd", 
@@ -116,7 +139,7 @@ fit_pop_pulse <- function(data,
   fix_params <- as.list(param_list %in% fix_params)
   names(fix_params) <- param_list
   
-  pop_param_validation(data, time, location_prior, spec, iters, thin, burnin, 
+  pop_param_validation(concs, times, location_prior, spec, iters, thin, burnin, 
                        use_tibble, verbose, verbose_patient, verbose_iter, 
                        fix_params, pat_mass_means, pat_width_means, 
                        pat_baselines, pat_halflives, pulse_counts, 
@@ -155,7 +178,7 @@ fit_pop_pulse <- function(data,
   }
   
   # Call RCPP population function
-  fit <- population_(data, times, location_prior, priors, proposalvariances,
+  fit <- population_(concs, times, location_prior, priors, proposalvariances,
                      startingvalues, iters, thin, burnin, verbose,
                      verbose_patient, verbose_iter, pv_adjust_iter, 
                      pv_adjust_max_iter, bivariate_pv_target_ratio, 
@@ -170,7 +193,7 @@ fit_pop_pulse <- function(data,
                         FUN = function(x){as.data.frame(do.call(rbind, x))})
   returnData <- vector(mode = "list", length = length(data))
   for(i in 1:length(data)) {
-    returnData[[i]] <- data.frame("data" = data[i], "time" = times[i])
+    returnData[[i]] <- data.frame("data" = concs[i], "time" = times[i])
     colnames(returnData[[i]]) <- c("data", "time")
   }
   
@@ -200,7 +223,7 @@ fit_pop_pulse <- function(data,
 # Useful utility
 `%notin%` <- Negate(`%in%`)
 
-pop_param_validation <- function(data, time, location_prior, spec, iters, thin,
+pop_param_validation <- function(concs, times, location_prior, spec, iters, thin,
                                  burnin, use_tibble, verbose, verbose_patient,
                                  verbose_iter, fix_params, pat_mass_means,
                                  pat_width_means, pat_baselines,
