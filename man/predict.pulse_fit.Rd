@@ -4,20 +4,20 @@
 \alias{predict.pulse_fit}
 \alias{calc_mean_contrib}
 \alias{add_baseline_error}
-\title{Predicted concentration and related functions}
+\title{Predict concentrations at each observation time}
 \usage{
-\method{predict}{pulse_fit}(object, cred_interval = 0.8, ...)
+\method{predict}{pulse_fit}(object, ...)
 
 calc_mean_contrib(time, location, halflife, mass, width)
 
 add_baseline_error(x, baseline, model_error)
 }
 \arguments{
-\item{object}{A model fit from \code{fit_pulse()} (class "pulse_object").}
+\item{object}{A model fit from \code{fit_pulse()} (class "pulse_fit") or
+from \code{fit_pop_pulse()} (class "pop_pulse_fit").}
 
-\item{cred_interval}{Size of the credible interval to calculate.}
-
-\item{...}{further arguments passed to or from other methods.}
+\item{...}{Additional arguments affecting the predictions produced. Use
+\code{cred_interval} to alter size of credible interval calculated.}
 
 \item{time}{Vector of times from fitstart to fitend, by minute? sampling
 interval?}
@@ -37,9 +37,8 @@ interval?}
 \item{model_error}{Model error estimate for this iteration.}
 }
 \description{
-Calculates the predicted concentration and specified credible interval. The
-plot function plots this predicted concentration with 80% credible intervals
-(adjustable by argument) and the true concentration.
+Calculates the predicted concentration and specified credible interval for 
+each observation time.
 }
 \examples{
 

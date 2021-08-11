@@ -2,14 +2,16 @@
 #' 
 #' 
 #' @export
-summary.pulse_fit <- function(fit, quantiles = c(.1, .2, .5, .8, .9)) {
-  pat_params <- fit$patient_chain %>%
+summary.pulse_fit <- function(object, ...) {
+  args <- list(...)
+  if(is.null(args$quantiles)) { args$quantiles <- c(.1, .2, .5, .8, .9) }
+  pat_params <- object$patient_chain %>%
     select(-c(.data$iteration)) %>%
-    summarise_all(quantile, quantiles)
+    summarise_all(quantile, args$quantiles)
   
   cat("Patient parameters\n")
   cat("               ")
-  cat(paste0(quantiles*100, "%    "))
+  cat(paste0(args$quantiles*100, "%    "))
   cat("\n")
   cat("mass_mean:    ", paste(format(round(pat_params$mass_mean, 3), nsmall = 3), " "), "\n")
   cat("width_mean:   ", paste(format(round(pat_params$width_mean, 2), nsmall = 2), " "), "\n")
@@ -22,20 +24,22 @@ summary.pulse_fit <- function(fit, quantiles = c(.1, .2, .5, .8, .9)) {
 }
 
 #' @export
-summary.pop_pulse_fit <- function(fit, quantiles = c(.1, .2, .5, .8, .9),
-                                  patient = 1) {
+summary.pop_pulse_fit <- function(object, ...) {
+  args <- list(...)
+  if(is.null(args$quantiles)) { args$quantiles <- c(.1, .2, .5, .8, .9) }
+  if(is.null(args$patient)) { args$patient <- 1 }
   # if(!is.null(patient)) {
-  pop_params <- fit$population_chain %>%
+  pop_params <- object$population_chain %>%
     select(-c(.data$iteration)) %>%
-    summarise_all(quantile, quantiles)
+    summarise_all(quantile, args$quantiles)
     
-  pat_params <- fit$patient_chain[[patient]] %>%
+  pat_params <- object$patient_chain[[args$patient]] %>%
     select(-c(.data$iteration, .data$likelihood)) %>%
-    summarise_all(quantile, quantiles)
+    summarise_all(quantile, args$quantiles)
   
   cat("Population parameters\n")
   cat("               ")
-  cat(paste0(quantiles*100, "%    "))
+  cat(paste0(args$quantiles*100, "%    "))
   cat("\n")
   cat("mass_mean:    ", paste(format(round(pop_params$mass_mean, 3), nsmall = 3), " "), "\n")
   cat("mass_s2s_sd:  ", paste(format(round(pop_params$mass_s2s_sd, 3), nsmall = 3), " "), "\n")
@@ -48,9 +52,9 @@ summary.pop_pulse_fit <- function(fit, quantiles = c(.1, .2, .5, .8, .9),
   cat("halflife_mean:", paste(format(round(pop_params$halflife_mean, 2), nsmall = 2), " "), "\n")
   cat("halflife_sd:  ", paste(format(round(pop_params$halflife_sd, 3), nsmall = 3), " "), "\n\n")
   
-  cat("Patient", names(fit$patient_chain)[patient], "parameters\n")
+  cat("Patient", names(object$patient_chain)[args$patient], "parameters\n")
   cat("               ")
-  cat(paste0(quantiles*100, "%    "))
+  cat(paste0(args$quantiles*100, "%    "))
   cat("\n")
   cat("mass_mean:    ", paste(format(round(pat_params$mass_mean, 3), nsmall = 3), " "), "\n")
   cat("width_mean:   ", paste(format(round(pat_params$width_mean, 2), nsmall = 2), " "), "\n")

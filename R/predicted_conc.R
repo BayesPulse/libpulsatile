@@ -1,14 +1,13 @@
-#' Predicted concentration and related functions
+#' Predict concentrations at each observation time
 #' 
-#' Calculates the predicted concentration and specified credible interval. The
-#' plot function plots this predicted concentration with 80% credible intervals
-#' (adjustable by argument) and the true concentration.
+#' Calculates the predicted concentration and specified credible interval for 
+#' each observation time.
 #' 
-#' @param object A model fit from \code{fit_pulse()} (class "pulse_object").
-#' @param cred_interval Size of the credible interval to calculate.
-#' @param ... further arguments passed to or from other methods.
+#' @param object A model fit from \code{fit_pulse()} (class "pulse_fit") or
+#'   from \code{fit_pop_pulse()} (class "pop_pulse_fit").
+#' @param ...  Additional arguments affecting the predictions produced. Use
+#'   \code{cred_interval} to alter size of credible interval calculated.
 #' @importFrom tidyr gather
-#' @importFrom tidyr spread
 #' @importFrom tidyr unnest
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr select
@@ -25,7 +24,6 @@
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr funs
 #' @importFrom dplyr vars
-#' @importFrom dplyr %>%
 #' @importFrom dplyr arrange
 #' @importFrom stats quantile
 #' @importFrom stats median
@@ -41,7 +39,10 @@
 #' fit_predicted <- predict(this_fit, cred_interval = 0.8)
 #'
 #' @export
-predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
+predict.pulse_fit <- function(object, ...) {
+  
+  args <- list(...)
+  if (is.null(args$cred_interval)) { args$cred_interval <- 0.8 }
 
   if (class(object$data) == "pulse_sim") {
     data <- object$data$data
@@ -49,7 +50,7 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
     data <- object$data
   }
 
-  diff_from_bound <- (1 - cred_interval) / 2
+  diff_from_bound <- (1 - args$cred_interval) / 2
   lwr             <- diff_from_bound
   upr             <- 1 - diff_from_bound
 
@@ -57,9 +58,6 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
                         by = c("iteration", "total_num_pulses" = "num_pulses"))
 
   # Only plot within range of data -- saw some weird behavior using full
-  # fitstart/fitend
-  #   fitstart <- object$time_range[1]
-  #   fitend   <- object$time_range[2]
   fitstart <- min(data$time)
   fitend   <- max(data$time)
   time     <- seq(fitstart, fitend, by = 10) # TODO: change 10 to whatever the sampling interval is
@@ -76,20 +74,15 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
     select(.data$iteration, .data$pulse_num, .data$baseline, .data$model_error,
            .data$time, .data$mean_contrib) 
 
-  # wide <- onechain %>% spread(key = .data$time, value = .data$mean_contrib)
   wide <- onechain %>% 
     pivot_wider(names_from = .data$time, values_from = .data$mean_contrib)
   
-  # long <- wide %>% 
-  #   group_by(.data$iteration, .data$baseline, .data$model_error) %>%
-  #   summarise_at(vars(UQ(fitstart):UQ(fitend)), funs(sum)) %>% 
-  #   mutate_at(vars(UQ(fitstart):UQ(fitend)), 
-  #             funs(add_baseline_error), baseline = quote(baseline), model_error = quote(model_error))
   long <- wide %>% 
     group_by(.data$iteration, .data$baseline, .data$model_error) %>%
     summarise_at(vars(UQ(fitstart):UQ(fitend)), sum) %>% 
     mutate_at(vars(UQ(fitstart):UQ(fitend)), 
-              add_baseline_error, baseline = quote(baseline), model_error = quote(model_error))
+              add_baseline_error, baseline = quote(baseline), 
+              model_error = quote(model_error))
   
   long <- 
     long %>% 
@@ -109,12 +102,20 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
 
 }
 
+#' Predict concentrations at each observation time
+#' 
+#' Calculates the predicted concentration and specified credible interval for 
+#' each observation time.
+#' 
+#' @inheritParams predict.pulse_fit
 #' @export
-predict.pop_pulse_fit <- function(object, cred_interval = 0.8, ...) {
+predict.pop_pulse_fit <- function(object, ...) {
   
+  args <- list(...)
+  if (is.null(args$cred_interval)) { args$cred_interval <- 0.8 }
   data <- object$data
   
-  diff_from_bound <- (1 - cred_interval) / 2
+  diff_from_bound <- (1 - args$cred_interval) / 2
   lwr             <- diff_from_bound
   upr             <- 1 - diff_from_bound
   
@@ -228,11 +229,6 @@ add_baseline_error <- function(x, baseline, model_error) {
 ### TODO: add option of passing just the fit object to bp_predicted()
 
 
-#' Plot predicted concentration, credible interval, and observed data
-#'
-#'
-#' @param fit a fit_pulse object
-#' @param predicted result of predict.pulse_fit(fit)
 #' @importFrom tidyr gather_
 #' @importFrom dplyr select_vars_
 #' @importFrom ggplot2 ggplot
@@ -241,18 +237,6 @@ add_baseline_error <- function(x, baseline, model_error) {
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 xlab
 #' @importFrom ggplot2 ylab
-#' @keywords pulse fit plot diagnostics predicted
-#' @examples
-#'
-#' this_pulse <- simulate_pulse()
-#' this_spec  <- pulse_spec(location_prior_type = "strauss",
-#'                          prior_location_gamma = 0,
-#'                          prior_location_range = 40)
-#' this_fit   <- fit_pulse(data = this_pulse, iters = 1000, thin = 10,
-#'                         spec = this_spec)
-#' fit_predicted <- predict(this_fit, cred_interval = 0.8)
-#' bp_predicted(this_fit, fit_predicted)
-#'
 #' @export
 bp_predicted.pulse_fit <- function(fit, predicted) {
   
@@ -267,17 +251,15 @@ bp_predicted.pulse_fit <- function(fit, predicted) {
     geom_path() +
     geom_point() + 
     geom_path(data = predicted, aes_string(y = "mean.conc"), color = "red") +
-    geom_path(data = predicted, aes_string(y = "upper"), color = "red", linetype = "dashed") +
+    geom_path(data = predicted, aes_string(y = "upper"), color = "red", 
+              linetype = "dashed") +
     geom_path(data = predicted, aes_string(y = "lower"), color = "red", linetype = "dashed") +
     xlab("Time (minutes)") +
     ylab("Concentration (ng/mL)")
 
 }
 
-#' Plot predicted concentration, credible interval, and observed data
-#'
-#' @param fit a pop_fit_pulse object
-#' @param predicted result of predict.pulse_fit(fit)
+
 #' @export
 bp_predicted.pop_pulse_fit <- function(fit, predicted) {
   

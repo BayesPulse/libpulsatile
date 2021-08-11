@@ -6,6 +6,13 @@
 \usage{
 bp_location_posterior(fit, ...)
 }
+\arguments{
+\item{fit}{A \code{pulse_fit} or \code{pop_pulse_fit} object}
+
+\item{...}{Additional arguments. Use \code{patient} argument to determine
+which patient's trace plots are shown when \code{fit} is a
+\code{pop_pulse_fit} object.}
+}
 \description{
 Creates plot of posterior pulse locations
 }

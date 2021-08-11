@@ -1,12 +1,3 @@
-#' Diagnostic plots for \code{fit_pulse()} models
-#' 
-#' Plotting functions for mcmc chains from \code{fit_pulse()} models.  Includes
-#' trace plots and posterior densities of the 'patient' parameters and pulse
-#' location density (a set of pulse-specific parameter, from 'pulse' chain).
-#' 
-#' @param fit A model fit from \code{fit_pulse()}.
-#' @param type Either histogram or density.  Only applies to
-#' \code{bp_posteriors} function
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr gather_
 #' @importFrom dplyr select_vars_
@@ -16,15 +7,8 @@
 #' @importFrom ggplot2 geom_histogram
 #' @importFrom ggplot2 geom_density
 #' @importFrom ggplot2 facet_wrap
-#' @keywords pulse fit plot diagnostics
-#' @examples
-#' this_pulse <- simulate_pulse()
-#' this_spec  <- pulse_spec()
-#' this_fit   <- fit_pulse(data = this_pulse, iters = 1000, thin = 10,
-#'                         spec = this_spec)
-#' #bp_trace(this_fit)
 #' @export
-bp_trace.pulse_fit <- function(fit) {
+bp_trace.pulse_fit <- function(fit, ...) {
 
   stopifnot(class(fit) == "pulse_fit")
   
@@ -40,15 +24,16 @@ bp_trace.pulse_fit <- function(fit) {
 
 #' @importFrom dplyr bind_rows
 #' @export
-bp_trace.pop_pulse_fit <- function(fit, patient = NULL) {
+bp_trace.pop_pulse_fit <- function(fit, ...) {
+  args <- list(...)
   
   dat <- population_chain(fit)
   colnames(dat)[2:11] <- paste0("pop_", colnames(dat)[2:11])
   dat <- tidyr::pivot_longer(dat, !.data$iteration, names_to = "parameter",
                                 values_to = "value")
   
-  if (!is.null(patient)) {
-    patDat <- patient_chain(fit, patient)
+  if (!is.null(args$patient)) {
+    patDat <- patient_chain(fit, args$patient)
     colnames(patDat)[2:6] <- paste0("pat_", colnames(patDat)[2:6])
     patDat <- tidyr::pivot_longer(patDat, !.data$iteration, names_to = "parameter",
                                values_to = "value")
@@ -68,11 +53,8 @@ bp_trace.pop_pulse_fit <- function(fit, patient = NULL) {
     facet_wrap(~ parameter, ncol = nCol, nrow = nRow, scales = "free")
 }
 
-
-
-#' @rdname bp_trace
 #' @export
-bp_posteriors.pulse_fit <- function(fit, type = c("histogram", "density")) {
+bp_posteriors.pulse_fit <- function(fit, type = c("histogram", "density"), ...) {
 
   type <- match.arg(type)
   dat <- patient_chain(fit)
@@ -99,16 +81,17 @@ bp_posteriors.pulse_fit <- function(fit, type = c("histogram", "density")) {
 
 #' @export
 bp_posteriors.pop_pulse_fit <- function(fit, type = c("histogram", "density"), 
-                                        patient = NULL) {
+                                        ...) {
   
+  args <- list(...)
   type <- match.arg(type)
   dat <- population_chain(fit)
   colnames(dat)[2:11] <- paste0("pop_", colnames(dat)[2:11])
   dat <- tidyr::pivot_longer(dat, !.data$iteration, names_to = "parameter",
                              values_to = "value")
   
-  if (!is.null(patient)) {
-    patDat <- patient_chain(fit, patient)
+  if (!is.null(args$patient)) {
+    patDat <- patient_chain(fit, args$patient)
     colnames(patDat)[2:6] <- paste0("pat_", colnames(patDat)[2:6])
     patDat <- tidyr::pivot_longer(patDat, !.data$iteration, names_to = "parameter",
                                   values_to = "value")
@@ -140,7 +123,7 @@ bp_posteriors.pop_pulse_fit <- function(fit, type = c("histogram", "density"),
 }
 
 #' @export
-bp_location_posterior.pulse_fit <- function(fit) {
+bp_location_posterior.pulse_fit <- function(fit, ...) {
   ggplot2::ggplot(pulse_chain(fit)) +
     ggplot2::aes_string(x = "location") +
     ggplot2::geom_histogram(binwidth = 5)
@@ -148,9 +131,10 @@ bp_location_posterior.pulse_fit <- function(fit) {
 }
 
 #' @export
-bp_location_posterior.pop_pulse_fit <- function(fit, patient = NULL) {
-  if(!is.null(patient)) {
-    rtn <- ggplot2::ggplot(pulse_chain(fit, patient)) +
+bp_location_posterior.pop_pulse_fit <- function(fit, ...) {
+  args <- list(...)
+  if(!is.null(args$patient)) {
+    rtn <- ggplot2::ggplot(pulse_chain(fit, args$patient)) +
       ggplot2::aes_string(x = "location") +
       ggplot2::geom_histogram(binwidth = 5)
   } else {

@@ -8,7 +8,6 @@ fit_pop_pulse(
   data,
   time = "time",
   conc = "concentration",
-  location_prior = "strauss",
   spec,
   iters = 250000,
   thin = 50,
@@ -68,6 +67,9 @@ columns printed to those which fit in the console.}
 \item{verbose_patient}{Expands diagnostic output to include patient level
 parameters. Default is \code{FALSE}.}
 
+\item{verbose_iter}{Integer that sets diagnostic output to printout at the
+given interval if 'verbose' is \code{TRUE}. Default is 5000.}
+
 \item{fix_params}{Character vector enabling parameters to fixed (i.e. not 
 estimated). Vector may include options:
 "pop_mass_mean", "pop_width_mean", "pop_baseline_mean",
@@ -115,22 +117,19 @@ vector must equal the sum of \code{pulse_counts}.}
 used, \code{pulse_count} must also be fixed, and length of the vector 
 must equal the sum of \code{pulse_counts}.}
 
-\item{pulse_locations}{Numeric vector used in conjunction with 
-\code{fix_params} to choose fixed values for individual pulse locations. 
-If used, \code{pulse_count} must also be fixed, and 
-length of the vector must equal the sum of \code{pulse_counts}.}
-
-\item{verbose_iters}{Integer that sets diagnostic output to printout at the
-given interval if 'verbose' is \code{TRUE}. Default is 5000.}
-
-\item{pulse_mass_sdscale}{Numeric vector used in conjunction with 
+\item{pulse_mass_sdscales}{Numeric vector used in conjunction with 
 \code{fix_params} to choose fixed values for individual pulse mass standard
 deviation scales. If used, \code{pulse_count} must also be fixed, and 
 length of the vector must equal the sum of \code{pulse_counts}.}
 
-\item{pulse_width_sdscale}{Numeric vector used in conjunction with 
+\item{pulse_width_sdscales}{Numeric vector used in conjunction with 
 \code{fix_params} to choose fixed values for individual pulse width standard
 deviation scales. If used, \code{pulse_count} must also be fixed, and 
+length of the vector must equal the sum of \code{pulse_counts}.}
+
+\item{pulse_locations}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse locations. 
+If used, \code{pulse_count} must also be fixed, and 
 length of the vector must equal the sum of \code{pulse_counts}.}
 }
 \description{

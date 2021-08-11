@@ -51,6 +51,8 @@
 #' @param pv_pulse_location Proposal variance for pulse locations
 #' @param pv_sdscale_pulse_mass Proposal variance for individual pulse mass distribution standard deviation scale 
 #' @param pv_sdscale_pulse_width Proposal variance for individual pulse width distribution standard deviation scale 
+#' @param pv_ind_pulse_mass Proposal variance for individual pulse masses
+#' @param pv_ind_pulse_width Proposal variance for individual pulse widths
 #' 
 #' 
 #' @export

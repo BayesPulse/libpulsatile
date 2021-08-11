@@ -54,6 +54,9 @@ columns printed to those which fit in the console.}
 \item{verbose}{Prints diagnostics and estimates every 5000th iteration.
 Default is \code{FALSE}.}
 
+\item{verbose_iter}{Integer that sets diagnostic output to printout at the
+given interval if 'verbose' is \code{TRUE}. Default is 5000.}
+
 \item{fix_params}{Character vector enabling parameters to fixed (i.e. not 
 estimated). Vector may include options:
 "pulse_count", "mass_mean", "width_mean", "mass_sd", 
@@ -75,22 +78,19 @@ vector must equal the sum of \code{pulse_counts}.}
 used, \code{pulse_count} must also be fixed, and length of the vector 
 must equal the sum of \code{prior_mean_pulse_count}.}
 
-\item{pulse_locations}{Numeric vector used in conjunction with 
-\code{fix_params} to choose fixed values for individual pulse locations. 
-If used, \code{pulse_count} must also be fixed, and 
-length of the vector must equal the sum of \code{prior_mean_pulse_count}.}
-
-\item{verbose_iters}{Integer that sets diagnostic output to printout at the
-given interval if 'verbose' is \code{TRUE}. Default is 5000.}
-
-\item{pulse_mass_sdscale}{Numeric vector used in conjunction with 
+\item{pulse_mass_sdscales}{Numeric vector used in conjunction with 
 \code{fix_params} to choose fixed values for individual pulse mass standard
 deviation scales. If used, \code{pulse_count} must also be fixed, and 
 length of the vector must equal the sum of \code{prior_mean_pulse_count}.}
 
-\item{pulse_width_sdscale}{Numeric vector used in conjunction with 
+\item{pulse_width_sdscales}{Numeric vector used in conjunction with 
 \code{fix_params} to choose fixed values for individual pulse width standard
 deviation scales. If used, \code{pulse_count} must also be fixed, and 
+length of the vector must equal the sum of \code{prior_mean_pulse_count}.}
+
+\item{pulse_locations}{Numeric vector used in conjunction with 
+\code{fix_params} to choose fixed values for individual pulse locations. 
+If used, \code{pulse_count} must also be fixed, and 
 length of the vector must equal the sum of \code{prior_mean_pulse_count}.}
 }
 \description{

@@ -1,12 +1,3 @@
-#   Extract heirarchical chains
-#     - hormone1_chain() ??? driver_chain()
-#     - hormone2_chain() ??? response_chain()
-#     - pulse_chain()
-#     - subject_chain()
-#     - pop_chain()
-#     - chains() --> list/str chains available and functions to extract them
-#
-
 #' chains
 #' 
 #' Functions for extracting and working with the various levels of posterior
@@ -37,23 +28,27 @@ population_chain.pop_pulse_fit <- function(fit) {
 }
 
 #' @export
-pulse_chain.pulse_fit <- function(fit) {
+pulse_chain.pulse_fit <- function(fit, ...) {
   fit$pulse_chain
 }
 
 #' @export
-pulse_chain.pop_pulse_fit <- function(fit, patient) {
-  fit$pulse_chain[[patient]]
+pulse_chain.pop_pulse_fit <- function(fit, ...) {
+  args <- list(...)
+  if(is.null(args$patient)) { args$patient <- 1}
+  fit$pulse_chain[[args$patient]]
 }
 
 #' @export
-patient_chain.pulse_fit <- function(fit) {
+patient_chain.pulse_fit <- function(fit, ...) {
   fit$patient_chain
 }
 
 #' @export
-patient_chain.pop_pulse_fit <- function(fit, patient) {
-  fit$patient_chain[[patient]]
+patient_chain.pop_pulse_fit <- function(fit, ...) {
+  args <- list(...)
+  if(is.null(args$patient)) { args$patient <- 1}
+  fit$patient_chain[[args$patient]]
 }
 
 

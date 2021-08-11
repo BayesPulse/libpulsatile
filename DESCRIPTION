@@ -21,12 +21,14 @@ Imports:
   ggplot2,
   tibble,
   tidyr,
-  rlang
+  rlang,
+  stats
 Suggests:
   magrittr,
   RcppArmadillo,
   testthat,
-  xml2
+  xml2,
+  knitr
 LinkingTo:
   Rcpp,
   RcppArmadillo,

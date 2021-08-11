@@ -150,6 +150,10 @@ pop_spec(
 \item{pv_sdscale_pulse_mass}{Proposal variance for individual pulse mass distribution standard deviation scale}
 
 \item{pv_sdscale_pulse_width}{Proposal variance for individual pulse width distribution standard deviation scale}
+
+\item{pv_ind_pulse_mass}{Proposal variance for individual pulse masses}
+
+\item{pv_ind_pulse_width}{Proposal variance for individual pulse widths}
 }
 \description{
 pop_spec

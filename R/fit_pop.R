@@ -31,7 +31,7 @@
 #'   'verbose_iters' argument. Default is \code{FALSE}.
 #' @param verbose_patient Expands diagnostic output to include patient level
 #'   parameters. Default is \code{FALSE}.
-#' @param verbose_iters Integer that sets diagnostic output to printout at the
+#' @param verbose_iter Integer that sets diagnostic output to printout at the
 #'   given interval if 'verbose' is \code{TRUE}. Default is 5000.
 #' @param fix_params Character vector enabling parameters to fixed (i.e. not 
 #'   estimated). Vector may include options:
@@ -72,11 +72,11 @@
 #'   \code{fix_params} to choose fixed values for individual pulse widths. If
 #'   used, \code{pulse_count} must also be fixed, and length of the vector 
 #'   must equal the sum of \code{pulse_counts}.
-#' @param pulse_mass_sdscale Numeric vector used in conjunction with 
+#' @param pulse_mass_sdscales Numeric vector used in conjunction with 
 #'   \code{fix_params} to choose fixed values for individual pulse mass standard
 #'   deviation scales. If used, \code{pulse_count} must also be fixed, and 
 #'   length of the vector must equal the sum of \code{pulse_counts}.
-#' @param pulse_width_sdscale Numeric vector used in conjunction with 
+#' @param pulse_width_sdscales Numeric vector used in conjunction with 
 #'   \code{fix_params} to choose fixed values for individual pulse width standard
 #'   deviation scales. If used, \code{pulse_count} must also be fixed, and 
 #'   length of the vector must equal the sum of \code{pulse_counts}.
@@ -89,7 +89,6 @@
 fit_pop_pulse <- function(data,
                           time = "time",
                           conc = "concentration",
-                          location_prior = "strauss",
                           spec,
                           iters = 250000,
                           thin = 50,
@@ -119,6 +118,9 @@ fit_pop_pulse <- function(data,
   # stopifnot(is.numeric(indata[[time]]), is.numeric(indata[[conc]]),
   #           is.logical(use_tibble), is.logical(verbose))
   
+  
+  location_prior = "strauss"
+  
   numPats <- length(data)
   times <- vector(mode = "list", length = numPats)
   concs <- vector(mode = "list", length = numPats)
@@ -139,7 +141,7 @@ fit_pop_pulse <- function(data,
   fix_params <- as.list(param_list %in% fix_params)
   names(fix_params) <- param_list
   
-  pop_param_validation(concs, times, location_prior, spec, iters, thin, burnin, 
+  pop_param_validation(data, time, conc, location_prior, spec, iters, thin, burnin, 
                        use_tibble, verbose, verbose_patient, verbose_iter, 
                        fix_params, pat_mass_means, pat_width_means, 
                        pat_baselines, pat_halflives, pulse_counts, 
@@ -223,7 +225,7 @@ fit_pop_pulse <- function(data,
 # Useful utility
 `%notin%` <- Negate(`%in%`)
 
-pop_param_validation <- function(concs, times, location_prior, spec, iters, thin,
+pop_param_validation <- function(data, time, conc, location_prior, spec, iters, thin,
                                  burnin, use_tibble, verbose, verbose_patient,
                                  verbose_iter, fix_params, pat_mass_means,
                                  pat_width_means, pat_baselines,
@@ -262,19 +264,19 @@ pop_param_validation <- function(concs, times, location_prior, spec, iters, thin
   
   if(fix_params[["pat_mass_mean"]] & 
      (length(pat_mass_means) != length(data))) {
-    stop("length(pat_mass_means) != ncol(data)")
+    stop("length(pat_mass_means) != length(data)")
   }
   if(fix_params[["pat_width_mean"]] & 
      (length(pat_width_means) != length(data))) {
-    stop("length(pat_width_means) != ncol(data)")
+    stop("length(pat_width_means) != length(data)")
   }
   if(fix_params[["pat_bl_hl"]] & 
      (length(pat_baselines) != length(data))) {
-    stop("length(pat_baselines) != ncol(data)")
+    stop("length(pat_baselines) != length(data)")
   }
   if(fix_params[["pat_bl_hl"]] & 
      (length(pat_halflives) != length(data))) {
-    stop("length(pat_halflives) != ncol(data)")
+    stop("length(pat_halflives) != length(data)")
   }
   
   # Check pulse parameter fixing arguments
