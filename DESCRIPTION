@@ -24,11 +24,12 @@ Imports:
   rlang,
   stats
 Suggests:
-  magrittr,
-  RcppArmadillo,
-  testthat,
-  xml2,
-  knitr
+    magrittr,
+    RcppArmadillo,
+    testthat,
+    xml2,
+    knitr,
+    covr
 LinkingTo:
   Rcpp,
   RcppArmadillo,
