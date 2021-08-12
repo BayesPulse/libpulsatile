@@ -131,7 +131,8 @@ predict.pop_pulse_fit <- function(object, ...) {
     fitstart <- sym(as.character(fitstart))
     fitend <- sym(as.character(fitend))
     
-    onechain <- full_join(pulse_chain(object, i), patient_chain(object,i ),
+    onechain <- full_join(pulse_chain(object, patient = i), 
+                          patient_chain(object, patient = i),
                           by = c("iteration", 
                                  "total_num_pulses" = "num_pulses"))
     

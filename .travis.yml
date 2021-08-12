@@ -13,27 +13,17 @@
 #     # Header
 
 language: r
-sudo: false
-dist: trusty
 cache: packages
-latex: false
+r:
+  - release
+warnings_are_errors: true
 
 # For coverate reporting
 r_packages:
   - covr
 
-# Build project
-script:
-  - make
-
 # Report coverage rate to coveralls
 after_success:
     - Rscript -e 'library(covr); codecov()'
-
-# Send e-mails if stuff changes
-notifications:
-  email:
-    on_success: change
-    on_failure: change
 
 
