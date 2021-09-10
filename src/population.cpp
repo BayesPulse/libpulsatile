@@ -133,6 +133,13 @@ Rcpp::List population_(Rcpp::List concentrations,
     pats.push_back(temppatient);
   }
 
+  int q = 0;
+
+  for(auto pat : pats) {
+    Rcpp::Rcout << "Patient " << q << " : start = " << pat.data.fitstart << " end = " << pat.data.fitend << "\n";
+    q++;
+  }
+
   // Create population object and pointer to it
   Population pop(pats, popPriors, popEstimates);
   Population * population = &pop;

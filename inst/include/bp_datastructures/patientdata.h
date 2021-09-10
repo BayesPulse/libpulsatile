@@ -49,8 +49,10 @@ struct PatientData {
     duration_of_obs   = time(number_of_obs - 1) - time(0); // NOTE: 1430 for typical 24 hour dataset (not 1440)
     avg_period_of_obs = duration_of_obs / (number_of_obs - 1);
 
-    fitstart = -(avg_period_of_obs * 4);
+    //fitstart = -(avg_period_of_obs * 4);
+    fitstart = in_time(0) - (avg_period_of_obs * 5);
     fitend   =  time(number_of_obs - 1) + (avg_period_of_obs * 2);
+
 
   }
 
