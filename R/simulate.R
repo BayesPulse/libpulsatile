@@ -1,4 +1,4 @@
-#' Simulate pulsatile hormone data
+#' Simulate pulsatile hormone data for a single patient
 #' 
 #' @description 
 #'   \code{\link{simulate_pulse}} simulates a time series dataset
