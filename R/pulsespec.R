@@ -11,15 +11,15 @@
 #' specification of "prior_mean_pulse_count", "prior_location_gamma", and
 #' "prior_location_range".
 #' @param prior_mass_mean Mean of Gaussian prior on patient mean pulse mass
-#' @param prior_mass_var Variance of the Gaussian prior on population mean pulse mass
+#' @param prior_mass_var Variance of the Gaussian prior on patient mean pulse mass
 #' @param prior_mass_sd Scale of the Half-Cauchy prior on the standard deviation of patient mean pulse mass
 #' @param prior_width_mean Mean of Gaussian prior on patient mean pulse width
-#' @param prior_width_var Variance of the Gaussian prior on population mean pulse width
+#' @param prior_width_var Variance of the Gaussian prior on patient mean pulse width
 #' @param prior_width_sd Scale of the Half-Cauchy prior on the standard deviation of patient mean pulse width
 #' @param prior_baseline_mean Mean of Gaussian prior on patient baseline concentration
 #' @param prior_baseline_var Variance of the Gaussian prior on baseline concentration
 #' @param prior_halflife_mean Mean of Gaussian prior on patient mean elimination half-life
-#' @param prior_halflife_var Variance of the Gaussian prior on population mean elimination half-life
+#' @param prior_halflife_var Variance of the Gaussian prior on patient mean elimination half-life
 #' @param prior_error_alpha Shape parameter of Gamma prior on patient error variance
 #' @param prior_error_beta Scale parameter of Gamma prior on patient error variance
 #' @param prior_location_gamma Repulsion parameter for Strauss prior on pulse count
@@ -163,9 +163,7 @@ print.pulse_spec <- function(x, ...) {
 
   cat("\nBayesian time-series analysis of pulsatile hormone data: 
       Model Specification Object\n\n")
-  cat("Model type:", paste0(x$model$model, "\n"))
-  cat("Number of iterations:", 
-      formatC(x$model$iterations, format = "d", big.mark = ","), "\n")
+  cat("Model type: Single Patient")
   cat("\n")
   cat("Pulse mass:\n")
   cat("  Fixed effect (mean)\n")

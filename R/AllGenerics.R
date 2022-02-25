@@ -1,10 +1,7 @@
 # Definitions found in diagnostics.R -------------------------------------------
-
 #' Creates chain trace plots
 #' 
 #' @param fit A \code{pulse_fit} or \code{pop_pulse_fit} object
-#' @param type String indicating whether to plot as a histogram ("histogram")
-#'   or density ("density").
 #' @param ... Additional arguments. Use \code{patient} argument to determine
 #'   which patient's trace plots are shown when \code{fit} is a
 #'   \code{pop_pulse_fit} object.
@@ -16,16 +13,18 @@
 #'                         spec = this_spec)
 #' bp_trace(this_fit)
 #' @export
-bp_trace <- function(fit, type, ...) UseMethod("bp_trace")
+bp_trace <- function(fit, ...) UseMethod("bp_trace")
 
 #' Creates posterior density plots
 #' 
 #' @param fit A \code{pulse_fit} or \code{pop_pulse_fit} object
+#' @param type String indicating whether to plot as a histogram ("histogram")
+#'   or density ("density").
 #' @param ... Additional arguments. Use \code{patient} argument to determine
 #'   which patient's trace plots are shown when \code{fit} is a
 #'   \code{pop_pulse_fit} object.
 #' @export
-bp_posteriors <- function(fit, ...) UseMethod("bp_posteriors")
+bp_posteriors <- function(fit, type, ...) UseMethod("bp_posteriors")
 
 #' Creates plot of posterior pulse locations
 #' 

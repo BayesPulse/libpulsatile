@@ -21,8 +21,8 @@
 #' @param prior_error_alpha Shape parameter of Gamma prior on patient error variance
 #' @param prior_error_beta Scale parameter of Gamma prior on patient error variance
 #' @param prior_mean_pulse_count Rate parameter for Strauss prior on pulse count
-#' @param prior_strauss_repulsion Repulsion parameter for Strauss prior on pulse count
-#' @param prior_strauss_repulsion_range Rate parameter for Strauss prior on pulse count
+#' @param prior_location_gamma Repulsion parameter for Strauss prior on pulse count
+#' @param prior_location_range Rate parameter for Strauss prior on pulse count
 #' @param sv_mass_mean Starting value for population mean pulse mass 
 #' @param sv_mass_s2s_sd Starting value for standard deviation of patient mean pulse mass
 #' @param sv_mass_p2p_sd Starting value for standard deviation of pulse-to-pulse variation of masses
@@ -45,9 +45,9 @@
 #' @param pv_pop_baseline_mean Proposal variance for population mean baseline 
 #' @param pv_pat_baseline Proposal variance for patient baselines 
 #' @param pv_pat_baseline_sd Proposal variance for standard deviation of patient baseline 
-#' @param pv_pop_halflife_mean Proposal variance for population mean half-life 
-#' @param pv_pat_halflife Proposal variance for standard deviation of patient half-life
-#' @param pv_pat_halflife_sd Proposal variance for standard deviation of patient half-life 
+#' @param pv_pop_halflife_mean Proposal variance for population mean elimination half-life 
+#' @param pv_pat_halflife Proposal variance for patient elimination half-life
+#' @param pv_pat_halflife_sd Proposal variance for standard deviation of patient elimination half-life 
 #' @param pv_pulse_location Proposal variance for pulse locations
 #' @param pv_sdscale_pulse_mass Proposal variance for individual pulse mass distribution standard deviation scale 
 #' @param pv_sdscale_pulse_width Proposal variance for individual pulse width distribution standard deviation scale 
@@ -74,8 +74,8 @@ pop_spec <- function(prior_mass_mean = 3.5,
                      prior_error_alpha = 0.0001,
                      prior_error_beta = 0.0001,
                      prior_mean_pulse_count = 8,
-                     prior_strauss_repulsion = 0,
-                     prior_strauss_repulsion_range = 40,
+                     prior_location_gamma = 0,
+                     prior_location_range = 40,
                      sv_mass_mean = 3.5,
                      sv_mass_s2s_sd = 0.5,
                      sv_mass_p2p_sd = 0.5,
@@ -128,8 +128,8 @@ pop_spec <- function(prior_mass_mean = 3.5,
                          error_alpha             = prior_error_alpha,
                          error_beta              = prior_error_beta,
                          mean_pulse_count        = prior_mean_pulse_count,
-                         strauss_repulsion       = prior_strauss_repulsion,
-                         strauss_repulsion_range = prior_strauss_repulsion_range),
+                         strauss_repulsion       = prior_location_gamma,
+                         strauss_repulsion_range = prior_location_range),
            proposal_variances = list(pat_mass_mean       = pv_pat_mass_mean,
                                      pop_mass_mean       = pv_pop_mass_mean,
                                      ind_mass_sd         = pv_ind_mass_sd,
@@ -165,4 +165,39 @@ pop_spec <- function(prior_mass_mean = 3.5,
            class = "pop_pulse_spec")
       
       return(pop_ps_obj)
+}
+
+# #' @export 
+print.pop_spec <- function(x, ...) {
+
+  cat("\nBayesian time-series analysis of pulsatile hormone data:
+      Model Specification Object\n\n")
+  cat("Model type: Population\n")
+  cat("\n")
+  cat("Pulse mass:\n")
+  cat("  Fixed effect (mean)\n")
+  cat("    prior mean =", x$priors$mass_mean, "\n")
+  cat("    prior variance =", x$priors$mass_variance, "\n")
+  cat("    starting value =", x$starting_values$mass_mean, "\n")
+  cat("    proposal variance =", x$proposal_variances$mass_mean, "\n")
+  cat("  Fixed effect (SD)\n")
+  cat("    prior parameter =", x$priors$mass_sd_param, "\n")
+  cat("    starting value =", x$starting_values$mass_sd, "\n")
+  cat("    proposal variance =", x$proposal_variances$mass_sd, "\n")
+  cat("  Random effects (individual pulses)\n")
+  cat("    proposal variance =", x$proposal_variances$pulse_mass, "\n")
+  cat("\n")
+  cat("Pulse width:\n")
+  cat("  Fixed effect (mean)\n")
+  cat("    prior mean =", x$priors$width_mean, "\n")
+  cat("    prior variance =", x$priors$width_variance, "\n")
+  cat("    starting value =", x$starting_values$width_mean, "\n")
+  cat("    proposal variance =", x$proposal_variances$width_mean, "\n")
+  cat("  Fixed effect (SD)\n")
+  cat("    prior parameter =", x$priors$width_sd_param, "\n")
+  cat("    starting value =", x$starting_values$width_sd, "\n")
+  cat("    proposal variance =", x$proposal_variances$width_sd, "\n")
+  cat("  Random effects (individual pulses)\n")
+  cat("    proposal variance =", x$proposal_variances$pulse_width, "\n")
+
 }
