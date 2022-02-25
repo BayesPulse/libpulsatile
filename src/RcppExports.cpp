@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // population_
 Rcpp::List population_(Rcpp::List concentrations, Rcpp::List times, Rcpp::CharacterVector location_prior, Rcpp::List inpriors, Rcpp::List proposalvars, Rcpp::List startingvals, int mcmc_iterations, int thin, int burnin, bool verbose, bool verbose_patient, int verbose_iter, int pv_adjust_iter, int pv_adjust_max_iter, double bivariate_pv_target_ratio, double univariate_pv_target_ratio, Rcpp::List fix_params, Rcpp::NumericVector pat_mass_mean_vec, Rcpp::NumericVector pat_width_mean_vec, Rcpp::NumericVector pat_baseline_vec, Rcpp::NumericVector pat_halflife_vec, Rcpp::NumericVector pulse_count_vec, Rcpp::NumericVector masses_vec, Rcpp::NumericVector width_vec, Rcpp::NumericVector mass_sdscale_vec, Rcpp::NumericVector width_sdscale_vec, Rcpp::NumericVector location_vec);
 RcppExport SEXP _bayespulse_population_(SEXP concentrationsSEXP, SEXP timesSEXP, SEXP location_priorSEXP, SEXP inpriorsSEXP, SEXP proposalvarsSEXP, SEXP startingvalsSEXP, SEXP mcmc_iterationsSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP verboseSEXP, SEXP verbose_patientSEXP, SEXP verbose_iterSEXP, SEXP pv_adjust_iterSEXP, SEXP pv_adjust_max_iterSEXP, SEXP bivariate_pv_target_ratioSEXP, SEXP univariate_pv_target_ratioSEXP, SEXP fix_paramsSEXP, SEXP pat_mass_mean_vecSEXP, SEXP pat_width_mean_vecSEXP, SEXP pat_baseline_vecSEXP, SEXP pat_halflife_vecSEXP, SEXP pulse_count_vecSEXP, SEXP masses_vecSEXP, SEXP width_vecSEXP, SEXP mass_sdscale_vecSEXP, SEXP width_sdscale_vecSEXP, SEXP location_vecSEXP) {
