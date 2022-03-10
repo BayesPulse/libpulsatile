@@ -16,7 +16,7 @@ fit_pop_pulse(
   verbose = FALSE,
   verbose_patient = FALSE,
   verbose_iter = 5000,
-  fix_params = NULL,
+  fix_params = c("mass_p2p_sd", "width_p2p_sd"),
   pat_mass_means = numeric(),
   pat_width_means = numeric(),
   pat_baselines = numeric(),

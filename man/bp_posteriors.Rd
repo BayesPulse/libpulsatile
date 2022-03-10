@@ -4,10 +4,13 @@
 \alias{bp_posteriors}
 \title{Creates posterior density plots}
 \usage{
-bp_posteriors(fit, ...)
+bp_posteriors(fit, type, ...)
 }
 \arguments{
 \item{fit}{A \code{pulse_fit} or \code{pop_pulse_fit} object}
+
+\item{type}{String indicating whether to plot as a histogram ("histogram")
+or density ("density").}
 
 \item{...}{Additional arguments. Use \code{patient} argument to determine
 which patient's trace plots are shown when \code{fit} is a

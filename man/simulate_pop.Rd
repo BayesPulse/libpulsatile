@@ -25,6 +25,8 @@ simulate_pop(
 )
 }
 \arguments{
+\item{num_pats}{Number of patients to simulate.}
+
 \item{num_obs}{Number of observations to simulate per patient. Duration of 
 observation window equals \code{num_obs} times \code{interval}.}
 
@@ -38,25 +40,29 @@ observation window equals \code{num_obs} times \code{interval}.}
 
 \item{ipi_min}{Minimum number of units between pulses}
 
-\item{mass_mean}{Mean pulse mass}
+\item{pop_mass_mean}{Population pulse mass}
 
-\item{mass_sd}{Standard deviation of pulse mass}
+\item{mass_s2s_sd}{Standard deviation of patient pulse mass means}
 
-\item{width_mean}{Mean pulse width (in minutes)}
+\item{mass_p2p_sd}{Standard deviation of pulse masses}
 
-\item{width_sd}{Standard deviation of pulse width (in minutes)}
+\item{pop_width_mean}{Population mean pulse width (in minutes)}
 
-\item{halflife_mean}{Mean of half-life (in minutes)}
+\item{width_s2s_sd}{Standard deviation of patient pulse width means (in minutes)}
 
-\item{halflife_var}{Variance of half-life (in minutes)}
+\item{width_p2p_sd}{Standard deviation of pulse width (in minutes)}
 
-\item{baseline_mean}{Mean of baseline}
+\item{pop_halflife_mean}{Population mean of half-life (in minutes)}
 
-\item{baseline_var}{Variance of baseline}
+\item{halflife_sd}{Variance of patient half-lives (in minutes)}
+
+\item{pop_baseline_mean}{Population mean of baseline}
+
+\item{baseline_sd}{Variance of patient baselines}
 }
 \value{
-A object of class \code{pulse_sim} containing time-series dataset
-  and dataset of characteristics of each pulse
+A object of class \code{pop_sim} containing time-series data set
+  and data set of characteristics of each pulse
 }
 \description{
 \code{\link{simulate_pop}} simulates multiple time series data sets

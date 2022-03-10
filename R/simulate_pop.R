@@ -5,7 +5,8 @@
 #'   representing blood concentration measurements of a pulsatile hormone. A
 #'   set of time series as well as \code{data.frame}'s of population, patient,
 #'   and individual pulse characteristics are returned.
-#'    
+#'   
+#' @param num_pats Number of patients to simulate.
 #' @param num_obs Number of observations to simulate per patient. Duration of 
 #'    observation window equals \code{num_obs} times \code{interval}.
 #' @param interval Time in minutes between observations, typically 6-10.
@@ -13,16 +14,18 @@
 #' @param ipi_mean Mean number of sampling units between pulses (mean inter-pulse interval).
 #' @param ipi_var Variance of gamma for drawing interpulse interval
 #' @param ipi_min Minimum number of units between pulses
-#' @param mass_mean Mean pulse mass
-#' @param mass_sd Standard deviation of pulse mass
-#' @param width_mean Mean pulse width (in minutes)
-#' @param width_sd Standard deviation of pulse width (in minutes)
-#' @param halflife_mean Mean of half-life (in minutes)
-#' @param halflife_var Variance of half-life (in minutes)
-#' @param baseline_mean Mean of baseline
-#' @param baseline_var Variance of baseline
-#' @return A object of class \code{pulse_sim} containing time-series dataset
-#'   and dataset of characteristics of each pulse
+#' @param pop_mass_mean Population pulse mass
+#' @param mass_s2s_sd Standard deviation of patient pulse mass means 
+#' @param mass_p2p_sd Standard deviation of pulse masses
+#' @param pop_width_mean Population mean pulse width (in minutes)
+#' @param width_s2s_sd Standard deviation of patient pulse width means (in minutes)
+#' @param width_p2p_sd Standard deviation of pulse width (in minutes)
+#' @param pop_halflife_mean Population mean of half-life (in minutes)
+#' @param halflife_sd Variance of patient half-lives (in minutes)
+#' @param pop_baseline_mean Population mean of baseline
+#' @param baseline_sd Variance of patient baselines
+#' @return A object of class \code{pop_sim} containing time-series data set
+#'   and data set of characteristics of each pulse
 #' @seealso print.pulse_sim, plot.pulse_sim
 #' @keywords pulse simulation
 #' @examples
@@ -98,9 +101,9 @@ simulate_pop <- function(num_pats = 10,
   
   # Create DF of subject level values
   patTruth <- pulseTruth %>%
-    group_by(pat_id) %>%
+    group_by(.data$pat_id) %>%
     summarise(pulseCount = n(),
-              massMean = mean(mass),
+              massMean = mean(.data$mass),
               widthMean = mean(.data$width)) %>%
     mutate(halflife = halflife,
            baseline = baseline)
@@ -108,11 +111,11 @@ simulate_pop <- function(num_pats = 10,
   # Create DF of population level values
   populationTruth <- patTruth %>%
     summarise(subjectCount = n(),
-              pulseCountMean = mean(pulseCount),
-              massMean = mean(massMean),
-              widthMean = mean(widthMean),
-              halflifeMean = mean(halflife),
-              baselineMean = mean(baseline))
+              pulseCountMean = mean(.data$pulseCount),
+              massMean = mean(.data$massMean),
+              widthMean = mean(.data$widthMean),
+              halflifeMean = mean(.data$halflife),
+              baselineMean = mean(.data$baseline))
   
   # Create structure to be returned
   names(simData) <- paste0("Patient_", 1:num_pats)
@@ -138,6 +141,10 @@ simulate_pop <- function(num_pats = 10,
 #' @return A ggplot2 plot of the \code{simulate_pulse} time-series dataset.
 #' @seealso simulate_pop, print.pop_sim, summary.pop_sim
 #' @keywords pulse simulation
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 geom_line
 #' @examples
 #' this_pop <- simulate_pop()
 #' plot(this_pop)

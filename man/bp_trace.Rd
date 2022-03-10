@@ -4,13 +4,10 @@
 \alias{bp_trace}
 \title{Creates chain trace plots}
 \usage{
-bp_trace(fit, type, ...)
+bp_trace(fit, ...)
 }
 \arguments{
 \item{fit}{A \code{pulse_fit} or \code{pop_pulse_fit} object}
-
-\item{type}{String indicating whether to plot as a histogram ("histogram")
-or density ("density").}
 
 \item{...}{Additional arguments. Use \code{patient} argument to determine
 which patient's trace plots are shown when \code{fit} is a

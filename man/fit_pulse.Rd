@@ -16,7 +16,7 @@ fit_pulse(
   use_tibble = TRUE,
   verbose = FALSE,
   verbose_iter = 5000,
-  fix_params = NULL,
+  fix_params = c("width_sd"),
   pulse_masses = numeric(),
   pulse_widths = numeric(),
   pulse_mass_sdscales = numeric(),
