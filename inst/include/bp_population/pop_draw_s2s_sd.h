@@ -43,24 +43,28 @@ class Pop_DrawS2S_SD :
           est_sd_         = &PopulationEstimates::width_s2s_sd;
           randomeffect_   = &PatientEstimates::width_mean;
           sd_param_       = &PopulationPriors::width_s2s_sd_param;
+          sd_param_rate_  = &PopulationPriors::width_s2s_sd_rate;
           parameter_name  = "SD of mean pulse widths";
         } else if (for_mass) {
           est_mean_       = &PopulationEstimates::mass_mean;
           est_sd_         = &PopulationEstimates::mass_s2s_sd;
           randomeffect_   = &PatientEstimates::mass_mean;
           sd_param_       = &PopulationPriors::mass_s2s_sd_param;
+          sd_param_rate_  = &PopulationPriors::mass_s2s_sd_rate;
           parameter_name  = "SD of mean pulse masses";
         } else if (for_baseline) {
           est_mean_       = &PopulationEstimates::baseline_mean;
           est_sd_         = &PopulationEstimates::baseline_sd;
           randomeffect_   = &PatientEstimates::baseline;
           sd_param_       = &PopulationPriors::baseline_sd_param;
+          sd_param_rate_  = &PopulationPriors::baseline_sd_rate;
           parameter_name  = "SD of baselines";
         } else {
           est_mean_       = &PopulationEstimates::halflife_mean;
           est_sd_         = &PopulationEstimates::halflife_sd;
           randomeffect_   = &PatientEstimates::halflife;
           sd_param_       = &PopulationPriors::halflife_sd_param;
+          sd_param_rate_  = &PopulationPriors::halflife_sd_rate;
           parameter_name  = "SD of halflives";
         }
       };
@@ -146,7 +150,7 @@ double Pop_DrawS2S_SD::posterior_function(Population *population,
   second_part = 0.5 * ((1 / (pop_sd * pop_sd)) - (1 / (proposal * proposal)));
     
   // 4th part of acceptance ratio: Ratio of priors
-  fourth_part = log(pop_sd_param * pop_sd_param + pop_sd * pop_sd) - log(pop_sd_param * pop_sd_param + proposal * proposal);
+  fourth_part = (pop_sd_param - 1) * (log(proposal * proposal) - log(pop_sd * pop_sd)) + pop_sd_param_rate  * (1/(proposal * proposal) - 1/(pop_sd * pop_sd));
 
   // Compute and return log rho
   return old_int - new_int + first_part + second_part * third_part + fourth_part;

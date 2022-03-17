@@ -44,6 +44,7 @@ class Pop_DrawSDRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
           sd_param_       = &PopulationPriors::width_p2p_sd_param;
+          sd_param_rate_ = &PopulationPriors::width_p2p_sd_rate;
           parameter_name  = "SD of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
@@ -51,6 +52,7 @@ class Pop_DrawSDRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
           sd_param_       = &PopulationPriors::mass_p2p_sd_param;
+          sd_param_rate_ = &PopulationPriors::mass_p2p_sd_rate;
           parameter_name  = "SD of pulse masses";
         }
 
@@ -63,7 +65,8 @@ class Pop_DrawSDRandomEffects :
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
-    double PopulationPriors::*sd_param_; //pulse specific mass or width
+    double PopulationPriors::*sd_param_; //pulse specific mass or width shape in gamma prior
+    double PopulationPriors::*sd_param_rate_; //scale in gamma prior for mass or width
 
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };
@@ -119,6 +122,7 @@ double Pop_DrawSDRandomEffects::posterior_function(Population *population,
   //double patient_mean    = (*est).*est_mean_;
   double patient_sd      = (*popEst).*est_sd_;
   double patient_sd_param = (*popPriors).*sd_param_;
+  double patient_sd_param_rate = (*popPriors).*sd_param_rate_;
 
   // Calculate pulse-specific portion of acceptance ratio
     for (auto &patient : population->patients) {
@@ -145,8 +149,8 @@ double Pop_DrawSDRandomEffects::posterior_function(Population *population,
         first_part  += patient.get_pulsecount() * (log(patient_sd) - log(proposal));
         second_part += 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
     
-        // 4th part of acceptance ratio: Ratio of priors
-        fourth_part = log(patient_sd_param * patient_sd_param + patient_sd * patient_sd) - log(patient_sd_param * patient_sd_param + proposal * proposal);
+        // 4th part of acceptance ratio: Ratio of priors (Gamma distribution)
+        fourth_part = (patient_sd_param - 1) * (log(proposal * proposal) - log (patient_sd * patient_sd)) + patient_sd_param_rate * (1/(proposal * proposal) - 1/(patient_sd * patient_sd));
     }
 
   // Compute and return log rho
