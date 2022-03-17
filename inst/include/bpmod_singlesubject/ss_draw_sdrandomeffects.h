@@ -42,7 +42,8 @@ class SS_DrawSDRandomEffects :
           est_sd_         = &PatientEstimates::width_sd;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
-          sd_param_         = &PatientPriors::width_sd_param;
+          sd_param_       = &PatientPriors::width_sd_param;
+          sd_param_rate_  = &PatientPriors::width_sd_param_rate_;
           parameter_name = "SD of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
@@ -50,6 +51,7 @@ class SS_DrawSDRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
           sd_param_         = &PatientPriors::mass_sd_param;
+          sd_param_rate_  = &PatientPriors::mass_sd_param_rate_;
           parameter_name = "SD of pulse masses";
         }
 
@@ -62,7 +64,8 @@ class SS_DrawSDRandomEffects :
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
-    double PatientPriors::*sd_param_; //pulse specific mass or width
+    double PatientPriors::*sd_param_; //pulse specific mass or width shape parameter in gamma prior.
+    double PatientPriors::*sd_param_rate_; //pulse specific mass or width rate parameter in gamma prior.
 
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };
@@ -105,6 +108,7 @@ class SS_DrawSDRandomEffects :
       double patient_mean    = (*est).*est_mean_;
       double patient_sd      = (*est).*est_sd_;
       double patient_sd_param = (*priors).*sd_param_;
+      double patient_sd_param_rate = (*priors).*sd_param_rate_;
     
       // Calculate pulse-specific portion of acceptance ratio
       for (auto &pulse : patient->pulses) {
@@ -127,8 +131,7 @@ class SS_DrawSDRandomEffects :
       second_part = 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
         
       // 4th part of acceptance ratio: Ratio of priors
-      fourth_part = log(patient_sd_param * patient_sd_param + patient_sd * patient_sd) - 
-        log(patient_sd_param * patient_sd_param + proposal * proposal);
+        fourth_part = (patient_sd_param - 1) * (log(proposal * proposal) - log (patient_sd * patient_sd)) + patient_sd_param_rate * (1/(proposal * proposal) - 1/(patient_sd * patient_sd));
     
       // Compute and return log rho
       return old_int - new_int + first_part + second_part * third_part + fourth_part;
