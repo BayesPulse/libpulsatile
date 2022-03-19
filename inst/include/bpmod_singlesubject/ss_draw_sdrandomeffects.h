@@ -1,5 +1,5 @@
-#ifndef GUARD_bpmod_singlesubject_draw_sd_randomeffects_h
-#define GUARD_bpmod_singlesubject_draw_sd_randomeffects_h
+#ifndef GUARD_bpmod_singlesubject_draw_prec_randomeffects_h
+#define GUARD_bpmod_singlesubject_draw_prec_randomeffects_h
 
 #include <RcppArmadillo.h>
 #ifndef NORINSIDE
@@ -13,19 +13,19 @@
 // NOTE: I separated out function definitions here 
 
 //
-// SS_DrawSDRandomEffects
-//   Modified Metropolis Hastings sampler instantiating the mmh class for
-//   sample the sd of the pulse masses & widths
-//   This version has the half-Cauchy prior for the SD of the masses and widths
+// SS_DrawPrecRandomEffects
+//   Modified Metropolis Hastings sampler instantiating the mh class for
+//   sample the inv-var (precision) of the pulse masses & widths
+//   This version has the Gamma for the inv var (precision) of the masses and widths
 
-class SS_DrawSDRandomEffects : 
+class SS_DrawPrecRandomEffects :
   public ModifiedMetropolisHastings<Patient, Patient, double, ProposalVariance>
 {
 
   public:
 
     // Constructor
-    SS_DrawSDRandomEffects(double in_pv,
+    SS_DrawPrecRandomEffects(double in_pv,
                            int in_adjust_iter,
                            int in_max_iter,
                            double in_target_ratio,
@@ -42,17 +42,17 @@ class SS_DrawSDRandomEffects :
           est_sd_         = &PatientEstimates::width_sd;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
-          sd_param_       = &PatientPriors::width_sd_param;
-          sd_param_rate_  = &PatientPriors::width_sd_param_rate_;
-          parameter_name = "SD of pulse widths";
+          prec_param_       = &PatientPriors::width_prec_param;
+          prec_param_rate_  = &PatientPriors::width_prec_param_rate_;
+          parameter_name = "Prec of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
           est_sd_         = &PatientEstimates::mass_sd;
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
-          sd_param_         = &PatientPriors::mass_sd_param;
-          sd_param_rate_  = &PatientPriors::mass_sd_param_rate_;
-          parameter_name = "SD of pulse masses";
+          prec_param_     = &PatientPriors::mass_prec_param;
+          prec_param_rate_ = &PatientPriors::mass_prec_param_rate_;
+          parameter_name = "Prec of pulse masses";
         }
 
       };
@@ -64,8 +64,8 @@ class SS_DrawSDRandomEffects :
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
-    double PatientPriors::*sd_param_; //pulse specific mass or width shape parameter in gamma prior.
-    double PatientPriors::*sd_param_rate_; //pulse specific mass or width rate parameter in gamma prior.
+    double PatientPriors::*prec_param_; //shape parameter in gamma prior on the p2p precision of pulse specific mass/width.
+    double PatientPriors::*pred_param_rate_; //rate parameter in gamma prior on the p2p precison of pulse specific mass or width.
 
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };
@@ -89,7 +89,7 @@ class SS_DrawSDRandomEffects :
     
     // posterior_function()
     //   Calculates the acceptance ratio for use in modified metropolis hastings
-    //   sampler (inherited SS_DrawSDRandomEffects::sample() function)
+    //   sampler (inherited SS_DrawPrecRandomEffects::sample() function)
     //
     double posterior_function(Patient *patient, 
                               double proposal, 
@@ -107,8 +107,8 @@ class SS_DrawSDRandomEffects :
       PatientPriors *priors = &patient->priors;
       double patient_mean    = (*est).*est_mean_;
       double patient_sd      = (*est).*est_sd_;
-      double patient_sd_param = (*priors).*sd_param_;
-      double patient_sd_param_rate = (*priors).*sd_param_rate_;
+      double patient_prec_param = (*priors).*prec_param_;
+      double patient_prec_param_rate = (*priors).*prec_param_rate_;
     
       // Calculate pulse-specific portion of acceptance ratio
       for (auto &pulse : patient->pulses) {
@@ -131,7 +131,7 @@ class SS_DrawSDRandomEffects :
       second_part = 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
         
       // 4th part of acceptance ratio: Ratio of priors
-        fourth_part = (patient_sd_param - 1) * (log(proposal * proposal) - log (patient_sd * patient_sd)) + patient_sd_param_rate * (1/(proposal * proposal) - 1/(patient_sd * patient_sd));
+        fourth_part = (patient_prec_param - 1) * (log(proposal * proposal) - log (patient_sd * patient_sd)) + patient_prec_param_rate * (1/(proposal * proposal) - 1/(patient_sd * patient_sd));
     
       // Compute and return log rho
       return old_int - new_int + first_part + second_part * third_part + fourth_part;

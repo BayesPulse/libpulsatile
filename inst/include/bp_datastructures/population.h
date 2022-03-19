@@ -28,7 +28,8 @@ struct PopulationPriors {
 
   double baseline_mean;             //Mean of the prior on the pop mean baseline
   double baseline_variance;         //Variance of the prior on the pop mean baseline
-  double baseline_sd_param;         //Subj to Subj SD of the patient baselines
+  double baseline_var_param;         //Shape in the Gamma prior on inv subj-to-subj var
+  double baseline_var_param_rate;    //Rate in the Gamma prior on inv subj-to-subj var
     
   double halflife_mean;             //Mean of the prior on the pop mean halflife
   double halflife_variance;         //Variance of the prior on the pop mean halflife
