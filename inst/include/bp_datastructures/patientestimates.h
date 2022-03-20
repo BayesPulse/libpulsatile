@@ -62,8 +62,8 @@ struct PatientEstimates {
                    double sv_error_var,
                    double sv_mass_mean,
                    double sv_width_mean,
-                   double sv_mass_sd,
-                   double sv_width_sd,
+                   double sv_mass_prec,
+                   double sv_width_prec,
                    bool notused){
     baseline_halflife = {sv_baseline, sv_halflife};
     baseline = sv_baseline;
@@ -71,8 +71,9 @@ struct PatientEstimates {
     errorsq = sv_error_var;
     mass_mean   = sv_mass_mean;
     width_mean  = sv_width_mean;
-    mass_sd = sv_mass_sd;
-    width_sd = sv_width_sd;
+    mass_prec = sv_mass_prec;
+    width_prec = sv_width_prec;
+    
   }
 
   // Coordinates vector and double BL/HL
@@ -85,9 +86,10 @@ struct PatientEstimates {
 
   //
   // For single-subject model only
+  // We define the precision of the pulse-to-pulse variation in this version
   //
-  double mass_sd;
-  double width_sd;
+  double mass_prec;
+  double width_prec;
 
   // Single-subject constructor:
   PatientEstimates(double sv_baseline,
@@ -95,14 +97,14 @@ struct PatientEstimates {
                    double sv_errorsq,
                    double sv_mass_mean,
                    double sv_width_mean,
-                   double sv_mass_sd,
-                   double sv_width_sd){
+                   double sv_mass_prec,
+                   double sv_width_prec){
     baseline_halflife = { sv_baseline, sv_halflife };
     errorsq     = sv_errorsq;
     mass_mean   = sv_mass_mean;
     width_mean  = sv_width_mean;
-    mass_sd  = sv_mass_sd;
-    width_sd = sv_width_sd;
+    mass_prec = sv_mass_prec;
+    width_prec = sv_width_prec;
   }
 
 };

@@ -39,7 +39,7 @@ class SS_DrawFixedEffects :
           prior_mean_     = &PatientPriors::width_mean;
           prior_variance_ = &PatientPriors::width_variance;
           est_mean_       = &PatientEstimates::width_mean;
-          est_sd_         = &PatientEstimates::width_sd;
+          est_prec_         = &PatientEstimates::width_prec;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
           parameter_name  = "Mean width";
@@ -47,7 +47,7 @@ class SS_DrawFixedEffects :
           prior_mean_     = &PatientPriors::mass_mean;
           prior_variance_ = &PatientPriors::mass_variance;
           est_mean_       = &PatientEstimates::mass_mean;
-          est_sd_         = &PatientEstimates::mass_sd;
+          est_prec_         = &PatientEstimates::mass_prec;
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
           parameter_name  = "Mean mass";
@@ -60,7 +60,7 @@ class SS_DrawFixedEffects :
     double PatientPriors::*prior_mean_;
     double PatientPriors::*prior_variance_;
     double PatientEstimates::*est_mean_;
-    double PatientEstimates::*est_sd_;
+    double PatientEstimates::*est_prec_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
 
@@ -83,7 +83,7 @@ class SS_DrawFixedEffects :
       double prior_mass_mean   = (*priors).*prior_mean_;
       double prior_mass_var    = (*priors).*prior_variance_;
       double current           = (*est).*est_mean_;
-      double stddev            = (*est).*est_sd_;
+      double stddev            = 1/sqrt((*est).*est_prec_);
       double scale             = 0.0;
       double randomeffect      = 0.0;
 

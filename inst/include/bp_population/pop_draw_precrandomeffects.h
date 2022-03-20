@@ -1,5 +1,5 @@
-#ifndef GUARD_bpmod_population_draw_sd_randomeffects_h
-#define GUARD_bpmod_population_draw_sd_randomeffects_h
+#ifndef GUARD_bpmod_population_draw_prec_randomeffects_h
+#define GUARD_bpmod_population_draw_prec_randomeffects_h
 
 #include <RcppArmadillo.h>
 #ifndef NORINSIDE
@@ -19,7 +19,7 @@
 //   sample the sd of the pulse masses & widths
 //   This version has the half-Cauchy prior for the SD of the masses and widths
 
-class Pop_DrawSDRandomEffects :
+class Pop_DrawPrecRandomEffects :
   public ModifiedMetropolisHastings<Population, Population, double, ProposalVariance>
 {
 
@@ -40,18 +40,20 @@ class Pop_DrawSDRandomEffects :
         // Choose which set of parameters to use: width or mass
         if (for_width) {
           est_mean_       = &PatientEstimates::width_mean;
-          est_sd_         = &PopulationEstimates::width_p2p_sd;
+          est_prec_         = &PopulationEstimates::width_p2p_prec;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
-          sd_param_       = &PopulationPriors::width_p2p_sd_param;
-          parameter_name  = "SD of pulse widths";
+          prec_param_       = &PopulationPriors::width_p2p_prec_param;
+          prec_param_rate_ = &PopulationPriors::width_p2p_prec_rate;
+          parameter_name  = "Prec of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
-          est_sd_         = &PopulationEstimates::mass_p2p_sd;
+          est_prec_         = &PopulationEstimates::mass_p2p_prec;
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
-          sd_param_       = &PopulationPriors::mass_p2p_sd_param;
-          parameter_name  = "SD of pulse masses";
+          prec_param_       = &PopulationPriors::mass_p2p_prec_param;
+          prec_param_rate_ = &PopulationPriors::mass_p2p_prec_rate;
+          parameter_name  = "Prec of pulse masses";
         }
 
       };
@@ -59,11 +61,12 @@ class Pop_DrawSDRandomEffects :
   private:
 
     double PatientEstimates::*est_mean_;
-    double PopulationEstimates::*est_sd_;
+    double PopulationEstimates::*est_prec_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
-    double PopulationPriors::*sd_param_; //pulse specific mass or width
+    double PopulationPriors::*prec_param_; //pulse specific mass or width shape in gamma prior
+    double PopulationPriors::*prec_param_rate_; //scale in gamma prior for mass or width
 
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };
@@ -84,7 +87,7 @@ class Pop_DrawSDRandomEffects :
 //   Defines whether the proposal value is within the parameter support
 //   For the Cauchy this is just positive
 //    TO DO: can we remove the Patient part of the function?
-bool Pop_DrawSDRandomEffects::parameter_support(double val,  Population *population) {
+bool Pop_DrawPrecRandomEffects::parameter_support(double val,  Population *population) {
 
  // PatientPriors *priors = &patient->priors;
   //double patient_sd_param = (*priors).*sd_param_;
@@ -98,7 +101,7 @@ bool Pop_DrawSDRandomEffects::parameter_support(double val,  Population *populat
 //   Calculates the acceptance ratio for use in modified metropolis hastings
 //   sampler (inherited SS_DrawSDRandomEffects::sample() function)
 //
-double Pop_DrawSDRandomEffects::posterior_function(Population *population,
+double Pop_DrawPrecRandomEffects::posterior_function(Population *population,
                                                    double proposal, 
                                                    Population *notused) {
 
@@ -117,8 +120,9 @@ double Pop_DrawSDRandomEffects::posterior_function(Population *population,
   PopulationEstimates *popEst = &population->estimates;
   PopulationPriors *popPriors = &population->priors;
   //double patient_mean    = (*est).*est_mean_;
-  double patient_sd      = (*popEst).*est_sd_;
-  double patient_sd_param = (*popPriors).*sd_param_;
+  double patient_prec      = (*popEst).*est_prec_;
+  double patient_prec_param = (*popPriors).*prec_param_;
+  double patient_prec_param_rate = (*popPriors).*prec_param_rate_;
 
   // Calculate pulse-specific portion of acceptance ratio
     for (auto &patient : population->patients) {
@@ -129,8 +133,8 @@ double Pop_DrawSDRandomEffects::posterior_function(Population *population,
       for (auto &pulse : patient.pulses) {
 
           // Normalizing constants for ratio of log likelihoods. They are truncated t-distributions
-          stdx_old   = patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
-          stdx_new   = patient_mean / ( proposal / sqrt(pulse.*tvarscale_) );
+          stdx_old   = patient_mean * sqrt(patient_prec) * sqrt(pulse.*tvarscale_);
+          stdx_new   = patient_mean * sqrt(proposal) * sqrt(pulse.*tvarscale_);
           new_int   += Rf_pnorm5(stdx_new, 0, 1, 1.0, 1.0);
           old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
 
@@ -142,11 +146,11 @@ double Pop_DrawSDRandomEffects::posterior_function(Population *population,
       }
 
         // 1st and 2nd 'parts' of acceptance ratio: This is for the ratio of log likelihoods, which are truncated t-distn.
-        first_part  += patient.get_pulsecount() * (log(patient_sd) - log(proposal));
-        second_part += 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
+        first_part  += patient.get_pulsecount() * (log(sqrt(proposal)) - log(sqrt(patient_prec)));
+        second_part += 0.5 * (patient_prec - proposal);
     
-        // 4th part of acceptance ratio: Ratio of priors
-        fourth_part = log(patient_sd_param * patient_sd_param + patient_sd * patient_sd) - log(patient_sd_param * patient_sd_param + proposal * proposal);
+        // 4th part of acceptance ratio: Ratio of priors (Gamma distribution)
+        fourth_part = (patient_prec_param - 1) * (log (patient_prec) - log(proposal)) + patient_prec_param_rate * (proposal - patient_prec);
     }
 
   // Compute and return log rho

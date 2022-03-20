@@ -3,7 +3,7 @@
 
 #include <bp_population/pop_draw_popmeans.h>
 #include <bp_population/pop_draw_s2s_sd.h>
-#include <bp_population/pop_draw_sdrandomeffects.h>
+#include <bp_population/pop_draw_precrandomeffects.h>
 #include <bp_datastructures/population.h>
 #include <bp_datastructures/chains_pop.h>
 #include <bp_datastructures/populationestimates.h>

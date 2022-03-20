@@ -1,5 +1,5 @@
-#ifndef GUARD_bpmod_singlesubject_draw_sd_randomeffects_h
-#define GUARD_bpmod_singlesubject_draw_sd_randomeffects_h
+#ifndef GUARD_bpmod_singlesubject_draw_prec_randomeffects_h
+#define GUARD_bpmod_singlesubject_draw_prec_randomeffects_h
 
 #include <RcppArmadillo.h>
 #ifndef NORINSIDE
@@ -13,19 +13,19 @@
 // NOTE: I separated out function definitions here 
 
 //
-// SS_DrawSDRandomEffects
-//   Modified Metropolis Hastings sampler instantiating the mmh class for
-//   sample the sd of the pulse masses & widths
-//   This version has the half-Cauchy prior for the SD of the masses and widths
+// SS_DrawPrecRandomEffects
+//   Modified Metropolis Hastings sampler instantiating the mh class for
+//   sample the inv-var (precision) of the pulse masses & widths
+//   This version has the Gamma for the inv var (precision) of the masses and widths
 
-class SS_DrawSDRandomEffects : 
+class SS_DrawPrecRandomEffects :
   public ModifiedMetropolisHastings<Patient, Patient, double, ProposalVariance>
 {
 
   public:
 
     // Constructor
-    SS_DrawSDRandomEffects(double in_pv,
+    SS_DrawPrecRandomEffects(double in_pv,
                            int in_adjust_iter,
                            int in_max_iter,
                            double in_target_ratio,
@@ -39,18 +39,20 @@ class SS_DrawSDRandomEffects :
         // Choose which set of parameters to use: width or mass
         if (for_width) {
           est_mean_       = &PatientEstimates::width_mean;
-          est_sd_         = &PatientEstimates::width_sd;
+          est_prec_       = &PatientEstimates::width_prec;
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
-          sd_param_         = &PatientPriors::width_sd_param;
-          parameter_name = "SD of pulse widths";
+          prec_param_       = &PatientPriors::width_prec_param;
+          prec_param_rate_  = &PatientPriors::width_prec_param_rate_;
+          parameter_name = "Prec of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
-          est_sd_         = &PatientEstimates::mass_sd;
+          est_prec_         = &PatientEstimates::mass_prec;
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
-          sd_param_         = &PatientPriors::mass_sd_param;
-          parameter_name = "SD of pulse masses";
+          prec_param_     = &PatientPriors::mass_prec_param;
+          prec_param_rate_ = &PatientPriors::mass_prec_param_rate_;
+          parameter_name = "Prec of pulse masses";
         }
 
       };
@@ -58,17 +60,18 @@ class SS_DrawSDRandomEffects :
   private:
 
     double PatientEstimates::*est_mean_;
-    double PatientEstimates::*est_sd_;
+    double PatientEstimates::*est_prec_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
-    double PatientPriors::*sd_param_; //pulse specific mass or width
+    double PatientPriors::*prec_param_; //shape parameter in gamma prior on the p2p precision of pulse specific mass/width.
+    double PatientPriors::*pred_param_rate_; //rate parameter in gamma prior on the p2p precison of pulse specific mass or width.
 
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };
 
     //------------------------------------------------------------
-    // Defined functions for SD random effects MMH class
+    // Defined functions for Precision of random effects MMH class
     //------------------------------------------------------------
     
     // parameter_support()
@@ -86,7 +89,7 @@ class SS_DrawSDRandomEffects :
     
     // posterior_function()
     //   Calculates the acceptance ratio for use in modified metropolis hastings
-    //   sampler (inherited SS_DrawSDRandomEffects::sample() function)
+    //   sampler (inherited SS_DrawPrecRandomEffects::sample() function)
     //
     double posterior_function(Patient *patient, 
                               double proposal, 
@@ -103,15 +106,17 @@ class SS_DrawSDRandomEffects :
       PatientEstimates *est  = &patient->estimates;
       PatientPriors *priors = &patient->priors;
       double patient_mean    = (*est).*est_mean_;
-      double patient_sd      = (*est).*est_sd_;
-      double patient_sd_param = (*priors).*sd_param_;
+      double patient_prec    = (*est).*est_prec_;
+      double patient_prec_param = (*priors).*prec_param_;
+      double patient_prec_param_rate = (*priors).*prec_param_rate_;
     
+        
       // Calculate pulse-specific portion of acceptance ratio
       for (auto &pulse : patient->pulses) {
     
         // Normalizing constants for ratio of log likelihoods. They are truncated t-distributions
-        stdx_old   = patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
-        stdx_new   = patient_mean / ( proposal / sqrt(pulse.*tvarscale_) );
+        stdx_old   = patient_mean * sqrt(patient_prec) * sqrt(pulse.*tvarscale_);
+        stdx_new   = patient_mean * sqrt(proposal) * sqrt(pulse.*tvarscale_);
         new_int   += Rf_pnorm5(stdx_new, 0, 1, 1.0, 1.0);
         old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
     
@@ -123,12 +128,11 @@ class SS_DrawSDRandomEffects :
       }
     
       // 1st and 2nd 'parts' of acceptance ratio: This is for the ratio of log likelihoods, which are truncated t-distn.
-      first_part  = patient->get_pulsecount() * (log(patient_sd) - log(proposal));
-      second_part = 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
+      first_part  = patient->get_pulsecount() * (log(sqrt(proposal)) - log(sqrt(patient_prec)));
+      second_part = 0.5 * (patient_prec - proposal);
         
       // 4th part of acceptance ratio: Ratio of priors
-      fourth_part = log(patient_sd_param * patient_sd_param + patient_sd * patient_sd) - 
-        log(patient_sd_param * patient_sd_param + proposal * proposal);
+        fourth_part = (patient_prec_param - 1) * (log(patient_prec) - log(proposal)) + patient_prec_param_rate * (proposal - patient_prec);
     
       // Compute and return log rho
       return old_int - new_int + first_part + second_part * third_part + fourth_part;

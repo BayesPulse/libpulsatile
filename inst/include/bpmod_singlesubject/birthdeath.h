@@ -238,8 +238,8 @@ class BirthDeathProcess
       double new_width = -1.;
       double new_tvarscale_mass  = Rf_rgamma(2, 0.5);
       double new_tvarscale_width = Rf_rgamma(2, 0.5);
-      double new_t_sd_mass  = patient->estimates.mass_sd / sqrt(new_tvarscale_mass);
-      double new_t_sd_width = patient->estimates.width_sd / sqrt(new_tvarscale_width);
+      double new_t_sd_mass  = (1/sqrt(patient->estimates.mass_prec)) / sqrt(new_tvarscale_mass);
+      double new_t_sd_width = (1/sqrt(patient->estimates.width_prec)) / sqrt(new_tvarscale_width);
 
       while (new_mass < 0) {
         new_mass = Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass);
