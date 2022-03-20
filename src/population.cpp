@@ -66,11 +66,11 @@ Rcpp::List population_(Rcpp::List concentrations,
   // Create population priors and estimates objects
   PopulationPriors popPriors(inpriors["mass_mean"],
                              inpriors["mass_var"],                
-                             inpriors["mass_p2p_sd"],     
+                             inpriors["mass_p2p_prec"],
                              inpriors["mass_s2s_sd"],     
                              inpriors["width_mean"],              
                              inpriors["width_var"],               
-                             inpriors["width_p2p_sd"],    
+                             inpriors["width_p2p_prec"],
                              inpriors["width_s2s_sd"],
                              inpriors["baseline_mean"],
                              inpriors["baseline_var"],
@@ -83,10 +83,10 @@ Rcpp::List population_(Rcpp::List concentrations,
 
   PopulationEstimates popEstimates(startingvals["mass_mean"],
                                    startingvals["mass_s2s_sd"],
-                                   startingvals["mass_p2p_sd"],
+                                   startingvals["mass_p2p_prec"],
                                    startingvals["width_mean"],
                                    startingvals["width_s2s_sd"],
-                                   startingvals["width_p2p_sd"],
+                                   startingvals["width_p2p_prec"],
                                    startingvals["baseline_mean"],
                                    startingvals["baseline_s2s_sd"],
                                    startingvals["halflife_mean"],
@@ -110,8 +110,8 @@ Rcpp::List population_(Rcpp::List concentrations,
                                 startingvals["error_var"],
                                 startingvals["mass_mean"],
                                 startingvals["width_mean"],
-                                startingvals["mass_p2p_sd"],
-                                startingvals["width_p2p_sd"],
+                                startingvals["mass_p2p_prec"],
+                                startingvals["width_p2p_prec"],
                                 false);
 
   Rcpp::Rcout << "Patient priors and estimates created\n";
@@ -165,10 +165,10 @@ Rcpp::List population_(Rcpp::List concentrations,
   BirthDeathProcess birth_death;
   
   // Population Level   
-  Pop_DrawSDRandomEffects draw_sd_masses(proposalvars["ind_mass_sd"], adj_iter,
+  Pop_DrawPrecRandomEffects draw_prec_masses(proposalvars["ind_mass_prec"],                                            adj_iter,
                                          adj_max, univ_target, false,
                                          verbose, verbose_iter);
-  Pop_DrawSDRandomEffects draw_sd_width(proposalvars["ind_width_sd"], adj_iter,
+  Pop_DrawPrecRandomEffects draw_prec_width(proposalvars["ind_width_prec"],                                            adj_iter,
                                          adj_max, univ_target, true,
                                          verbose, verbose_iter);
   Pop_DrawS2S_SD draw_s2s_sd_width(proposalvars["pat_width_sd"], adj_iter, adj_max, univ_target,
@@ -231,11 +231,11 @@ Rcpp::List population_(Rcpp::List concentrations,
     checkUserInterrupt(); 
     chains.print_diagnostic_output(population, iteration, verbose_patient);
 
-    if (!fix_params["mass_p2p_sd"]) {
-      draw_sd_masses.sample(population, &population->estimates.mass_p2p_sd, population, iteration);
+    if (!fix_params["mass_p2p_prec"]) {
+      draw_prec_masses.sample(population, &population->estimates.mass_p2p_prec, population, iteration);
     }
-    if (!fix_params["width_p2p_sd"]) {
-      draw_sd_width.sample(population, &population->estimates.width_p2p_sd, population, iteration);
+    if (!fix_params["width_p2p_prec"]) {
+      draw_prec_width.sample(population, &population->estimates.width_p2p_prec, population, iteration);
     }
     if (!fix_params["pop_width_mean"]) {
       draw_pop_means_width.sample(population, &population->estimates.width_mean, iteration);
