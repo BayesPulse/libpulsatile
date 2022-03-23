@@ -1,20 +1,23 @@
 Package: bayespulse
 Type: Package
-Title:
-    Bayesian model for pulsatile hormone concentration data
-Version: 0.0.2
+Title: Bayesian Analysis of Pulsatile Hormone Time Series
+Version: 0.99.0
 Authors@R: c(
       person("Max", "McGrath", email = "max.mcgrath@ucdenver.edu", 
              rol = c("cre", "aut")),
       person("Matt", "Mulvahill", email = "matthew.mulvahill@ucdenver.edu", 
              role = c("aut")),
-      person("Nichole", "Carlson", email = "nichole.carlson@ucdenver.edu", 
+      person("Nichole", "Carlson", email = "nichole.carlson@cuanschutz.edu", 
              role = c("aut", "cph", "ths")))
 Description:
-    One paragraph description of what the package does as one or more full sentences.
-URL: https://github.com/BayesPulse/bayespulse
-BugReports: https://github.com/BayesPulse/bayespulse/issues
-License: GPL (>= 2)
+    Tools for Bayesian analysis of hormone data where the hormones are released 
+    in an intermittent (i.e. pulsatile) pattern. Implements a birth-death MCMC
+    algorithm that may be used to model time series parameters from a single 
+    patient or from a population of patients. Also includes tools for simulating 
+    time series, analyzing MCMC performance, and describing posterior estimates.
+URL: <https://github.com/BayesPulse/libpulsatile>
+BugReports: <https://github.com/BayesPulse/libpulsatile/issues>
+License: GPL-2
 Imports:
   Rcpp (>= 0.12.13),
   dplyr,
@@ -25,12 +28,12 @@ Imports:
   stats,
   truncnorm
 Suggests:
-    magrittr,
-    RcppArmadillo,
-    testthat,
-    xml2,
-    knitr,
-    covr
+  magrittr,
+  RcppArmadillo,
+  testthat,
+  xml2,
+  knitr,
+  covr
 LinkingTo:
   Rcpp,
   RcppArmadillo,
