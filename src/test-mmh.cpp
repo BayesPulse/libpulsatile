@@ -182,7 +182,7 @@ context( "MMH - Temp/Partial tests" ) {
   // Create sampler object 
   arma::vec bhl_pv = { 0.5, 45 };
   SS_DrawFixedEffects draw_fixed_effects(1.1, 500, 25000, 0.35, false, false, 5000);
-  SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500, 25000, 0.35, false, false, 5000);
+  //SS_DrawSDRandomEffects draw_sd_pulse_masses(2, 500, 25000, 0.35, false, false, 5000);
   SS_DrawBaselineHalflife draw_baselinehalflife(bhl_pv, 500, 25000, 0.25, false, 5000);
   SS_DrawLocationsStrauss draw_pulse_locations_strauss(10, 500, 25000, 0.35, false, 5000);
   SS_DrawRandomEffects draw_pulse_masses(1.1, 500, 25000, 0.35, false, false, 5000);
@@ -200,8 +200,8 @@ context( "MMH - Temp/Partial tests" ) {
     expect_true( draw_fixed_effects.pv.getpsd() == sqrt(1.1)  );
     expect_true( draw_fixed_effects.pv.getpv() == Approx(1.1) );
     
-    expect_true( draw_sd_pulse_masses.pv.getpsd() == sqrt(2)  );
-    expect_true( draw_sd_pulse_masses.pv.getpv() == Approx(2) );
+    //expect_true( draw_sd_pulse_masses.pv.getpsd() == sqrt(2)  );
+    //expect_true( draw_sd_pulse_masses.pv.getpv() == Approx(2) );
     
     double x, y, xy;
     x = 0.5; y = 45; xy = -0.9 * sqrt(x * y);
@@ -231,7 +231,7 @@ context( "MMH - Temp/Partial tests" ) {
     x = 0.5; y = 45; xy = -0.9 * sqrt(x * y);
     arma::mat checkpv = { { x, xy }, { xy, y } };
     double pvfe     = draw_fixed_effects.pv.getpv();
-    double pvsd     = draw_sd_pulse_masses.pv.getpv();
+    //double pvsd     = draw_sd_pulse_masses.pv.getpv();
     double pvloc    = draw_pulse_locations_strauss.pv.getpv();
     double pvpmass  = draw_pulse_masses.pv.getpv();
     double pvpscale = draw_pulse_tvarscale.pv.getpv();
@@ -239,8 +239,8 @@ context( "MMH - Temp/Partial tests" ) {
     while (iter < 1500) {
       
       draw_fixed_effects.sample(patient, &patient->estimates.mass_mean, iter);
-      draw_sd_pulse_masses.sample(patient, &patient->estimates.mass_sd, patient,
-                                  iter);
+      //draw_sd_pulse_masses.sample(patient, &patient->estimates.mass_sd, patient,
+      //                            iter);
       draw_baselinehalflife.sample(patient,
                                    &patient->estimates.baseline_halflife, iter);
       draw_pulse_locations_strauss.sample_pulses(patient, iter);
@@ -253,7 +253,7 @@ context( "MMH - Temp/Partial tests" ) {
     }
     
     expect_true( draw_fixed_effects.pv.getpv()           != pvfe );
-    expect_true( draw_sd_pulse_masses.pv.getpv()         != pvsd );
+    //expect_true( draw_sd_pulse_masses.pv.getpv()         != pvsd );
     expect_true( draw_pulse_locations_strauss.pv.getpv() != pvloc );
     expect_true( draw_pulse_masses.pv.getpv()            != pvpmass );
     expect_true( draw_pulse_tvarscale.pv.getpv()         != pvpscale );

@@ -75,7 +75,7 @@ struct PopulationPriors {
     mass_mean          = prior_mass_mean;
     mass_variance      = prior_mass_var;
     mass_p2p_prec_param = prior_mass_p2p_prec_param;
-    mass_p2p_prec_param_rate = priors_mass_p2p_prec_param_rate;
+    mass_p2p_prec_param_rate = prior_mass_p2p_prec_param_rate;
     mass_s2s_sd_param  = prior_mass_s2s_sd_param;
 
     width_mean         = prior_width_mean;
@@ -127,10 +127,10 @@ struct PopulationEstimates {
 
   mass_mean = sv_mass_mean;
   mass_s2s_sd = sv_mass_s2s_sd;
-  mass_p2p_sd = sv_mass_p2p_prec;
+  mass_p2p_prec = sv_mass_p2p_prec;
   width_mean = sv_width_mean;
   width_s2s_sd = sv_width_s2s_sd;
-  width_p2p_sd = sv_width_p2p_prec;
+  width_p2p_prec = sv_width_p2p_prec;
   baseline_mean = sv_baseline_mean;
   baseline_sd = sv_baseline_sd;
   halflife_mean = sv_halflife_mean;

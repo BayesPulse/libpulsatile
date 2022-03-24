@@ -26,13 +26,13 @@ class Pop_DrawPrecRandomEffects :
   public:
 
     // Constructor
-    Pop_DrawSDRandomEffects(double in_pv,
-                           int in_adjust_iter,
-                           int in_max_iter,
-                           double in_target_ratio,
-                           bool for_width,
-                           bool verbose,
-                           int verbose_iter) :
+    Pop_DrawPrecRandomEffects(double in_pv,
+                              int in_adjust_iter,
+                              int in_max_iter,
+                              double in_target_ratio,
+                              bool for_width,
+                              bool verbose,
+                              int verbose_iter) :
       ModifiedMetropolisHastings <Population, Population, double, ProposalVariance>::
       ModifiedMetropolisHastings(in_pv, in_adjust_iter, in_max_iter,
                                  in_target_ratio, verbose, verbose_iter) {
@@ -44,7 +44,7 @@ class Pop_DrawPrecRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
           prec_param_       = &PopulationPriors::width_p2p_prec_param;
-          prec_param_rate_ = &PopulationPriors::width_p2p_prec_rate;
+          prec_param_rate_ = &PopulationPriors::width_p2p_prec_param_rate;
           parameter_name  = "Prec of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
@@ -52,7 +52,7 @@ class Pop_DrawPrecRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
           prec_param_       = &PopulationPriors::mass_p2p_prec_param;
-          prec_param_rate_ = &PopulationPriors::mass_p2p_prec_rate;
+          prec_param_rate_ = &PopulationPriors::mass_p2p_prec_param_rate;
           parameter_name  = "Prec of pulse masses";
         }
 

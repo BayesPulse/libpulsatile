@@ -178,7 +178,7 @@ struct PatientPriors {
                 double prior_mass_prec_param,
                 double prior_mass_prec_param_rate,
                 double prior_width_prec_param,
-                double prior_width_prec_param_rate
+                double prior_width_prec_param_rate,
                 double prior_error_alpha,
                 double prior_error_beta,
                 int    prior_pulse_count,  // does this prior really need to be an int? Or can we say 12.2 for prior pulse count?

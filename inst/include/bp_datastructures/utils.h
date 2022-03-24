@@ -70,7 +70,7 @@ class DataStructuresUtils {
       PatientData data(thistime, conc);
       //Create priors object
       PatientPriors priors(2.6, 100, 45, 100, 3.5, 100, 42, 1000,
-                           5, 5, 0.0001, 0.0001, 12, 0, 40);
+                           0.001, 0.001, 0.001, 0.001, 0.0001, 0.0001, 12, 0, 40);
       // Create estimates object (w/ starting vals)
       PatientEstimates estimates(2.6, 45, 0.005, 3.5, 42, 10, 35);
 

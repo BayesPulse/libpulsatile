@@ -14,7 +14,7 @@
 context("PatientPriors - Single Patient Constructor" ) {
   
   PatientPriors ppsingle(1.5, 100, 45, 100, 3.5, 100, 30, 100,
-                         5, 7, 1000, 1000, 12, 0, 40);
+                         0.001, 0.001, 0.001, 0.001, 1000, 1000, 12, 0, 40);
   
   test_that( "Variables included in constructor are initialized as expected." ) {
     
@@ -26,8 +26,12 @@ context("PatientPriors - Single Patient Constructor" ) {
     expect_true(ppsingle.mass_variance     == 100.0);
     expect_true(ppsingle.width_mean        == 30.0);
     expect_true(ppsingle.width_variance    == 100.0);
-    expect_true(ppsingle.mass_sd_param     == 5);
-    expect_true(ppsingle.width_sd_param    == 7);
+    //expect_true(ppsingle.mass_sd_param     == 5);
+    //expect_true(ppsingle.width_sd_param    == 7);
+    expect_true(ppsingle.mass_prec_param   == 0.001);
+    expect_true(ppsingle.mass_prec_param_rate == 0.001);
+    expect_true(ppsingle.width_prec_param   == 0.001);
+    expect_true(ppsingle.width_prec_param_rate == 0.001);
     expect_true(ppsingle.error_alpha       == 1000);
     expect_true(ppsingle.error_beta        == 0.001);
     expect_true(ppsingle.pulse_count       == 12);
@@ -81,8 +85,8 @@ context("PatientEstimates - Single Patient Constructor" ) {
     expect_true(pesingle.errorsq     == 0.05);
     expect_true(pesingle.mass_mean   == 3.5);
     expect_true(pesingle.width_mean  == 30);
-    expect_true(pesingle.mass_sd  == 10);
-    expect_true(pesingle.width_sd == 10);
+    expect_true(pesingle.mass_prec  == 10);
+    expect_true(pesingle.width_prec == 10);
     
   }
   

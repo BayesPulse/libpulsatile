@@ -76,9 +76,9 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                        inpriors["width_mean"],
                        inpriors["width_variance"],
                        inpriors["mass_prec_param"],
-                       inpriors["mass_prec_param_rate"]
+                       inpriors["mass_prec_param_rate"],
                        inpriors["width_prec_param"],
-                       inpriors["width_prec_param_rate"]
+                       inpriors["width_prec_param_rate"],
                        inpriors["error_alpha"],
                        inpriors["error_beta"],
                        inpriors["pulse_count"],

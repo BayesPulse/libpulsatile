@@ -43,7 +43,7 @@ class SS_DrawPrecRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
           prec_param_       = &PatientPriors::width_prec_param;
-          prec_param_rate_  = &PatientPriors::width_prec_param_rate_;
+          prec_param_rate_  = &PatientPriors::width_prec_param_rate;
           parameter_name = "Prec of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
@@ -51,7 +51,7 @@ class SS_DrawPrecRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
           prec_param_     = &PatientPriors::mass_prec_param;
-          prec_param_rate_ = &PatientPriors::mass_prec_param_rate_;
+          prec_param_rate_ = &PatientPriors::mass_prec_param_rate;
           parameter_name = "Prec of pulse masses";
         }
 
@@ -65,7 +65,7 @@ class SS_DrawPrecRandomEffects :
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     
     double PatientPriors::*prec_param_; //shape parameter in gamma prior on the p2p precision of pulse specific mass/width.
-    double PatientPriors::*pred_param_rate_; //rate parameter in gamma prior on the p2p precison of pulse specific mass or width.
+    double PatientPriors::*prec_param_rate_; //rate parameter in gamma prior on the p2p precison of pulse specific mass or width.
 
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };

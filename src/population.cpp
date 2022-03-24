@@ -67,10 +67,12 @@ Rcpp::List population_(Rcpp::List concentrations,
   PopulationPriors popPriors(inpriors["mass_mean"],
                              inpriors["mass_var"],                
                              inpriors["mass_p2p_prec"],
+                             inpriors["mass_p2p_prec_rate"],
                              inpriors["mass_s2s_sd"],     
                              inpriors["width_mean"],              
                              inpriors["width_var"],               
                              inpriors["width_p2p_prec"],
+                             inpriors["width_p2p_prec_rate"],
                              inpriors["width_s2s_sd"],
                              inpriors["baseline_mean"],
                              inpriors["baseline_var"],
@@ -165,10 +167,10 @@ Rcpp::List population_(Rcpp::List concentrations,
   BirthDeathProcess birth_death;
   
   // Population Level   
-  Pop_DrawPrecRandomEffects draw_prec_masses(proposalvars["ind_mass_prec"],                                            adj_iter,
+  Pop_DrawPrecRandomEffects draw_prec_masses(proposalvars["ind_mass_prec"], adj_iter,
                                          adj_max, univ_target, false,
                                          verbose, verbose_iter);
-  Pop_DrawPrecRandomEffects draw_prec_width(proposalvars["ind_width_prec"],                                            adj_iter,
+  Pop_DrawPrecRandomEffects draw_prec_width(proposalvars["ind_width_prec"], adj_iter,
                                          adj_max, univ_target, true,
                                          verbose, verbose_iter);
   Pop_DrawS2S_SD draw_s2s_sd_width(proposalvars["pat_width_sd"], adj_iter, adj_max, univ_target,
