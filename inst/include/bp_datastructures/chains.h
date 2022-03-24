@@ -99,8 +99,8 @@ class Chains {
         patient_chain(output_index, 4) = pat->estimates.width_mean;
         patient_chain(output_index, 5) = pat->estimates.baseline_halflife(1);
         patient_chain(output_index, 6) = pat->estimates.errorsq;
-        patient_chain(output_index, 7) = pat->estimates.mass_sd;
-        patient_chain(output_index, 8) = pat->estimates.width_sd;
+        patient_chain(output_index, 7) = pat->estimates.mass_prec;
+        patient_chain(output_index, 8) = pat->estimates.width_prec;
     
         // Create a matrix of current pulse-level estimates and add matrix to the
         //   vector chain
@@ -164,9 +164,9 @@ class Chains {
           " Half-life = "      << patient->estimates.baseline_halflife(1) <<
           " Error variance = " << patient->estimates.errorsq              << "\n" <<
           "Mass mean = "       << patient->estimates.mass_mean            <<
-          " Mass SD = "        << patient->estimates.mass_sd              <<
+          " Mass Prec = "        << patient->estimates.mass_prec              <<
           " Width mean = "     << patient->estimates.width_mean           <<
-          " Width SD = "       << patient->estimates.width_sd             << "\n" <<
+          " Width Prec = "       << patient->estimates.width_prec             << "\n" <<
     
           //" Current pulse-specific parms: " << "\n" << 
           //"Pulse No. Time  Mass  Width\n" << pulse_chains.back() <<
@@ -199,8 +199,8 @@ class Chains {
                                               "width_mean",
                                               "halflife",
                                               "model_error",
-                                              "mass_sd",
-                                              "width_sd");
+                                              "mass_prec",
+                                              "width_prec");
     
       return out;
     

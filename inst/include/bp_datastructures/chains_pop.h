@@ -99,8 +99,8 @@ void PopChains::save_sample(Population * pop, int iter) {
 
     // Fill population chain w/ current population-level estimates
     pop_chain(output_index, 0)  = (double)r_iter;
-    pop_chain(output_index, 1)  = pop->estimates.mass_p2p_sd;
-    pop_chain(output_index, 2)  = pop->estimates.width_p2p_sd;
+    pop_chain(output_index, 1)  = pop->estimates.mass_p2p_prec;
+    pop_chain(output_index, 2)  = pop->estimates.width_p2p_prec;
     pop_chain(output_index, 3)  = pop->estimates.width_mean;
     pop_chain(output_index, 4)  = pop->estimates.mass_mean;
     pop_chain(output_index, 5)  = pop->estimates.baseline_mean;
@@ -236,10 +236,10 @@ void PopChains::print_diagnostic_output(Population * pop, int iter, bool verbose
                              << "\n" <<
       "Mass mean = "         << pop->estimates.mass_mean         <<
       " Mass S2S sd = "      << pop->estimates.mass_s2s_sd       <<
-      " Mass P2P sd = "      << pop->estimates.mass_p2p_sd       << "\n" <<
+      " Mass P2P prec = "      << pop->estimates.mass_p2p_prec       << "\n" <<
       "Width mean = "        << pop->estimates.width_mean        <<
       " Width S2S sd = "     << pop->estimates.width_s2s_sd      <<
-      " Width P2P sd = "     << pop->estimates.width_p2p_sd      << "\n" <<
+      " Width P2P prec = "     << pop->estimates.width_p2p_prec      << "\n" <<
       "Baseline mean = "     << pop->estimates.baseline_mean     <<
       " Baseline S2S sd = "  << pop->estimates.baseline_sd       << "\n" <<
       "Halflife mean = "     << pop->estimates.halflife_mean     <<
@@ -271,9 +271,9 @@ void PopChains::print_diagnostic_output(Population * pop, int iter, bool verbose
           "Likelihood = "      << pat.likelihood(false)              <<
           " Pulse count = "    << pat.get_pulsecount()               << "\n" <<
           "Mass mean = "       << pat.estimates.mass_mean            <<
-          " Mass P2P SD = "    << pat.estimates.mass_sd              << "\n" <<
+          " Mass P2P Prec = "    << pat.estimates.mass_prec              << "\n" <<
           "Width mean = "      << pat.estimates.width_mean           <<
-          " Width P2P SD = "   << pat.estimates.width_sd             << "\n" <<
+          " Width P2P Prec = "   << pat.estimates.width_prec             << "\n" <<
           "Baseline = "        << pat.estimates.baseline             <<
           " BL Vec = "         << pat.estimates.baseline_halflife(0) << "\n" <<
           "Halflife = "        << pat.estimates.halflife             <<
@@ -312,8 +312,8 @@ NumericMatrix PopChains::addattribs_pop_chain(arma::mat in) {
   // Convert arma obj to Rcpp
   NumericMatrix out = as<NumericMatrix>(wrap(in));
   colnames(out) = CharacterVector::create("iteration",
-                                          "mass_p2p_sd",
-                                          "width_p2p_sd",
+                                          "mass_p2p_prec",
+                                          "width_p2p_prec",
                                           "width_mean",
                                           "mass_mean",
                                           "baseline_mean",

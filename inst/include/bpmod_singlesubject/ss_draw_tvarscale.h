@@ -38,13 +38,13 @@ class SS_DrawTVarScale :
         // Choose which set of parameters to use: width or mass
         if (for_width) {
           est_mean_     = &PatientEstimates::width_mean;
-          est_sd_       = &PatientEstimates::width_sd;
+          est_prec_       = &PatientEstimates::width_prec;
           randomeffect_ = &PulseEstimates::width;
           tvarscale_    = &PulseEstimates::tvarscale_width;
           parameter_name = "tvarscale width";
         } else {
           est_mean_     = &PatientEstimates::mass_mean;
-          est_sd_       = &PatientEstimates::mass_sd;
+          est_prec_       = &PatientEstimates::mass_prec;
           randomeffect_ = &PulseEstimates::mass;
           tvarscale_    = &PulseEstimates::tvarscale_mass;
           parameter_name = "tvarscale mass";
@@ -64,7 +64,7 @@ class SS_DrawTVarScale :
   private:
 
     double PatientEstimates::*est_mean_;
-    double PatientEstimates::*est_sd_;
+    double PatientEstimates::*est_prec_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
     double PulseEstimates::*tvarscale_;
 
@@ -86,7 +86,7 @@ class SS_DrawTVarScale :
       double re_ratio    = 0.0;
       PatientEstimates *est  = &patient->estimates;
       double patient_mean       = (*est).*est_mean_;
-      double patient_sd         = (*est).*est_sd_;
+      double patient_sd         = 1/sqrt((*est).*est_prec_);
       double pulse_randomeffect = (*pulse).*randomeffect_;
       double curr_scale         = (*pulse).*tvarscale_;
 

@@ -65,9 +65,9 @@ struct PatientPriors {
   //
   
   // Population uniform prior maximums (likely to be altered)
-  double mass_p2p_sd;           //Subj to subj SD in the mean pulse mass
+  double mass_p2p_prec;           //Subj to subj precision in the mean pulse mass
   double mass_s2s_sd;           //Pulse to Pulse SD in the ind. pulse masses
-  double width_p2p_sd;          //Subj to subj SD in the mean pulse width
+  double width_p2p_prec;          //Subj to subj precision in the mean pulse width
   double width_s2s_sd;          //Pulse to Pulse SD in the ind. pulse widths
   double baseline_sd;           //Subj to subj SD in the baseline estimates
   double halflife_sd;           //Subj to subj SD in the half-life estimates
@@ -79,9 +79,11 @@ struct PatientPriors {
 
   // Member variables not used in Population model:
   double mass_variance; //variance of the prior on the mean pulse mass
-  double mass_sd_param;  //parameter in the Cauchy prior on the pulse-to-pulse sd mass
+  double mass_prec_param;  //shape parameter in the Inv-gamma prior on the pulse-to-pulse prec of mass
+  double mass_prec_param_rate; //rate parameter in the Inv-gamma prior on the pulse-to-pulse prec of mass
   double width_variance; //variance of the prior on the mean pulse width
-  double width_sd_param; //parameter in the Cauchy prior on the pulse-to-pulse sd width
+  double width_prec_param; //shape parameter in the Inv-gamma prior on the pulse-to-pulse prec of width
+  double width_prec_param_rate; //rate parameter in the Inv-gamma prior on the pulse-to-pulse prec of width
   double baseline_variance; //Variance of the priors on the baseline;
   double halflife_variance; //Variance of the priors on the halflife;
 
@@ -173,8 +175,10 @@ struct PatientPriors {
                 double prior_mass_variance,
                 double prior_width_mean,
                 double prior_width_variance,
-                double prior_mass_sd_param,
-                double prior_width_sd_param,
+                double prior_mass_prec_param,
+                double prior_mass_prec_param_rate,
+                double prior_width_prec_param,
+                double prior_width_prec_param_rate
                 double prior_error_alpha,
                 double prior_error_beta,
                 int    prior_pulse_count,  // does this prior really need to be an int? Or can we say 12.2 for prior pulse count?
@@ -193,14 +197,16 @@ struct PatientPriors {
     width_variance    = prior_width_variance;
 
     // Set population model-only parms to 0
-    mass_p2p_sd     = 0;
+    mass_p2p_prec     = 0;
     mass_s2s_sd     = 0;
-    width_p2p_sd    = 0;
+    width_p2p_prec    = 0;
     width_s2s_sd    = 0;
     
     // Single-subject only
-    mass_sd_param           = prior_mass_sd_param;
-    width_sd_param          = prior_width_sd_param;
+    mass_prec_param           = prior_mass_prec_param;
+    mass_prec_param_rate      = prior_mass_prec_param_rate;
+    width_prec_param          = prior_width_prec_param;
+    width_prec_param_rate     = prior_width_prec_param_rate;
     error_alpha             = prior_error_alpha;
     error_beta              = 1 / prior_error_beta;
     num_orderstat           = pu.orderstat_default();

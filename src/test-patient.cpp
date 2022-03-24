@@ -15,7 +15,7 @@ context("Patient - Single Patient Constructor") {
   test_that( "Estimates can be accessed" ) {
     expect_true(pat.estimates.baseline_halflife(0) == 2.6);
     expect_true(pat.estimates.mass_mean == 3.5);
-    expect_true(pat.estimates.mass_sd == 10);
+    expect_true(pat.estimates.mass_sd == 1/10);
   }
   
   test_that( "Estimates can be updated" ) {
@@ -23,14 +23,14 @@ context("Patient - Single Patient Constructor") {
     expect_true(pat.estimates.baseline_halflife(0) == 10);
     pat.estimates.mass_mean = 5.0;
     expect_true(pat.estimates.mass_mean == 5.0);
-    pat.estimates.mass_sd = 50;
-    expect_true(pat.estimates.mass_sd == 50);
+    pat.estimates.mass_prec = 1/50^2;
+    expect_true(pat.estimates.mass_prec == 1/50^2);
     expect_true(pat.estimates.get_decay() == (log(2)/45));
   }
   
   test_that( "Priors can be accessed" ) {
     expect_true(pat.priors.baseline_mean == 2.6);
-    expect_true(pat.priors.mass_sd_param == 5);
+    expect_true(pat.priors.mass_prec_param == 1/5^2);
     expect_true(pat.priors.error_alpha == 0.0001);
     expect_true(pat.priors.num_orderstat == 3);
     expect_true(pat.priors.strauss_repulsion == 0);
@@ -38,12 +38,14 @@ context("Patient - Single Patient Constructor") {
   
   test_that( "Priors can be updated" ) {
     pat.priors.baseline_mean     = 2.25;
-    pat.priors.mass_sd_param       = 5;
+    pat.priors.mass_prec_param      = 0.001;
+    pat.priors.mass_prec_param_rate = 0.001;
     pat.priors.error_alpha       = 700;
     pat.priors.num_orderstat     = 4;
     pat.priors.strauss_repulsion = 0.75;
     expect_true(pat.priors.baseline_mean     == 2.25);
-    expect_true(pat.priors.mass_sd_param       == 5);
+    expect_true(pat.priors.mass_prec_param   == 0.001);
+    expect_true(pat.priors.mass_prec_param_rate == 0.001);
     expect_true(pat.priors.error_alpha       == 700);
     expect_true(pat.priors.num_orderstat     == 4);
     expect_true(pat.priors.strauss_repulsion == 0.75);

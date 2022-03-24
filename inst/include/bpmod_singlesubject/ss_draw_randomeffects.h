@@ -38,12 +38,12 @@ class SS_DrawRandomEffects :
         // Choose which set of parameters to use: width or mass
         if (for_width) {
           est_mean_       = &PatientEstimates::width_mean;
-          est_sd_         = &PatientEstimates::width_sd;
+          est_prec_         = &PatientEstimates::width_prec;
           randomeffect_   = &PulseEstimates::width;
           parameter_name = "pulse width";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
-          est_sd_         = &PatientEstimates::mass_sd;
+          est_prec_         = &PatientEstimates::mass_prec;
           randomeffect_   = &PulseEstimates::mass;
           parameter_name = "pulse mass";
         }
@@ -63,7 +63,7 @@ class SS_DrawRandomEffects :
   private:
 
     double PatientEstimates::*est_mean_;
-    double PatientEstimates::*est_sd_;
+    double PatientEstimates::*est_prec_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
 
     std::string parameter_name;
@@ -87,7 +87,7 @@ class SS_DrawRandomEffects :
                plikelihood;
         PatientEstimates *est  = &patient->estimates;
         double patient_mean    = (*est).*est_mean_;
-        double patient_sd      = (*est).*est_sd_;
+        double patient_prec      = (*est).*est_prec_;
         double curr_likelihood = patient->likelihood(false);
 
         //Rcpp::Rcout << "Patient mean: " << patient_mean <<
@@ -102,8 +102,8 @@ class SS_DrawRandomEffects :
         prior_new    = proposal - patient_mean;
         prior_new   *= 0.5 * prior_new;
         prior_ratio  = prior_old - prior_new;
-        prior_ratio /= patient_sd;
-        prior_ratio /= patient_sd;
+        prior_ratio /= 1/sqrt(patient_prec);
+        prior_ratio /= 1/sqrt(patient_prec);
 
         // Save the current value of mass/width and set to proposed value
         //std::cout << "\n\nInitial random effect value: " << (*pulse).*randomeffect_ << std::endl;

@@ -316,7 +316,7 @@ struct Patient {
         if(fix_params["pulse_mass"]) {
           new_mass = masses_vec(l);
         } else {
-          new_t_sd_mass = estimates.mass_sd / sqrt(new_tvarscale_mass);
+          new_t_sd_mass = (1/sqrt(estimates.mass_prec)) / sqrt(new_tvarscale_mass);
           new_mass = -1.0;
           while (new_mass < 0) {
             new_mass = Rf_rnorm(estimates.mass_mean, new_t_sd_mass);
@@ -327,7 +327,7 @@ struct Patient {
         if(fix_params["pulse_width"]) {
           new_width = width_vec(l);
         } else {
-          new_t_sd_width = estimates.width_sd / sqrt(new_tvarscale_width);
+          new_t_sd_width = (1/sqrt(estimates.width_prec)) / sqrt(new_tvarscale_width);
           new_width = -1.0;
           while (new_width < 0) {
             new_width = Rf_rnorm(estimates.width_mean, new_t_sd_width);
@@ -359,7 +359,7 @@ struct Patient {
            if(fix_params["pulse_mass"]) {
              new_mass = masses_vec(l);
            } else {
-             new_t_sd_mass = estimates.mass_sd / sqrt(new_tvarscale_mass);
+             new_t_sd_mass = (1/sqrt(estimates.mass_prec)) / sqrt(new_tvarscale_mass);
              new_mass = -1.0;
              while (new_mass < 0) {
                new_mass = Rf_rnorm(estimates.mass_mean, new_t_sd_mass);
@@ -370,7 +370,7 @@ struct Patient {
            if(fix_params["pulse_width"]) {
              new_width = width_vec(l);
            } else {
-             new_t_sd_width = estimates.width_sd / sqrt(new_tvarscale_width);
+             new_t_sd_width = (1/sqrt(estimates.width_prec)) / sqrt(new_tvarscale_width);
              new_width = -1.0;
              while (new_width < 0) {
                new_width = Rf_rnorm(estimates.width_mean, new_t_sd_width);

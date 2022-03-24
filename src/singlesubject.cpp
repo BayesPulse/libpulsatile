@@ -75,8 +75,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                        inpriors["mass_variance"],
                        inpriors["width_mean"],
                        inpriors["width_variance"],
-                       inpriors["mass_sd_param"],
-                       inpriors["width_sd_param"],
+                       inpriors["mass_prec_param"],
+                       inpriors["mass_prec_param_rate"]
+                       inpriors["width_prec_param"],
+                       inpriors["width_prec_param_rate"]
                        inpriors["error_alpha"],
                        inpriors["error_beta"],
                        inpriors["pulse_count"],
@@ -89,8 +91,8 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                              startingvals["errorsq"],
                              startingvals["mass_mean"],
                              startingvals["width_mean"],
-                             startingvals["mass_sd"],
-                             startingvals["width_sd"]);
+                             startingvals["mass_prec"],
+                             startingvals["width_prec"]);
 
   // TODO: SHOULD WE USE THE INTERNAL TEST DATASET/PATIENT OBJ?
 //  bool TEST = false;
@@ -133,10 +135,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
 
   // Modified Metropolis Hastings for the standard deviation of the random
   // effects (sd mass & sd width) (patient level estimate)
-  SS_DrawSDRandomEffects draw_sd_masses(proposalvars["mass_sd"], adj_iter,
+  SS_DrawPrecRandomEffects draw_prec_masses(proposalvars["mass_prec"], adj_iter,
                                         adj_max, univ_target, false, verbose,
                                         verbose_iter);
-  SS_DrawSDRandomEffects draw_sd_widths(proposalvars["width_sd"], adj_iter,
+  SS_DrawPrecRandomEffects draw_prec_widths(proposalvars["width_prec"], adj_iter,
                                        adj_max, univ_target, true, verbose,
                                     verbose_iter);
 
@@ -203,8 +205,8 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
     if (!fix_params["pulse_count"]) birth_death.sample(patient, false, iteration);
     if (!fix_params["mass_mean"]) draw_fixeff_mass.sample(patient, &patient->estimates.mass_mean, iteration);
     if (!fix_params["width_mean"]) draw_fixeff_width.sample(patient, &patient->estimates.width_mean, iteration);
-    if (!fix_params["mass_sd"]) draw_sd_masses.sample(patient, &patient->estimates.mass_sd, patient, iteration);
-    if (!fix_params["width_sd"]) draw_sd_widths.sample(patient, &patient->estimates.width_sd, patient, iteration);
+    if (!fix_params["mass_prec"]) draw_prec_masses.sample(patient, &patient->estimates.mass_prec, patient, iteration);
+    if (!fix_params["width_prec"]) draw_prec_widths.sample(patient, &patient->estimates.width_prec, patient, iteration);
     if (!fix_params["bl_hl"]) draw_blhl.sample(patient, &patient->estimates.baseline_halflife, iteration);
     if (!fix_params["pulse_location"]) draw_locations->sample_pulses(patient, iteration);
     if (!fix_params["pulse_mass"]) draw_masses.sample_pulses(patient, iteration);

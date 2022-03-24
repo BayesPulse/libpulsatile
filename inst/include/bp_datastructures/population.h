@@ -37,12 +37,14 @@ struct PopulationPriors {
 
   double mass_mean;                 //Mean of the prior on the pop mean pulse mass
   double mass_variance;             //Var of the prior on the pop mean pulse mass
-  double mass_p2p_sd_param;         //pulse to pulse SD of the ind. pulse masses
+  double mass_p2p_prec_param;       //pulse to pulse prec of the ind. pulse masses
+  double mass_p2p_prec_param_rate;  //rate param of the pulse to pulse prec of hte in. pulse masses
   double mass_s2s_sd_param;         //subj to subj SD of the subj mean pulse mass
     
   double width_mean;                //Mean of the prior on the pop mean pulse width
   double width_variance;            //Var of the prior on the pop mean pulse width
-  double width_p2p_sd_param;        //pulse to pulse SD of the ind pulse widths
+  double width_p2p_prec_param;        //pulse to pulse prec of the ind pulse widths
+  double width_p2p_prec_param_rate;  //rate param of the pulse to pulse prec of the ind. pulse width.
   double width_s2s_sd_param;        //subj to subj SD of the subj mean pulse width
 
   double error_alpha;               // Alpha for gamma prior on model error
@@ -52,11 +54,13 @@ struct PopulationPriors {
   // Constructor
   PopulationPriors(double prior_mass_mean,
                    double prior_mass_var,                
-                   double prior_mass_p2p_sd_param,
+                   double prior_mass_p2p_prec_param,
+                   double prior_mass_p2p_prec_param_rate,
                    double prior_mass_s2s_sd_param,
                    double prior_width_mean,              
                    double prior_width_var,               
-                   double prior_width_p2p_sd_param,
+                   double prior_width_p2p_prec_param,
+                   double prior_width_p2p_prec_param_rate,
                    double prior_width_s2s_sd_param,
                    double prior_baseline_mean,
                    double prior_baseline_var,
@@ -70,12 +74,14 @@ struct PopulationPriors {
 
     mass_mean          = prior_mass_mean;
     mass_variance      = prior_mass_var;
-    mass_p2p_sd_param  = prior_mass_p2p_sd_param;
+    mass_p2p_prec_param = prior_mass_p2p_prec_param;
+    mass_p2p_prec_param_rate = priors_mass_p2p_prec_param_rate;
     mass_s2s_sd_param  = prior_mass_s2s_sd_param;
 
     width_mean         = prior_width_mean;
     width_variance     = prior_width_var;
-    width_p2p_sd_param = prior_width_p2p_sd_param;
+    width_p2p_prec_param = prior_width_p2p_prec_param;
+    width_p2p_prec_param_rate = prior_width_p2p_prec_param_rate;
     width_s2s_sd_param = prior_width_s2s_sd_param;
       
     baseline_mean      = prior_baseline_mean;
@@ -96,11 +102,11 @@ struct PopulationPriors {
 struct PopulationEstimates {
   double mass_mean;
   double mass_s2s_sd;
-  double mass_p2p_sd;
+  double mass_p2p_prec;
 
   double width_mean;
   double width_s2s_sd;
-  double width_p2p_sd;
+  double width_p2p_prec;
 
   double baseline_mean;
   double baseline_sd;
@@ -110,10 +116,10 @@ struct PopulationEstimates {
 
   PopulationEstimates(double sv_mass_mean,
                       double sv_mass_s2s_sd,
-                      double sv_mass_p2p_sd,
+                      double sv_mass_p2p_prec,
                       double sv_width_mean,
                       double sv_width_s2s_sd,
-                      double sv_width_p2p_sd,
+                      double sv_width_p2p_prec,
                       double sv_baseline_mean,
                       double sv_baseline_sd,
                       double sv_halflife_mean,
@@ -121,10 +127,10 @@ struct PopulationEstimates {
 
   mass_mean = sv_mass_mean;
   mass_s2s_sd = sv_mass_s2s_sd;
-  mass_p2p_sd = sv_mass_p2p_sd;
+  mass_p2p_sd = sv_mass_p2p_prec;
   width_mean = sv_width_mean;
   width_s2s_sd = sv_width_s2s_sd;
-  width_p2p_sd = sv_width_p2p_sd;
+  width_p2p_sd = sv_width_p2p_prec;
   baseline_mean = sv_baseline_mean;
   baseline_sd = sv_baseline_sd;
   halflife_mean = sv_halflife_mean;
@@ -197,8 +203,8 @@ struct Population {
       pat.priors.halflife_variance = pow(estimates.halflife_sd, 2);
 
       // For draw_randomeff
-      pat.estimates.mass_sd = estimates.mass_p2p_sd;
-      pat.estimates.width_sd = estimates.width_p2p_sd;
+      pat.estimates.mass_prec = estimates.mass_p2p_prec;
+      pat.estimates.width_prec = estimates.width_p2p_prec;
     }
   };
 
@@ -285,7 +291,7 @@ void fix_estimates(Rcpp::List fix_params,
       if(fix_params["pulse_mass"]) {
         new_mass = masses_vec(l);
       } else {
-        new_t_sd_mass = pat.estimates.mass_sd / sqrt(new_tvarscale_mass);
+        new_t_sd_mass = (1/sqrt(pat.estimates.mass_prec)) / sqrt(new_tvarscale_mass);
         new_mass = -1.0;
         while (new_mass < 0) {
           new_mass = Rf_rnorm(pat.estimates.mass_mean, new_t_sd_mass);
@@ -296,7 +302,7 @@ void fix_estimates(Rcpp::List fix_params,
       if(fix_params["pulse_width"]) {
         new_width = width_vec(l);
       } else {
-        new_t_sd_width = pat.estimates.width_sd / sqrt(new_tvarscale_width);
+        new_t_sd_width = (1/sqrt(pat.estimates.width_prec)) / sqrt(new_tvarscale_width);
         new_width = -1.0;
         while (new_width < 0) {
           new_width = Rf_rnorm(pat.estimates.width_mean, new_t_sd_width);
@@ -328,7 +334,7 @@ void fix_estimates(Rcpp::List fix_params,
          if(fix_params["pulse_mass"]) {
            new_mass = masses_vec(l);
          } else {
-           new_t_sd_mass = pat.estimates.mass_sd / sqrt(new_tvarscale_mass);
+           new_t_sd_mass = (1/sqrt(pat.estimates.mass_prec)) / sqrt(new_tvarscale_mass);
            new_mass = -1.0;
            while (new_mass < 0) {
              new_mass = Rf_rnorm(pat.estimates.mass_mean, new_t_sd_mass);
@@ -339,7 +345,7 @@ void fix_estimates(Rcpp::List fix_params,
          if(fix_params["pulse_width"]) {
            new_width = width_vec(l);
          } else {
-           new_t_sd_width = pat.estimates.width_sd / sqrt(new_tvarscale_width);
+           new_t_sd_width = (1/sqrt(pat.estimates.width_prec)) / sqrt(new_tvarscale_width);
            new_width = -1.0;
            while (new_width < 0) {
              new_width = Rf_rnorm(pat.estimates.width_mean, new_t_sd_width);

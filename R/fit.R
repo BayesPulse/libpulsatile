@@ -95,8 +95,8 @@ fit_pulse <- function(data,
             is.logical(use_tibble), is.logical(verbose))
   
   # Prepare named list that is used to fix parameters
-  param_list <- c("pulse_count", "mass_mean", "width_mean", "mass_sd", 
-                  "width_sd", "bl_hl", "pulse_location", "error_var",
+  param_list <- c("pulse_count", "mass_mean", "width_mean", "mass_prec",
+                  "width_prec", "bl_hl", "pulse_location", "error_var",
                   "pulse_mass", "pulse_width", "pulse_mass_sdscale", 
                   "pulse_width_sdscale")
   if(!all(fix_params %in% param_list)) {stop("Invalid 'fix_params' element(s)")}
