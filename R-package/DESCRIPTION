@@ -24,6 +24,9 @@ Suggests:
   magrittr,
   RcppArmadillo,
   testthat,
+  knitr,
+  rmarkdown
+VignetteBuilder: knitr
 LinkingTo:
   Rcpp,
   RcppArmadillo,

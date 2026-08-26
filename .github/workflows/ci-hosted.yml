@@ -57,6 +57,11 @@ jobs:
       with:
         r-version: ${{ matrix.r-version }}
 
+    # Vignettes (rmarkdown/html_vignette) need pandoc at R CMD build time;
+    # the hosted runner images don't bundle a version R can find.
+    - name: Setup pandoc
+      uses: r-lib/actions/setup-pandoc@v2
+
     - name: Setup R dependencies (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: |

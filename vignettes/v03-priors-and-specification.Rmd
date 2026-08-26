@@ -1,0 +1,164 @@
+---
+title: "Specifying priors and starting values"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Specifying priors and starting values}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 5, dpi = 96)
+library(bayespulse)
+```
+
+In a Bayesian deconvolution model the priors encode what we know about the
+hormone system *before* seeing the data. The observed series is decomposed into
+a baseline, a set of pulses (each with a mass and a width), exponential
+elimination, and measurement error. Many of these pieces are only weakly
+identified from a single subject's data -- a tall narrow pulse and a shorter
+wider one can produce similar-looking peaks, for example -- so reasonably
+informative priors are not just a formality; they stabilize estimation and keep
+the sampler in physiologically plausible regions.
+
+`pulse_spec()` is where all of this is set: the priors themselves, the starting
+values that seed the MCMC chains (the `sv_*` arguments), and the proposal
+variances that tune Metropolis-Hastings steps (the `pv_*` arguments). This
+vignette focuses on the priors and what they mean physiologically; starting
+values and proposal-variance tuning are covered by the fitting and diagnostics
+material. Because nothing here runs MCMC -- we only draw from priors and
+simulate -- the examples are fast.
+
+## First: which parameterization?
+
+Before reading any single prior, you need to know which scale the model is on,
+because it changes what every mass and width number *means*. Three arguments set
+this, and their defaults are the parameterization used in the source papers:
+
+| Argument | Default | Effect |
+|---|---|---|
+| `pulse_distribution` | `"lognormal"` | Pulse mass and width random effects are Gaussian on the **log** scale. `"truncnorm"` restores the legacy natural-scale truncated normal. |
+| `sd_prior` | `"uniform"` | Pulse-to-pulse SDs get a Uniform(0, max) prior, so `prior_sd_mass` is an **upper bound**. Under `"half_cauchy"` the same argument is a **scale** instead. |
+| `student_t_pulses` | `FALSE` | Pulse random effects are Gaussian. `TRUE` adds a per-pulse t-scale mixture, giving heavier tails. |
+
+The choice also selects which set of numeric defaults fills in any prior,
+starting value, or proposal variance you leave unspecified -- log-scale defaults
+under `"lognormal"`, natural-scale ones under `"truncnorm"`. Mixing scales is the
+easiest mistake to make here: passing `prior_mass_mean = 2.5` to a lognormal
+model does not request a mean mass of 2.5, it requests a mean *log* mass of 2.5,
+i.e. a median mass of $e^{2.5} \approx 12$.
+
+To reproduce the package's pre-lognormal behaviour exactly, set all three
+together: `pulse_spec(pulse_distribution = "truncnorm", sd_prior = "half_cauchy",
+student_t_pulses = TRUE)`.
+
+## What the priors mean
+
+Each prior controls one part of the generative process. Under the default
+lognormal parameterization the mass and width arguments are on the **log** scale;
+baseline, half-life, and pulse count are always on their natural scale. Variances
+express how tightly a quantity is constrained a priori.
+
+| Argument | Controls | Scale | Typical choice / notes |
+|---|---|---|---|
+| `prior_baseline_mean`, `prior_baseline_var` | Constant baseline concentration | natural | Center near the assay's observed trough; a moderate variance lets the data adjust it. |
+| `prior_mass_mean`, `prior_mass_var` | Mean pulse mass (hormone released per pulse) | log | Set from prior studies of the hormone. A value of 1.2 is a median mass of about 3.3. |
+| `prior_width_mean`, `prior_width_var` | Mean pulse width (spread of a pulse) | log of a **variance** | Doubly indirect: 3.5 is a variance of $e^{3.5} \approx 33$, i.e. a pulse SD of about 5.8 minutes. |
+| `prior_sd_mass` | Pulse-to-pulse variability in mass | log | Under the default `sd_prior = "uniform"` this is the upper bound of the prior, not a standard deviation. Larger values admit more heterogeneity. |
+| `prior_sd_width` | Pulse-to-pulse variability in width | log | Estimated from the data like any other parameter. Interpreted the same way as `prior_sd_mass`. |
+| `prior_halflife_mean`, `prior_halflife_var` | Elimination half-life | natural (minutes) | Often known fairly well from physiology, so a smaller variance is reasonable. |
+| `prior_mean_pulse_count` | Expected number of pulses over the window | natural (count) | Anchors how many secretion events to expect; scale to the observation length. |
+| `location_prior_type`, `prior_location_gamma`, `prior_location_range` | Spatial prior on pulse locations (e.g. `"strauss"`) | natural (minutes) | Repulsive prior; see "The location prior" below. |
+
+Two of these deserve a second look. **Pulse width is on the log of a variance**,
+so it is two transformations away from the "how many minutes long is a pulse"
+question you probably want to ask; the anatomy vignette shows how easily that
+trips up a parameter sweep. And **`prior_sd_mass` / `prior_sd_width` are not
+standard deviations** under the default uniform prior -- they are the upper end
+of the range the SD is allowed to take.
+
+Unless you have a specific reason to override them, leaving the mass and width
+arguments unset is usually the better choice: the built-in log-scale defaults are
+tuned for this parameterization, and the individual-pulse proposal variances in
+particular were calibrated by simulation study. Hand-picked values carried over
+from the natural-scale parameterization tend to mix poorly.
+
+## Informative vs vague priors
+
+The variance arguments are the main dial between informative and vague. A small
+prior variance encodes confidence -- the model is told a parameter is near a
+particular value and the data have to work hard to move it (informative). A
+large variance expresses ignorance and lets the data dominate (vague). The
+right choice depends on how much trustworthy prior knowledge you have: half-life
+is often well characterized and warrants a tighter prior, while baseline or
+pulse mass may deserve more room.
+
+A good way to see what a prior *implies* is a prior-predictive check: draw
+parameters from the prior, simulate series, and look at the spread of outcomes.
+Below we vary the baseline and half-life priors only, drawing each from a normal
+and flooring at small positive values so `simulate_pulse()` always receives
+valid inputs. Both are natural-scale parameters, so this example sidesteps the
+log-scale question entirely and we can leave `simulate_pulse()` on its default
+natural-scale settings.
+
+```{r prior-predictive, fig.height = 6}
+set.seed(2026)
+draw_series <- function(baseline_sd, halflife_sd) {
+  bl <- max(0.3, rnorm(1, mean = 2.5, sd = baseline_sd))
+  hl <- max(5,   rnorm(1, mean = 45,  sd = halflife_sd))
+  simulate_pulse(num_obs = 60, interval = 10, mass_mean = 2.5,
+                 width_mean = 35, constant_baseline = bl,
+                 constant_halflife = hl)
+}
+op <- par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
+# Informative priors: small SDs -> series cluster tightly
+for (i in 1:2) {
+  s <- draw_series(baseline_sd = 0.25, halflife_sd = 4)
+  plot(s$data$time, s$data$concentration, type = "l",
+       main = "informative prior", xlab = "Time (min)", ylab = "Conc.")
+}
+# Vague priors: large SDs -> series vary widely
+for (i in 1:2) {
+  s <- draw_series(baseline_sd = 1.2, halflife_sd = 25)
+  plot(s$data$time, s$data$concentration, type = "l",
+       main = "vague prior", xlab = "Time (min)", ylab = "Conc.")
+}
+par(op)
+```
+
+The two informative-prior draws (top row) look much alike: the prior tightly
+constrains where the series can sit and how quickly it decays. The two
+vague-prior draws (bottom row) range widely, because the prior offers little
+constraint and very different baselines and decay rates are equally admissible.
+Inspecting these prior-predictive series is a quick sanity check that your
+priors imply plausible data before any fitting begins. This example varies only
+the baseline and half-life for illustration, but the same logic applies to the
+mass, width, and pulse-count priors.
+
+## The location prior
+
+Pulse locations get a spatial prior rather than independent draws. The default
+`location_prior_type = "strauss"` uses a Strauss point process, which is
+*repulsive*: it down-weights configurations in which pulses sit very close
+together. This matches the biology -- real secretion events do not pile
+arbitrarily close to one another, since the system needs time between bursts.
+Two arguments tune it: `prior_location_gamma` is the repulsion strength (a value
+of $\gamma = 1$ means no repulsion, so locations are effectively
+order-independent, while smaller $\gamma$ imposes stronger repulsion that
+discourages near-coincident pulses), and `prior_location_range` is the
+interaction distance, the separation below which pulses are penalized.
+
+## Where to go next
+
+`population_spec()` mirrors these same prior ideas at the population level,
+where the priors describe distributions of pulse parameters across subjects. The
+getting-started vignette shows a complete `pulse_spec()` call in a fitted model,
+and the diagnostics material covers starting values and convergence in detail.
+
+Priors matter most where the data are least able to speak, and for this model
+that is the mass/width ridge described at the top of this vignette. Once you have
+a fitted model, `identifiability_check()` reports how much of each parameter's
+posterior is being carried by its prior rather than the data -- a direct way to
+tell whether a prior you intended as mildly informative is in fact doing the
+bulk of the work. The convergence vignette puts it to use.

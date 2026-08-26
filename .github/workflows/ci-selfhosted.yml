@@ -78,12 +78,15 @@ jobs:
         # Missing BINARIES are an unambiguous "VM not provisioned" — hard-fail
         # so the build stops here with an actionable message, not deep inside
         # devtools::check().
+        # pandoc: vignette re-building inside devtools::check() hard-fails
+        # without it (first hit 2026-08-26 on the hosted runners when the
+        # vignette PR landed), so it is checked here like any other binary.
         missing=""
-        for tool in R Rscript gfortran make g++ ccache pkg-config; do
+        for tool in R Rscript gfortran make g++ ccache pkg-config pandoc; do
           command -v "$tool" >/dev/null || missing="$missing $tool"
         done
         if [ -n "$missing" ]; then
-          echo "::error::Runner VM is missing:$missing. Provision on the VM (apt-get install r-base-dev gfortran ccache pkg-config liblapack-dev libblas-dev libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libuv1-dev libtirpc-dev) — self-hosted jobs do not apt-get install per run."
+          echo "::error::Runner VM is missing:$missing. Provision on the VM (apt-get install r-base-dev gfortran ccache pkg-config pandoc liblapack-dev libblas-dev libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libuv1-dev libtirpc-dev) — self-hosted jobs do not apt-get install per run."
           exit 1
         fi
         # Headers/libs that RcppArmadillo + devtools::check() need. WARN, don't

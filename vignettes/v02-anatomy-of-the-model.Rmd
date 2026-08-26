@@ -1,0 +1,143 @@
+---
+title: "Anatomy of the model: the generative process"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Anatomy of the model: the generative process}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 4.5, dpi = 96)
+library(bayespulse)
+```
+
+An observed hormone series is the sum of a baseline level, pulsatile secretion
+(a set of Gaussian pulses), exponential elimination back toward baseline, and
+measurement error. This vignette builds intuition for that generative process
+by simulating series and varying each piece in turn. The formal model, with its
+secretion and elimination functions written out, is given in the getting-started
+vignette; here the goal is simply to see what each parameter does to the shape
+of the series.
+
+Every simulation below uses `simulate_pulse()`'s default
+`pulse_distribution = "truncnorm"`, which puts pulse mass and width on their
+natural scale -- a `mass_mean` of 3.5 really is a mean mass of 3.5. That keeps
+the sweeps easy to read. When you go on to *fit* a model, `pulse_spec()` defaults
+to the lognormal parameterization instead, where the same quantities live on the
+log scale; the getting-started and priors vignettes cover that difference.
+
+## A single simulated series
+
+We start from one realistic series to anchor the comparisons that follow.
+
+```{r base-series}
+set.seed(1)
+sim <- simulate_pulse(num_obs = 72, interval = 10, mass_mean = 3.5,
+                      width_mean = 35, constant_baseline = 2.6,
+                      constant_halflife = 45)
+plot(sim)
+```
+
+## Pulse mass
+
+Pulse mass controls how much hormone is released per pulse: a larger mass
+produces taller pulses.
+
+```{r sweep-mass, fig.height = 7}
+masses <- c(1.5, 3.5, 6.0)
+op <- par(mfrow = c(3, 1), mar = c(4, 4, 2, 1))
+for (m in masses) {
+  set.seed(1)
+  s <- simulate_pulse(num_obs = 72, interval = 10, mass_mean = m,
+                      width_mean = 35, constant_baseline = 2.6,
+                      constant_halflife = 45)
+  plot(s$data$time, s$data$concentration, type = "l",
+       main = paste("mass_mean =", m), xlab = "Time (min)", ylab = "Conc.")
+}
+par(op)
+```
+
+## Pulse width
+
+Pulse width controls how spread out each secretion event is: a larger width
+gives broader, flatter humps.
+
+One detail matters enormously when reading these plots: **width is on the
+variance scale**. A `width_mean` of 100 is a pulse standard deviation of
+$\sqrt{100} = 10$ minutes, not 100 minutes. That square root compresses things
+sharply, and it is easy to sweep a range that looks like it should matter and
+see almost no change. Sampling here is every 10 minutes, so any pulse whose
+standard deviation is well under 10 minutes is narrower than the sampling grid
+can resolve -- widths of 15 and 60 (SD 3.9 and 7.7 minutes) produce series that
+are nearly indistinguishable. To see the effect we need a range that straddles
+the sampling interval:
+
+```{r sweep-width, fig.height = 7}
+widths <- c(4, 100, 625)   # variance scale: SD = 2, 10, and 25 minutes
+op <- par(mfrow = c(3, 1), mar = c(4, 4, 2, 1))
+for (w in widths) {
+  set.seed(1)
+  s <- simulate_pulse(num_obs = 72, interval = 10, mass_mean = 3.5,
+                      width_mean = w, constant_baseline = 2.6,
+                      constant_halflife = 45)
+  plot(s$data$time, s$data$concentration, type = "l",
+       main = sprintf("width_mean = %d  (SD = %.0f min)", w, sqrt(w)),
+       xlab = "Time (min)", ylab = "Conc.")
+}
+par(op)
+```
+
+Now the progression is clear: at SD 2 minutes each pulse is a sharp spike that
+the sampling grid barely catches, while at SD 25 minutes secretion is smeared
+across several samples and neighbouring pulses begin to merge into a smooth,
+low-amplitude wave. This is a real limit on what any deconvolution model can
+recover -- pulses much narrower than the sampling interval leave too little
+trace in the data to be identified reliably, a point the study-design vignette
+returns to.
+
+## Half-life
+
+The elimination half-life controls how quickly hormone clears between pulses:
+a longer half-life means slower decay and higher troughs.
+
+```{r sweep-halflife, fig.height = 7}
+halflives <- c(20, 45, 90)
+op <- par(mfrow = c(3, 1), mar = c(4, 4, 2, 1))
+for (h in halflives) {
+  set.seed(1)
+  s <- simulate_pulse(num_obs = 72, interval = 10, mass_mean = 3.5,
+                      width_mean = 35, constant_baseline = 2.6,
+                      constant_halflife = h)
+  plot(s$data$time, s$data$concentration, type = "l",
+       main = paste("constant_halflife =", h), xlab = "Time (min)",
+       ylab = "Conc.")
+}
+par(op)
+```
+
+## Inter-pulse interval
+
+The mean inter-pulse interval controls how often pulses occur: a larger
+interval yields fewer, more widely separated pulses.
+
+```{r sweep-ipi, fig.height = 7}
+ipis <- c(8, 14, 24)
+op <- par(mfrow = c(3, 1), mar = c(4, 4, 2, 1))
+for (ip in ipis) {
+  set.seed(1)
+  s <- simulate_pulse(num_obs = 72, interval = 10, ipi_mean = ip,
+                      ipi_var = 10, ipi_min = 4, mass_mean = 3.5,
+                      width_mean = 35, constant_baseline = 2.6,
+                      constant_halflife = 45)
+  plot(s$data$time, s$data$concentration, type = "l",
+       main = paste("ipi_mean =", ip), xlab = "Time (min)", ylab = "Conc.")
+}
+par(op)
+```
+
+Together these four parameters, plus the baseline level and the measurement
+error variance, generate the rich variety of shapes seen in real hormone
+series. The next vignettes show how to encode prior knowledge about each of
+them and how to fit the model to recover them from data.
