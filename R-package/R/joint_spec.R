@@ -16,6 +16,10 @@
 #'   "prior_location_range".
 #'
 #' @section Driver Hormone Priors:
+#' The \code{prior_driver_*} arguments set the prior distributions on the
+#' driver hormone's pulse mass and width, baseline, half-life, model error,
+#' pulse count, and pulse locations.
+#'
 #' @param prior_driver_mass_mean Prior mean for driver pulse mass
 #' @param prior_driver_mass_var Prior variance for driver pulse mass
 #' @param prior_driver_width_mean Prior mean for driver pulse width (on variance scale)
@@ -33,6 +37,9 @@
 #' @param prior_driver_location_range Strauss interaction range for driver (in time units)
 #'
 #' @section Response Hormone Priors:
+#' The \code{prior_response_*} arguments mirror the driver priors for the
+#' response hormone.
+#'
 #' @param prior_response_mass_mean Prior mean for response pulse mass
 #' @param prior_response_mass_var Prior variance for response pulse mass
 #' @param prior_response_width_mean Prior mean for response pulse width (on variance scale)
@@ -50,12 +57,19 @@
 #' @param prior_response_location_range Strauss interaction range for response (in time units)
 #'
 #' @section Association Priors:
+#' The \code{prior_log_rho_*} and \code{prior_log_nu_*} arguments set normal
+#' priors on the log of the coupling strength (\code{rho}) and coupling
+#' temporal spread (\code{nu}).
+#'
 #' @param prior_log_rho_mean Prior mean for log(rho) - coupling strength parameter
 #' @param prior_log_rho_var Prior variance for log(rho)
 #' @param prior_log_nu_mean Prior mean for log(nu) - coupling temporal spread parameter
 #' @param prior_log_nu_var Prior variance for log(nu)
 #'
 #' @section Driver Starting Values:
+#' The \code{sv_driver_*} arguments set the MCMC starting values for the
+#' driver hormone's common parameters.
+#'
 #' @param sv_driver_mass_mean Starting value for driver mean pulse mass
 #' @param sv_driver_width_mean Starting value for driver mean pulse width
 #' @param sv_driver_baseline_mean Starting value for driver baseline
@@ -65,6 +79,9 @@
 #' @param sv_driver_width_sd Starting value for driver pulse-to-pulse SD of width
 #'
 #' @section Response Starting Values:
+#' The \code{sv_response_*} arguments mirror the driver starting values for
+#' the response hormone.
+#'
 #' @param sv_response_mass_mean Starting value for response mean pulse mass
 #' @param sv_response_width_mean Starting value for response mean pulse width
 #' @param sv_response_baseline_mean Starting value for response baseline
@@ -74,10 +91,16 @@
 #' @param sv_response_width_sd Starting value for response pulse-to-pulse SD of width
 #'
 #' @section Association Starting Values:
+#' \code{sv_rho} and \code{sv_nu} set the MCMC starting values for the
+#' coupling parameters.
+#'
 #' @param sv_rho Starting value for rho (coupling strength)
 #' @param sv_nu Starting value for nu (coupling temporal spread, is variance)
 #'
 #' @section Driver Proposal Variances:
+#' The \code{pv_driver_*} arguments set the Metropolis-Hastings proposal
+#' variances for the driver hormone's parameters.
+#'
 #' @param pv_driver_baseline Proposal variance for driver baseline
 #' @param pv_driver_halflife Proposal variance for driver half-life
 #' @param pv_driver_mean_pulse_mass Proposal variance for driver mean pulse mass
@@ -91,6 +114,9 @@
 #' @param pv_driver_pulse_location Proposal variance for driver pulse locations
 #'
 #' @section Response Proposal Variances:
+#' The \code{pv_response_*} arguments mirror the driver proposal variances
+#' for the response hormone.
+#'
 #' @param pv_response_baseline Proposal variance for response baseline
 #' @param pv_response_halflife Proposal variance for response half-life
 #' @param pv_response_mean_pulse_mass Proposal variance for response mean pulse mass
@@ -104,6 +130,9 @@
 #' @param pv_response_pulse_location Proposal variance for response pulse locations
 #'
 #' @section Association Proposal Variances:
+#' \code{pv_log_rho} and \code{pv_log_nu} set the proposal variances for the
+#' coupling parameters, on the log scale.
+#'
 #' @param pv_log_rho Proposal variance for log(rho)
 #' @param pv_log_nu Proposal variance for log(nu)
 #'

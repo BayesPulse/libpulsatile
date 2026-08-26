@@ -280,38 +280,58 @@ pulses influence the intensity of response hormone pulse occurrence.
 }
 \section{Driver Hormone Priors}{
 
+The \code{prior_driver_*} arguments set the prior distributions on the
+driver hormone's pulse mass and width, baseline, half-life, model error,
+pulse count, and pulse locations.
 }
 
 \section{Response Hormone Priors}{
 
+The \code{prior_response_*} arguments mirror the driver priors for the
+response hormone.
 }
 
 \section{Association Priors}{
 
+The \code{prior_log_rho_*} and \code{prior_log_nu_*} arguments set normal
+priors on the log of the coupling strength (\code{rho}) and coupling
+temporal spread (\code{nu}).
 }
 
 \section{Driver Starting Values}{
 
+The \code{sv_driver_*} arguments set the MCMC starting values for the
+driver hormone's common parameters.
 }
 
 \section{Response Starting Values}{
 
+The \code{sv_response_*} arguments mirror the driver starting values for
+the response hormone.
 }
 
 \section{Association Starting Values}{
 
+\code{sv_rho} and \code{sv_nu} set the MCMC starting values for the
+coupling parameters.
 }
 
 \section{Driver Proposal Variances}{
 
+The \code{pv_driver_*} arguments set the Metropolis-Hastings proposal
+variances for the driver hormone's parameters.
 }
 
 \section{Response Proposal Variances}{
 
+The \code{pv_response_*} arguments mirror the driver proposal variances
+for the response hormone.
 }
 
 \section{Association Proposal Variances}{
 
+\code{pv_log_rho} and \code{pv_log_nu} set the proposal variances for the
+coupling parameters, on the log scale.
 }
 
 \section{Breaking change (default parameterization)}{
