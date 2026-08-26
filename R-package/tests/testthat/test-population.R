@@ -67,6 +67,22 @@ test_that("population_spec() validates inputs correctly", {
     "outside the Uniform"
   )
 
+  # Targeted lognormal-resolved-bound case: the case above fixes BOTH sv and max
+  # explicitly, so it passes regardless of parameterization. Here we exercise the
+  # PARAMETERIZATION-RESOLVED bound. Under pulse_distribution = "lognormal" (no
+  # explicit prior_width_sd_max) the Uniform bound resolves to 10, so a starting
+  # SD of 12 is out of support and must error. (Under "truncnorm" the bound would
+  # resolve to 30 and 12 would be accepted -- exactly the asymmetry being closed.)
+  expect_error(
+    population_spec(pulse_distribution = "lognormal", sv_width_sd = 12),
+    "outside the Uniform"
+  )
+  # In-support log-scale starting SD (below the resolved bound of 10) passes.
+  expect_s3_class(
+    population_spec(pulse_distribution = "lognormal", sv_width_sd = 5),
+    "population_spec"
+  )
+
   # Default spec keeps every starting SD inside its prior support
   expect_s3_class(population_spec(), "population_spec")
 })

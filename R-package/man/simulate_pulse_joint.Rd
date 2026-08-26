@@ -10,21 +10,22 @@ simulate_pulse_joint(
   num_obs = 144,
   interval = 10,
   response_pulse_count = 12,
-  driver_mass_mean = 3.5,
-  driver_mass_sd = 1,
-  driver_width_mean = 35,
-  driver_width_sd = 5,
+  driver_mass_mean = NULL,
+  driver_mass_sd = NULL,
+  driver_width_mean = NULL,
+  driver_width_sd = NULL,
   driver_baseline = 2.6,
   driver_halflife = 45,
   driver_ipi_mean = 12,
   driver_ipi_var = 40,
-  response_mass_mean = 3.5,
-  response_mass_sd = 1,
-  response_width_mean = 35,
-  response_width_sd = 5,
+  response_mass_mean = NULL,
+  response_mass_sd = NULL,
+  response_width_mean = NULL,
+  response_width_sd = NULL,
   response_baseline = 2.6,
   response_halflife = 45,
   error_var = 0.005,
+  pulse_distribution = c("truncnorm", "lognormal"),
   seed = NULL
 )
 }
@@ -42,22 +43,44 @@ must be > 0.}
 \item{response_pulse_count}{Base (driver-independent) expected number of
 response pulses over the window.}
 
-\item{driver_mass_mean, driver_mass_sd}{Driver pulse mass mean and SD.}
+\item{driver_mass_mean, driver_mass_sd}{Driver pulse mass mean and SD. If
+\code{NULL} (default) they resolve to natural-scale \code{3.5}/\code{1.0}
+under \code{pulse_distribution = "truncnorm"} or LOG-scale
+\code{1.2}/\code{0.5} under \code{"lognormal"}.}
 
-\item{driver_width_mean, driver_width_sd}{Driver pulse width mean and SD.}
+\item{driver_width_mean, driver_width_sd}{Driver pulse width mean and SD. If
+\code{NULL} (default) they resolve to natural-scale \code{35}/\code{5}
+(truncnorm) or LOG-scale \code{3.0}/\code{0.7} (lognormal).}
 
 \item{driver_baseline, driver_halflife}{Driver baseline and half-life.}
 
 \item{driver_ipi_mean, driver_ipi_var}{Driver inter-pulse interval mean and
 variance.}
 
-\item{response_mass_mean, response_mass_sd}{Response pulse mass mean and SD.}
+\item{response_mass_mean, response_mass_sd}{Response pulse mass mean and SD,
+with the same \code{NULL} defaults as the driver equivalents
+(\code{3.5}/\code{1.0} truncnorm, LOG-scale \code{1.2}/\code{0.5} lognormal).}
 
-\item{response_width_mean, response_width_sd}{Response pulse width mean and SD.}
+\item{response_width_mean, response_width_sd}{Response pulse width mean and SD,
+with the same \code{NULL} defaults as the driver equivalents
+(\code{35}/\code{5} truncnorm, LOG-scale \code{3.0}/\code{0.7} lognormal).}
 
 \item{response_baseline, response_halflife}{Response baseline and half-life.}
 
 \item{error_var}{Variance of the multiplicative log-normal observation error.}
+
+\item{pulse_distribution}{Character, one of \code{"truncnorm"} (default) or
+\code{"lognormal"}, selecting the data-generating distribution for the
+per-pulse mass and width random effects of BOTH the driver and response
+hormones. \code{"truncnorm"} keeps the legacy natural-scale truncated
+Student-t mixture, in which the \code{*_mass_mean}, \code{*_mass_sd},
+\code{*_width_mean} and \code{*_width_sd} arguments are natural-scale.
+\code{"lognormal"} draws \code{mass = exp(rnorm(1, mass_mean, mass_sd))} and
+\code{width = exp(rnorm(1, width_mean, width_sd))} (Gaussian on the log
+scale, no t-scale mixture and no truncation), so those arguments are
+LOG-scale. Use \code{"lognormal"} to generate data consistent with the
+papers-default (\code{pulse_distribution = "lognormal"}) fit produced by
+\code{\link{joint_spec}}.}
 
 \item{seed}{Optional RNG seed for reproducibility.}
 }
@@ -79,6 +102,14 @@ An object of class \code{joint_sim}: a list with \code{driver_data}
   and \code{tau_j} are the driver pulse locations. Larger \code{rho} produces
   more response pulses clustered near driver pulses; smaller \code{nu}
   produces tighter clustering.
+}
+\note{
+The data-generating default here is \code{pulse_distribution =
+  "truncnorm"}, whereas \code{\link{joint_spec}} (and thus
+  \code{\link{fit_pulse_joint}}) defaults to \code{"lognormal"}. Simulating
+  with defaults and fitting with defaults therefore fits a lognormal model to
+  truncnorm-generated data. Pass \code{pulse_distribution = "lognormal"} here
+  to match the papers-default fit.
 }
 \examples{
 sim <- simulate_pulse_joint(rho = 0.8, nu = 100, seed = 1)

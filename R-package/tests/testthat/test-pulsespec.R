@@ -77,6 +77,17 @@ test_that("pulse_spec() rejects a starting SD outside the Uniform prior support"
   expect_s3_class(
     pulse_spec(sd_prior = "half_cauchy", sv_width_sd = 15, prior_sd_width = 10),
     "pulse_spec")
+
+  # Parameterization-RESOLVED bound: the case above fixes prior_sd_width
+  # explicitly, so it never exercises the lognormal-resolved bound. Under
+  # pulse_distribution = "lognormal" (no explicit prior_sd_width) the Uniform
+  # bound resolves to 10, so a starting SD of 12 is out of support and must error
+  # (under "truncnorm" the bound would resolve to 5).
+  expect_error(pulse_spec(pulse_distribution = "lognormal", sv_width_sd = 12),
+               "outside the Uniform")
+  # In-support log-scale starting SD (below the resolved bound of 10) passes.
+  expect_s3_class(pulse_spec(pulse_distribution = "lognormal", sv_width_sd = 5),
+                  "pulse_spec")
 })
 
 test_that("user-supplied values override the parameterization defaults", {

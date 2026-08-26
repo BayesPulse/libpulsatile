@@ -77,6 +77,13 @@ An object of class \code{population_sim}: a list with \code{data} (a
   to 0, the default, for identical subjects). The result plugs directly into
   \code{\link{fit_pulse_population}} as its \code{data} argument.
 }
+\note{
+This function defaults to \code{pulse_distribution = "truncnorm"},
+  whereas \code{\link{population_spec}} defaults to \code{"lognormal"}.
+  Simulating with defaults and fitting with defaults therefore fits a
+  lognormal model to truncnorm-generated data. Pass \code{pulse_distribution =
+  "lognormal"} to match the papers-default fit.
+}
 \examples{
 sim <- simulate_pulse_population(n_subjects = 4, seed = 1)
 length(sim$data)

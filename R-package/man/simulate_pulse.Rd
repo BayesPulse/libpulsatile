@@ -92,6 +92,13 @@ A object of class \code{pulse_sim} containing time-series dataset
   the time series and a dataset of the individual pulse characteristics are
   returned.
 }
+\note{
+This function defaults to \code{pulse_distribution = "truncnorm"},
+  whereas \code{\link{pulse_spec}} defaults to \code{"lognormal"}. Simulating
+  with defaults and fitting with defaults therefore fits a lognormal model to
+  truncnorm-generated data. Pass \code{pulse_distribution = "lognormal"} to
+  match the papers-default fit.
+}
 \examples{
 this_pulse <- simulate_pulse()
 str(this_pulse)

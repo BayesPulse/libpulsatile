@@ -9,10 +9,12 @@
 #include <bp_datastructures/patient.h>
 #include <bp_datastructures/pulseestimates.h>
 #include <bp_datastructures/utils.h>
+#include <bp_mcmc/utils.h>
 #include <bpmod_singlesubject/ss_draw_tvarscale.h>
 #include <bpmod_singlesubject/ss_draw_randomeffects.h>
 #include <bpmod_singlesubject/ss_draw_fixedeffects.h>
 #include <bpmod_singlesubject/ss_draw_sdrandomeffects.h>
+#include <bpmod_singlesubject/birthdeath.h>
 #include <testing/catch.h>
 
 
@@ -421,5 +423,123 @@ TEST_CASE( "sdrandomeffects Uniform SD prior: prior ratio cancels, support bound
     pat.uniform_sd_prior = false;
     REQUIRE( sampler.parameter_support(sdmax + 1.0, &pat) );
     REQUIRE_FALSE( sampler.parameter_support(0.0, &pat) );
+  }
+}
+
+
+//
+// SS_DrawTVarScale::posterior_function -- log-normal parameterization
+//
+// The per-pulse t-scale (kappa) update under the papers' log-normal model:
+// log(theta) ~ N(mu, sigma^2/kappa), with mu/sigma the mean/SD of the LOG random
+// effect. The quadratic deviation is formed on the log scale, (log(theta) - mu),
+// and there is no truncation at 0, so the two pnorm normalizing constants of the
+// natural-scale branch are dropped. The sqrt(kappa) precision normalizing
+// constant (-0.5 log kappa + 0.5 log proposal) is retained, and the 1/theta
+// Jacobian is constant in kappa (theta fixed) so it cancels. This checks the
+// exact closed form and guards that the lognormal branch is actually taken.
+//
+TEST_CASE( "tvarscale posterior_function: log-normal kappa update",
+           "[draw_][tvarscale][lognormal]" ) {
+
+  DataStructuresUtils utils;
+  Patient pat = utils.create_new_test_patient_obj();
+  pat.lognormal_pulses = true;   // papers' parameterization
+
+  const double mu     = 1.2;   // mean of LOG mass
+  const double sigma  = 0.5;   // SD of LOG mass
+  const double theta  = 5.0;   // pulse mass (natural scale, > 0)
+  const double kappa  = 1.3;   // current tvarscale_mass
+  const double prop   = 2.0;   // proposed tvarscale
+
+  pat.estimates.mass_mean = mu;
+  pat.estimates.mass_sd   = sigma;
+
+  PulseEstimates pulse;          // empty pulse; posterior_function only reads
+  pulse.mass           = theta;  // mass and tvarscale_mass
+  pulse.tvarscale_mass = kappa;
+
+  // for_width = false -> sample the mass tvarscale
+  SS_DrawTVarScale sampler(1.0, 500, 25000, 0.35, false, false, 5000);
+
+  double got = sampler.posterior_function(&pulse, prop, &pat);
+
+  // Analytic log-normal log-ratio (same closed form the sampler computes).
+  const double prior_ratio = std::log(Rf_dgamma(prop, 2, 0.5, 0)) -
+                             std::log(Rf_dgamma(kappa, 2, 0.5, 0));
+  const double logre       = std::log(theta);
+  const double dev2        = (logre - mu) * (logre - mu);
+  const double re_ratio    = (dev2 * 0.5 * kappa - dev2 * 0.5 * prop) /
+                             (sigma * sigma)
+                             - 0.5 * std::log(kappa) + 0.5 * std::log(prop);
+  const double expected    = prior_ratio + re_ratio;
+
+  SECTION( "matches the analytic log-normal log-ratio" ) {
+    REQUIRE( got == Approx(expected) );
+  }
+
+  SECTION( "differs from the natural-scale parameterization" ) {
+    // The same inputs under the natural-scale branch use (theta - mu) residuals
+    // and keep the two pnorm truncation terms, so the ratio must differ --
+    // confirming the lognormal branch is actually taken.
+    pat.lognormal_pulses = false;
+    double got_natural = sampler.posterior_function(&pulse, prop, &pat);
+    REQUIRE( got != Approx(got_natural) );
+  }
+}
+
+
+//
+// BirthDeathProcess::add_new_pulse -- log-normal draw path
+//
+// Under lognormal_pulses the new pulse's mass/width are drawn as exp(rnorm(mu,
+// sigma/sqrt(kappa))). With gaussian_random_effects the per-pulse kappa is fixed
+// at 1 (no rgamma draw), so add_new_pulse consumes exactly two rnorm draws --
+// letting a separately-seeded reference reproduce them exactly. This verifies
+// the draw equals exp() of the underlying normal and is strictly positive.
+//
+TEST_CASE( "birth-death add_new_pulse: log-normal draw is exp(normal) and positive",
+           "[birthdeath][lognormal]" ) {
+
+  DataStructuresUtils utils;
+  PulseUtils pu;
+  BirthDeathProcess bd;
+
+  Patient pat = utils.create_new_test_patient_obj();
+  pat.lognormal_pulses        = true;   // draw on the log scale, exponentiate
+  pat.gaussian_random_effects = true;   // kappa fixed at 1 -> exactly two rnorms
+  pat.estimates.mass_mean  = 1.2;       // mean of LOG mass
+  pat.estimates.mass_sd    = 0.5;
+  pat.estimates.width_mean = 3.0;       // mean of LOG width
+  pat.estimates.width_sd   = 0.7;
+
+  const int n0 = pat.get_pulsecount();
+
+  // Reference: reproduce the exact two draws add_new_pulse makes under the
+  // gaussian-kappa log-normal branch (kappa = 1, so no rgamma is drawn).
+  double n_mass = 0.0, n_width = 0.0;
+  {
+    pu.set_seed(20240706);
+    Rcpp::RNGScope scope;
+    n_mass  = Rf_rnorm(1.2, 0.5);
+    n_width = Rf_rnorm(3.0, 0.7);
+  }
+
+  pu.set_seed(20240706);
+  bd.add_new_pulse(&pat, 500.0);
+
+  REQUIRE( pat.get_pulsecount() == n0 + 1 );
+  PulseEstimates & p = pat.pulses.back();
+
+  SECTION( "mass/width are exp() of the underlying normal draws" ) {
+    REQUIRE( p.mass  == Approx(std::exp(n_mass)) );
+    REQUIRE( p.width == Approx(std::exp(n_width)) );
+  }
+
+  SECTION( "log-normal draws are strictly positive; gaussian kappa is fixed at 1" ) {
+    REQUIRE( p.mass  > 0.0 );
+    REQUIRE( p.width > 0.0 );
+    REQUIRE( p.tvarscale_mass  == 1.0 );
+    REQUIRE( p.tvarscale_width == 1.0 );
   }
 }

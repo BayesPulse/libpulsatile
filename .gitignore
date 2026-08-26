@@ -17,3 +17,4 @@ R-package/src/tests
 .document.Rout
 *.Rcheck
 *.tar.gz
+.worktrees/

@@ -1,6 +1,8 @@
 #include <RcppArmadillo.h>
+#include <cmath>
 #include <bp_datastructures/bp_datastructures.h>
 #include <bp_datastructures/associationparameters.h>
+#include <bp_mcmc/utils.h>
 #include <bpmod_joint/joint_update_lambda.h>
 #include <bpmod_joint/joint_birthdeath.h>
 #include <bpmod_joint/joint_draw_association.h>
@@ -234,6 +236,89 @@ TEST_CASE("JointBirthDeathProcess instantiation", "[joint][birthdeath]") {
     JointBirthDeathProcess joint_bd;
     // Just verify it compiles and constructs
     REQUIRE(true);
+  }
+}
+
+
+//
+// JointBirthDeathProcess::add_new_response_pulse -- log-normal draw path
+//
+// The response-hormone birth branch draws a new pulse's mass/width from the
+// response patient's fixed effects. Under response_patient->lognormal_pulses the
+// draw is exp(rnorm(mu, sigma/sqrt(kappa))); with gaussian_random_effects the
+// kappa is fixed at 1 (no rgamma draw), so add_new_response_pulse consumes
+// exactly two rnorm draws, which a separately-seeded reference reproduces
+// exactly. This verifies (a) the log-normal branch draws exp() of a normal and
+// is strictly positive, and (b) the new pulse's lambda is the driver-coupling
+// kernel evaluated at its position.
+//
+TEST_CASE("joint add_new_response_pulse: log-normal draw is exp(normal) and positive",
+          "[joint][birthdeath][lognormal]") {
+
+  PulseUtils pu;
+
+  // Data grid shared by the driver and response patients.
+  NumericVector time = NumericVector::create(0, 2, 4, 6, 8);
+  NumericVector conc = NumericVector::create(5, 7, 6, 8, 5);
+  PatientData data(time, conc);
+
+  PatientPriors priors(3.0, 1.0, 50.0, 100.0, 10.0, 9.0, 1.5, 0.25,
+                       3.0, 0.5, 0.001, 0.001, 4, 0.5, 1.0);
+
+  // Single-subject estimates constructor carries mass_sd/width_sd. The mean/SD
+  // values here are LOG-scale (the log-normal parameterization).
+  PatientEstimates est(2.6, 45.0, 0.005, 1.2, 3.0, 0.5, 0.7);
+
+  Patient driver(data, priors, est);
+  Patient response(data, priors, est);
+
+  response.lognormal_pulses        = true;   // draw on the log scale
+  response.gaussian_random_effects = true;   // kappa fixed at 1 -> two rnorms
+  response.estimates.mass_mean  = 1.2;       // mean of LOG mass
+  response.estimates.mass_sd    = 0.5;
+  response.estimates.width_mean = 3.0;       // mean of LOG width
+  response.estimates.width_sd   = 0.7;
+
+  // A single driver pulse at t = 4 so the new response pulse gets a positive,
+  // known coupling lambda from the kernel.
+  const double driver_time = 4.0;
+  driver.pulses.clear();
+  driver.pulses.push_back(
+      PulseEstimates(driver_time, 10.0, 1.0, 1.0, 1.0, 0.1, data.time));
+
+  AssociationEstimates assoc(2.0, 1.0);
+  JointBirthDeathProcess jbd;
+
+  const double position = 4.0;
+  const int n0 = response.get_pulsecount();
+
+  // Reference draws matching the gaussian-kappa log-normal branch.
+  double n_mass = 0.0, n_width = 0.0;
+  {
+    pu.set_seed(13572468);
+    Rcpp::RNGScope scope;
+    n_mass  = Rf_rnorm(1.2, 0.5);
+    n_width = Rf_rnorm(3.0, 0.7);
+  }
+
+  pu.set_seed(13572468);
+  jbd.add_new_response_pulse(&driver, &response, assoc, position);
+
+  REQUIRE(response.get_pulsecount() == n0 + 1);
+  PulseEstimates & p = response.pulses.back();
+
+  SECTION("mass/width are exp() of the underlying normal draws and positive") {
+    REQUIRE(p.mass  == Approx(std::exp(n_mass)));
+    REQUIRE(p.width == Approx(std::exp(n_width)));
+    REQUIRE(p.mass  > 0.0);
+    REQUIRE(p.width > 0.0);
+    REQUIRE(p.tvarscale_mass  == 1.0);   // gaussian kappa
+    REQUIRE(p.tvarscale_width == 1.0);
+  }
+
+  SECTION("new pulse carries the driver-coupling lambda at its position") {
+    REQUIRE(p.lambda == Approx(assoc.kernel(position, driver_time)));
+    REQUIRE(p.lambda > 0.0);
   }
 }
 

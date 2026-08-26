@@ -54,16 +54,18 @@ class JointBirthDeathProcess
                         const AssociationEstimates &assoc_est,
                         int iter);
 
-  private:
-
-    PulseUtils pu;
-    BirthDeathProcess standard_bd;  // Reuse standard birth-death for driver
-
-    // Response-specific methods
+    // Exposed for unit testing the response new-pulse draw (log-normal vs
+    // natural-scale branch). Public access here does not change normal sampling
+    // behavior -- sample_response() drives response births internally.
     void add_new_response_pulse(Patient *driver_patient,
                                Patient *response_patient,
                                const AssociationEstimates &assoc_est,
                                double position);
+
+  private:
+
+    PulseUtils pu;
+    BirthDeathProcess standard_bd;  // Reuse standard birth-death for driver
 
     void remove_pulse(Patient *patient, arma::vec death_rates, int pulse_count);
 

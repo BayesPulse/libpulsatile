@@ -47,6 +47,11 @@
 #'   LOG-scale parameters. Use \code{"lognormal"} to generate data consistent
 #'   with the papers-default (\code{pulse_distribution = "lognormal"}) fit
 #'   produced by \code{\link{pulse_spec}} / \code{\link{population_spec}}.
+#' @note This function defaults to \code{pulse_distribution = "truncnorm"},
+#'   whereas \code{\link{pulse_spec}} defaults to \code{"lognormal"}. Simulating
+#'   with defaults and fitting with defaults therefore fits a lognormal model to
+#'   truncnorm-generated data. Pass \code{pulse_distribution = "lognormal"} to
+#'   match the papers-default fit.
 #' @return A object of class \code{pulse_sim} containing time-series dataset
 #'   and dataset of characteristics of each pulse
 #' @seealso print.pulse_sim, plot.pulse_sim
@@ -305,16 +310,43 @@ plot.pulse_sim <- function(x, ...) {
 #' @param interval Time in minutes between observations.
 #' @param response_pulse_count Base (driver-independent) expected number of
 #'   response pulses over the window.
-#' @param driver_mass_mean,driver_mass_sd Driver pulse mass mean and SD.
-#' @param driver_width_mean,driver_width_sd Driver pulse width mean and SD.
+#' @param driver_mass_mean,driver_mass_sd Driver pulse mass mean and SD. If
+#'   \code{NULL} (default) they resolve to natural-scale \code{3.5}/\code{1.0}
+#'   under \code{pulse_distribution = "truncnorm"} or LOG-scale
+#'   \code{1.2}/\code{0.5} under \code{"lognormal"}.
+#' @param driver_width_mean,driver_width_sd Driver pulse width mean and SD. If
+#'   \code{NULL} (default) they resolve to natural-scale \code{35}/\code{5}
+#'   (truncnorm) or LOG-scale \code{3.0}/\code{0.7} (lognormal).
 #' @param driver_baseline,driver_halflife Driver baseline and half-life.
 #' @param driver_ipi_mean,driver_ipi_var Driver inter-pulse interval mean and
 #'   variance.
-#' @param response_mass_mean,response_mass_sd Response pulse mass mean and SD.
-#' @param response_width_mean,response_width_sd Response pulse width mean and SD.
+#' @param response_mass_mean,response_mass_sd Response pulse mass mean and SD,
+#'   with the same \code{NULL} defaults as the driver equivalents
+#'   (\code{3.5}/\code{1.0} truncnorm, LOG-scale \code{1.2}/\code{0.5} lognormal).
+#' @param response_width_mean,response_width_sd Response pulse width mean and SD,
+#'   with the same \code{NULL} defaults as the driver equivalents
+#'   (\code{35}/\code{5} truncnorm, LOG-scale \code{3.0}/\code{0.7} lognormal).
 #' @param response_baseline,response_halflife Response baseline and half-life.
 #' @param error_var Variance of the multiplicative log-normal observation error.
+#' @param pulse_distribution Character, one of \code{"truncnorm"} (default) or
+#'   \code{"lognormal"}, selecting the data-generating distribution for the
+#'   per-pulse mass and width random effects of BOTH the driver and response
+#'   hormones. \code{"truncnorm"} keeps the legacy natural-scale truncated
+#'   Student-t mixture, in which the \code{*_mass_mean}, \code{*_mass_sd},
+#'   \code{*_width_mean} and \code{*_width_sd} arguments are natural-scale.
+#'   \code{"lognormal"} draws \code{mass = exp(rnorm(1, mass_mean, mass_sd))} and
+#'   \code{width = exp(rnorm(1, width_mean, width_sd))} (Gaussian on the log
+#'   scale, no t-scale mixture and no truncation), so those arguments are
+#'   LOG-scale. Use \code{"lognormal"} to generate data consistent with the
+#'   papers-default (\code{pulse_distribution = "lognormal"}) fit produced by
+#'   \code{\link{joint_spec}}.
 #' @param seed Optional RNG seed for reproducibility.
+#' @note The data-generating default here is \code{pulse_distribution =
+#'   "truncnorm"}, whereas \code{\link{joint_spec}} (and thus
+#'   \code{\link{fit_pulse_joint}}) defaults to \code{"lognormal"}. Simulating
+#'   with defaults and fitting with defaults therefore fits a lognormal model to
+#'   truncnorm-generated data. Pass \code{pulse_distribution = "lognormal"} here
+#'   to match the papers-default fit.
 #' @return An object of class \code{joint_sim}: a list with \code{driver_data}
 #'   and \code{response_data} (each a tibble with \code{time} and
 #'   \code{concentration}), the \code{driver_parameters} and
@@ -332,22 +364,52 @@ simulate_pulse_joint <- function(rho                  = 0.5,
                                  num_obs              = 144,
                                  interval             = 10,
                                  response_pulse_count = 12,
-                                 driver_mass_mean     = 3.5,
-                                 driver_mass_sd       = 1.0,
-                                 driver_width_mean    = 35,
-                                 driver_width_sd      = 5,
+                                 driver_mass_mean     = NULL,
+                                 driver_mass_sd       = NULL,
+                                 driver_width_mean    = NULL,
+                                 driver_width_sd      = NULL,
                                  driver_baseline      = 2.6,
                                  driver_halflife      = 45,
                                  driver_ipi_mean      = 12,
                                  driver_ipi_var       = 40,
-                                 response_mass_mean   = 3.5,
-                                 response_mass_sd     = 1.0,
-                                 response_width_mean  = 35,
-                                 response_width_sd    = 5,
+                                 response_mass_mean   = NULL,
+                                 response_mass_sd     = NULL,
+                                 response_width_mean  = NULL,
+                                 response_width_sd    = NULL,
                                  response_baseline    = 2.6,
                                  response_halflife    = 45,
                                  error_var            = 0.005,
+                                 pulse_distribution   = c("truncnorm",
+                                                          "lognormal"),
                                  seed                 = NULL) {
+
+  pulse_distribution <- match.arg(pulse_distribution)
+
+  # Conditional defaults for the driver and response pulse mass/width
+  # location-scale parameters. Under "truncnorm" these are natural-scale (legacy
+  # defaults, byte-for-byte); under "lognormal" they are LOG-scale, so exp() of
+  # them yields sane natural masses/widths (matching pulse_spec()'s log-scale
+  # defaults) instead of exp(rnorm(35, 5)) ~ 1e15. A user-supplied value always
+  # wins. Mirrors the NULL-sentinel pattern in simulate_pulse().
+  if (pulse_distribution == "lognormal") {
+    if (is.null(driver_mass_mean))    driver_mass_mean    <- 1.2
+    if (is.null(driver_mass_sd))      driver_mass_sd      <- 0.5
+    if (is.null(driver_width_mean))   driver_width_mean   <- 3.0
+    if (is.null(driver_width_sd))     driver_width_sd     <- 0.7
+    if (is.null(response_mass_mean))  response_mass_mean  <- 1.2
+    if (is.null(response_mass_sd))    response_mass_sd    <- 0.5
+    if (is.null(response_width_mean)) response_width_mean <- 3.0
+    if (is.null(response_width_sd))   response_width_sd   <- 0.7
+  } else {
+    if (is.null(driver_mass_mean))    driver_mass_mean    <- 3.5
+    if (is.null(driver_mass_sd))      driver_mass_sd      <- 1.0
+    if (is.null(driver_width_mean))   driver_width_mean   <- 35
+    if (is.null(driver_width_sd))     driver_width_sd     <- 5
+    if (is.null(response_mass_mean))  response_mass_mean  <- 3.5
+    if (is.null(response_mass_sd))    response_mass_sd    <- 1.0
+    if (is.null(response_width_mean)) response_width_mean <- 35
+    if (is.null(response_width_sd))   response_width_sd   <- 5
+  }
 
   if (!is.null(seed)) set.seed(seed)
   stopifnot(rho > 0, nu > 0, response_pulse_count > 0)
@@ -370,12 +432,23 @@ simulate_pulse_joint <- function(rho                  = 0.5,
     A <- s2p <- mass_kappa <- width_kappa <- rep(0, max(np, 1))
     if (np > 0) {
       for (i in seq_len(np)) {
-        mass_kappa[i]  <- stats::rgamma(1, shape = 2, rate = 2)
-        width_kappa[i] <- stats::rgamma(1, shape = 2, rate = 2)
-        tvar  <- mass_sd^2  / mass_kappa[i]
-        t2var <- width_sd^2 / width_kappa[i]
-        while (A[i]   < 0.25) A[i]   <- stats::rnorm(1, mass_mean,  sqrt(tvar))
-        while (s2p[i] < 0.5)  s2p[i] <- stats::rnorm(1, width_mean, sqrt(t2var))
+        if (pulse_distribution == "lognormal") {
+          # Log-normal random effects (Gaussian on the log scale, no t-scale
+          # mixture, no truncation). mass_mean/mass_sd/width_mean/width_sd are
+          # LOG-scale parameters, matching the papers-default lognormal fit and
+          # simulate_pulse()'s lognormal branch.
+          mass_kappa[i]  <- 1
+          width_kappa[i] <- 1
+          A[i]   <- exp(stats::rnorm(1, mass_mean,  mass_sd))
+          s2p[i] <- exp(stats::rnorm(1, width_mean, width_sd))
+        } else {
+          mass_kappa[i]  <- stats::rgamma(1, shape = 2, rate = 2)
+          width_kappa[i] <- stats::rgamma(1, shape = 2, rate = 2)
+          tvar  <- mass_sd^2  / mass_kappa[i]
+          t2var <- width_sd^2 / width_kappa[i]
+          while (A[i]   < 0.25) A[i]   <- stats::rnorm(1, mass_mean,  sqrt(tvar))
+          while (s2p[i] < 0.5)  s2p[i] <- stats::rnorm(1, width_mean, sqrt(t2var))
+        }
       }
     }
     ytmp <- 0
@@ -406,7 +479,8 @@ simulate_pulse_joint <- function(rho                  = 0.5,
                            mass_mean = driver_mass_mean, mass_sd = driver_mass_sd,
                            width_mean = driver_width_mean, width_sd = driver_width_sd,
                            constant_baseline = driver_baseline,
-                           constant_halflife = driver_halflife)
+                           constant_halflife = driver_halflife,
+                           pulse_distribution = pulse_distribution)
   tau_driver <- driver$parameters$location
   n_driver   <- length(tau_driver)
 
@@ -487,6 +561,11 @@ simulate_pulse_joint <- function(rho                  = 0.5,
 #'   \code{mass_mean}/\code{width_mean}) are LOG-scale parameters, matching the
 #'   papers-default population fit.
 #' @param seed Optional RNG seed for reproducibility.
+#' @note This function defaults to \code{pulse_distribution = "truncnorm"},
+#'   whereas \code{\link{population_spec}} defaults to \code{"lognormal"}.
+#'   Simulating with defaults and fitting with defaults therefore fits a
+#'   lognormal model to truncnorm-generated data. Pass \code{pulse_distribution =
+#'   "lognormal"} to match the papers-default fit.
 #' @return An object of class \code{population_sim}: a list with \code{data} (a
 #'   list of per-subject data frames with \code{time} and \code{concentration},
 #'   ready for \code{fit_pulse_population}), \code{n_subjects}, and \code{truth}
