@@ -413,6 +413,34 @@ test_that("fit_pulse_joint() handles pulse_sim objects", {
 })
 
 
+test_that("response birth-death does not collapse under the default hard-core location prior", {
+
+  skip_on_cran()
+
+  # Regression guard: with the default joint_spec() location prior
+  # (prior_response_location_gamma = 0, the hard-core Strauss process), the
+  # response birth acceptance used log-scale arithmetic where gamma = 0 gave
+  # sum_s_r * log(0) = NaN (or -Inf), silently rejecting every response birth.
+  # Deaths still fired while more than one pulse remained, so the response
+  # pulse count collapsed to exactly 1 within a few iterations and stayed
+  # there for the whole run, no matter how long the chain.
+  sim <- simulate_pulse_joint(rho = 1.5, nu = 100, response_pulse_count = 10,
+                              num_obs = 72, interval = 10,
+                              pulse_distribution = "lognormal", seed = 21)
+
+  set.seed(11)
+  fit <- fit_pulse_joint(sim$driver_data, sim$response_data,
+                         spec = joint_spec(prior_response_pulse_count = 10),
+                         iters = 2000, thin = 10, burnin = 500,
+                         verbose = FALSE)
+
+  expect_gt(mean(fit$response_chain$num_pulses), 2)
+  # A healthy birth-death chain churns constantly; a frozen count (the failure
+  # mode of this bug, stuck at exactly one value for every saved draw) does not.
+  expect_gt(length(unique(fit$response_chain$num_pulses)), 1)
+})
+
+
 #------------------------------------------------------------------------------#
 #    End of file                                                               #
 #------------------------------------------------------------------------------#
