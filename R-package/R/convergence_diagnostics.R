@@ -460,15 +460,20 @@ convergence_report <- function(fit) {
 #' interval to the width of the prior support. A large ratio (\code{coverage})
 #' means the posterior fills the prior and the parameter is likely weakly
 #' identified. Only parameters with a finite, bounded prior range contribute a
-#' non-\code{NA} verdict; for a \code{population_fit} the uniform-prior variance
+#' non-\code{NA} verdict. For a \code{population_fit} the uniform-prior variance
 #' components (the \code{*_sd} columns) are mapped to their prior bounds
-#' automatically.
+#' automatically. For a single-subject \code{pulse_fit} the chain is taken from
+#' \code{\link{patient_chain}} and, when the spec uses the default
+#' \code{sd_prior = "uniform"}, the \code{mass_sd}/\code{width_sd} bounds are
+#' derived from the spec's Uniform(0, max) priors; under
+#' \code{sd_prior = "half_cauchy"} the SD priors are unbounded and no bounds
+#' can be derived.
 #'
-#' @param fit A \code{population_fit} object, or a data frame / matrix of
-#'   posterior draws (one column per parameter).
+#' @param fit A \code{population_fit} or \code{pulse_fit} object, or a data
+#'   frame / matrix of posterior draws (one column per parameter).
 #' @param prior_bounds Optional named list giving the prior support for
 #'   parameters as length-2 numeric vectors \code{c(lower, upper)}. Overrides /
-#'   supplements the bounds derived automatically from a \code{population_fit}.
+#'   supplements the bounds derived automatically from a fitted model.
 #' @param coverage_threshold Fraction of the prior range above which a parameter
 #'   is flagged as weakly identified (default 0.5).
 #'
@@ -493,18 +498,24 @@ convergence_report <- function(fit) {
 identifiability_check <- function(fit, prior_bounds = NULL,
                                   coverage_threshold = 0.5) {
 
-  # Resolve the chain and, for a population_fit, the uniform-prior bounds.
+  # Resolve the chain and, for a fitted model, the uniform-prior bounds.
   if (inherits(fit, "population_fit")) {
     chain <- fit$population_chain
     auto_bounds <- .population_prior_bounds(fit)
     # Explicit prior_bounds take precedence over the auto-derived ones.
     user_bounds <- if (is.null(prior_bounds)) list() else prior_bounds
     prior_bounds <- utils::modifyList(auto_bounds, user_bounds)
+  } else if (inherits(fit, "pulse_fit")) {
+    chain <- patient_chain(fit)
+    auto_bounds <- .pulse_prior_bounds(fit)
+    user_bounds <- if (is.null(prior_bounds)) list() else prior_bounds
+    prior_bounds <- utils::modifyList(auto_bounds, user_bounds)
   } else if (is.data.frame(fit) || is.matrix(fit)) {
     chain <- as.data.frame(fit)
     if (is.null(prior_bounds)) prior_bounds <- list()
   } else {
-    stop("fit must be a population_fit or a data.frame/matrix of posterior draws")
+    stop(paste("fit must be a population_fit, a pulse_fit, or a",
+               "data.frame/matrix of posterior draws"))
   }
 
   if ("iteration" %in% names(chain)) {
@@ -559,6 +570,32 @@ identifiability_check <- function(fit, prior_bounds = NULL,
   out <- do.call(rbind, results)
   rownames(out) <- NULL
   out
+}
+
+
+# Derive prior bounds for a single-subject pulse_fit's chain columns. Only the
+# pulse-to-pulse SDs have bounded priors, and only under sd_prior = "uniform"
+# (Uniform(0, max)); a half-Cauchy prior has unbounded support, so the stored
+# *_sd_max values are not prior bounds there and nothing can be derived.
+.pulse_prior_bounds <- function(fit) {
+
+  pri <- fit$spec$priors
+  if (is.null(pri) || !isTRUE(as.logical(pri$uniform_sd_prior))) return(list())
+
+  # chain column -> priors upper-bound name (Uniform(0, max))
+  bound_names <- c(
+    mass_sd  = "mass_sd_max",
+    width_sd = "width_sd_max"
+  )
+
+  bounds <- list()
+  for (param in names(bound_names)) {
+    mx <- pri[[bound_names[[param]]]]
+    if (!is.null(mx) && is.finite(mx) && mx > 0) {
+      bounds[[param]] <- c(0, mx)
+    }
+  }
+  bounds
 }
 
 

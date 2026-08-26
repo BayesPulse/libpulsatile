@@ -7,12 +7,12 @@
 identifiability_check(fit, prior_bounds = NULL, coverage_threshold = 0.5)
 }
 \arguments{
-\item{fit}{A \code{population_fit} object, or a data frame / matrix of
-posterior draws (one column per parameter).}
+\item{fit}{A \code{population_fit} or \code{pulse_fit} object, or a data
+frame / matrix of posterior draws (one column per parameter).}
 
 \item{prior_bounds}{Optional named list giving the prior support for
 parameters as length-2 numeric vectors \code{c(lower, upper)}. Overrides /
-supplements the bounds derived automatically from a \code{population_fit}.}
+supplements the bounds derived automatically from a fitted model.}
 
 \item{coverage_threshold}{Fraction of the prior range above which a parameter
 is flagged as weakly identified (default 0.5).}
@@ -42,9 +42,15 @@ For each parameter the check compares the width of the central 95\% posterior
 interval to the width of the prior support. A large ratio (\code{coverage})
 means the posterior fills the prior and the parameter is likely weakly
 identified. Only parameters with a finite, bounded prior range contribute a
-non-\code{NA} verdict; for a \code{population_fit} the uniform-prior variance
+non-\code{NA} verdict. For a \code{population_fit} the uniform-prior variance
 components (the \code{*_sd} columns) are mapped to their prior bounds
-automatically.
+automatically. For a single-subject \code{pulse_fit} the chain is taken from
+\code{\link{patient_chain}} and, when the spec uses the default
+\code{sd_prior = "uniform"}, the \code{mass_sd}/\code{width_sd} bounds are
+derived from the spec's Uniform(0, max) priors; under
+\code{sd_prior = "half_cauchy"} the SD priors are unbounded and no bounds
+can be derived.
+
 
 A high \code{prior_coverage} is a symptom, not a proof: strongly informative
 data can still yield a wide posterior if the prior is tight. Read it alongside

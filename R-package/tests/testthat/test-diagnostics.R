@@ -304,3 +304,61 @@ test_that("identifiability_check() returns NA verdict without prior bounds", {
   # Posterior summaries are still populated.
   expect_true(all(is.finite(res$post_sd)))
 })
+
+
+test_that("identifiability_check() accepts a single-subject pulse_fit", {
+  set.seed(7)
+  sim <- simulate_pulse(num_obs = 30, interval = 10,
+                        pulse_distribution = "lognormal")
+  spec <- pulse_spec(location_prior_type = "strauss",
+                     prior_location_gamma = 0.1, prior_location_range = 30,
+                     prior_mean_pulse_count = 5)
+  fit <- fit_pulse(data = sim$data, spec = spec,
+                   iters = 2000, thin = 10, burnin = 500, verbose = FALSE)
+
+  res <- identifiability_check(fit)
+
+  expect_s3_class(res, "data.frame")
+  expect_false("iteration" %in% res$parameter)
+  expect_true(all(c("mass_sd", "width_sd") %in% res$parameter))
+
+  # The uniform SD priors give bounded support, so those rows get real
+  # verdicts derived automatically from spec$priors (Uniform(0, 10) here).
+  sd_rows <- res[res$parameter %in% c("mass_sd", "width_sd"), ]
+  expect_true(all(sd_rows$prior_range == 10))
+  expect_true(all(is.finite(sd_rows$prior_coverage)))
+  expect_true(all(!is.na(sd_rows$weak_identifiability)))
+
+  # Parameters without a bounded prior stay NA (unchecked, not "fine").
+  bl_row <- res[res$parameter == "baseline", ]
+  expect_true(is.na(bl_row$prior_coverage))
+
+  # Explicit prior_bounds still override/supplement the auto-derived ones.
+  res2 <- identifiability_check(fit,
+                                prior_bounds = list(baseline = c(0, 20)))
+  bl2 <- res2[res2$parameter == "baseline", ]
+  expect_equal(bl2$prior_range, 20)
+  sd2 <- res2[res2$parameter == "mass_sd", ]
+  expect_equal(sd2$prior_range, 10)
+})
+
+
+test_that("identifiability_check() derives no SD bounds under half_cauchy", {
+  set.seed(7)
+  sim <- simulate_pulse(num_obs = 30, interval = 10,
+                        pulse_distribution = "lognormal")
+  spec <- pulse_spec(location_prior_type = "strauss",
+                     prior_location_gamma = 0.1, prior_location_range = 30,
+                     prior_mean_pulse_count = 5,
+                     sd_prior = "half_cauchy")
+  fit <- fit_pulse(data = sim$data, spec = spec,
+                   iters = 2000, thin = 10, burnin = 500, verbose = FALSE)
+
+  res <- identifiability_check(fit)
+
+  # A half-Cauchy prior has unbounded support: sd_max is not a prior bound
+  # there, so no automatic verdict may be derived from it.
+  sd_rows <- res[res$parameter %in% c("mass_sd", "width_sd"), ]
+  expect_true(all(is.na(sd_rows$prior_range)))
+  expect_true(all(is.na(sd_rows$weak_identifiability)))
+})
