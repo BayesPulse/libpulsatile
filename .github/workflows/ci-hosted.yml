@@ -42,10 +42,20 @@ jobs:
         # context in a job-level `if` (referencing it there is a plan-time
         # error that fails the whole workflow with zero jobs).
         os: ${{ github.event_name == 'pull_request' && fromJSON('["ubuntu-latest", "macos-latest"]') || fromJSON('["macos-latest"]') }}
-        r-version: ['4.3.0']
+        # 'release' tracks the current R release. The old 4.3.0 pin had aged
+        # out of CRAN's binary windows, silently forcing every dependency to
+        # compile from source on BOTH OSes (~13 min/run); current release gets
+        # binaries again. The R-library cache key below embeds the resolved
+        # version, so a release bump naturally starts a fresh library.
+        r-version: ['release']
 
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
+      # Parallel compiles: R CMD INSTALL/check pass this to make for the
+      # package's src/ objects, and the standalone `make` reads it from the
+      # environment directly. Hosted runners have 3-4 cores (ubuntu 4, macOS
+      # arm64 3); a spare job slot just waits, so -j4 is safe on both.
+      MAKEFLAGS: -j4
 
     steps:
     - uses: actions/checkout@v4
@@ -56,6 +66,11 @@ jobs:
       uses: r-lib/actions/setup-r@v2
       with:
         r-version: ${{ matrix.r-version }}
+        # Point default repos at Posit Public Package Manager, which serves
+        # prebuilt binaries for Ubuntu (CRAN only ships Linux packages as
+        # source). Install steps below must use getOption("repos") — a
+        # hardcoded repos= argument would silently bypass this.
+        use-public-rspm: true
 
     # Vignettes (rmarkdown/html_vignette) need pandoc at R CMD build time;
     # the hosted runner images don't bundle a version R can find.
@@ -84,13 +99,24 @@ jobs:
         # Ensure R can find gfortran
         sudo ln -sf /opt/homebrew/bin/gfortran /usr/local/bin/gfortran || true
 
+    # Resolve the actual R version once, up front: both cache keys below embed
+    # it (matrix says 'release', a moving label) so an upstream R release bump
+    # starts fresh caches instead of restoring ABI-stale artifacts.
+    - name: Resolve R version / locate R library
+      id: rlib
+      run: |
+        mkdir -p "$R_LIBS_USER"
+        echo "path=$R_LIBS_USER" >> "$GITHUB_OUTPUT"
+        echo "rver=$(Rscript --vanilla -e 'cat(as.character(getRversion()))')" >> "$GITHUB_OUTPUT"
+      shell: bash
+
     - name: Restore compiler cache (ccache)
       uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/.ccache
-        key: ccache-${{ matrix.os }}-r${{ matrix.r-version }}-${{ github.sha }}
+        key: ccache-${{ matrix.os }}-R${{ steps.rlib.outputs.rver }}-${{ github.sha }}
         restore-keys: |
-          ccache-${{ matrix.os }}-r${{ matrix.r-version }}-
+          ccache-${{ matrix.os }}-R${{ steps.rlib.outputs.rver }}-
 
     - name: Route R compiles through ccache
       run: |
@@ -107,13 +133,23 @@ jobs:
         ccache -z
       shell: bash
 
+    # The single biggest time sink was reinstalling every R dependency from
+    # scratch each run (~13 of ~16 minutes with the old source builds).
+    - name: Restore R package library
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.rlib.outputs.path }}
+        key: rlib-${{ matrix.os }}-R${{ steps.rlib.outputs.rver }}-${{ hashFiles('R-package/DESCRIPTION') }}
+        restore-keys: |
+          rlib-${{ matrix.os }}-R${{ steps.rlib.outputs.rver }}-
+
     - name: Install R packages
       run: |
-        # Ensure the library directory exists and is writable
-        mkdir -p $R_LIBS_USER
-        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'testthat', 'remotes'), repos='https://cran.rstudio.com', lib=Sys.getenv('R_LIBS_USER'))"
+        # repos deliberately NOT hardcoded: getOption('repos') carries the
+        # P3M/binary repo configured by setup-r's use-public-rspm.
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'testthat', 'remotes'), lib=Sys.getenv('R_LIBS_USER'))"
         # Install R package dependencies from DESCRIPTION file
-        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); remotes::install_deps('R-package', dependencies=TRUE, repos='https://cran.rstudio.com')"
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); remotes::install_deps('R-package', dependencies=TRUE)"
       shell: bash
 
     - name: Install RInside (with fallback)
@@ -132,7 +168,7 @@ jobs:
           cat('RInside installed from GitHub\n')
         }, error = function(e) {
           tryCatch({
-            install.packages('RInside', repos='https://cran.rstudio.com', quiet=TRUE)
+            install.packages('RInside', quiet=TRUE)  # repos from use-public-rspm
             cat('RInside installed from CRAN\n')
           }, error = function(e2) {
             cat('RInside installation failed, will use NORINSIDE flag\n')

@@ -179,7 +179,12 @@ This comprehensive check typically takes 2-5 minutes but saves 30+ minutes of CI
 **GitHub Actions** workflows in `.github/workflows/` run on every push and PR:
 
 ### Workflows
-- **`ci-hosted.yml`**: Build and test on GitHub-hosted runners with R 4.3.0.
+- **`ci-hosted.yml`**: Build and test on GitHub-hosted runners with the
+  current R release (`r-version: 'release'`; the old 4.3.0 pin had aged out
+  of CRAN's binary windows, forcing slow source installs). R dependencies are
+  cached (`actions/cache` on the user library, keyed on resolved R version +
+  DESCRIPTION hash) and Ubuntu installs come as Posit P3M binaries — do not
+  hardcode `repos=` in install steps or the binary repo is bypassed.
   This is where pull requests (including fork PRs) run — free on a public repo
   and safely isolated from the self-hosted runner.
   - `pull_request` (master/develop): full Ubuntu + macOS matrix
