@@ -1,0 +1,231 @@
+---
+title: "Working with posterior chains: custom summaries and predictive checks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with posterior chains: custom summaries and predictive checks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.path = "v08-working-with-chains-",
+                      fig.width = 7, fig.height = 5, dpi = 96)
+library(bayespulse)
+library(ggplot2)
+set.seed(2026)
+```
+
+Every plot in this vignette series -- `bp_trace()`, `bp_posteriors()`,
+`bp_location_posterior()`, `bp_predicted()` -- is a convenience wrapper
+around the same underlying objects: tidy tables of posterior draws stored in
+the fit. When the packaged plots stop matching the question you are asking,
+go to the draws directly. This vignette shows how: extracting the chains,
+building custom summaries and derived quantities, and running
+posterior-predictive checks.
+
+## 1. A fit to work with
+
+The same simulated series, specification, and fit as the getting-started
+vignette. (Precomputed offline via `vignettes/precompute.R`; about a minute
+at this chain length.)
+
+```{r fit, results = "hide"}
+simdat <- simulate_pulse(num_obs = 60, interval = 10, error_var = 0.005,
+                         ipi_mean = 12, ipi_var = 10, ipi_min = 4,
+                         pulse_distribution = "lognormal",
+                         mass_mean = 0.9, mass_sd = 0.3,
+                         width_mean = 4.6, width_sd = 0.3,
+                         constant_halflife = 40, constant_baseline = 2.5)
+
+spec <- pulse_spec(
+  location_prior_type    = "strauss",
+  prior_location_gamma   = 0.1,  prior_location_range = 30,
+  prior_halflife_mean    = 38,   prior_halflife_var   = 1000,
+  prior_baseline_mean    = 2.25, prior_baseline_var   = 100,
+  prior_mean_pulse_count = 10,
+  sv_baseline_mean = 2.5, sv_halflife_mean = 42, sv_error_var = 0.005,
+  pv_pulse_location = 5)
+
+fit <- fit_pulse(data = simdat$data, spec = spec,
+                 iters = 250000, thin = 100, burnin = 25000, verbose = FALSE)
+```
+
+## 2. The common-parameter chain
+
+`patient_chain()` returns one row per saved draw of the subject-level
+parameters, keyed by `iteration`:
+
+```{r patient-chain}
+chain <- patient_chain(fit)
+head(chain, 3)
+```
+
+With a plain data frame in hand, any summary is a line of base R. A
+quantile table for every parameter:
+
+```{r summaries}
+params <- setdiff(names(chain), "iteration")
+t(sapply(chain[params], quantile, probs = c(0.025, 0.5, 0.975)))
+```
+
+Derived quantities are just transformations of the draws -- transform first,
+summarize after, and the uncertainty propagates itself. Two examples that
+answer natural-scale questions about log-scale parameters:
+
+```{r derived}
+# Posterior for the *median pulse mass* on the natural concentration scale
+# (mass_mean is the mean of log mass, so exp(mass_mean) is the median mass)
+quantile(exp(chain$mass_mean), probs = c(0.025, 0.5, 0.975))
+
+# Posterior probability that the half-life exceeds 45 minutes
+mean(chain$halflife > 45)
+```
+
+The first line is worth pausing on: a 95% interval for the natural-scale
+median pulse mass is awkward to read off the log-scale posterior summaries,
+but is one `exp()` away when you work with draws.
+
+## 3. The per-pulse chain
+
+`pulse_chain()` returns the pulse-level draws in long format: one row per
+pulse per saved draw, again keyed by `iteration`. Because the number of
+pulses is itself sampled, different draws contribute different numbers of
+rows -- exactly the kind of ragged structure a long table handles naturally.
+
+```{r pulse-chain}
+pulses <- pulse_chain(fit)
+head(pulses, 3)
+nrow(pulses) / nrow(chain)  # average pulses per draw
+```
+
+(`eta_mass` and `eta_width` are the per-pulse Student-t scale factors; under
+the default Gaussian pulse random effects they are fixed at 1.)
+
+A hand-rolled version of `bp_location_posterior()` -- with the true simulated
+pulse locations overlaid, which the packaged plot cannot know about:
+
+```{r locations, fig.height = 3.5}
+ggplot(pulses, aes(location)) +
+  geom_histogram(binwidth = 10, boundary = 0,
+                 fill = "grey70", color = "grey40", linewidth = 0.2) +
+  geom_vline(xintercept = simdat$parameters$location,
+             linetype = "dashed", color = "firebrick") +
+  labs(x = "Pulse location (minutes)",
+       y = "Draws containing a pulse in bin") +
+  theme_minimal()
+```
+
+Each dashed line is a true pulse location; the histogram is where the
+posterior places pulses across all saved draws. This is the same information
+`bp_location_posterior(fit)` shows -- the point is that owning the draws
+lets you add whatever your question needs, here the ground truth.
+
+## 4. The fitted curve, by hand
+
+`predict()` returns a tidy table (time, posterior mean and median
+concentration, credible bounds), so the packaged `bp_predicted()` plot is
+easy to rebuild -- and restyle -- yourself:
+
+```{r predicted, fig.height = 3.5}
+pred <- predict(fit, cred_interval = 0.9)
+ggplot(pred, aes(time)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "steelblue",
+              alpha = 0.25) +
+  geom_line(aes(y = mean.conc), color = "steelblue") +
+  geom_point(data = simdat$data, aes(time, concentration), size = 0.8) +
+  labs(x = "Time (minutes)", y = "Concentration") +
+  theme_minimal()
+```
+
+This answers "does the fitted curve pass through the data?" -- a check of
+fit at the level of the mean. The next section asks a stronger question.
+
+## 5. Posterior-predictive checks
+
+A posterior-predictive check asks: *if the fitted model were true, would
+data like mine be typical?* For each of a sample of posterior draws, we
+push the drawn subject-level parameters back through the package's own
+simulator, generating a full replicate dataset -- new pulse train, new
+pulses, new noise -- and compare summary statistics of the replicates
+against the observed series.
+
+One honest limitation to state up front: the pulse-timing regime
+(`ipi_mean`, `ipi_var`) is a *design input* to the simulator, not a
+parameter the model estimates, so we hold it at its design value. The check
+below therefore probes the concentration-scale behaviour (level, spread,
+peaks), not the timing model.
+
+```{r ppc, results = "hide"}
+stat_fun <- function(y) c(mean = mean(y), sd = sd(y), max = max(y))
+
+set.seed(11)
+draw_ids <- sample(chain$iteration, 200)
+ppc <- do.call(rbind, lapply(draw_ids, function(g) {
+  d <- chain[chain$iteration == g, ]
+  rep_sim <- simulate_pulse(num_obs = 60, interval = 10,
+                            error_var = d$model_error,
+                            ipi_mean = 12, ipi_var = 10, ipi_min = 4,
+                            pulse_distribution = "lognormal",
+                            mass_mean = d$mass_mean, mass_sd = d$mass_sd,
+                            width_mean = d$width_mean, width_sd = d$width_sd,
+                            constant_halflife = d$halflife,
+                            constant_baseline = d$baseline)
+  stat_fun(rep_sim$data$concentration)
+}))
+observed <- stat_fun(simdat$data$concentration)
+```
+
+Before summarizing, check the replicates themselves:
+
+```{r ppc-clean}
+finite_rep <- apply(is.finite(ppc), 1, all)
+sum(!finite_rep)
+ppc <- ppc[finite_rep, ]
+```
+
+A few replicates come back non-finite, and the reason is worth knowing: each
+one carries a `width_sd` draw from near the top of its Uniform(0, 10) prior.
+The convergence and simulation-study vignettes both flagged `width_sd` as
+weakly identified -- its posterior stays close to its prior -- and this is
+what that abstraction means in data space. A log-scale pulse-width SD of 9
+implies individual pulse widths spanning many orders of magnitude, which no
+finite hormone series exhibits and which overflow the simulator. The
+posterior-predictive loop surfaces those draws honestly; we drop them and
+note the count rather than pretend they were never sampled.
+
+```{r ppc-plot, fig.height = 3.5}
+ppc_long <- data.frame(statistic = rep(colnames(ppc), each = nrow(ppc)),
+                       value = as.vector(ppc))
+obs_long <- data.frame(statistic = names(observed), value = observed)
+ggplot(ppc_long, aes(value)) +
+  geom_density(fill = "grey80", color = "grey40") +
+  geom_vline(data = obs_long, aes(xintercept = value),
+             color = "firebrick", linewidth = 0.7) +
+  facet_wrap(~ statistic, scales = "free") +
+  labs(x = "Statistic value across replicate datasets",
+       y = "Density") +
+  theme_minimal()
+```
+
+```{r ppc-pvals}
+round(colMeans(sweep(ppc, 2, observed, ">=")), 2)
+```
+
+The red line is the observed value of each statistic; the grey density is
+its distribution across replicate datasets generated from the posterior.
+Values near 0 or 1 in the tail-probability table would flag a statistic the
+model systematically fails to reproduce; mid-range values mean the observed
+data look like a typical draw from the fitted model. Checks like this are
+cheap to extend -- swap in any statistic your application cares about
+(trough level, peak-to-trough ratio, time above a threshold) by changing
+`stat_fun()`.
+
+## 6. Where this leaves the series
+
+This closes the vignette ladder: simulating and understanding the model
+(anatomy, priors), fitting and checking a single subject (getting started,
+convergence), pooling subjects (population), coupling hormones (joint), and
+quantifying trust and design (simulation study). The chains extracted here
+are the common currency underneath all of it -- when a packaged summary
+does not answer your question, the draws will.
