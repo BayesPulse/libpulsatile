@@ -123,12 +123,17 @@ plot_acf(fit)
 
 ## Performance
 
-The population model demonstrates excellent linear scaling:
-- **10 subjects, 10,000 iterations**: ~14 minutes
-- **Average**: 0.048 seconds per iteration
-- **Memory usage**: <25 MB even for 50 subjects
+Runtime scales roughly linearly in iterations and observations. Measured
+on Apple Silicon (2026-08), at the production defaults of 250,000
+iterations:
 
-See [BENCHMARK_REPORT.md](BENCHMARK_REPORT.md) for detailed performance analysis.
+- **Single subject** (60 observations): under a minute
+- **Population, 5 subjects** (720 total observations): ~11 minutes
+- **Joint driver-response** (2 x 144 observations): a few minutes
+
+Benchmark scripts live in [R-package/benchmarks/](R-package/benchmarks/);
+the simulation-study vignette (`v07`) shows how to time and scale fits for
+your own design.
 
 ## Platform Support
 
