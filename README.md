@@ -131,6 +131,8 @@ iterations:
 - **Population, 5 subjects** (720 total observations): ~11 minutes
 - **Joint driver-response** (2 x 144 observations): a few minutes
 
+These figures come from the timed vignette precompute runs recorded in
+PRs #30 (population), #32 (joint), and #33 (single-subject replicates).
 Benchmark scripts live in [R-package/benchmarks/](R-package/benchmarks/);
 the simulation-study vignette (`v07`) shows how to time and scale fits for
 your own design.

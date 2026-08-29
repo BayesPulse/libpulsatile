@@ -4,7 +4,7 @@
 \alias{chains}
 \alias{pulse_chain}
 \alias{patient_chain}
-\title{chains}
+\title{Posterior MCMC chains}
 \usage{
 chains(fit)
 
@@ -13,11 +13,33 @@ pulse_chain(fit)
 patient_chain(fit)
 }
 \arguments{
-\item{fit}{A model fit from \code{fit_pulse}.}
+\item{fit}{A model fit from \code{\link{fit_pulse}},
+\code{\link{fit_pulse_population}}, or \code{\link{fit_pulse_joint}}.
+Accessors \code{patient_chain()} and \code{pulse_chain()} currently
+support single-subject (\code{pulse_fit}) objects only.}
+}
+\value{
+\code{chains()} prints the inventory and invisibly returns it as a
+  data frame with one row per chain and columns \code{chain} (name),
+  \code{access} (the expression that extracts it, written in terms of an
+  object named \code{fit}), \code{rows}, and \code{columns}. Accessors in
+  the \code{access} column that contain \code{[[i]]} or \code{[[j]]} are
+  subscripted by subject and saved draw respectively.
+
+  \code{patient_chain()} returns the subject-level (common parameter) chain
+  and \code{pulse_chain()} the per-pulse chain, each as a tibble.
 }
 \description{
-Functions for extracting and working with the various levels of posterior
-mcmc chains.
+Functions for locating and extracting the various levels of
+  posterior MCMC chains held in a model fit.
+
+  \code{chains()} prints an inventory of every chain in a fit, the
+  expression that extracts it, and its dimensions. The single-subject model
+  has accessor functions (\code{patient_chain()}, \code{pulse_chain()});
+  the population and joint models store their chains as list elements, and
+  the population per-pulse chains are nested two levels deep (subject, then
+  saved draw), so \code{chains()} is the quickest way to see what a fit
+  holds and how to reach it.
 }
 \examples{
 
@@ -25,9 +47,9 @@ pulse <- simulate_pulse()
 spec  <- pulse_spec()
 fit   <- fit_pulse(data = pulse, iters = 1000, thin = 10,
                    burnin = 100, spec = spec)
-#chains(fit)
-#pulse_chain(fit)
-#patient_chain(fit)
+chains(fit)
+head(patient_chain(fit))
+head(pulse_chain(fit))
 
 }
 \keyword{fit}

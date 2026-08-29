@@ -5,6 +5,22 @@ This document consolidates unique issues identified by Claude Code reviews acros
 **Last Updated:** 2025-12-30
 **Source:** Claude Code reviews on PRs #6 and #8
 
+> **Status note (2026-08-29):** this tracker predates substantial later work
+> and still needs a per-item triage (mark fixed/stale/open with evidence,
+> then retire the file). Verified so far:
+>
+> - **H3 is WITHDRAWN.** Its recommended fix was applied and broke the joint
+>   response sampler outright; see the entry for the full account. Read H3
+>   before touching the Strauss acceptance in `joint_birthdeath.h`.
+> - **M3** (crude association integral) is **stale** -- the integral in
+>   `joint_draw_association.h` has since been corrected and re-verified
+>   during PRs #31/#32.
+> - **C1** (stale per-pulse `lambda` after location moves) is still present
+>   in `joint_mcmc_iteration.h`, but the association samplers recompute
+>   kernels from current positions rather than reading the stored `lambda`,
+>   so its practical impact needs assessment.
+> - Remaining entries are unverified against current master.
+
 ---
 
 ## Table of Contents
@@ -134,31 +150,40 @@ PopulationChains(...) {
 
 ### H3. Numerical Overflow in Strauss Acceptance Calculation (PR #8)
 
-**Status:** ✅ RESOLVED. `joint_birthdeath.h` now computes the acceptance ratio on the log scale (`log_papas_cif = log(birth_rate_at_pos) + sum_s_r * log(strauss_repulsion)`; `accept = log(runif) < log_b_ratio`), avoiding the `pow()` over/underflow (commit `90b6de9`).
+**Status:** ❌ WITHDRAWN (2026-08-29) - not a real defect, and the recommended
+fix caused an outage. **Do not re-apply the log-scale rewrite described below.**
 
-**Location:** `joint_birthdeath.h:216-218`
+**Location:** `joint_birthdeath.h` (response birth acceptance)
 
-**Problem:**
-Direct use of `pow(strauss_repulsion, sum_s_r)` can overflow or underflow for extreme values.
+**What happened:** the log-scale fix recommended by this entry was applied in
+`90b6de9`, and it broke the joint model's response sampler outright. Under the
+`joint_spec()` default `prior_response_location_gamma = 0` (the hard-core
+Strauss process), `sum_s_r * log(strauss_repulsion)` is `0 * log(0) = NaN` when
+no existing pulse is nearby and `-Inf` otherwise, so *every* response birth was
+rejected. Deaths continued while more than one pulse remained, so the response
+pulse count collapsed to exactly 1 within a few iterations and stayed there for
+the whole run at any chain length, leaving the coupling posteriors equal to
+their priors. Reverted to natural-scale `pow()` in PR #31, which also added a
+regression test (`test-joint.R`) and an explanatory comment at the call site.
 
-**Description:**
-If `strauss_repulsion < 1` and `sum_s_r` is large, the result underflows to zero. If `strauss_repulsion > 1` and `sum_s_r` is large, overflow occurs.
+**Why the original concern does not apply:** `joint_spec()` validates both
+`prior_driver_location_gamma` and `prior_response_location_gamma` to `[0, 1]`
+(`R/joint_spec.R`), so `pow(gamma, sum_s_r)` cannot overflow -- the `gamma > 1`
+branch of the description below is unreachable through the R interface. The
+remaining `gamma < 1` case underflows toward zero, which is the *correct*
+result: a proposal crowded by many neighbours should be rejected under a
+Strauss prior. The single-subject sampler (`birthdeath.h`) has used the same
+natural-scale `pow()` on this path since the beginning without trouble.
 
-**Impact:**
-- Numerical instability in birth-death process
-- Incorrect acceptance probabilities
-- Potential NaN or Inf values propagating through MCMC
+**Original problem statement (retained for the record, superseded above):**
+Direct use of `pow(strauss_repulsion, sum_s_r)` can overflow or underflow for
+extreme values. If `strauss_repulsion < 1` and `sum_s_r` is large, the result
+underflows to zero. If `strauss_repulsion > 1` and `sum_s_r` is large, overflow
+occurs.
 
-**Recommended Fix:**
-Use log-scale arithmetic:
-```cpp
-double log_papas_cif = log(birth_rate_at_pos) +
-                       sum_s_r * log(response_patient->priors.strauss_repulsion);
-double log_b_ratio = log_papas_cif - log(birth_rate);
-accept_pos = (log(Rf_runif(0, 1)) < log_b_ratio) ? 1 : 0;
-```
-
-**Severity:** HIGH - Numerical stability issue
+**Severity:** N/A - withdrawn. If a future change ever does make `gamma > 1`
+reachable, revisit with a formulation that special-cases `gamma == 0` rather
+than taking `log(gamma)` unconditionally.
 
 ---
 
