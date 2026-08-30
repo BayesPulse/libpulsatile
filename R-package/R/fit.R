@@ -28,7 +28,7 @@
 #'   columns printed to those which fit in the console.
 #' @param verbose Prints diagnostics and estimates every 5000th iteration.
 #'   Default is \code{FALSE}.
-#' @importFrom tibble as_data_frame
+#' @importFrom tibble as_tibble
 #' @keywords pulse fit
 #' @examples
 #' this_pulse <- simulate_pulse()
@@ -52,7 +52,7 @@ fit_pulse <- function(data,
                       ) {
 
   
-  if (all(class(data) == "pulse_sim")) {
+  if (inherits(data, "pulse_sim")) {
     indata <- data$data
   } else {
     indata <- data.frame("time" = data[[time]], "concentration" = data[[conc]])
@@ -87,7 +87,7 @@ fit_pulse <- function(data,
                       "spec"), 
                     names(Call), nomatch = 0)
 
-  if (class(spec) != "pulse_spec") {
+  if (!inherits(spec, "pulse_spec")) {
     stop("spec is invalid -- see the fit_pulse() and pulse_spec()
          documentation.")
   }
@@ -113,8 +113,8 @@ fit_pulse <- function(data,
   patient_chain$num_pulses      <- as.integer(patient_chain$num_pulses)
 
   if (use_tibble) {
-    patient_chain <- tibble::as_data_frame(patient_chain)
-    pulse_chain  <- tibble::as_data_frame(pulse_chain)
+    patient_chain <- tibble::as_tibble(patient_chain)
+    pulse_chain  <- tibble::as_tibble(pulse_chain)
   }
 
   rtn_obj <- 

@@ -1,0 +1,223 @@
+name: CI (hosted)
+
+# The GitHub-hosted half of the CI split (see ci-selfhosted.yml for the other
+# half and the security rationale). This is where pull requests — including
+# fork PRs from external contributors — run: hosted runners are free on a
+# public repo and isolate untrusted PR code away from the self-hosted runner.
+#
+# Trigger split:
+#   * pull_request        -> full matrix (ubuntu + macos) for PR feedback
+#   * push master/develop -> macOS ONLY. Linux pushes build on the self-hosted
+#     runner (ci-selfhosted.yml); macOS cannot move there, so it keeps running
+#     here on push to preserve the coverage the old ci.yml had.
+#
+# ccache + actions/cache speed up the C++-heavy R package compiles between
+# runs (compiler calls are routed through ccache via ~/.R/Makevars).
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+# Newest commit on a ref wins; rapid-fire pushes to a PR branch shouldn't pile
+# up hosted matrix runs. (Refs differ per PR, so this never cancels main.)
+concurrency:
+  group: ci-hosted-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least privilege: this workflow runs untrusted fork-PR code, so pin the token
+# to read-only rather than inheriting the repo-default scope.
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # On pull_request: full matrix. On push, the ubuntu build belongs to
+        # the self-hosted workflow — only macOS runs here (see header). This
+        # lives in the matrix expression because `matrix` is not an available
+        # context in a job-level `if` (referencing it there is a plan-time
+        # error that fails the whole workflow with zero jobs).
+        os: ${{ github.event_name == 'pull_request' && fromJSON('["ubuntu-latest", "macos-latest"]') || fromJSON('["macos-latest"]') }}
+        # 'release' tracks the current R release. The old 4.3.0 pin had aged
+        # out of CRAN's binary windows, silently forcing every dependency to
+        # compile from source on BOTH OSes (~13 min/run); current release gets
+        # binaries again. The R-library cache key below embeds the resolved
+        # version, so a release bump naturally starts a fresh library.
+        r-version: ['release']
+
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      # Parallel compiles: R CMD INSTALL/check pass this to make for the
+      # package's src/ objects, and the standalone `make` reads it from the
+      # environment directly. Hosted runners have 3-4 cores (ubuntu 4, macOS
+      # arm64 3); a spare job slot just waits, so -j4 is safe on both.
+      MAKEFLAGS: -j4
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Required for symbolic links
+
+    - name: Setup R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: ${{ matrix.r-version }}
+        # Point default repos at Posit Public Package Manager, which serves
+        # prebuilt binaries for Ubuntu (CRAN only ships Linux packages as
+        # source). Install steps below must use getOption("repos") — a
+        # hardcoded repos= argument would silently bypass this.
+        use-public-rspm: true
+
+    # Vignettes (rmarkdown/html_vignette) need pandoc at R CMD build time;
+    # the hosted runner images don't bundle a version R can find.
+    - name: Setup pandoc
+      uses: r-lib/actions/setup-pandoc@v2
+
+    - name: Setup R dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        # libuv1-dev: the 'fs' package (a transitive dependency of
+        # devtools/testthat/covr) now builds against system libuv; without it
+        # fs fails to compile and cascades to every package that depends on it.
+        sudo apt-get install -y gfortran liblapack-dev libblas-dev \
+          libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev \
+          libfontconfig1-dev libharfbuzz-dev libfribidi-dev \
+          libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev \
+          libuv1-dev ccache
+
+    - name: Setup R dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        # Install gfortran for RcppArmadillo
+        brew install gfortran || true
+        brew install ccache || true
+        # Ensure R can find gfortran
+        sudo ln -sf /opt/homebrew/bin/gfortran /usr/local/bin/gfortran || true
+
+    # Resolve the actual R version once, up front: both cache keys below embed
+    # it (matrix says 'release', a moving label) so an upstream R release bump
+    # starts fresh caches instead of restoring ABI-stale artifacts.
+    - name: Resolve R version / locate R library
+      id: rlib
+      run: |
+        mkdir -p "$R_LIBS_USER"
+        echo "path=$R_LIBS_USER" >> "$GITHUB_OUTPUT"
+        echo "rver=$(Rscript --vanilla -e 'cat(as.character(getRversion()))')" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Restore compiler cache (ccache)
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/.ccache
+        key: ccache-${{ matrix.os }}-R${{ steps.rlib.outputs.rver }}-${{ github.sha }}
+        restore-keys: |
+          ccache-${{ matrix.os }}-R${{ steps.rlib.outputs.rver }}-
+
+    - name: Route R compiles through ccache
+      run: |
+        mkdir -p "$CCACHE_DIR" ~/.R
+        # Wrap whatever compilers this R was configured with, rather than
+        # hardcoding gcc/clang names that differ across the matrix.
+        {
+          echo "CC=ccache $(R CMD config CC)"
+          echo "CXX=ccache $(R CMD config CXX)"
+          echo "CXX11=ccache $(R CMD config CXX11)"
+          echo "CXX14=ccache $(R CMD config CXX14)"
+          echo "CXX17=ccache $(R CMD config CXX17)"
+        } >> ~/.R/Makevars
+        ccache -z
+      shell: bash
+
+    # The single biggest time sink was reinstalling every R dependency from
+    # scratch each run (~13 of ~16 minutes with the old source builds).
+    - name: Restore R package library
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.rlib.outputs.path }}
+        key: rlib-${{ matrix.os }}-R${{ steps.rlib.outputs.rver }}-${{ hashFiles('R-package/DESCRIPTION') }}
+        restore-keys: |
+          rlib-${{ matrix.os }}-R${{ steps.rlib.outputs.rver }}-
+
+    - name: Install R packages
+      run: |
+        # repos deliberately NOT hardcoded: getOption('repos') carries the
+        # P3M/binary repo configured by setup-r's use-public-rspm.
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'testthat', 'remotes'), lib=Sys.getenv('R_LIBS_USER'))"
+        # Install R package dependencies from DESCRIPTION file
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); remotes::install_deps('R-package', dependencies=TRUE)"
+      shell: bash
+
+    - name: Install RInside (with fallback)
+      # Authenticated GitHub API (5000 req/hr) on TRUSTED runs so install_github
+      # doesn't flake against the unauthenticated 60 req/hr cap on shared runner
+      # IPs — but withhold the token on FORK PRs (defense in depth; it's already
+      # read-only there). The expression is '' only when this is a fork PR;
+      # pushes and same-repo PRs leave pull_request null, so they get the token.
+      env:
+        GITHUB_PAT: ${{ github.event.pull_request.head.repo.fork == true && '' || secrets.GITHUB_TOKEN }}
+      run: |
+        # Try to install RInside from GitHub, fallback to CRAN if available, or skip
+        Rscript -e "
+        tryCatch({
+          remotes::install_github('eddelbuettel/RInside', upgrade='never', quiet=TRUE)
+          cat('RInside installed from GitHub\n')
+        }, error = function(e) {
+          tryCatch({
+            install.packages('RInside', quiet=TRUE)  # repos from use-public-rspm
+            cat('RInside installed from CRAN\n')
+          }, error = function(e2) {
+            cat('RInside installation failed, will use NORINSIDE flag\n')
+            cat('Error:', conditionMessage(e2), '\n')
+          })
+        })"
+      shell: bash
+
+    - name: Build C++ library
+      run: |
+        make clean
+        # Check if RInside is available, if not, skip C++ build and focus on R package
+        if Rscript -e "library(RInside)" 2>/dev/null; then
+          echo "RInside available, building C++ library"
+          make
+        else
+          echo "RInside not available, skipping C++ standalone build"
+          echo "Will focus on R package build which uses NORINSIDE flag"
+        fi
+
+    - name: Run C++ tests
+      run: |
+        # Only run C++ tests if the binary was built
+        if [ -f "bin/tests" ]; then
+          echo "Running C++ tests"
+          # Set LD_LIBRARY_PATH to find R shared libraries
+          export LD_LIBRARY_PATH="$(R RHOME)/lib:${LD_LIBRARY_PATH}"
+          bin/tests
+        else
+          echo "C++ tests not available (RInside not installed)"
+        fi
+
+    - name: Build and check R package
+      run: |
+        cd R-package
+        # Use devtools directly instead of make (which uses --vanilla flag that ignores R_LIBS_USER)
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::document()"
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::check()"
+
+    - name: Install R package
+      run: |
+        cd R-package
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::install()"
+
+    - name: Run R tests
+      run: |
+        cd R-package
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::test()"
+
+    - name: ccache stats
+      if: always()
+      run: ccache -s || true

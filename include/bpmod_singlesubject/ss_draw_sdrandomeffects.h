@@ -43,6 +43,7 @@ class SS_DrawSDRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_width;
           randomeffect_   = &PulseEstimates::width;
           sd_param_         = &PatientPriors::width_sd_param;
+          sd_max_           = &PatientPriors::width_sd_max;
           parameter_name = "SD of pulse widths";
         } else {
           est_mean_       = &PatientEstimates::mass_mean;
@@ -50,10 +51,17 @@ class SS_DrawSDRandomEffects :
           tvarscale_      = &PulseEstimates::tvarscale_mass;
           randomeffect_   = &PulseEstimates::mass;
           sd_param_         = &PatientPriors::mass_sd_param;
+          sd_max_           = &PatientPriors::mass_sd_max;
           parameter_name = "SD of pulse masses";
         }
 
       };
+
+    // Exposed publicly so the closed-form log-ratio and the support bound can be
+    // unit tested; the MH base dispatches through its own private virtuals, so
+    // this does not change normal sampling behavior.
+    double posterior_function(Patient *patient, double proposal, Patient *notused);
+    bool parameter_support(double val, Patient *patient);
 
   private:
 
@@ -61,14 +69,12 @@ class SS_DrawSDRandomEffects :
     double PatientEstimates::*est_sd_;
     double PulseEstimates::*tvarscale_;
     double PulseEstimates::*randomeffect_; //pulse specific mass or width
-    
+
     double PatientPriors::*sd_param_; //pulse specific mass or width
+    double PatientPriors::*sd_max_;   //Uniform(0,.) upper bound, mass or width
 
     std::string parameter_name;
     std::string get_parameter_name() { return parameter_name; };
-
-    bool parameter_support(double val, Patient *patient);
-    double posterior_function(Patient *patient, double proposal, Patient *notused);
 
 };
 
@@ -80,13 +86,19 @@ class SS_DrawSDRandomEffects :
 //------------------------------------------------------------
 
 // parameter_support()
-//   Defines whether the proposal value is within the parameter support
-//   For the Cauchy this is just positive
-//    TO DO: can we remove the Patient part of the function?
-bool SS_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
+//   Defines whether the proposal value is within the parameter support.
+//   Half-Cauchy prior (default): support is positive.
+//   Uniform(0, max) prior: support is the open interval (0, max), where max is
+//   the mass/width upper bound read from the patient's priors. The MH base checks
+//   this before evaluating posterior_function, so any proposal reaching the
+//   acceptance-ratio calculation is guaranteed inside the support -- this is what
+//   lets the Uniform prior ratio cancel to 0 there.
+inline bool SS_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
 
- // PatientPriors *priors = &patient->priors;
-  //double patient_sd_param = (*priors).*sd_param_;
+  if (patient->uniform_sd_prior) {
+    double max = (patient->priors).*sd_max_;
+    return (val > 0.0 && val < max);
+  }
 
   return (val > 0.0);
 
@@ -97,8 +109,8 @@ bool SS_DrawSDRandomEffects::parameter_support(double val, Patient *patient) {
 //   Calculates the acceptance ratio for use in modified metropolis hastings
 //   sampler (inherited SS_DrawSDRandomEffects::sample() function)
 //
-double SS_DrawSDRandomEffects::posterior_function(Patient *patient, 
-                                                  double proposal, 
+inline double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
+                                                  double proposal,
                                                   Patient *notused) {
 
   double stdx_old    = 0.0;
@@ -118,16 +130,27 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   // Calculate pulse-specific portion of acceptance ratio
   for (auto &pulse : patient->pulses) {
 
-    // Normalizing constants for ratio of log likelihoods. They are truncated t-distributions
-    stdx_old   = patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
-    stdx_new   = patient_mean / ( proposal / sqrt(pulse.*tvarscale_) );
-    new_int   += Rf_pnorm5(stdx_new, 0, 1, 1.0, 1.0);
-    old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
+    if (patient->lognormal_pulses) {
+      // Log-normal parameterization (papers): log(theta) ~ N(mu, sigma^2/kappa).
+      // Residuals are on the log scale and there is no truncation at 0, so the
+      // truncated-normal normalizing constants (old_int/new_int) are dropped.
+      double logre = log(pulse.*randomeffect_);
+      third_part += pulse.*tvarscale_ *
+                    (logre - patient_mean) *
+                    (logre - patient_mean);
+    } else {
+      // Natural-scale truncated-normal parameterization (research option).
+      // Normalizing constants for ratio of log likelihoods. They are truncated t-distributions
+      stdx_old   = patient_mean / ( patient_sd  / sqrt(pulse.*tvarscale_) );
+      stdx_new   = patient_mean / ( proposal / sqrt(pulse.*tvarscale_) );
+      new_int   += Rf_pnorm5(stdx_new, 0, 1, 1.0, 1.0);
+      old_int   += Rf_pnorm5(stdx_old, 0, 1, 1.0, 1.0);
 
-    // 3rd part of acceptance ratio: This is for ratio of log likelihoods, which are truncated t-distribuitons
-    third_part += pulse.*tvarscale_ * 
-                  (pulse.*randomeffect_ - patient_mean) * 
-                  (pulse.*randomeffect_ - patient_mean);
+      // 3rd part of acceptance ratio: This is for ratio of log likelihoods, which are truncated t-distribuitons
+      third_part += pulse.*tvarscale_ *
+                    (pulse.*randomeffect_ - patient_mean) *
+                    (pulse.*randomeffect_ - patient_mean);
+    }
 
   }
 
@@ -135,8 +158,18 @@ double SS_DrawSDRandomEffects::posterior_function(Patient *patient,
   first_part  = patient->get_pulsecount() * (log(patient_sd) - log(proposal));
   second_part = 0.5 * ((1 / (patient_sd * patient_sd)) - (1 / (proposal * proposal)));
     
-  // 4th part of acceptance ratio: Ratio of priors
+  // 4th part of acceptance ratio: Ratio of priors on the pulse-to-pulse SD.
+  // This axis is orthogonal to lognormal_pulses: only the prior ratio changes.
+  if (patient->uniform_sd_prior) {
+    // Uniform(0, max): the density is constant on its support, and both the
+    // current SD and the proposal are inside (0, max) (parameter_support rejects
+    // out-of-support proposals before posterior_function is ever called), so the
+    // prior ratio is log(1/max) - log(1/max) = 0.
+    fourth_part = 0.0;
+  } else {
+    // Half-Cauchy prior with scale patient_sd_param (research option).
     fourth_part = log(patient_sd_param + patient_sd * patient_sd) - log(patient_sd_param + proposal * proposal);
+  }
 
   // Compute and return log rho
   return old_int - new_int + first_part + second_part * third_part + fourth_part;

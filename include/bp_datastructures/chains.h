@@ -104,7 +104,7 @@ class Chains {
 //------------------------------------------------------------
 
 // Member Function: Record this iteration
-void Chains::save_sample(Patient * pat, int iter) {
+inline void Chains::save_sample(Patient * pat, int iter) {
 
   int r_iter = iter + 1;
 
@@ -155,7 +155,7 @@ void Chains::save_sample(Patient * pat, int iter) {
 };
 
 // Member Function: Return chains object (R list)
-List Chains::output(Patient * pat) {
+inline List Chains::output(Patient * pat) {
 
   // Add names to each output chain
   NumericMatrix patient_chain_r = addattribs_patient_chain(patient_chain);
@@ -173,9 +173,9 @@ List Chains::output(Patient * pat) {
 
 }
 
-// Member Function: Print chain/patient diagnostic info 
+// Member Function: Print chain/patient diagnostic info
 //   (proposal variance diagnostics handled by MH class)
-void Chains::print_diagnostic_output(Patient * patient, int iter) {
+inline void Chains::print_diagnostic_output(Patient * patient, int iter) {
 
   if (verbose == 1 && (iter % verbose_iter == 0)) {
 
@@ -205,7 +205,7 @@ void Chains::print_diagnostic_output(Patient * patient, int iter) {
 //------------------------------------------------------------
 
 // Member Function: Prep patient_chain for exporting
-NumericMatrix Chains::addattribs_patient_chain(arma::mat in) {
+inline NumericMatrix Chains::addattribs_patient_chain(arma::mat in) {
 
   // Convert arma obj to Rcpp
   NumericMatrix out = as<NumericMatrix>(wrap(in));
@@ -231,7 +231,7 @@ NumericMatrix Chains::addattribs_patient_chain(arma::mat in) {
 }
 
 // Member Function: Function for adding attributes to one_set_of_pulses
-NumericMatrix Chains::addattribs_set_of_pulses(NumericMatrix out) {
+inline NumericMatrix Chains::addattribs_set_of_pulses(NumericMatrix out) {
 
   colnames(out) = CharacterVector::create("iteration",
                                           "total_num_pulses",
@@ -250,7 +250,7 @@ NumericMatrix Chains::addattribs_set_of_pulses(NumericMatrix out) {
 }
 
 //
-List Chains::addattribs_pulse_chain(std::vector<arma::mat>  in) {
+inline List Chains::addattribs_pulse_chain(std::vector<arma::mat>  in) {
 
   //MatrixVector::iterator iter = pulse_chains.begin() ;
   //while( iter != iter.end() ){

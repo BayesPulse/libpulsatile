@@ -1,0 +1,269 @@
+---
+title: "Population modeling: pooling subjects in one hierarchical fit"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Population modeling: pooling subjects in one hierarchical fit}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.path = "v05-population-model-",
+                      fig.width = 7, fig.height = 5, dpi = 96)
+library(bayespulse)
+library(ggplot2)
+```
+
+Hormone studies rarely stop at one subject. A typical protocol samples a
+cohort -- five, ten, twenty people -- and the scientific questions are about
+the group: what is the average pulse mass in these patients, how much do
+subjects vary around it, and does this group differ from that one?
+
+One option is to fit each subject separately, as in the getting-started
+vignette, and average afterwards. That discards something valuable: subjects
+inform one another. A subject whose series happens to be noisy or short can
+borrow strength from the rest of the cohort, and the between-subject spread is
+itself estimated with proper uncertainty instead of being computed post hoc
+from a handful of point estimates. The population model does this by fitting
+all subjects jointly in a single hierarchical model -- the Bayesian machinery
+for *partial pooling*.
+
+## 1. The hierarchical model
+
+Each subject's series follows the same deconvolution model used in the
+single-subject vignette: baseline plus Gaussian secretion pulses convolved
+with exponential elimination, observed on the log scale with additive error.
+The hierarchy enters at the subject level. Subject $i$ has its own baseline
+$B_i$, half-life $H_i$, mean log pulse mass $\mu_{\alpha,i}$, and mean log
+pulse width $\mu_{\omega,i}$, and these are drawn from population
+distributions:
+
+$$
+B_i \sim N(\mu_B, \sigma^2_B), \qquad
+H_i \sim N(\mu_H, \sigma^2_H), \qquad
+\mu_{\alpha,i} \sim N(\mu_\alpha, \sigma^2_\alpha), \qquad
+\mu_{\omega,i} \sim N(\mu_\omega, \sigma^2_\omega).
+$$
+
+The population means ($\mu_B, \mu_H, \mu_\alpha, \mu_\omega$) answer "what is
+this cohort like on average?", and the population SDs
+($\sigma_B, \sigma_H, \sigma_\alpha, \sigma_\omega$) answer "how much do
+subjects differ?". Below the subject level, individual pulses vary around
+their subject's means with pulse-to-pulse SDs that are shared across
+subjects, as is the observation error variance.
+
+## 2. Simulate a cohort
+
+`simulate_pulse_population()` draws each subject's parameters from the
+population distributions above and then simulates that subject's series with
+`simulate_pulse()`. As in the single-subject vignettes we request
+`pulse_distribution = "lognormal"` explicitly, so the simulated data match the
+parameterization `population_spec()` fits by default (the simulator alone
+still defaults to the legacy `"truncnorm"`).
+
+The mass and width arguments are on the **log scale** -- we leave the
+within-subject values at their tuned defaults (`mass_mean = 1.2`,
+`width_mean = 3.0`) and only say how much *subjects* differ: a
+`mass_mean_sd` of 0.15 means subject-level median pulse masses spread about
+15% around the population median, and the baseline and half-life SDs are on
+their natural scales (concentration units and minutes).
+
+```{r simulate}
+pop <- simulate_pulse_population(
+  n_subjects = 5, num_obs = 144, interval = 10,
+  pulse_distribution = "lognormal",
+  baseline = 2.5,   baseline_sd   = 0.3,
+  halflife = 40,    halflife_sd   = 5,
+  mass_mean_sd = 0.15, width_mean_sd = 0.2,
+  seed = 2026)
+```
+
+```{r plot-cohort, fig.height = 8}
+cohort <- do.call(rbind, lapply(seq_len(pop$n_subjects), function(i)
+  cbind(subject = paste("Subject", i), pop$data[[i]])))
+ggplot(cohort, aes(time, concentration)) +
+  geom_line(linewidth = 0.3) + geom_point(size = 0.6) +
+  facet_wrap(~ subject, ncol = 1) +
+  labs(x = "Time (minutes)", y = "Concentration") +
+  theme_minimal()
+```
+
+Five subjects observed every 10 minutes for 24 hours. The series share a
+family resemblance -- similar pulse frequency and decay -- but differ in
+level and pulse size, which is exactly the structure the hierarchy is built
+to capture.
+
+## 3. Specify the population model
+
+`population_spec()` mirrors `pulse_spec()`, with two differences worth
+noticing. First, the location priors now describe the *population
+distributions*: `prior_baseline_mean_mean` and `prior_baseline_mean_var` are
+the prior on $\mu_B$, and so on. Second, there are new priors on the
+between-subject SDs; by default these are Uniform(0, max) with the maxima set
+by `prior_baseline_sd_max` and `prior_halflife_sd_max`.
+
+As in the single-subject vignettes we set only the data-specific arguments
+and leave everything governing pulse mass and width at the tuned log-scale
+defaults.
+
+```{r spec}
+spec <- population_spec(
+  location_prior_type      = "strauss",
+  prior_location_gamma     = 0.1,  prior_location_range   = 30,
+  prior_baseline_mean_mean = 2.6,  prior_baseline_mean_var = 100,
+  prior_halflife_mean_mean = 45,   prior_halflife_mean_var = 100,
+  prior_mean_pulse_count   = 12)
+```
+
+## 4. Fit the model
+
+`fit_pulse_population()` runs the same birth-death MCMC as `fit_pulse()`, but
+with all subjects updated within each iteration and the population-level
+parameters updated from the subject-level values. We pass the list of
+per-subject data frames straight from the simulation. (This chunk is
+precomputed offline via `vignettes/precompute.R`, so the vignette itself
+builds quickly; run live, a fit this long takes on the order of ten minutes,
+so reduce `iters` if you are exploring interactively.)
+
+```{r fit}
+set.seed(42)
+fit <- fit_pulse_population(pop$data, spec = spec,
+                            iters = 250000, thin = 50, burnin = 25000,
+                            verbose = FALSE)
+fit
+```
+
+## 5. Turnkey convergence diagnostics
+
+The convergence vignette assessed a single-subject fit with the
+model-agnostic tools (`effective_sample_size()`, `gelman_rubin()`). For a
+`population_fit`, bayespulse provides a turnkey suite. `convergence_report()`
+prints an at-a-glance summary and flags parameters whose effective sample
+size is low:
+
+```{r report}
+report <- convergence_report(fit)
+```
+
+The report invisibly returns the underlying table (also available directly
+via `population_diagnostics()`), so you can work with it programmatically:
+
+```{r diagnostics}
+report[order(report$ess), c("parameter", "mean", "ess", "lag1_acf")]
+```
+
+The pulse-to-pulse `width_sd` mixes slowest here -- the lowest effective
+sample size and the highest lag-1 autocorrelation in the table -- but still
+clears the ESS bar comfortably. That is the same weakly identified
+mass/width ridge met in the convergence vignette, showing up at the
+population level.
+
+`plot_trace()` and `plot_acf()` accept the same `parameters` argument;
+here are the four population means:
+
+```{r trace}
+plot_trace(fit, parameters = c("baseline_mean", "halflife_mean",
+                               "mass_mean", "width_mean"))
+```
+
+```{r acf}
+plot_acf(fit, parameters = c("baseline_mean", "halflife_mean",
+                             "mass_mean", "width_mean"))
+```
+
+Interpretation follows the convergence vignette: fuzzy, stationary trace
+bands and quickly decaying autocorrelation are what converged, efficient
+sampling looks like; slowly decaying autocorrelation means the chain must run
+longer for the same number of effectively independent draws.
+
+Finally, `identifiability_check()` works on a `population_fit` directly -- it
+reads the uniform-prior bounds for the between-subject SDs from the fit's own
+spec, so no manual bounds are needed:
+
+```{r identifiability}
+identifiability_check(fit)
+```
+
+A cohort of five subjects carries only five observations' worth of
+information about each between-subject SD, and the check flags exactly that:
+the half-life SD's posterior still covers about 71% of its Uniform(0, 20)
+prior (the same warning appears at the bottom of `convergence_report()`
+above). Its effective sample size is healthy, so this is not a mixing
+problem -- more subjects, not longer chains, are the remedy.
+
+## 6. Shrinkage: what pooling buys you
+
+To see partial pooling at work, fit each subject separately with
+`fit_pulse()` -- the no-pooling analysis -- using priors that match the
+population model's subject level. (Also precomputed offline.)
+
+```{r singles}
+single_spec <- pulse_spec(
+  location_prior_type    = "strauss",
+  prior_location_gamma   = 0.1, prior_location_range = 30,
+  prior_baseline_mean    = 2.6, prior_baseline_var   = 100,
+  prior_halflife_mean    = 45,  prior_halflife_var   = 100,
+  prior_mean_pulse_count = 12,
+  sv_baseline_mean = 2.6, sv_halflife_mean = 45)
+
+singles <- lapply(seq_len(pop$n_subjects), function(i) {
+  set.seed(500 + i)
+  fit_pulse(data = pop$data[[i]], spec = single_spec,
+            iters = 250000, thin = 100, burnin = 25000, verbose = FALSE)
+})
+```
+
+Now compare, for each subject, the unpooled posterior mean against the
+population fit's subject-level posterior mean, with the estimated population
+mean as a reference line. We show baseline and half-life -- the two
+subject-level parameters on natural, directly interpretable scales; the
+log-scale mass and width means shrink the same way:
+
+```{r shrinkage, fig.height = 4}
+est <- do.call(rbind, lapply(seq_len(pop$n_subjects), function(i) {
+  unpooled <- patient_chain(singles[[i]])
+  pooled   <- fit$subject_chains[[i]]
+  data.frame(subject   = factor(i),
+             parameter = c("baseline", "half-life"),
+             unpooled  = c(mean(unpooled$baseline), mean(unpooled$halflife)),
+             pooled    = c(mean(pooled$baseline),   mean(pooled$halflife)))
+}))
+pop_means <- data.frame(
+  parameter = c("baseline", "half-life"),
+  value     = c(mean(fit$population_chain$baseline_mean),
+                mean(fit$population_chain$halflife_mean)))
+
+ggplot(est, aes(y = subject)) +
+  geom_vline(data = pop_means, aes(xintercept = value), linetype = "dashed") +
+  geom_segment(aes(x = unpooled, xend = pooled, yend = subject),
+               arrow = arrow(length = unit(0.15, "cm")), color = "grey50") +
+  geom_point(aes(x = unpooled, shape = "unpooled"), size = 2.5) +
+  geom_point(aes(x = pooled, shape = "pooled"), size = 2.5) +
+  scale_shape_manual(NULL, values = c(unpooled = 1, pooled = 16)) +
+  facet_wrap(~ parameter, scales = "free_x") +
+  labs(x = "Posterior mean", y = "Subject") +
+  theme_minimal()
+```
+
+Each arrow runs from the subject's unpooled estimate (open circle) to its
+estimate under the population model (filled circle); the dashed line is the
+estimated population mean. The population estimates sit between each
+subject's own data and the cohort average -- that pull toward the center is
+*shrinkage*. It is strongest for subjects whose own series pin the parameter
+down least, because the population distribution then contributes relatively
+more information, and mild for subjects whose data speak clearly. With 24
+hours of 10-minute sampling every series here is informative, so most arrows
+are short; subject 3, whose series drags the baseline lowest and the
+half-life longest, shows the clearest pull back toward the cohort. With
+shorter or noisier series -- common in clinical protocols -- the pooling
+becomes correspondingly more valuable. The result is a principled
+compromise: individual estimates stabilized by the cohort, and cohort-level
+summaries ($\mu$, $\sigma$) with honest uncertainty.
+
+## Where next
+
+The remaining rung on the modeling ladder is the joint driver-response model
+-- two coupled hormones fit simultaneously, with the driver's pulses
+influencing when the response hormone fires. It is covered in the next
+vignette.

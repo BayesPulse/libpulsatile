@@ -5,8 +5,7 @@
 #' pulse_spec() and fit_pulse().
 #'
 #' @name bayespulse-package
-#' @docType package
 #' @aliases bayespulse bayespulse-package
 #' @useDynLib bayespulse, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-NULL
+"_PACKAGE"

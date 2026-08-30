@@ -14,4 +14,8 @@ build_package.R
 README.Rmd
 ^.*.Rout$
 ^Makefile$
-
+^benchmarks$
+^vignettes/.*\.Rmd\.orig$
+^vignettes/precompute\.R$
+^doc$
+^Meta$

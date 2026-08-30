@@ -1,0 +1,95 @@
+name: Epic / Large Initiative
+description: Create an epic to track a large multi-issue feature or initiative
+title: "[Epic] "
+labels: ["type:epic", "priority:medium"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Epics** are large features or initiatives that span multiple issues and weeks/months of work.
+
+  - type: textarea
+    id: vision
+    attributes:
+      label: Vision & Goals
+      description: What is the big-picture vision for this epic?
+      placeholder: Describe the overall goal and why this matters
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What's included in this epic?
+      placeholder: |
+        High-level features and capabilities this epic will deliver
+    validations:
+      required: true
+
+  - type: textarea
+    id: stories
+    attributes:
+      label: User Stories / Child Issues
+      description: List the main stories or issues that make up this epic
+      placeholder: |
+        - [ ] #123 Story 1
+        - [ ] #124 Story 2
+        - [ ] Create: Story 3 description
+    validations:
+      required: true
+
+  - type: textarea
+    id: success
+    attributes:
+      label: Success Metrics
+      description: How will we measure success?
+      placeholder: |
+        - Metric 1: Target value
+        - Metric 2: Target value
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this epic?
+      options:
+        - Critical - Must have for MVP/release
+        - High - Important for business goals
+        - Medium - Nice to have
+        - Low - Future consideration
+    validations:
+      required: true
+
+  - type: input
+    id: target-date
+    attributes:
+      label: Target Completion
+      description: When do we aim to complete this? (optional)
+      placeholder: "Q1 2025, March 2025, etc."
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies & Risks
+      description: What dependencies or risks should we be aware of?
+      placeholder: |
+        **Dependencies:**
+        - Depends on Epic #456
+
+        **Risks:**
+        - Risk 1
+        - Risk 2
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of Scope
+      description: What is explicitly NOT included in this epic?
+      placeholder: List things that might be confused as part of this epic but aren't
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information, links, or documentation

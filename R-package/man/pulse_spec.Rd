@@ -4,21 +4,45 @@
 \alias{pulse_spec}
 \title{pulse_spec}
 \usage{
-pulse_spec(location_prior_type = c("strauss", "order-statistic"),
-  prior_mass_mean = 3.5, prior_mass_var = 100, prior_width_mean = 42,
-  prior_width_var = 1000, prior_baseline_mean = 2.6,
-  prior_baseline_var = 100, prior_halflife_mean = 45,
-  prior_halflife_var = 100, prior_error_alpha = 1e-04,
-  prior_error_beta = 1e-04, prior_location_gamma = 0,
-  prior_location_range = 40, prior_sd_mass = 5, prior_sd_width = 5,
-  prior_mean_pulse_count = 12, sv_mass_mean = 3.5,
-  sv_width_mean = 42, sv_baseline_mean = 2.6, sv_halflife_mean = 45,
-  sv_error_var = 0.005, sv_mass_sd = 1.6, sv_width_sd = 35,
-  pv_baseline = 0.02, pv_halflife = 1.5, pv_mean_pulse_mass = 6,
-  pv_mean_pulse_width = 3700, pv_indiv_pulse_mass = 1,
-  pv_indiv_pulse_width = 15000, pv_sd_pulse_mass = 4.5,
-  pv_sd_pulse_width = 4000, pv_sdscale_pulse_mass = 4,
-  pv_sdscale_pulse_width = 4, pv_pulse_location = 65)
+pulse_spec(
+  location_prior_type = c("strauss", "order-statistic"),
+  prior_mass_mean = NULL,
+  prior_mass_var = NULL,
+  prior_width_mean = NULL,
+  prior_width_var = NULL,
+  prior_baseline_mean = 2.6,
+  prior_baseline_var = 100,
+  prior_halflife_mean = 45,
+  prior_halflife_var = 100,
+  prior_error_alpha = 1e-04,
+  prior_error_beta = 1e-04,
+  prior_location_gamma = 0,
+  prior_location_range = 40,
+  prior_sd_mass = NULL,
+  prior_sd_width = NULL,
+  prior_mean_pulse_count = 12,
+  sv_mass_mean = NULL,
+  sv_width_mean = NULL,
+  sv_baseline_mean = 2.6,
+  sv_halflife_mean = 45,
+  sv_error_var = 0.005,
+  sv_mass_sd = NULL,
+  sv_width_sd = NULL,
+  pv_baseline = 0.02,
+  pv_halflife = 1.5,
+  pv_mean_pulse_mass = NULL,
+  pv_mean_pulse_width = NULL,
+  pv_indiv_pulse_mass = NULL,
+  pv_indiv_pulse_width = NULL,
+  pv_sd_pulse_mass = NULL,
+  pv_sd_pulse_width = NULL,
+  pv_sdscale_pulse_mass = 4,
+  pv_sdscale_pulse_width = 4,
+  pv_pulse_location = 65,
+  pulse_distribution = c("lognormal", "truncnorm"),
+  sd_prior = c("uniform", "half_cauchy"),
+  student_t_pulses = FALSE
+)
 }
 \arguments{
 \item{location_prior_type}{Takes on two values: "order-statistic" and
@@ -29,13 +53,19 @@ prior parameter for mean pulse count ("prior_mean_pulse_count").
 specification of "prior_mean_pulse_count", "prior_location_gamma", and
 "prior_location_range".}
 
-\item{prior_mass_mean}{mass mean hyperparm}
+\item{prior_mass_mean}{Pulse mass prior mean. Under \code{pulse_distribution =
+"lognormal"} (default) this is the mean of log-mass; under \code{"truncnorm"}
+it is the natural-scale mass mean.}
 
-\item{prior_mass_var}{mass variance hyperparm}
+\item{prior_mass_var}{Pulse mass prior variance (on the same scale as
+\code{prior_mass_mean}).}
 
-\item{prior_width_mean}{width mean hyperparm (on variance scale)}
+\item{prior_width_mean}{Pulse width prior mean. Under \code{"lognormal"}
+(default) this is the mean of log-width; under \code{"truncnorm"} it is the
+natural-scale width mean (on the variance scale).}
 
-\item{prior_width_var}{width variance hyperparm (on variance scale)}
+\item{prior_width_var}{Pulse width prior variance (on the same scale as
+\code{prior_width_mean}).}
 
 \item{prior_baseline_mean}{mean of prior on baseline}
 
@@ -53,9 +83,13 @@ specification of "prior_mean_pulse_count", "prior_location_gamma", and
 
 \item{prior_location_range}{placeholder}
 
-\item{prior_sd_mass}{placeholder}
+\item{prior_sd_mass}{Pulse-to-pulse SD-of-mass prior parameter. Under
+\code{sd_prior = "uniform"} (default) it is the upper bound of the
+Uniform(0, .) prior; under \code{sd_prior = "half_cauchy"} it is the
+half-Cauchy scale. Defaults to 10 (lognormal) or 5 (truncnorm).}
 
-\item{prior_sd_width}{placeholder}
+\item{prior_sd_width}{Pulse-to-pulse SD-of-width prior parameter, interpreted
+like \code{prior_sd_mass}. Defaults to 10 (lognormal) or 5 (truncnorm).}
 
 \item{prior_mean_pulse_count}{placeholder}
 
@@ -94,10 +128,50 @@ specification of "prior_mean_pulse_count", "prior_location_gamma", and
 \item{pv_sdscale_pulse_width}{placeholder}
 
 \item{pv_pulse_location}{placeholder}
+
+\item{pulse_distribution}{Character, one of \code{"lognormal"} (default) or
+\code{"truncnorm"}. \code{"lognormal"} places the pulse mass/width random
+effects on the log scale (\eqn{\log\theta \sim N(\mu, \sigma^2/\kappa)}) --
+the parameterization used by the Mulvahill thesis and Horton et al. (2017).
+\code{"truncnorm"} keeps the legacy natural-scale truncated-normal random
+effects. This choice also selects the paper-aligned (lognormal) vs. the
+legacy natural-scale (truncnorm) numeric defaults for any prior, starting
+value, or proposal variance left unspecified.}
+
+\item{sd_prior}{Character, one of \code{"uniform"} (default) or
+\code{"half_cauchy"}. \code{"uniform"} gives the pulse-to-pulse SDs a
+Uniform(0, max) prior (papers' default); \code{"half_cauchy"} gives them the
+legacy half-Cauchy prior. Controls how \code{prior_sd_mass}/
+\code{prior_sd_width} are interpreted (uniform upper bound vs. Cauchy scale).}
+
+\item{student_t_pulses}{Logical. If \code{TRUE}, pulse mass and width random
+effects follow a Student-t distribution via a per-pulse t-scale
+(\code{tvarscale}, kappa) scale-mixture. If \code{FALSE} (default), the
+t-scale is fixed at 1 for every pulse and never sampled, giving Gaussian
+pulse random effects. Setting this to \code{FALSE} removes the weak
+identifiability ridge between the pulse-to-pulse SD and the per-pulse
+t-scales, which can improve mixing of the SD parameters (notably the SD of
+pulse width) at the cost of no longer accommodating heavy-tailed pulses.}
 }
 \description{
 Generates a pulse_spec object -- the specification object required for
 fitting a fit_pulse model.
 }
+\section{Breaking change (default parameterization)}{
+
+As of this version the out-of-the-box defaults are
+\code{{lognormal, uniform, gaussian}} -- i.e. \code{pulse_distribution =
+"lognormal"}, \code{sd_prior = "uniform"}, \code{student_t_pulses = FALSE} --
+which reproduces the published single-subject (Mulvahill thesis) model.
+Previously the defaults were \code{{truncnorm, half_cauchy, student-t}}. This
+flips fitted results AND changes the meaning of \code{prior_width_mean} /
+\code{sv_width_sd} etc.: under \code{"lognormal"} these live on the LOG scale
+(e.g. mean log-width \eqn{\approx} 3.5), whereas under \code{"truncnorm"} they
+are natural-scale (e.g. width mean 42 on the variance scale). To reproduce the
+exact pre-change behavior, call \code{pulse_spec(pulse_distribution =
+"truncnorm", sd_prior = "half_cauchy", student_t_pulses = TRUE)}. Any numeric
+argument you supply explicitly always overrides the parameterization default.
+}
+
 \keyword{pulse}
 \keyword{simulation}

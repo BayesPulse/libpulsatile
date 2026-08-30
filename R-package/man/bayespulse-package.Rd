@@ -10,3 +10,20 @@ Bayesian deconvolution model for the analysis of time-series of
 pulsatile hormone data. See the help files for the primary functions
 pulse_spec() and fit_pulse().
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/mmulvahill/libpulsatile}
+  \item Report bugs at \url{https://github.com/mmulvahill/libpulsatile/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Matt Mulvahill \email{matt@mulvahill.com}
+
+Authors:
+\itemize{
+  \item Nichole Carlson \email{nichole.carlson@ucdenver.edu} [copyright holder, thesis advisor]
+}
+
+}

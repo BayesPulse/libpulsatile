@@ -4,6 +4,5 @@
 #' pulsatile hormone data. See the help files for the primary functions
 #' pulse_spec() and fit_pulse().
 #'
-#' @docType package
-#' @aliases pulsatile pulsatile-package 
+#' @aliases pulsatile pulsatile-package
 NULL

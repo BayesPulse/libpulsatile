@@ -1,0 +1,192 @@
+name: CI (self-hosted)
+
+# The MaroonBells self-hosted half of the CI split (see ci-hosted.yml).
+#
+# ############################ HARD SECURITY RULE ############################
+# This repo is PUBLIC. No workflow that targets the self-hosted runner may
+# ever have a `pull_request` trigger — fork PR code must never execute on the
+# runner. If you add a trigger here, it must be one only repo writers can
+# fire. The job-level guard below is defense in depth, NOT the control: the
+# trigger list is the control. Keep fork-PR workflow approval at its
+# strictest in Settings -> Actions ("Require approval for all external
+# contributors") as a further layer.
+# NB: workflow_dispatch and release are not risk-free — they let anyone with
+# WRITE access run an arbitrary ref on this runner. That's the trust write
+# access already implies; the rule above is about UNtrusted (fork) code. The
+# runner's blast radius is therefore "any write-access account" — today just
+# the owner (mmulvahill). Revisit this assumption if collaborators are added.
+# ############################################################################
+#
+# The runner is ephemeral (one job per registration, re-registers in ~30s;
+# queued jobs wait, they don't fail) and carries the `cpu-heavy` label.
+# Failure mode to know: there is NO hosted Linux fallback on push — if the
+# runner is offline/unregistered, this job queues indefinitely (the commit
+# shows pending, never green) and the only Linux build signal is this one. This
+# repo has no CMake build — the standalone C++ library builds through the
+# R-aware Makefile and the R package through devtools — so the runner-migration
+# design's "cmake -G Ninja + high parallelism" recipe maps here to make/R with
+# parallelism capped at -j24 and compiles routed through ccache
+# (CCACHE_DIR=/home/runner/.ccache, persistent on the runner VM across
+# ephemeral registrations, so no actions/cache round-trip is needed). That dir
+# lives forever on host disk (unlike a GitHub-GC'd actions/cache); ccache's
+# default 5GB max_size self-evicts, so budget ~5GB there — raise with
+# `ccache -M` on the VM if a warm cache would help larger builds.
+#
+# R, gfortran, and the R package system libs are NOT in the runner's base
+# tool list — the preflight step fails fast with a provisioning message
+# rather than dying mysteriously mid-build if the VM lacks them.
+
+on:
+  push:
+    branches: [ master, develop ]
+  workflow_dispatch: {}
+  release:
+    types: [published]
+
+# Newest push wins; an ephemeral single-slot runner shouldn't burn time
+# finishing a build the next push already obsoleted.
+concurrency:
+  group: ci-selfhosted-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least privilege on a runner with persistent state: this build only reads the
+# repo. Declared explicitly rather than inheriting the repo-default token scope.
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    # Defense in depth (see header): only the canonical repo, never anything
+    # PR-shaped, even if the trigger list above is ever edited carelessly.
+    if: github.repository_owner == 'mmulvahill' && github.event_name != 'pull_request'
+    runs-on: [self-hosted, maroonbells, cpu-heavy]
+    timeout-minutes: 120
+    env:
+      CCACHE_DIR: /home/runner/.ccache
+      # Cap build parallelism on the shared homelab box (~24 threads).
+      MAKEFLAGS: "-j24"
+      # R_LIBS_USER is set in the preflight step (versioned by R major.minor)
+      # and exported to all later steps via $GITHUB_ENV — see there for why.
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Required for symbolic links
+
+    - name: Preflight — verify the runner VM is provisioned
+      run: |
+        # Missing BINARIES are an unambiguous "VM not provisioned" — hard-fail
+        # so the build stops here with an actionable message, not deep inside
+        # devtools::check().
+        # pandoc: vignette re-building inside devtools::check() hard-fails
+        # without it (first hit 2026-08-26 on the hosted runners when the
+        # vignette PR landed), so it is checked here like any other binary.
+        missing=""
+        for tool in R Rscript gfortran make g++ ccache pkg-config pandoc; do
+          command -v "$tool" >/dev/null || missing="$missing $tool"
+        done
+        if [ -n "$missing" ]; then
+          echo "::error::Runner VM is missing:$missing. Provision on the VM (apt-get install r-base-dev gfortran ccache pkg-config pandoc liblapack-dev libblas-dev libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libuv1-dev libtirpc-dev) — self-hosted jobs do not apt-get install per run."
+          exit 1
+        fi
+        # Headers/libs that RcppArmadillo + devtools::check() need. WARN, don't
+        # fail: pkg-config .pc files are not guaranteed even when the lib is
+        # correctly installed (lapack/blas in particular ship no .pc on many
+        # distros), so a hard-fail here could block every push on a false
+        # negative. A real miss still surfaces as a warning + the cryptic build
+        # error it was meant to pre-empt; a genuinely-missing lib is rare on a
+        # once-provisioned VM.
+        # Kept in step with the -dev packages in the provisioning command above
+        # (harfbuzz/fribidi/tiff/jpeg/git2 included so a miss warns rather than
+        # only surfacing as a mid-check compile error). Some .pc names differ
+        # from their apt package (libtiff5-dev -> libtiff-4); a wrong guess just
+        # yields a spurious warning, never a block, since these don't hard-fail.
+        # libtirpc: the standalone C++ library (RInside build) links -ltirpc;
+        # hosted ubuntu images bundle it, the leaner homelab VM did not — this
+        # was the first self-hosted build's failure (2026-07-09, run 29050723925,
+        # "cannot find -ltirpc"), so it's warned here and in the provisioning list.
+        for lib in lapack blas libcurl openssl libxml-2.0 fontconfig freetype2 libpng libuv \
+                   harfbuzz fribidi libtiff-4 libjpeg libgit2 libtirpc; do
+          pkg-config --exists "$lib" 2>/dev/null \
+            || echo "::warning::pkg-config can't find '$lib' — if the build fails in RcppArmadillo/devtools::check(), install its -dev package (this can also be a missing .pc file on an otherwise-fine VM)."
+        done
+        echo "runner: ${RUNNER_NAME:-unknown} on $(hostname)"
+        R --version | head -1
+        ccache --version | head -1
+        # Persistent library, namespaced by R major.minor and exported to all
+        # later steps. Persistence across ephemeral registrations is the speed
+        # win (steady-state runs skip installs); versioning guards the one way
+        # that bites — an in-place R upgrade would otherwise load ABI-stale
+        # compiled packages (RcppArmadillo especially) instead of rebuilding.
+        # A new R version just starts a fresh dir and reinstalls cleanly.
+        rver=$(Rscript -e 'cat(paste0(R.version$major, ".", R.version$minor))')
+        echo "R_LIBS_USER=/home/runner/.r-libs/${rver}" >> "$GITHUB_ENV"
+
+    - name: Route R compiles through ccache
+      run: |
+        mkdir -p "$CCACHE_DIR" ~/.R
+        {
+          echo "CC=ccache $(R CMD config CC)"
+          echo "CXX=ccache $(R CMD config CXX)"
+          echo "CXX11=ccache $(R CMD config CXX11)"
+          echo "CXX14=ccache $(R CMD config CXX14)"
+          echo "CXX17=ccache $(R CMD config CXX17)"
+        } > ~/.R/Makevars
+        ccache -z
+
+    - name: Install R packages (persistent library — installs only what's missing)
+      run: |
+        # Persistent across ephemeral runner registrations, so steady-state
+        # runs skip straight past installation. Consequence to keep in mind:
+        # because deps are installed only when MISSING, this leg verifies
+        # "builds against the currently-installed set", NOT "installs cleanly
+        # from scratch" — a DESCRIPTION change that drops/downgrades a dep isn't
+        # exercised here. The hosted matrix (ci-hosted.yml) does a clean install
+        # on every PR, so that guarantee lives there; don't rely on this leg for
+        # it. remotes::install_deps still picks up NEW/updated deps each run.
+        mkdir -p "$R_LIBS_USER"
+        Rscript -e "
+          .libPaths(Sys.getenv('R_LIBS_USER'))
+          need <- setdiff(c('Rcpp','RcppArmadillo','devtools','testthat','remotes'),
+                          rownames(installed.packages()))
+          if (length(need)) install.packages(need, repos='https://cran.rstudio.com', lib=Sys.getenv('R_LIBS_USER'))
+          remotes::install_deps('R-package', dependencies=TRUE, repos='https://cran.rstudio.com')"
+      shell: bash
+
+    - name: Install RInside (with fallback)
+      run: |
+        Rscript -e "
+        .libPaths(Sys.getenv('R_LIBS_USER'))
+        if (requireNamespace('RInside', quietly=TRUE)) {
+          cat('RInside already installed\n')
+        } else tryCatch({
+          install.packages('RInside', repos='https://cran.rstudio.com', quiet=TRUE)
+          cat('RInside installed from CRAN\n')
+        }, error = function(e) {
+          cat('RInside installation failed, will use NORINSIDE flag\n')
+        })"
+      shell: bash
+
+    - name: Build C++ library and run tests
+      run: |
+        make clean
+        if Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); library(RInside)" 2>/dev/null; then
+          echo "RInside available, building C++ library"
+          make
+          export LD_LIBRARY_PATH="$(R RHOME)/lib:${LD_LIBRARY_PATH:-}"
+          bin/tests
+        else
+          echo "RInside not available, skipping C++ standalone build (R package uses NORINSIDE)"
+        fi
+
+    - name: Build, check, install, and test R package
+      run: |
+        cd R-package
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::document()"
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::check()"
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::install()"
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::test()"
+
+    - name: ccache stats
+      if: always()
+      run: ccache -s || true

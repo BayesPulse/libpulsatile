@@ -1,30 +1,26 @@
 #' Predicted concentration and related functions
-#' 
+#'
 #' Calculates the predicted concentration and specified credible interval. The
 #' plot function plots this predicted concentration with 80% credible intervals
 #' (adjustable by argument) and the true concentration.
-#' 
+#'
 #' @param object A model fit from \code{fit_pulse()} (class "pulse_object").
 #' @param cred_interval Size of the credible interval to calculate.
 #' @param ... further arguments passed to or from other methods.
-#' @importFrom tidyr gather
-#' @importFrom tidyr spread
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
 #' @importFrom tidyr unnest
 #' @importFrom dplyr select
+#' @importFrom dplyr across
+#' @importFrom dplyr all_of
 #' @importFrom rlang sym
-#' @importFrom rlang UQ
 #' @importFrom rlang .data
 #' @importFrom dplyr full_join
 #' @importFrom dplyr %>%
-#' @importFrom dplyr mutate_at
 #' @importFrom dplyr mutate
-#' @importFrom dplyr summarise_at
 #' @importFrom dplyr summarise
 #' @importFrom dplyr group_by
 #' @importFrom dplyr ungroup
-#' @importFrom dplyr funs
-#' @importFrom dplyr vars
-#' @importFrom dplyr %>%
 #' @importFrom dplyr arrange
 #' @importFrom stats quantile
 #' @importFrom stats median
@@ -42,9 +38,9 @@
 #' @export
 predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
 
-  stopifnot(class(object) == "pulse_fit")
+  stopifnot(inherits(object, "pulse_fit"))
 
-  if (class(object$data) == "pulse_sim") {
+  if (inherits(object$data, "pulse_sim")) {
     data <- object$data$data
   } else {
     data <- object$data
@@ -67,26 +63,34 @@ predict.pulse_fit <- function(object, cred_interval = 0.8, ...) {
   fitstart <- sym(as.character(fitstart))
   fitend <- sym(as.character(fitend))
 
-  onechain <- onechain %>% 
-    mutate(time = list(time)) %>% unnest %>%
+  onechain <- onechain %>%
+    mutate(time = list(time)) %>%
+    unnest(cols = c(time)) %>%
     mutate(mean_contrib = calc_mean_contrib(time, .data$location,
                                             .data$halflife, .data$mass,
-                                            .data$width)) 
-  onechain <- 
+                                            .data$width))
+  onechain <-
     onechain %>%
     select(.data$iteration, .data$pulse_num, .data$baseline, .data$model_error,
-           .data$time, .data$mean_contrib) 
+           .data$time, .data$mean_contrib)
 
-  wide <- onechain %>% spread(key = .data$time, value = .data$mean_contrib)
-  long <- wide %>% 
+  wide <- onechain %>%
+    pivot_wider(names_from = .data$time, values_from = .data$mean_contrib)
+
+  # Get numeric column names for the time columns
+  time_cols <- setdiff(names(wide), c("iteration", "pulse_num", "baseline", "model_error"))
+
+  long <- wide %>%
     group_by(.data$iteration, .data$baseline, .data$model_error) %>%
-    summarise_at(vars(UQ(fitstart):UQ(fitend)), funs(sum)) %>% 
-    mutate_at(vars(UQ(fitstart):UQ(fitend)), 
-              funs(add_baseline_error), baseline = quote(baseline), model_error = quote(model_error))
+    summarise(across(all_of(time_cols), sum), .groups = "drop") %>%
+    mutate(across(all_of(time_cols),
+                  ~ add_baseline_error(.x, baseline = .data$baseline,
+                                       model_error = .data$model_error)))
 
-  long <- 
-    long %>% 
-    gather(key = "time", value = "concentration", UQ(fitstart):UQ(fitend)) %>%
+  long <-
+    long %>%
+    pivot_longer(cols = all_of(time_cols), names_to = "time",
+                 values_to = "concentration") %>%
     mutate(time = as.numeric(.data$time))
 
   rtn <- long %>% 
@@ -165,10 +169,7 @@ add_baseline_error <- function(x, baseline, model_error) {
 #'
 #' @param fit a fit_pulse object
 #' @param predicted result of predict.pulse_fit(fit)
-#' @importFrom tidyr gather_
-#' @importFrom dplyr select_vars_
-#' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
+#' @importFrom ggplot2 ggplot aes
 #' @importFrom ggplot2 geom_path
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 xlab
@@ -187,21 +188,20 @@ add_baseline_error <- function(x, baseline, model_error) {
 #'
 #' @export
 bp_predicted <- function(fit, predicted) {
-  
-  if (class(fit$data) == "pulse_sim") {
+
+  if (inherits(fit$data, "pulse_sim")) {
     data <- fit$data$data
   } else {
     data <- fit$data
   }
 
-
   ggplot(data) +
-    aes_string(x = "time", y = "concentration") +
+    aes(x = .data$time, y = .data$concentration) +
     geom_path() +
-    geom_point() + 
-    geom_path(data = predicted, aes_string(y = "mean.conc"), color = "red") +
-    geom_path(data = predicted, aes_string(y = "upper"), color = "red", linetype = "dashed") +
-    geom_path(data = predicted, aes_string(y = "lower"), color = "red", linetype = "dashed") +
+    geom_point() +
+    geom_path(data = predicted, aes(y = .data$mean.conc), color = "red") +
+    geom_path(data = predicted, aes(y = .data$upper), color = "red", linetype = "dashed") +
+    geom_path(data = predicted, aes(y = .data$lower), color = "red", linetype = "dashed") +
     xlab("Time (minutes)") +
     ylab("Concentration (ng/mL)")
 

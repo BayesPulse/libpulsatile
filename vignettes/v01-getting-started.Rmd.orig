@@ -1,0 +1,188 @@
+---
+title: "Getting started: single-subject pulse deconvolution"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started: single-subject pulse deconvolution}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.path = "v01-getting-started-",
+                      fig.width = 7, fig.height = 5, dpi = 96)
+library(bayespulse)
+set.seed(2026)
+```
+
+Many hormones are secreted into the bloodstream in a pulsatile fashion and
+then eliminated exponentially. To characterize features such as baseline
+concentration, half-life, pulse mass, or the number of pulses over a
+period of time, serial blood sampling is performed at regular intervals so
+that hormone levels are measured repeatedly across a long observation window.
+
+bayespulse uses a Bayesian deconvolution model to recover these features from
+an observed series. It jointly estimates the unknown number of pulses together
+with the baseline concentration, the pulse parameters, and the elimination
+rate, reweighting prior physiological knowledge with the information in the
+data.
+
+This vignette walks through a single subject end to end: simulating a hormone
+series, specifying the model, fitting it with birth-death MCMC, and inspecting
+the results.
+
+## 1. The deconvolution model
+
+Let $y(t_j)$ be the observed hormone concentration at time $t_j$ for
+$j = 1, \dots, m$, and let $C(t_j)$ be the true concentration. Because
+concentrations are strictly positive, the model is fit on the log scale, with
+the observed value equal to the log true concentration plus additive error:
+
+$$
+\log[y(t_j)] = \log[C(t_j)] + \epsilon(t_j),
+\qquad \epsilon(t_j) \sim N(0, \sigma^2_\epsilon),
+$$
+
+where $\epsilon(t_j)$ captures technical and biologic variability. The true
+concentration combines a baseline term with the convolution of a secretion
+function and an elimination function:
+
+$$
+C(t_j) = B + \int_{-\infty}^{t_j} S(z; \boldsymbol{\theta}_s)\,
+E(t_j - z; \boldsymbol{\theta}_e)\, dz .
+$$
+
+Pulsatile secretion is modeled as a sum of Gaussian components, one per pulse.
+Assuming $N$ pulses, each with mass $\alpha_k$, width $\omega_k$, and location
+$\tau_k$,
+
+$$
+S(z; \boldsymbol{\theta}_s) = \sum_{k=1}^{N}
+\frac{\alpha_k}{\sqrt{2\pi\omega_k}}\,
+e^{-\frac{1}{2\omega_k}(z - \tau_k)^2} .
+$$
+
+Elimination follows an exponential decay with rate $\lambda$, equivalently a
+half-life $H$:
+
+$$
+E(t_j - z; \boldsymbol{\theta}_e) = e^{-\lambda(t_j - z)}
+= e^{-\frac{\log 2}{H}(t_j - z)} .
+$$
+
+Combining the secretion and elimination functions gives the full model for the
+observed concentration at time $t_j$:
+
+$$
+\log[y(t_j)] = \log\!\left[ B + \int_{-\infty}^{t_j}
+\sum_{k=1}^{N} \frac{\alpha_k}{\sqrt{2\pi\omega_k}}\,
+e^{-\frac{1}{2\omega_k}(z - \tau_k)^2}\, e^{-\lambda(t_j - z)}\, dz \right]
++ \epsilon(t_j),
+$$
+
+where $B$ is the time-constant baseline concentration.
+
+## 2. Simulate a hormone series
+
+`bayespulse` places pulse mass and width on the **log scale** by default, matching
+the parameterization used in the source papers. We ask `simulate_pulse()` for
+data from that same distribution with `pulse_distribution = "lognormal"`, so the
+simulation and the model we fit below agree with one another. (This is worth
+being deliberate about: `simulate_pulse()` defaults to the legacy `"truncnorm"`
+parameterization, while `pulse_spec()` defaults to `"lognormal"`.)
+
+Because the scale is logarithmic, `mass_mean = 0.9` means a *median* pulse mass
+of $e^{0.9} \approx 2.5$. Pulse width is additionally on the **variance** scale,
+so `width_mean = 4.6` is a variance of $e^{4.6} \approx 100$, i.e. a pulse
+standard deviation of about 10 minutes.
+
+```{r simulate}
+simdat <- simulate_pulse(num_obs = 60, interval = 10, error_var = 0.005,
+                         ipi_mean = 12, ipi_var = 10, ipi_min = 4,
+                         pulse_distribution = "lognormal",
+                         mass_mean = 0.9, mass_sd = 0.3,
+                         width_mean = 4.6, width_sd = 0.3,
+                         constant_halflife = 40, constant_baseline = 2.5)
+```
+
+```{r plot-sim}
+plot(simdat)
+```
+
+The plot shows the simulated concentration series over time, with sharp rises
+at pulse locations followed by exponential decay back toward baseline.
+
+## 3. Specify the model
+
+The model specification encodes physiological knowledge through prior
+distributions on each parameter. Here we use a Strauss location prior, which
+discourages pulses from being placed implausibly close together. A full
+treatment of the priors and how to set them is covered in a later vignette.
+
+We only set the arguments that depend on *this* hormone and *this* observation
+window: the elimination half-life, the baseline level, how many pulses we expect
+over the window, and the location prior. Everything governing pulse mass and
+width is left unspecified, so `pulse_spec()` fills in its log-scale defaults --
+these are tuned to the lognormal parameterization and generally mix better than
+hand-picked values.
+
+```{r spec}
+spec <- pulse_spec(
+  location_prior_type    = "strauss",
+  prior_location_gamma   = 0.1,  prior_location_range = 30,
+  prior_halflife_mean    = 38,   prior_halflife_var   = 1000,
+  prior_baseline_mean    = 2.25, prior_baseline_var   = 100,
+  prior_mean_pulse_count = 10,
+  sv_baseline_mean = 2.5, sv_halflife_mean = 42, sv_error_var = 0.005,
+  pv_pulse_location = 5)
+```
+
+## 4. Fit the model
+
+Birth-death MCMC jointly estimates the number of pulses and the
+pulse, baseline, and elimination parameters: a birth-death process proposes
+adding or removing pulses, and conditional on the current pulse count the
+remaining parameters are updated by Metropolis-Hastings. We run a
+production-length chain below. This chunk is precomputed offline (via
+`vignettes/precompute.R`) so the vignette itself builds quickly.
+
+```{r fit}
+fit <- fit_pulse(data = simdat$data, spec = spec,
+                 iters = 250000, thin = 100, burnin = 25000, verbose = FALSE)
+```
+
+## 5. Inspect the results
+
+```{r trace}
+bp_trace(fit)
+```
+
+```{r posteriors}
+bp_posteriors(fit, type = "histogram")
+```
+
+```{r locations}
+bp_location_posterior(fit)
+```
+
+```{r predicted}
+predicted <- predict(fit, cred_interval = 0.8)
+bp_predicted(fit, predicted)
+```
+
+The trace plots show how the sampled parameter values evolve across iterations;
+well-mixed chains that move freely without trends or sticking suggest the
+sampler has converged. The pulse mass and width parameters mix well here; the
+baseline and half-life are slower, which is typical for this model and is taken
+up properly in the convergence vignette. The posterior histograms summarize the
+uncertainty in each estimated parameter. The location posterior shows where along
+the time axis pulses were detected, with peaks at the inferred pulse positions.
+Finally, the predicted plot overlays the fitted concentration curve and its 80%
+credible band on the observed data, giving a visual check of model fit.
+
+Remember that `mass_mean` and `width_mean` are reported on the log scale, so
+compare them against the `0.9` and `4.6` we simulated from rather than against
+natural-scale masses and widths.
+
+Convergence diagnostics in more depth, along with population and joint
+driver-response models, are covered in later vignettes.

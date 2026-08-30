@@ -1,0 +1,97 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        # Track current release (see ci-hosted.yml for the binary-window
+        # rationale); P3M gives Ubuntu prebuilt binaries.
+        r-version: 'release'
+        use-public-rspm: true
+
+    - name: Setup pandoc
+      uses: r-lib/actions/setup-pandoc@v2
+
+    - name: Setup R dependencies
+      run: |
+        sudo apt-get update
+        # libuv1-dev: the 'fs' package (a transitive dependency of
+        # devtools/testthat/covr) now builds against system libuv; without it
+        # fs fails to compile and cascades to every package that depends on it.
+        sudo apt-get install -y gfortran liblapack-dev libblas-dev \
+          libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev \
+          libfontconfig1-dev libharfbuzz-dev libfribidi-dev \
+          libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev \
+          libuv1-dev
+
+    # Cache the R library — same rationale and key scheme as ci-hosted.yml.
+    - name: Locate R library for cache
+      id: rlib
+      run: |
+        mkdir -p "$R_LIBS_USER"
+        echo "path=$R_LIBS_USER" >> "$GITHUB_OUTPUT"
+        echo "rver=$(Rscript --vanilla -e 'cat(as.character(getRversion()))')" >> "$GITHUB_OUTPUT"
+
+    - name: Restore R package library
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.rlib.outputs.path }}
+        key: rlib-coverage-R${{ steps.rlib.outputs.rver }}-${{ hashFiles('R-package/DESCRIPTION') }}
+        restore-keys: |
+          rlib-coverage-R${{ steps.rlib.outputs.rver }}-
+
+    - name: Install R packages
+      run: |
+        # repos deliberately NOT hardcoded: getOption('repos') carries the
+        # P3M/binary repo configured by setup-r's use-public-rspm.
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); install.packages(c('Rcpp', 'RcppArmadillo', 'devtools', 'testthat', 'covr', 'remotes'), lib=Sys.getenv('R_LIBS_USER'))"
+        # Install R package dependencies from DESCRIPTION file
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); remotes::install_deps('R-package', dependencies=TRUE)"
+
+    - name: Install RInside (optional for coverage)
+      # Same conditional-token rationale as ci-hosted.yml: keep the authenticated
+      # API rate limit on trusted runs, but withhold the token on fork PRs (this
+      # workflow also triggers on pull_request). '' only for fork PRs.
+      env:
+        GITHUB_PAT: ${{ github.event.pull_request.head.repo.fork == true && '' || secrets.GITHUB_TOKEN }}
+      run: |
+        # Try to install RInside, but don't fail if it doesn't work
+        Rscript -e "
+        tryCatch({
+          remotes::install_github('eddelbuettel/RInside', upgrade='never', quiet=TRUE)
+          cat('RInside installed\n')
+        }, error = function(e) {
+          cat('RInside installation failed, proceeding without it\n')
+        })"
+
+    - name: Build C++ library (optional)
+      run: |
+        make clean
+        # Try to build C++ library, but don't fail if RInside is missing
+        if Rscript -e "library(RInside)" 2>/dev/null; then
+          echo "Building C++ library"
+          make
+        else
+          echo "Skipping C++ build, focusing on R package coverage"
+        fi
+
+    - name: Generate coverage report
+      run: |
+        cd R-package
+        # Document and build first, then generate coverage
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); devtools::document()"
+        Rscript -e ".libPaths(Sys.getenv('R_LIBS_USER')); covr::codecov()"
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

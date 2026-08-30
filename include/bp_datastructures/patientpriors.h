@@ -98,6 +98,8 @@ struct PatientPriors {
     // Set single-subject only variables to 0
     mass_sd_param           = 0;
     width_sd_param          = 0;
+    mass_sd_max             = 0;
+    width_sd_max            = 0;
     error_alpha             = 0;
     error_beta              = 0;
     num_orderstat           = 0;
@@ -117,6 +119,8 @@ struct PatientPriors {
   // Member variables not used in Population model:
   double mass_sd_param;  //parameter in the Cauchy prior on the pulse-to-pulse sd mass
   double width_sd_param; //parameter in the Cauchy prior on the pulse-to-pulse sd width
+  double mass_sd_max;    //upper bound of Uniform(0, .) prior on the pulse-to-pulse sd mass
+  double width_sd_max;   //upper bound of Uniform(0, .) prior on the pulse-to-pulse sd width
   double error_alpha;
   double error_beta;
   double num_orderstat;
@@ -159,6 +163,12 @@ struct PatientPriors {
     // Single-subject only
     mass_sd_param           = prior_mass_sd_param;
     width_sd_param          = prior_width_sd_param;
+    // Upper bounds of the optional Uniform(0, .) SD prior. Not constructor args
+    // (avoids call-site churn); default to a large finite, non-binding bound. Only
+    // consulted when Patient::uniform_sd_prior is true, in which case the R priors
+    // list overrides these (see singlesubject.cpp; user-exposed in Task 14).
+    mass_sd_max             = 10.0;
+    width_sd_max            = 10.0;
     error_alpha             = prior_error_alpha;
     error_beta              = 1 / prior_error_beta;
     num_orderstat           = pu.orderstat_default();
@@ -170,8 +180,8 @@ struct PatientPriors {
 
 };
 
-// A more appropriate name for the population version
-typedef struct PatientPriors PopulationEstimates;
+// Note: PopulationEstimates is now defined in population.h as a separate struct
+// (not a typedef of PatientPriors)
 
 
 

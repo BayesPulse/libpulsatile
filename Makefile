@@ -57,7 +57,7 @@ SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := -O0 -g -Wall
 LIB := $(LDLIBS)
-INC := -I include -I include/testing $(CPPFLAGS) $(CXXFLAGS) -std=c++11
+INC := -I include -I include/testing $(CPPFLAGS) $(CXXFLAGS) -std=c++14
 
 #	-I include/population -I include/singlesubject -I include/datastructures \
 #	-I include/mcmc  \

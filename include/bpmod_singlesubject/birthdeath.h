@@ -20,9 +20,12 @@ class BirthDeathProcess
 
   public:
     void sample(Patient *patient, bool response_hormone, int iter);
+    // Exposed for unit testing the new-pulse draw (log-normal vs natural-scale
+    // branch). Public access here does not change normal sampling behavior --
+    // sample() drives births internally.
+    void add_new_pulse(Patient *patient, double position);
   private:
     PulseUtils pu;
-    void add_new_pulse(Patient *patient, double position);
     void remove_pulse(Patient *patient, arma::vec death_rates, int pulse_count);
     double calculate_total_deathrate(arma::vec death_rates, double pulse_count);
     double calculate_total_deathrate_original(arma::vec death_rates, double pulse_count);
@@ -44,7 +47,7 @@ class BirthDeathProcess
 //
 // sample()
 //
-void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter) {
+inline void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter) {
 
   Rcpp::RNGScope rng_scope;
 
@@ -194,21 +197,33 @@ void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter
 //-----------------------------------------------------------------------------
 // add_new_pulse()
 //-----------------------------------------------------------------------------
-void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
+inline void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
 
   Rcpp::RNGScope rng_scope;
   double new_mass  = -1.;
   double new_width = -1.;
-  double new_tvarscale_mass  = Rf_rgamma(2, 0.5);
-  double new_tvarscale_width = Rf_rgamma(2, 0.5);
+  // With Gaussian random effects the per-pulse t-scale (kappa) is fixed at 1;
+  // otherwise draw it from the Gamma(2, 0.5) mixing distribution (Student-t).
+  double new_tvarscale_mass  = patient->gaussian_random_effects ? 1.0 : Rf_rgamma(2, 0.5);
+  double new_tvarscale_width = patient->gaussian_random_effects ? 1.0 : Rf_rgamma(2, 0.5);
   double new_t_sd_mass  = patient->estimates.mass_sd / sqrt(new_tvarscale_mass);
   double new_t_sd_width = patient->estimates.width_sd / sqrt(new_tvarscale_width);
 
-  while (new_mass < 0) {
-    new_mass = Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass);
-  }
-  while (new_width < 0) {
-    new_width = Rf_rnorm(patient->estimates.width_mean, new_t_sd_width);
+  if (patient->lognormal_pulses) {
+    // Log-normal parameterization (papers): log(theta) ~ N(mu, sigma^2/kappa).
+    // mass_mean/width_mean are the means of the LOG values; draw on the log scale
+    // and exponentiate. Positivity is automatic, so no reject loop is needed.
+    new_mass  = exp(Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass));
+    new_width = exp(Rf_rnorm(patient->estimates.width_mean, new_t_sd_width));
+  } else {
+    // Natural-scale truncated-normal parameterization (research option): reject
+    // draws until positive.
+    while (new_mass < 0) {
+      new_mass = Rf_rnorm(patient->estimates.mass_mean, new_t_sd_mass);
+    }
+    while (new_width < 0) {
+      new_width = Rf_rnorm(patient->estimates.width_mean, new_t_sd_width);
+    }
   }
 
   // Create new pulse and insert
@@ -228,7 +243,7 @@ void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
 // remove_pulse()
 //   Pick a node to remove, find and remove it
 //-----------------------------------------------------------------------------
-void BirthDeathProcess::remove_pulse(Patient *patient, 
+inline void BirthDeathProcess::remove_pulse(Patient *patient, 
                                      arma::vec death_rates, 
                                      int pulse_count) {
 
@@ -325,7 +340,7 @@ void BirthDeathProcess::remove_pulse(Patient *patient,
 //  calc_death_rates_strauss()
 //    Calculates a vector of death rates, one for each existing pulse.
 //-----------------------------------------------------------------------------
-arma::vec BirthDeathProcess::calc_death_rate_strauss(Patient *patient,
+inline arma::vec BirthDeathProcess::calc_death_rate_strauss(Patient *patient,
                                                      arma::vec partial_likelihood,
                                                      int pulse_count,
                                                      bool response_hormone) {

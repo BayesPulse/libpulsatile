@@ -4,12 +4,25 @@
 \alias{simulate_pulse}
 \title{Simulate pulsatile hormone data}
 \usage{
-simulate_pulse(num_obs = 144, interval = 10, error_var = 0.005,
-  ipi_mean = 12, ipi_var = 40, ipi_min = 4, mass_mean = 3.5,
-  mass_sd = 1.6, width_mean = 35, width_sd = 5,
-  halflife_mean = NULL, halflife_var = NULL, baseline_mean = NULL,
-  baseline_var = NULL, constant_halflife = 45,
-  constant_baseline = 2.6)
+simulate_pulse(
+  num_obs = 144,
+  interval = 10,
+  error_var = 0.005,
+  ipi_mean = 12,
+  ipi_var = 40,
+  ipi_min = 4,
+  mass_mean = NULL,
+  mass_sd = NULL,
+  width_mean = NULL,
+  width_sd = NULL,
+  halflife_mean = NULL,
+  halflife_var = NULL,
+  baseline_mean = NULL,
+  baseline_var = NULL,
+  constant_halflife = 45,
+  constant_baseline = 2.6,
+  pulse_distribution = c("truncnorm", "lognormal")
+)
 }
 \arguments{
 \item{num_obs}{Number of observations to simulate.  Duration of observation
@@ -25,13 +38,19 @@ window equals \code{num_obs} times \code{interval}.}
 
 \item{ipi_min}{Minimum number of units between pulses}
 
-\item{mass_mean}{Mean pulse mass}
+\item{mass_mean}{Mean pulse mass. If \code{NULL} (default) it resolves to the
+parameterization-appropriate default: natural-scale \code{3.5} under
+\code{pulse_distribution = "truncnorm"} or LOG-scale \code{1.2} under
+\code{"lognormal"}.}
 
-\item{mass_sd}{Standard deviation of pulse mass}
+\item{mass_sd}{Standard deviation of pulse mass. If \code{NULL} (default),
+resolves to \code{1.6} (truncnorm) or LOG-scale \code{0.5} (lognormal).}
 
-\item{width_mean}{Mean pulse width (in minutes)}
+\item{width_mean}{Mean pulse width. If \code{NULL} (default), resolves to
+natural-scale \code{35} (truncnorm) or LOG-scale \code{3.0} (lognormal).}
 
-\item{width_sd}{Standard deviation of pulse width (in minutes)}
+\item{width_sd}{Standard deviation of pulse width. If \code{NULL} (default),
+resolves to \code{5} (truncnorm) or LOG-scale \code{0.7} (lognormal).}
 
 \item{halflife_mean}{Mean of half-life (in minutes)}
 
@@ -48,6 +67,20 @@ not used if this is non-null.}
 \item{constant_baseline}{To use a constant (specified) baseline, set this to
 a constant [0,inf). Mean and variance of baseline are not used if this is
 non-null.}
+
+\item{pulse_distribution}{Character, one of \code{"truncnorm"} (default) or
+\code{"lognormal"}, selecting the data-generating distribution for the
+per-pulse mass and width random effects. \code{"truncnorm"} keeps the legacy
+natural-scale truncated Student-t mixture (a Gaussian/gamma scale mixture
+with rejection below the physical floors), in which \code{mass_mean},
+\code{mass_sd}, \code{width_mean} and \code{width_sd} are natural-scale
+parameters. \code{"lognormal"} draws \code{mass = exp(rnorm(1, mass_mean,
+mass_sd))} and \code{width = exp(rnorm(1, width_mean, width_sd))} (Gaussian
+on the log scale, no t-scale mixture and no truncation), so \code{mass_mean},
+\code{mass_sd}, \code{width_mean} and \code{width_sd} are interpreted as
+LOG-scale parameters. Use \code{"lognormal"} to generate data consistent
+with the papers-default (\code{pulse_distribution = "lognormal"}) fit
+produced by \code{\link{pulse_spec}} / \code{\link{population_spec}}.}
 }
 \value{
 A object of class \code{pulse_sim} containing time-series dataset
@@ -58,6 +91,13 @@ A object of class \code{pulse_sim} containing time-series dataset
   representing blood concentration measurements of a pulsatile hormone. Both
   the time series and a dataset of the individual pulse characteristics are
   returned.
+}
+\note{
+This function defaults to \code{pulse_distribution = "truncnorm"},
+  whereas \code{\link{pulse_spec}} defaults to \code{"lognormal"}. Simulating
+  with defaults and fitting with defaults therefore fits a lognormal model to
+  truncnorm-generated data. Pass \code{pulse_distribution = "lognormal"} to
+  match the papers-default fit.
 }
 \examples{
 this_pulse <- simulate_pulse()
