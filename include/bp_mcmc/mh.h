@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include <RcppArmadillo.h>
+#include <bp_mcmc/rngscope.h>
 #ifndef NORINSIDE
 #include <RInside.h>
 #endif
@@ -51,7 +52,7 @@ class ModifiedMetropolisHastings
     //    - pass container (or one level higher in hierarchy) as container
     void sample(T *sampling_unit, SAMPLETYPE *current_val, U *container, int iter) {
 
-      Rcpp::RNGScope rng_scope;
+      BPRNGScope rng_scope;
       double accept_prob, alpha;
 
       // Draw new proposal
@@ -117,7 +118,7 @@ class ModifiedMetropolisHastings
 
     double draw_proposal(double current, double proposal_sd) {
 
-      Rcpp::RNGScope rng_scope;
+      BPRNGScope rng_scope;
       double new_value = 0;
       new_value = Rf_rnorm(current, proposal_sd);
 

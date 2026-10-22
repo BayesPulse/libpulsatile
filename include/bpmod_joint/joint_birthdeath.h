@@ -2,6 +2,7 @@
 #define GUARD_bpmod_joint_birthdeath_h
 
 #include <RcppArmadillo.h>
+#include <bp_mcmc/rngscope.h>
 #ifndef NORINSIDE
 #include <RInside.h>
 #endif
@@ -97,7 +98,7 @@ inline void JointBirthDeathProcess::sample_response(Patient *driver_patient,
                                                     const AssociationEstimates &assoc_est,
                                                     int iter) {
 
-  Rcpp::RNGScope rng_scope;
+  BPRNGScope rng_scope;
 
   int aaa                 = 0;   // Counter for BD iterations
   int max_num_node        = 60;  // Max pulses allowed
@@ -253,7 +254,7 @@ inline void JointBirthDeathProcess::add_new_response_pulse(
     const AssociationEstimates &assoc_est,
     double position) {
 
-  Rcpp::RNGScope rng_scope;
+  BPRNGScope rng_scope;
 
   double new_mass  = -1.;
   double new_width = -1.;

@@ -1,4 +1,5 @@
 #include <RcppArmadillo.h>
+#include <bp_mcmc/rngscope.h>
 // [[Rcpp::depends(RcppArmadillo)]]
 
 #ifndef NORINSIDE
@@ -79,9 +80,9 @@ Rcpp::List jointsinglesubject_(Rcpp::NumericVector driver_concentration,
                                 double bivariate_pv_target_ratio,
                                 double univariate_pv_target_ratio) {
 
-  // Note: no RNGScope here -- RcppExports.cpp already opens one around this
-  // .Call, so an inner scope would be a reference-counted no-op. set.seed()
-  // reproducibility is handled by that outer scope.
+  // Sync the R RNG state once for the whole run; the samplers' nested
+  // BPRNGScopes are then free (see bp_mcmc/rngscope.h).
+  BPRNGScope rng_scope;
 
   //
   // Initialize driver hormone patient

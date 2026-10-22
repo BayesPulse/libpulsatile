@@ -1,4 +1,5 @@
 #include <RcppArmadillo.h>
+#include <bp_mcmc/rngscope.h>
 #include <Rcpp.h>
 #include <bpmod_population/pop_mcmc_iteration.h>
 #include <bp_datastructures/population.h>
@@ -39,9 +40,9 @@ Rcpp::List population_(Rcpp::List subject_data_list,
                        double univariate_pv_target_ratio)
 {
 
-  // Note: no RNGScope here -- RcppExports.cpp already opens one around this
-  // .Call, so an inner scope would be a reference-counted no-op. set.seed()
-  // reproducibility is handled by that outer scope.
+  // Sync the R RNG state once for the whole run; the samplers' nested
+  // BPRNGScopes are then free (see bp_mcmc/rngscope.h).
+  BPRNGScope rng_scope;
 
   // Every nth iteration for printing verbose screen output
   int verbose_iter = 5000;

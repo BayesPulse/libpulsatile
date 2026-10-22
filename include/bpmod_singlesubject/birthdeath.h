@@ -2,6 +2,7 @@
 #define GUARD_bpmod_singlesubject_birthdeath_h
 
 #include <RcppArmadillo.h>
+#include <bp_mcmc/rngscope.h>
 #ifndef NORINSIDE
 #include <RInside.h>
 #endif
@@ -49,7 +50,7 @@ class BirthDeathProcess
 //
 inline void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter) {
 
-  Rcpp::RNGScope rng_scope;
+  BPRNGScope rng_scope;
 
   int aaa                 = 0;   // Counter for # BD iterations
   int max_num_node        = 60;  // Max number of pulses allowed before forced death (hardcoded parm)
@@ -199,7 +200,7 @@ inline void BirthDeathProcess::sample(Patient *patient, bool response_hormone, i
 //-----------------------------------------------------------------------------
 inline void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
 
-  Rcpp::RNGScope rng_scope;
+  BPRNGScope rng_scope;
   double new_mass  = -1.;
   double new_width = -1.;
   // With Gaussian random effects the per-pulse t-scale (kappa) is fixed at 1;

@@ -1,4 +1,5 @@
 #include <RcppArmadillo.h>
+#include <bp_mcmc/rngscope.h>
 #include <Rcpp.h>
 #include <bpmod_singlesubject/bpmod_singlesubject.h>
 #include <iostream>
@@ -37,12 +38,10 @@ Rcpp::List singlesubject_(Rcpp::NumericVector concentration,
                           double univariate_pv_target_ratio)
 {
 
-  // RNGScope for the standalone RInside build (bin/tests / main), which calls
-  // this function directly with no Rcpp .Call wrapper to open one. On the R
-  // package path RcppExports.cpp already opens an outer RNGScope, so this inner
-  // one is a reference-counted no-op there; it is kept solely for the standalone
-  // build's set.seed() reproducibility.
-  Rcpp::RNGScope rng_scope;
+  // Sync the R RNG state once for the whole run (also needed by the standalone
+  // RInside build, which calls this directly without an Rcpp .Call wrapper).
+  // The samplers' nested BPRNGScopes are then free (see bp_mcmc/rngscope.h).
+  BPRNGScope rng_scope;
 
   // every nth iteration for printing verbose screen output
   int verbose_iter = 5000;

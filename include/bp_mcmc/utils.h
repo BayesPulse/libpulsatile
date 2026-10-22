@@ -2,6 +2,7 @@
 #define GUARD_bp_mcmc_utils_h
 
 #include <RcppArmadillo.h>
+#include <bp_mcmc/rngscope.h>
 #ifndef NORINSIDE
 #include <RInside.h>
 #endif
@@ -56,7 +57,7 @@ class PulseUtils {
     //
     int one_rmultinom(arma::vec probs) {
 
-      Rcpp::RNGScope rng_scope;
+      BPRNGScope rng_scope;
       //int i;
       int rtn = 0;
       int n_probs = probs.size();
