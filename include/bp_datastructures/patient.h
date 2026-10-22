@@ -99,7 +99,7 @@ struct Patient {
     PulseEstimates firstpulse(in_data.fitstart,
                               1, 1, 1, 1,
                               in_parms.get_decay(), 
-                              in_data.concentration);
+                              in_data.time);
     pulses.push_back(firstpulse);
 
   }
