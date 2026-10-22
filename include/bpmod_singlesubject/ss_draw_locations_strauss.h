@@ -51,9 +51,6 @@ class SS_DrawLocationsStrauss : public SS_DrawLocations
       double acceptance_ratio = 0;
       double prior_ratio = 0;
       // Extracted variables
-      arma::vec curr_mean_contrib =
-        pulseiter->get_mean_contribution(patient->data.time,
-                                     patient->estimates.get_decay());
       double curr_likelihood = patient->likelihood(false); // would prefer get_likelihood()
       double plikelihood = 0;
       double gamma = patient->priors.strauss_repulsion;

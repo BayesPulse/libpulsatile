@@ -133,6 +133,14 @@ inline void JointBirthDeathProcess::sample_response(Patient *driver_patient,
     birth_rate = total_birth_rate / (fitend - fitstart);
   }
 
+  // Recompute the running sum of pulse contributions from scratch once per
+  // iteration so incremental updates cannot accumulate rounding drift
+  response_patient->rebuild_pulse_sum();
+
+  arma::vec death_rates;          // Death probabilities for each pulse
+  double total_death_rate = 0.0;  // Sum of death rates
+  bool state_changed      = true; // Pulses changed since rates were computed
+
   // Birth-death loop
   do {
 
@@ -140,50 +148,58 @@ inline void JointBirthDeathProcess::sample_response(Patient *driver_patient,
 
     // Calculate death rates
     pulse_count = response_patient->get_pulsecount();
-    // NOTE: Use false (not true) because response patient stores data in patient.data.concentration
-    // and pulses in patient.pulses (not patient.responses). The response_hormone=true mode is for
-    // single-patient models where both driver and response are in one Patient object.
-    arma::vec partial_likelihood = response_patient->get_partial_likelihood(false);
+    // The death rates depend only on the current pulses and parameters, so
+    // they are reused when the previous pass changed nothing (a rejected
+    // birth).
+    if (state_changed) {
 
-    arma::vec death_rates(pulse_count);
-    if (strauss == 1 && pulse_count > 1) {
-      death_rates = partial_likelihood - response_patient->likelihood(false);
-    } else if (pulse_count == 1) {
-      death_rates(0) = -1e300;
-    } else if (pulse_count == 0) {
-      death_rates.reset();
-    }
+      // NOTE: Use false (not true) because response patient stores data in patient.data.concentration
+      // and pulses in patient.pulses (not patient.responses). The response_hormone=true mode is for
+      // single-patient models where both driver and response are in one Patient object.
+      arma::vec partial_likelihood = response_patient->get_partial_likelihood(false);
 
-    // Calculate total death rate with numerical stability
-    double total_death_rate = 0.0;
-    double max = 0.0;
-
-    if (death_rates.size() != 0) {
-
-      total_death_rate = death_rates(0);
-
-      for (int i = 1; i < pulse_count; i++) {
-        max = (total_death_rate > death_rates(i)) ? total_death_rate : death_rates(i);
-        total_death_rate = log(exp(total_death_rate - max) + exp(death_rates(i) - max)) + max;
+      death_rates.set_size(pulse_count);
+      if (strauss == 1 && pulse_count > 1) {
+        death_rates = partial_likelihood - response_patient->likelihood(false);
+      } else if (pulse_count == 1) {
+        death_rates(0) = -1e300;
+      } else if (pulse_count == 0) {
+        death_rates.reset();
       }
 
-      for (int i = 0; i < pulse_count; i++) {
-        death_rates(i) -= total_death_rate;
-        death_rates(i) = exp(death_rates(i));
-      }
+      // Calculate total death rate with numerical stability
+      total_death_rate = 0.0;
+      double max = 0.0;
 
-      if (total_death_rate > 500) {
-        total_death_rate = 1e300;
+      if (death_rates.size() != 0) {
+
+        total_death_rate = death_rates(0);
+
+        for (int i = 1; i < pulse_count; i++) {
+          max = (total_death_rate > death_rates(i)) ? total_death_rate : death_rates(i);
+          total_death_rate = log(exp(total_death_rate - max) + exp(death_rates(i) - max)) + max;
+        }
+
+        for (int i = 0; i < pulse_count; i++) {
+          death_rates(i) -= total_death_rate;
+          death_rates(i) = exp(death_rates(i));
+        }
+
+        if (total_death_rate > 500) {
+          total_death_rate = 1e300;
+        } else {
+          total_death_rate = exp(total_death_rate);
+        }
+
       } else {
-        total_death_rate = exp(total_death_rate);
+        total_death_rate = 0;
       }
 
-    } else {
-      total_death_rate = 0;
-    }
+      if (pulse_count <= 1) {
+        total_death_rate = 0;
+      }
 
-    if (pulse_count <= 1) {
-      total_death_rate = 0;
+      state_changed = false;
     }
 
     // Update virtual time
@@ -233,10 +249,12 @@ inline void JointBirthDeathProcess::sample_response(Patient *driver_patient,
 
       if (accept_pos == 1) {
         add_new_response_pulse(driver_patient, response_patient, assoc_est, position);
+        state_changed = true;
       }
 
     } else {
       remove_pulse(response_patient, death_rates, pulse_count);
+      state_changed = true;
     }
 
   } while (true);
