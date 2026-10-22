@@ -173,6 +173,22 @@ This comprehensive check typically takes 2-5 minutes but saves 30+ minutes of CI
 - Use `pryr::mem_used()` for memory profiling
 - Document benchmark results in markdown reports
 - Track performance metrics over time for regression detection
+- **Sampler performance changes must not change the chains.** Install the
+  reference (e.g. master) and the candidate into separate libraries and run
+  `Rscript R-package/benchmarks/sampler_equivalence.R <lib_ref> <lib_new>`:
+  it times seeded single-subject, population, and joint fits and reports the
+  max relative difference between the two builds' chains, which should be at
+  rounding level (~1e-16). See `sampler_performance_report.md`.
+- **Likelihood fast path:** `Patient::likelihood(false)` and
+  `get_partial_likelihood(false)` use a running sum of pulse contributions;
+  `likelihood_reference()` / `likelihood(false, pulse_iter)` keep the original
+  full recomputation. Building with `-DBP_VERIFY_LIKELIHOOD` (e.g.
+  `CXX14FLAGS += -DBP_VERIFY_LIKELIHOOD` in a file passed via
+  `R_MAKEVARS_USER`) checks every fast-path value against the reference and
+  stops on a mismatch.
+- **RNG scopes:** use `BPRNGScope` (`bp_mcmc/rngscope.h`), not
+  `Rcpp::RNGScope`, in sampler code. Nested `Rcpp::RNGScope`s re-sync the R RNG
+  state on every draw, which is slow and replays any draw made between scopes.
 
 ## CI/CD Pipeline
 

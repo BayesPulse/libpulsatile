@@ -123,9 +123,11 @@ plot_acf(fit)
 
 ## Performance
 
-Runtime scales roughly linearly in iterations and observations. Measured
-on Apple Silicon (2026-08), at the production defaults of 250,000
-iterations:
+Runtime is linear in iterations. In series length it grows faster than
+linearly, because the number of pulses grows with the length of the series
+and each likelihood evaluation touches every observation. Measured on Apple
+Silicon (2026-08), at the production defaults of 250,000 iterations, before
+the running-sum likelihood:
 
 - **Single subject** (60 observations): under a minute
 - **Population, 5 subjects** (720 total observations): ~11 minutes
@@ -133,6 +135,9 @@ iterations:
 
 These figures come from the timed vignette precompute runs recorded in
 PRs #30 (population), #32 (joint), and #33 (single-subject replicates).
+The running-sum likelihood has since made fits 3-15x faster (more for
+longer series) with unchanged chains; see
+[sampler_performance_report.md](R-package/benchmarks/sampler_performance_report.md).
 Benchmark scripts live in [R-package/benchmarks/](R-package/benchmarks/);
 the simulation-study vignette (`v07`) shows how to time and scale fits for
 your own design.

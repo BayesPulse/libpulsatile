@@ -2,6 +2,7 @@
 #define GUARD_bpmod_singlesubject_birthdeath_h
 
 #include <RcppArmadillo.h>
+#include <bp_mcmc/rngscope.h>
 #ifndef NORINSIDE
 #include <RInside.h>
 #endif
@@ -49,7 +50,7 @@ class BirthDeathProcess
 //
 inline void BirthDeathProcess::sample(Patient *patient, bool response_hormone, int iter) {
 
-  Rcpp::RNGScope rng_scope;
+  BPRNGScope rng_scope;
 
   int aaa                 = 0;   // Counter for # BD iterations
   int max_num_node        = 60;  // Max number of pulses allowed before forced death (hardcoded parm)
@@ -73,70 +74,87 @@ inline void BirthDeathProcess::sample(Patient *patient, bool response_hormone, i
   }
 
 
+  // Recompute the running sum of pulse contributions from scratch once per
+  // iteration so incremental updates cannot accumulate rounding drift
+  if (!response_hormone) patient->rebuild_pulse_sum();
+
+  arma::vec death_rates;         // Death probabilities for each pulse
+  double total_death_rate = 0.0; // Sum of death rates
+  bool state_changed      = true; // Pulses changed since rates were computed
+
   // Start Birth-death loop Run until break reached
   do {
 
     aaa++; // iters counter
 
-    // 2. Calculate death rate for each component conditional on Strauss or order
-    //    statistic -- using pulse count and partial likelihoods
+    // Steps 2-4 depend only on the current pulses and parameters, so they are
+    // skipped when the previous pass changed nothing (a birth rejected by the
+    // Strauss prior); the cached death rates are then exactly what would be
+    // recomputed.
     pulse_count = patient->get_pulsecount();
-    arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);;
+    if (state_changed) {
+
+      // 2. Calculate death rate for each component conditional on Strauss or order
+      //    statistic -- using pulse count and partial likelihoods
+      arma::vec partial_likelihood = patient->get_partial_likelihood(response_hormone);;
 
 
-    // 3. Calculate individual death rate for each pulse
-    arma::vec death_rates(pulse_count);
-    if (strauss == 1) {
-      death_rates = calc_death_rate_strauss(patient, partial_likelihood,
-                                           pulse_count, response_hormone);
-    } //else {
-    //  death_rates = calc_death_rate_os(list, pulse_count, partial_likelihood,
-    //                                  full_likelihood, total_birth_rate, 
-    //                                  patient->priors->pulse_count, priors->orderstat);
-    //}
-
-
-    // 4. Calculate Total death rate and convert death_rates to probabilities
-    // (or cumulative probabilities)
-    // can't do in separate functions/steps due to precision issues (need
-    // full precision of total death rate to get probbilits to sum to 1.
-    //total_death_rate = calculate_total_deathrate(death_rates, pulse_count);
-    //total_death_rate = calculate_total_deathrate_original(death_rates, pulse_count);
-    double total_death_rate = 0.0;
-    double max = 0.0;
-
-    if (death_rates.size() != 0) {
-
-      total_death_rate = death_rates(0);
-
-      for (int i = 1; i < pulse_count; i++) {
-        max        = (total_death_rate > death_rates(i)) ? total_death_rate : death_rates(i);
-        total_death_rate = log(exp(total_death_rate - max) + exp(death_rates(i) - max)) + max;
-      }
-
-      for (int i = 0; i < pulse_count; i++) {
-        death_rates(i) -= total_death_rate;
-        death_rates(i)  = exp(death_rates(i));
-      }
-
-      // Convert probabilities to cumulative probabilities -- not necessary
-      // anymore for one_rmultinom()
-      //for (int i = 1; i < pulse_count; i++) {
-      //  death_rates(i) += death_rates(i-1);
+      // 3. Calculate individual death rate for each pulse
+      death_rates.set_size(pulse_count);
+      if (strauss == 1) {
+        death_rates = calc_death_rate_strauss(patient, partial_likelihood,
+                                             pulse_count, response_hormone);
+      } //else {
+      //  death_rates = calc_death_rate_os(list, pulse_count, partial_likelihood,
+      //                                  full_likelihood, total_birth_rate, 
+      //                                  patient->priors->pulse_count, priors->orderstat);
       //}
 
-      if (total_death_rate > 500 ) {
-        total_death_rate = 1e300;
-      } else {
-        total_death_rate = exp(total_death_rate); 
+
+      // 4. Calculate Total death rate and convert death_rates to probabilities
+      // (or cumulative probabilities)
+      // can't do in separate functions/steps due to precision issues (need
+      // full precision of total death rate to get probbilits to sum to 1.
+      //total_death_rate = calculate_total_deathrate(death_rates, pulse_count);
+      //total_death_rate = calculate_total_deathrate_original(death_rates, pulse_count);
+      total_death_rate = 0.0;
+      double max = 0.0;
+
+      if (death_rates.size() != 0) {
+
+        total_death_rate = death_rates(0);
+
+        for (int i = 1; i < pulse_count; i++) {
+          max        = (total_death_rate > death_rates(i)) ? total_death_rate : death_rates(i);
+          total_death_rate = log(exp(total_death_rate - max) + exp(death_rates(i) - max)) + max;
+        }
+
+        for (int i = 0; i < pulse_count; i++) {
+          death_rates(i) -= total_death_rate;
+          death_rates(i)  = exp(death_rates(i));
+        }
+
+        // Convert probabilities to cumulative probabilities -- not necessary
+        // anymore for one_rmultinom()
+        //for (int i = 1; i < pulse_count; i++) {
+        //  death_rates(i) += death_rates(i-1);
+        //}
+
+        if (total_death_rate > 500 ) {
+          total_death_rate = 1e300;
+        } else {
+          total_death_rate = exp(total_death_rate); 
+        }
+
+      } else { 
+        total_death_rate = 0; 
       }
 
-    } else { 
-      total_death_rate = 0; 
-    }
+      if (pulse_count <= 1) { 
+        total_death_rate = 0; 
+      }
 
-    if (pulse_count <= 1) { 
-      total_death_rate = 0; 
+      state_changed = false;
     }
 
 
@@ -179,11 +197,15 @@ inline void BirthDeathProcess::sample(Patient *patient, bool response_hormone, i
       }
 
       // If it's a valid position, generate initial parms and insert node
-      if (accept_pos == 1) add_new_pulse(patient, position);
+      if (accept_pos == 1) {
+        add_new_pulse(patient, position);
+        state_changed = true;
+      }
 
     } else { 
       // Choose and remove a pulse
       remove_pulse(patient, death_rates, pulse_count);
+      state_changed = true;
     }
 
   } while (true);
@@ -199,7 +221,7 @@ inline void BirthDeathProcess::sample(Patient *patient, bool response_hormone, i
 //-----------------------------------------------------------------------------
 inline void BirthDeathProcess::add_new_pulse(Patient *patient, double position) {
 
-  Rcpp::RNGScope rng_scope;
+  BPRNGScope rng_scope;
   double new_mass  = -1.;
   double new_width = -1.;
   // With Gaussian random effects the per-pulse t-scale (kappa) is fixed at 1;

@@ -38,7 +38,9 @@ variances to use.}
 sample).}
 
 \item{burnin}{Burn-in to apply to MCMC chains (i.e. remove first 'burnin'
-samples). Applied prior to thinning.}
+samples). Applied prior to thinning. A warning is issued if
+\code{burnin} is less than 25000, the iteration at which proposal
+variance adaptation stops.}
 
 \item{use_tibble}{Return chains as tbl_df class data frames, from the tibble
 package.  Mostly used for the print.tbl_df method, which limits the rows and
