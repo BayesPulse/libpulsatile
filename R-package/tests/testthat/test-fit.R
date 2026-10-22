@@ -70,3 +70,34 @@ test_that("default (lognormal) single-subject fit runs end-to-end on log-normal 
   expect_gt(width_sd_hat, 0.1)
   expect_lt(width_sd_hat, 3.0)
 })
+
+
+test_that("burnin shorter than proposal-variance adaptation triggers a warning", {
+  old <- options(bayespulse.warn_burnin_adaptation = TRUE)
+  on.exit(options(old))
+
+  expect_warning(check_burnin_adaptation(24999, 25000),
+                 "less than pv_adjust_max_iter")
+  expect_warning(check_burnin_adaptation(25000, 25000), NA)
+  expect_warning(check_burnin_adaptation(30000, 25000), NA)
+
+  # The option silences it
+  options(bayespulse.warn_burnin_adaptation = FALSE)
+  expect_warning(check_burnin_adaptation(100, 25000), NA)
+})
+
+
+test_that("fit_pulse warns when burnin < pv_adjust_max_iter", {
+  skip_on_cran()
+  old <- options(bayespulse.warn_burnin_adaptation = TRUE)
+  on.exit(options(old))
+
+  set.seed(99)
+  dat <- data.frame(time = seq(0, 1440, length.out = 24),
+                    concentration = abs(rnorm(24, mean = 3, sd = 1)))
+  expect_warning(
+    fit_pulse(data = dat, spec = pulse_spec(), iters = 200, thin = 10,
+              burnin = 100, verbose = FALSE),
+    "less than pv_adjust_max_iter"
+  )
+})

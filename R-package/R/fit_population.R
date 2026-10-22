@@ -26,6 +26,8 @@
 #' @param iters Number of MCMC iterations (default: 250000).
 #' @param thin Thinning interval - save every \code{thin}th sample (default: 50).
 #' @param burnin Number of initial samples to discard as burn-in (default: 0.1 * iters).
+#'   A warning is issued if \code{burnin} is less than 25000, the iteration
+#'   at which proposal variance adaptation stops.
 #' @param use_tibble Return chains as tibble data frames for prettier printing
 #'   (default: TRUE). Requires tibble package.
 #' @param verbose Print diagnostic output every 5000 iterations including
@@ -211,6 +213,7 @@ fit_pulse_population <- function(data,
   pv_adjust_max_iter <- 25000
   univariate_pv_target_ratio <- 0.35
   bivariate_pv_target_ratio <- 0.25
+  check_burnin_adaptation(burnin, pv_adjust_max_iter)
   
   # Prepare inputs for C++ function
   population_priors <- structure(

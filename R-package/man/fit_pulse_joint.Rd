@@ -46,7 +46,9 @@ variances to use for both hormones and their coupling.}
 
 \item{thin}{Thinning interval - save every \code{thin}th sample (default: 50).}
 
-\item{burnin}{Number of initial samples to discard as burn-in (default: 0.1 * iters).}
+\item{burnin}{Number of initial samples to discard as burn-in (default: 0.1 * iters).
+A warning is issued if \code{burnin} is less than 25000, the iteration
+at which proposal variance adaptation stops.}
 
 \item{use_tibble}{Return chains as tibble data frames for prettier printing
 (default: TRUE). Requires tibble package.}

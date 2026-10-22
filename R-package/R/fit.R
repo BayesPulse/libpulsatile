@@ -22,7 +22,9 @@
 #' @param thin Thinning to apply to MCMC chains (i.e. Keep every 'thin'th
 #'   sample).
 #' @param burnin Burn-in to apply to MCMC chains (i.e. remove first 'burnin'
-#'  samples). Applied prior to thinning.
+#'  samples). Applied prior to thinning. A warning is issued if
+#'  \code{burnin} is less than 25000, the iteration at which proposal
+#'  variance adaptation stops.
 #' @param use_tibble Return chains as tbl_df class data frames, from the tibble
 #'   package.  Mostly used for the print.tbl_df method, which limits the rows and
 #'   columns printed to those which fit in the console.
@@ -72,6 +74,7 @@ fit_pulse <- function(data,
   pv_adjust_max_iter <- 25000
   univariate_pv_target_ratio <- 0.35
   bivariate_pv_target_ratio  <- 0.25
+  check_burnin_adaptation(burnin, pv_adjust_max_iter)
   # priors class type -- Definitely in pulse_spec
   priors            <- lapply(spec$priors, function(x) ifelse(is.null(x), NA, x))
   proposalvariances <- lapply(spec$proposal_variances, function(x) ifelse(is.null(x), NA, x))
